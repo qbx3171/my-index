@@ -58,8 +58,11 @@
             .nav-links.show { display:flex; }
         }
         .user-area { flex-shrink:0; margin-left:auto; }
-        .auth-btn { background:var(--primary); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-full); font-weight:600; font-size:var(--font-sm); cursor:pointer; display:flex; align-items:center; gap:7px; box-shadow:0 2px 10px rgba(79,110,246,0.15); }
+        .auth-btn { background:linear-gradient(135deg, #4f6ef6, #3b54d4); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-full); font-weight:600; font-size:var(--font-sm); cursor:pointer; display:flex; align-items:center; gap:7px; box-shadow:0 2px 10px rgba(79,110,246,0.15); transition:0.2s; }
+        .auth-btn:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(79,110,246,0.3); }
         .user-name-btn { background:var(--surface); padding:9px 18px; border-radius:var(--radius-full); display:flex; align-items:center; gap:7px; cursor:pointer; border:1px solid var(--border); font-weight:500; font-size:var(--font-sm); }
+        .download-badge { background:#f59e0b; color:#fff; padding:2px 8px; border-radius:20px; font-size:0.6rem; margin-left:8px; }
+        .vip-badge { background:linear-gradient(135deg,#d4af37,#f5b041); color:#fff; padding:2px 8px; border-radius:20px; font-size:0.6rem; margin-left:8px; }
         .dropdown-content { display:none; position:absolute; right:0; top:48px; background:var(--surface); border-radius:var(--radius-lg); box-shadow:0 20px 40px rgba(0,0,0,0.1); padding:6px; min-width:140px; z-index:200; border:1px solid var(--border); }
         .dropdown-content.show { display:block; }
         .dropdown-content button { display:block; width:100%; padding:10px 14px; background:transparent; border:none; text-align:left; border-radius:var(--radius-sm); cursor:pointer; font-size:var(--font-sm); color:var(--text); }
@@ -152,6 +155,112 @@
         @media (max-width:640px) {
             .calendar-day { width:24px; height:24px; font-size:0.55rem; }
         }
+
+        /* 管理后台美化样式 */
+        .admin-user-card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .admin-user-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 2;
+            min-width: 180px;
+        }
+        .admin-user-avatar {
+            width: 44px;
+            height: 44px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        .admin-user-details {
+            flex: 1;
+        }
+        .admin-user-email {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+            word-break: break-all;
+        }
+        .admin-user-name {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .admin-user-role {
+            background: var(--bg);
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .admin-user-role.vip {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .admin-user-role.admin {
+            background: #eef2ff;
+            color: #4f6ef6;
+        }
+        .admin-action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 18px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .admin-action-btn:hover {
+            transform: translateY(-2px);
+            background: var(--primary-hover);
+            box-shadow: 0 4px 10px rgba(79,110,246,0.3);
+        }
+        .admin-action-btn:active {
+            transform: translateY(1px);
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .admin-loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 <body>
@@ -212,7 +321,7 @@
         </div>
     </div>
 
-    <!-- 模态框（保留完整内部结构） -->
+    <!-- 模态框（登录/注册/忘记密码） -->
     <div id="authModal" class="modal-overlay">
         <div class="modal-card" style="max-width:440px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
@@ -229,6 +338,7 @@
                 <input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
                 <input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
                 <input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
+                <input type="text" id="regInviteCode" placeholder="邀请码（选填）" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
                 <div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div>
                 <button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">注册</button>
             </div>
@@ -242,6 +352,34 @@
             </div>
         </div>
     </div>
+
+    <!-- 个人中心模态框 -->
+    <div id="profileModal" class="modal-overlay">
+        <div class="modal-card" style="max-width:440px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span style="font-weight:700;">个人中心</span><button id="closeProfileModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
+            <div><strong>用户名：</strong> <span id="profileUsername"></span></div>
+            <div><strong>会员等级：</strong> <span id="profileRole"></span></div>
+            <div><strong>本月剩余下载：</strong> <span id="profileRemaining"></span> 次</div>
+            <div><strong>我的邀请码：</strong><div class="invite-code-box" style="background:#f0f4fe;border:1px solid var(--primary);border-radius:12px;padding:12px;text-align:center;font-weight:600;margin:8px 0;" id="myInviteCode"></div><div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">邀请好友注册，双方各得5次下载机会</div></div>
+            <div style="margin-top:16px;"><strong>修改密码（选填）</strong></div>
+            <input type="password" id="profileNewPwd" placeholder="新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;">
+            <input type="password" id="profileConfirmPwd" placeholder="确认新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;">
+            <button id="saveProfileBtn" style="width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:30px;">保存修改</button>
+        </div>
+    </div>
+
+    <!-- 管理后台模态框（美化版） -->
+    <div id="adminModal" class="modal-overlay">
+        <div class="modal-card" style="max-width:800px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:20px;align-items:center;">
+                <h3 style="font-weight:700;"><i class="fas fa-users"></i> 用户管理</h3>
+                <button id="closeAdminModal" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">&times;</button>
+            </div>
+            <div id="adminUserList" style="max-height:65vh;overflow-y:auto;padding-right:4px;"></div>
+        </div>
+    </div>
+
+    <!-- 文章管理模态框 -->
     <div id="articleManageModal" class="modal-overlay">
         <div class="modal-card" style="max-width:700px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-weight:700;">文章管理</h3><button id="closeArticleModal" style="background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
@@ -261,6 +399,7 @@
             </div>
         </div>
     </div>
+
     <div id="articleDetailModal" class="modal-overlay">
         <div class="modal-card" style="max-width:600px;">
             <button id="closeDetailModal" style="float:right; background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button>
@@ -270,185 +409,1011 @@
             <div id="articleDetailMeta" style="margin-top:12px; font-size:0.7rem; color:var(--text-muted);"></div>
         </div>
     </div>
+
     <div id="pluginModal" class="modal-overlay"><div class="modal-card" style="max-width:500px;"><button id="closePluginModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>插件商店</h2><div id="pluginListContainer"></div></div></div>
     <div id="payModal" class="modal-overlay"><div class="modal-card" style="max-width:400px;text-align:center;"><button id="closePayModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>购买插件</h2><p id="payPluginName"></p><div style="display:flex;gap:8px;justify-content:center;margin:14px 0;"><button class="pay-tab active" data-method="wechat" style="padding:8px 18px;border-radius:20px;background:var(--primary);color:#fff;border:none;">微信</button><button class="pay-tab" data-method="alipay" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);color:var(--text);">支付宝</button></div><img id="payQrImage" style="width:180px;height:180px;margin:10px auto;display:block;border-radius:12px;"><p style="font-weight:bold;">¥30.00</p><p>客服微信：Win_Mac_123</p></div></div>
+
     <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
 
     <script>
-        (function(){const c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');let w,h,m={x:-1e3,y:-1e3},p=[];function r(){w=innerWidth;h=innerHeight;c.width=w;c.height=h}window.addEventListener('resize',r);r();document.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY});document.addEventListener('mouseleave',()=>{m.x=-1e3;m.y=-1e3});class P{constructor(){this.reset();this.y=Math.random()*h}reset(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.rad=Math.random()*1.8+0.4;this.op=Math.random()*0.4+0.1}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;const dx=m.x-this.x,dy=m.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150&&m.x>0){const force=(1-dist/150)*0.03;this.x+=dx*force;this.y+=dy*force;this.rad=Math.min(this.rad+0.01,2.5);this.op=Math.min(this.op+0.01,0.8)}else{this.rad=Math.max(this.rad-0.003,0.4);this.op=Math.max(this.op-0.002,0.1)}}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.rad,0,Math.PI*2);ctx.fillStyle=`rgba(79,110,246,${this.op})`;ctx.fill()}}for(let i=0;i<60;i++)p.push(new P());function conn(){for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<90){ctx.beginPath();ctx.strokeStyle=`rgba(79,110,246,${0.06*(1-dist/90)})`;ctx.lineWidth=0.4;ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.stroke()}}}function anim(){ctx.clearRect(0,0,w,h);p.forEach(v=>{v.update();v.draw()});conn();requestAnimationFrame(anim)}anim()})();
-
         (function(){
-            const CONFIG={AIRTABLE_TOKEN:'pat9BdIPuJKKqjBps.608e5055b9a5171435f172928c955a1bf67c8f10e6b42c34cc623f49cf1d5e43',AIRTABLE_BASE_ID:'appM4Ty76lOlslpU9'};
-            let softwares=[],bannerAds=[],sidebarAds=[],currentCategory="all",searchKeyword="",showAll=false;
-            const DEFAULT_LIMIT=12;
-            let currentUser=null,currentCaptcha={question:'',answer:0},articles=[],editingArticleId=null;
+            // 粒子动画（保持不变）
+            const c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');let w,h,m={x:-1e3,y:-1e3},p=[];function r(){w=innerWidth;h=innerHeight;c.width=w;c.height=h}window.addEventListener('resize',r);r();document.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY});document.addEventListener('mouseleave',()=>{m.x=-1e3;m.y=-1e3});class P{constructor(){this.reset();this.y=Math.random()*h}reset(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.rad=Math.random()*1.8+0.4;this.op=Math.random()*0.4+0.1}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;const dx=m.x-this.x,dy=m.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150&&m.x>0){const force=(1-dist/150)*0.03;this.x+=dx*force;this.y+=dy*force;this.rad=Math.min(this.rad+0.01,2.5);this.op=Math.min(this.op+0.01,0.8)}else{this.rad=Math.max(this.rad-0.003,0.4);this.op=Math.max(this.op-0.002,0.1)}}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.rad,0,Math.PI*2);ctx.fillStyle=`rgba(79,110,246,${this.op})`;ctx.fill()}}for(let i=0;i<60;i++)p.push(new P());function conn(){for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<90){ctx.beginPath();ctx.strokeStyle=`rgba(79,110,246,${0.06*(1-dist/90)})`;ctx.lineWidth=0.4;ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.stroke()}}}function anim(){ctx.clearRect(0,0,w,h);p.forEach(v=>{v.update();v.draw()});conn();requestAnimationFrame(anim)}anim();
 
-            function showToast(m,t='success'){const d=document.createElement('div');d.className=`toast-message ${t}`;d.innerHTML=`<i class="fas ${t==='success'?'fa-check-circle':'fa-exclamation-triangle'}"></i> ${m}`;document.body.appendChild(d);setTimeout(()=>d.remove(),3000);}
-            function esc(s){return String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]);}
-            function genCap(){let a=Math.floor(Math.random()*10)+1,b=Math.floor(Math.random()*10)+1,op=Math.random()>0.5?'+':'-',ans=op==='+'?a+b:a-b;if(ans<0)return genCap();return{question:`${a} ${op} ${b} = ?`,answer:ans};}
-            function refCap(q,i){let c=genCap();currentCaptcha=c;document.getElementById(q).innerText=c.question;document.getElementById(i).value='';}
-            const hamburger=document.getElementById('hamburgerBtn'),navLinks=document.getElementById('navLinks');
-            if(hamburger&&navLinks){hamburger.addEventListener('click',()=>{hamburger.classList.toggle('active');navLinks.classList.toggle('show');});navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{hamburger.classList.remove('active');navLinks.classList.remove('show');}));}
-            let currentDate=new Date();
-            function renderCalendar(){const y=currentDate.getFullYear(),m=currentDate.getMonth(),fd=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),mn=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];document.getElementById('calendarMonthYear').innerText=`${y}年 ${mn[m]}`;const el=document.getElementById('calendarDays');let h='<div class="calendar-day-name">一</div><div class="calendar-day-name">二</div><div class="calendar-day-name">三</div><div class="calendar-day-name">四</div><div class="calendar-day-name">五</div><div class="calendar-day-name">六</div><div class="calendar-day-name">日</div>';let d=1;for(let i=0;i<6;i++)for(let j=0;j<7;j++){if(i===0&&j<(fd===0?6:fd-1))h+='<div class="calendar-day"></div>';else if(d>days)h+='<div class="calendar-day"></div>';else{const t=d===new Date().getDate()&&m===new Date().getMonth()&&y===new Date().getFullYear();h+=`<div class="calendar-day ${t?'today':''}">${d}</div>`;d++;}}el.innerHTML=h;}
-            document.getElementById('prevMonth').addEventListener('click',()=>{currentDate.setMonth(currentDate.getMonth()-1);renderCalendar();});
-            document.getElementById('nextMonth').addEventListener('click',()=>{currentDate.setMonth(currentDate.getMonth()+1);renderCalendar();});
+            // ==================== 配置 ====================
+            const CONFIG = {
+                AIRTABLE_TOKEN: 'pat9BdIPuJKKqjBps.608e5055b9a5171435f172928c955a1bf67c8f10e6b42c34cc623f49cf1d5e43',
+                AIRTABLE_BASE_ID: 'appM4Ty76lOlslpU9'
+            };
+
+            // 检测是否为本地 file:// 协议
+            const isLocalFile = window.location.protocol === 'file:';
+            if(isLocalFile) console.log('检测到本地文件协议，将跳过 Airtable 网络请求，仅使用缓存和默认数据');
+
+            // ==================== 全局变量 ====================
+            let softwares = [], bannerAds = [], sidebarAds = [];
+            let currentCategory = "all", searchKeyword = "", showAll = false;
+            const DEFAULT_LIMIT = 12;
+            let currentUser = null;
+            let currentCaptcha = { question: '', answer: 0 };
+            let articles = [], editingArticleId = null;
+
+            // 下载次数相关（本地存储，每月重置）
+            function getCurrentMonthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
+            function getUserDownloadData(email){
+                const key = `download_${email}`;
+                const data = localStorage.getItem(key);
+                if(!data) return { month: getCurrentMonthKey(), count: 0 };
+                try{
+                    const parsed = JSON.parse(data);
+                    if(parsed.month !== getCurrentMonthKey()) return { month: getCurrentMonthKey(), count: 0 };
+                    return parsed;
+                }catch(e){ return { month: getCurrentMonthKey(), count: 0 }; }
+            }
+            function saveUserDownloadData(email, count){
+                localStorage.setItem(`download_${email}`, JSON.stringify({ month: getCurrentMonthKey(), count: count }));
+            }
+            function addDownloadBonus(email, bonus){
+                const data = getUserDownloadData(email);
+                saveUserDownloadData(email, Math.max(0, data.count - bonus));
+            }
+            function canDownload(user){
+                if(!user) return false;
+                if(user.role === 'vip') return true;
+                return getUserDownloadData(user.email).count < 30;
+            }
+            function recordDownload(user){
+                if(!user || user.role === 'vip') return true;
+                const data = getUserDownloadData(user.email);
+                saveUserDownloadData(user.email, data.count + 1);
+                return data.count + 1 <= 30;
+            }
+            function getRemainingCount(user){
+                if(!user) return 0;
+                if(user.role === 'vip') return Infinity;
+                return 30 - getUserDownloadData(user.email).count;
+            }
+
+            // ==================== 辅助函数 ====================
+            function showToast(m, t='success'){
+                const d = document.createElement('div');
+                d.className = `toast-message ${t}`;
+                d.innerHTML = `<i class="fas ${t==='success'?'fa-check-circle':'fa-exclamation-triangle'}"></i> ${m}`;
+                document.body.appendChild(d);
+                setTimeout(()=>d.remove(), 3000);
+            }
+            function esc(s){ return String(s).replace(/[&<>]/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+            function genCap(){
+                let a = Math.floor(Math.random()*10)+1, b = Math.floor(Math.random()*10)+1, op = Math.random()>0.5?'+':'-', ans = op==='+'?a+b:a-b;
+                if(ans<0) return genCap();
+                return { question: `${a} ${op} ${b} = ?`, answer: ans };
+            }
+            function refCap(q,i){
+                let c = genCap();
+                currentCaptcha = c;
+                document.getElementById(q).innerText = c.question;
+                document.getElementById(i).value = '';
+            }
+
+            // 汉堡菜单
+            const hamburger = document.getElementById('hamburgerBtn'), navLinks = document.getElementById('navLinks');
+            if(hamburger && navLinks){
+                hamburger.addEventListener('click', ()=>{
+                    hamburger.classList.toggle('active');
+                    navLinks.classList.toggle('show');
+                });
+                navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('show');
+                }));
+            }
+
+            // 日历
+            let currentDate = new Date();
+            function renderCalendar(){
+                const y = currentDate.getFullYear(), m = currentDate.getMonth();
+                const fd = new Date(y,m,1).getDay();
+                const days = new Date(y,m+1,0).getDate();
+                const mn = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+                document.getElementById('calendarMonthYear').innerText = `${y}年 ${mn[m]}`;
+                const el = document.getElementById('calendarDays');
+                let h = '<div class="calendar-day-name">一</div><div class="calendar-day-name">二</div><div class="calendar-day-name">三</div><div class="calendar-day-name">四</div><div class="calendar-day-name">五</div><div class="calendar-day-name">六</div><div class="calendar-day-name">日</div>';
+                let d = 1;
+                for(let i=0;i<6;i++){
+                    for(let j=0;j<7;j++){
+                        if(i===0 && j < (fd===0?6:fd-1)) h+='<div class="calendar-day"></div>';
+                        else if(d>days) h+='<div class="calendar-day"></div>';
+                        else{
+                            const isToday = (d===new Date().getDate() && m===new Date().getMonth() && y===new Date().getFullYear());
+                            h+=`<div class="calendar-day ${isToday?'today':''}">${d}</div>`;
+                            d++;
+                        }
+                    }
+                }
+                el.innerHTML = h;
+            }
+            document.getElementById('prevMonth').addEventListener('click', ()=>{ currentDate.setMonth(currentDate.getMonth()-1); renderCalendar(); });
+            document.getElementById('nextMonth').addEventListener('click', ()=>{ currentDate.setMonth(currentDate.getMonth()+1); renderCalendar(); });
             renderCalendar();
 
-            async function fetchT(url,opts,to=5000){const ctrl=new AbortController();const id=setTimeout(()=>ctrl.abort(),to);try{const r=await fetch(url,{...opts,signal:ctrl.signal});clearTimeout(id);return r}catch(e){clearTimeout(id);throw e}}
-            async function airReq(method,path,body=null,retries=2){const url=`https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`;const headers={'Authorization':`Bearer ${CONFIG.AIRTABLE_TOKEN}`,'Content-Type':'application/json'};const opts={method,headers};if(body)opts.body=JSON.stringify(body);for(let i=0;i<=retries;i++){try{const r=await fetchT(url,opts,5000);if(!r.ok)throw new Error(`HTTP ${r.status}`);return await r.json()}catch(e){if(i===retries)throw e;await new Promise(r=>setTimeout(r,600*(i+2)));}}}
-
-            function getStdAbbr(n){if(!n)return'SW';const l=n.toLowerCase();const map={'photoshop':'PS','illustrator':'AI','premiere pro':'PR','after effects':'AE','lightroom':'LR','indesign':'ID','cinema 4d':'C4D','c4d':'C4D','autocad':'AC','cad':'CAD','3ds max':'3DS','maya':'MA','sketchup':'SU','rhino':'RH','blender':'BL'};if(map[l])return map[l];for(let k in map)if(l.includes(k))return map[k];return n.slice(0,2).toUpperCase();}
-            function getColor(n){let h=0;for(let i=0;i<n.length;i++)h=n.charCodeAt(i)+((h<<5)-h);return`hsl(${Math.abs(h)%360},70%,55%)`;}
-            function renderIconHtml(icon,name){
-                if(!icon)return`<div class="icon-fallback" style="background:${getColor(name)};">${getStdAbbr(name)}</div>`;
-                if(icon.type==='image')return`<img src="${esc(icon.value)}" style="width:100%;height:100%;object-fit:cover;border:none;outline:none;display:block;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><div class="icon-fallback" style="background:${getColor(name)};display:none;">${getStdAbbr(name)}</div>`;
-                if(icon.type==='icon')return`<i class="fas ${esc(icon.value)}"></i>`;
-                return`<div class="icon-fallback" style="background:${getColor(name)};">${esc(icon.value||getStdAbbr(name))}</div>`;
+            // ==================== Airtable 请求封装（本地环境下跳过） ====================
+            async function fetchWithTimeout(url, opts, to=5000){
+                if(isLocalFile) throw new Error('本地 file:// 协议下跳过网络请求');
+                const ctrl = new AbortController();
+                const id = setTimeout(()=>ctrl.abort(), to);
+                try{
+                    const r = await fetch(url, {...opts, signal: ctrl.signal});
+                    clearTimeout(id);
+                    return r;
+                }catch(e){
+                    clearTimeout(id);
+                    throw e;
+                }
             }
-            function getField(f,p,def=''){for(let n of p)if(f[n]!==undefined)return f[n];return def;}
-            function parseIcon(iconField,name){if(!iconField)return{type:'text',value:getStdAbbr(name)};if(Array.isArray(iconField)&&iconField[0]?.url)return{type:'image',value:iconField[0].url};if(typeof iconField==='string'){if(iconField.startsWith('http')||iconField.startsWith('data:image'))return{type:'image',value:iconField};if(iconField.startsWith('fa-')||iconField.startsWith('fas '))return{type:'icon',value:iconField};return{type:'text',value:iconField};}return{type:'text',value:getStdAbbr(name)};}
+            async function airReq(method, path, body=null, retries=2){
+                if(isLocalFile) throw new Error('本地 file:// 协议下跳过网络请求');
+                const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`;
+                const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' };
+                const opts = { method, headers };
+                if(body) opts.body = JSON.stringify(body);
+                for(let i=0;i<=retries;i++){
+                    try{
+                        const r = await fetchWithTimeout(url, opts, 5000);
+                        if(!r.ok) throw new Error(`HTTP ${r.status}`);
+                        return await r.json();
+                    }catch(e){
+                        if(i===retries) throw e;
+                        await new Promise(r=>setTimeout(r, 600*(i+2)));
+                    }
+                }
+            }
 
-            async function fetchSoftwares(){try{const data=await airReq('GET','softwares?maxRecords=100');const result=data.records.map(rec=>{const f=rec.fields;const name=getField(f,['A name','name','Name'],'未命名');return{id:rec.id,name,category:getField(f,['A category','category','Category'],'other'),version:getField(f,['version','Version'],''),description:getField(f,['description','Description'],''),icon:parseIcon(getField(f,['icon','Icon'],null),name),url:getField(f,['url','URL'],'#'),addedDate:getField(f,['addedDate','AddedDate'],new Date().toISOString().split('T')[0]),downloads:Number(getField(f,['downloads','Downloads'],Math.floor(Math.random()*4000)+100)),os:(()=>{let o=getField(f,['os','OS'],null);return o?(Array.isArray(o)?o:o.split(',').map(s=>s.trim())):['Windows','Mac'];})()};});localStorage.setItem('cachedSoft',JSON.stringify(result));return result;}catch(e){const cached=localStorage.getItem('cachedSoft');return cached?JSON.parse(cached):[];}}
-            async function fetchAds(){try{const data=await airReq('GET','Ads?maxRecords=50');const result=data.records.map(r=>{const f=r.fields;let img=f.Image||f.image||'';if(Array.isArray(img)&&img[0]&&img[0].url)img=img[0].url;return{image:img,link:f.Link||f.link||'#',title:f.Title||f.title||'',position:(f.Position||f.position||'sidebar').toLowerCase(),enabled:f.Enabled!==false};}).filter(a=>a.enabled&&a.image&&a.link);localStorage.setItem('cachedAds',JSON.stringify(result));return result;}catch(e){const cached=localStorage.getItem('cachedAds');return cached?JSON.parse(cached):[];}}
-            async function fetchArticles(){try{const data=await airReq('GET','Articles?maxRecords=50&sort[0][field]=CreatedAt&sort[0][direction]=desc');return data.records.map(rec=>({id:rec.id,title:rec.fields.Title||'无标题',cover:rec.fields.Cover||'',excerpt:rec.fields.Excerpt||'',content:rec.fields.Content||'',tags:rec.fields.Tags||'',createdAt:rec.fields.CreatedAt||new Date().toISOString()}));}catch(e){return[];}}
-            async function createArticle(art){return await airReq('POST','Articles',{fields:{Title:art.title,Cover:art.cover,Excerpt:art.excerpt,Content:art.content,Tags:art.tags}});}
-            async function updateArticle(id,art){return await airReq('PATCH',`Articles/${id}`,{fields:{Title:art.title,Cover:art.cover,Excerpt:art.excerpt,Content:art.content,Tags:art.tags}});}
-            async function deleteArticle(id){return await airReq('DELETE',`Articles/${id}`);}
-            async function findUser(email){const d=await airReq('GET',`Users?filterByFormula={Email}="${encodeURIComponent(email)}"`);return d.records.length?d.records[0]:null;}
-            async function registerUser(email,pw,un){await airReq('POST','Users',{fields:{Email:email,Password:CryptoJS.SHA256(pw).toString(),Username:un,Role:'user'}});}
-            async function loginUser(email,pw){const rec=await findUser(email);if(!rec)throw new Error('邮箱未注册');if(rec.fields.Password!==CryptoJS.SHA256(pw).toString())throw new Error('密码错误');return{id:rec.id,email:rec.fields.Email,username:rec.fields.Username||email.split('@')[0],role:rec.fields.Role||'user'};}
-            async function updatePw(email,np){const rec=await findUser(email);if(!rec)throw new Error('邮箱不存在');await airReq('PATCH',`Users/${rec.id}`,{fields:{Password:CryptoJS.SHA256(np).toString()}});}
+            // ==================== 获取字段值（不区分大小写） ====================
+            function getFieldValue(fields, possibleNames, defaultValue=''){
+                for(let name of possibleNames){
+                    if(fields[name] !== undefined) return fields[name];
+                    const lowerName = name.toLowerCase();
+                    for(let key in fields){
+                        if(key.toLowerCase() === lowerName) return fields[key];
+                    }
+                }
+                return defaultValue;
+            }
 
-            function updateUserUI(){const area=document.getElementById('userArea');if(currentUser){area.innerHTML=`<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;document.getElementById('userMenuBtn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('userDropdown').classList.toggle('show');});document.getElementById('logoutBtn').addEventListener('click',()=>{currentUser=null;localStorage.removeItem('lezhe_user');updateUserUI();showToast('已退出');location.reload();});if(currentUser.role==='admin')document.getElementById('manageArticlesBtn').style.display='block';}else{area.innerHTML='<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>';document.getElementById('showAuthBtn').addEventListener('click',()=>openAuth('login'));document.getElementById('manageArticlesBtn').style.display='none';}}
-            function openAuth(tab='login'){const m=document.getElementById('authModal');document.getElementById('loginForm').style.display=tab==='login'?'block':'none';document.getElementById('registerForm').style.display=tab==='register'?'block':'none';document.getElementById('forgotForm').style.display=tab==='forgot'?'block':'none';document.getElementById('authModalTitle').innerText=tab==='register'?'注册':(tab==='forgot'?'找回密码':'登录');m.classList.add('active');if(tab==='login')refCap('loginCaptchaQuestion','loginCaptchaInput');else if(tab==='register')refCap('regCaptchaQuestion','regCaptchaInput');else refCap('forgotCaptchaQuestion','forgotCaptchaInput');}
+            // ==================== 软件/广告/文章/留言（本地环境下仅使用缓存或默认） ====================
+            async function fetchSoftwares(){
+                if(isLocalFile){
+                    console.log('本地模式：从缓存或默认数据加载软件');
+                    const cached = localStorage.getItem('cachedSoft');
+                    if(cached){
+                        try{
+                            const result = JSON.parse(cached);
+                            if(result && result.length) return result;
+                        }catch(e){}
+                    }
+                    // 默认软件数据（与 Airtable 结构类似）
+                    const defaultSoft = [
+                        { name: "Adobe Camera RAW", category: "adobe", version: "全版本", description: "用于处理RAW格式图像的工具", os: ["Windows","Mac"], downloads: 2035, addedDate: "2026-04-22", icon: "fa-camera", url: "#" },
+                        { name: "DaVinci Resolve", category: "other", version: "最新", description: "视频调色软件", os: ["Windows","Mac"], downloads: 1674, addedDate: "2026-04-21", icon: "fa-video", url: "#" },
+                        { name: "Acrobat DC", category: "adobe", version: "AcrXi Pro-2026", description: "PDF编辑与转换", os: ["Windows","Mac"], downloads: 1909, addedDate: "2026-04-23", icon: "fa-file-pdf", url: "#" },
+                        { name: "PhotoShop", category: "adobe", version: "CS6-2026", description: "图像处理软件", os: ["Windows","Mac"], downloads: 1273, addedDate: "2026-04-23", icon: "fa-image", url: "#" },
+                        { name: "Illustrator", category: "adobe", version: "CS6-2026", description: "矢量图形设计", os: ["Windows","Mac"], downloads: 2089, addedDate: "2026-04-22", icon: "fa-paint-brush", url: "#" },
+                        { name: "Premiere Pro", category: "adobe", version: "CS6-2026", description: "视频编辑软件", os: ["Windows","Mac"], downloads: 2052, addedDate: "2026-04-23", icon: "fa-film", url: "#" },
+                        { name: "AutoCAD", category: "autodesk", version: "2025", description: "计算机辅助设计", os: ["Windows","Mac"], downloads: 1567, addedDate: "2026-04-18", icon: "fa-cube", url: "#" },
+                        { name: "Cinema 4D", category: "c4d", version: "R19-2025", description: "三维建模、动画", os: ["Windows","Mac"], downloads: 1432, addedDate: "2026-04-16", icon: "fa-cube", url: "#" },
+                        { name: "Rhino 7/8", category: "rhino", version: "5.0-8.28", description: "工业设计、建筑设计", os: ["Windows","Mac"], downloads: 876, addedDate: "2026-04-14", icon: "fa-ruler-combined", url: "#" }
+                    ];
+                    return defaultSoft.map(s => ({ ...s, id: Math.random().toString(36) }));
+                }
+                // 线上模式：从 Airtable 获取
+                try{
+                    const data = await airReq('GET', 'softwares?maxRecords=100');
+                    const result = data.records.map(rec => {
+                        const f = rec.fields;
+                        const name = getFieldValue(f, ['Name', 'A name', 'name', '软件名称'], '未命名软件');
+                        const category = getFieldValue(f, ['Category', 'A category', 'category', '分类'], 'other');
+                        const version = getFieldValue(f, ['Version', 'version'], '');
+                        const description = getFieldValue(f, ['Description', 'description'], '');
+                        const icon = getFieldValue(f, ['Icon', 'icon'], null);
+                        const url = getFieldValue(f, ['URL', 'url'], '#');
+                        const addedDate = getFieldValue(f, ['AddedDate', 'addedDate'], new Date().toISOString().split('T')[0]);
+                        const downloads = Number(getFieldValue(f, ['Downloads', 'downloads'], Math.floor(Math.random()*4000)+100));
+                        let os = getFieldValue(f, ['OS', 'os'], ['Windows','Mac']);
+                        if(typeof os === 'string') os = os.split(',').map(s=>s.trim());
+                        if(!Array.isArray(os)) os = ['Windows','Mac'];
+                        return {
+                            id: rec.id,
+                            name: name,
+                            category: category,
+                            version: version,
+                            description: description,
+                            icon: icon,
+                            url: url,
+                            addedDate: addedDate,
+                            downloads: downloads,
+                            os: os
+                        };
+                    });
+                    localStorage.setItem('cachedSoft', JSON.stringify(result));
+                    return result;
+                }catch(e){
+                    console.error('fetchSoftwares error:', e);
+                    const cached = localStorage.getItem('cachedSoft');
+                    if(cached) return JSON.parse(cached);
+                    return [];
+                }
+            }
 
-            function bindEvents(){
+            async function fetchAds(){
+                if(isLocalFile){
+                    const cached = localStorage.getItem('cachedAds');
+                    if(cached) return JSON.parse(cached);
+                    return [
+                        { image: "https://picsum.photos/800/400?random=1", link: "#", title: "广告1", position: "banner", enabled: true },
+                        { image: "https://picsum.photos/300/200?random=2", link: "#", title: "广告2", position: "sidebar", enabled: true }
+                    ];
+                }
+                try{
+                    const data = await airReq('GET', 'Ads?maxRecords=50');
+                    const result = data.records.map(r=>{
+                        const f = r.fields;
+                        let img = getFieldValue(f, ['Image', 'image'], '');
+                        if(Array.isArray(img) && img[0] && img[0].url) img = img[0].url;
+                        return {
+                            image: img,
+                            link: getFieldValue(f, ['Link', 'link'], '#'),
+                            title: getFieldValue(f, ['Title', 'title'], ''),
+                            position: (getFieldValue(f, ['Position', 'position'], 'sidebar')).toLowerCase(),
+                            enabled: getFieldValue(f, ['Enabled', 'enabled'], true) !== false
+                        };
+                    }).filter(a=>a.enabled && a.image);
+                    localStorage.setItem('cachedAds', JSON.stringify(result));
+                    return result;
+                }catch(e){
+                    const cached = localStorage.getItem('cachedAds');
+                    return cached ? JSON.parse(cached) : [];
+                }
+            }
+
+            async function fetchArticles(){
+                if(isLocalFile) return [];
+                try{
+                    const data = await airReq('GET', 'Articles?maxRecords=50&sort[0][field]=CreatedAt&sort[0][direction]=desc');
+                    return data.records.map(rec=>({
+                        id: rec.id,
+                        title: rec.fields.Title || '无标题',
+                        cover: rec.fields.Cover || '',
+                        excerpt: rec.fields.Excerpt || '',
+                        content: rec.fields.Content || '',
+                        tags: rec.fields.Tags || '',
+                        createdAt: rec.fields.CreatedAt || new Date().toISOString()
+                    }));
+                }catch(e){ return []; }
+            }
+            async function createArticle(art){ if(isLocalFile) throw new Error('本地模式不支持创建文章'); return await airReq('POST','Articles',{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
+            async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地模式不支持更新文章'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
+            async function deleteArticle(id){ if(isLocalFile) throw new Error('本地模式不支持删除文章'); return await airReq('DELETE',`Articles/${id}`); }
+
+            // 用户相关（本地模式下使用 localStorage 模拟，线上使用 Airtable）
+            async function findUserByEmail(email){
+                if(isLocalFile){
+                    const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    return users.find(u => u.email === email) || null;
+                }
+                const data = await airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`);
+                return data.records.length ? data.records[0] : null;
+            }
+            async function findUserByInviteCode(code){
+                if(isLocalFile){
+                    const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    return users.find(u => u.inviteCode === code) || null;
+                }
+                const data = await airReq('GET', `Users?filterByFormula={InviteCode}="${encodeURIComponent(code)}"`);
+                return data.records.length ? data.records[0] : null;
+            }
+            async function registerUser(email, password, username, inviteCode=''){
+                if(isLocalFile){
+                    if(await findUserByEmail(email)) throw new Error('邮箱已注册');
+                    const hash = CryptoJS.SHA256(password).toString();
+                    const userCode = Math.random().toString(36).substring(2,10).toUpperCase();
+                    let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    let newUser = { email, password: hash, username, role: 'user', inviteCode: userCode, invitedBy: '', inviteBonus: 0 };
+                    if(inviteCode){
+                        const inviter = users.find(u => u.inviteCode === inviteCode);
+                        if(inviter){
+                            newUser.invitedBy = inviter.email;
+                            inviter.inviteBonus = (inviter.inviteBonus || 0) + 5;
+                            addDownloadBonus(inviter.email, 5);
+                            showToast(`邀请成功！您获得了5次额外下载`, 'success');
+                        } else {
+                            showToast('邀请码无效', 'warning');
+                        }
+                    }
+                    users.push(newUser);
+                    localStorage.setItem('lezhe_users', JSON.stringify(users));
+                    return;
+                }
+                if(await findUserByEmail(email)) throw new Error('邮箱已注册');
+                const hash = CryptoJS.SHA256(password).toString();
+                const userCode = Math.random().toString(36).substring(2,10).toUpperCase();
+                let fields = { Email: email, Password: hash, Username: username, Role: 'user', InviteCode: userCode, InvitedBy: '', InviteBonus: 0 };
+                if(inviteCode){
+                    const inviter = await findUserByInviteCode(inviteCode);
+                    if(inviter){
+                        fields.InvitedBy = inviter.fields.Email;
+                        const newBonus = (inviter.fields.InviteBonus || 0) + 5;
+                        await airReq('PATCH', `Users/${inviter.id}`, { fields: { InviteBonus: newBonus } });
+                        addDownloadBonus(inviter.fields.Email, 5);
+                        showToast(`邀请成功！您获得了5次额外下载`, 'success');
+                    } else {
+                        showToast('邀请码无效', 'warning');
+                    }
+                }
+                await airReq('POST', 'Users', { fields });
+            }
+            async function loginUser(email, password){
+                if(isLocalFile){
+                    const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    const user = users.find(u => u.email === email);
+                    if(!user) throw new Error('邮箱未注册');
+                    const hash = CryptoJS.SHA256(password).toString();
+                    if(user.password !== hash) throw new Error('密码错误');
+                    return {
+                        id: user.email,
+                        email: user.email,
+                        username: user.username,
+                        role: user.role || 'user',
+                        inviteCode: user.inviteCode || ''
+                    };
+                }
+                const rec = await findUserByEmail(email);
+                if(!rec) throw new Error('邮箱未注册');
+                const hash = CryptoJS.SHA256(password).toString();
+                if(rec.fields.Password !== hash) throw new Error('密码错误');
+                return {
+                    id: rec.id,
+                    email: rec.fields.Email,
+                    username: rec.fields.Username || email.split('@')[0],
+                    role: rec.fields.Role || 'user',
+                    inviteCode: rec.fields.InviteCode || ''
+                };
+            }
+            async function updatePassword(email, newPass){
+                if(isLocalFile){
+                    let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    const user = users.find(u => u.email === email);
+                    if(!user) throw new Error('邮箱不存在');
+                    user.password = CryptoJS.SHA256(newPass).toString();
+                    localStorage.setItem('lezhe_users', JSON.stringify(users));
+                    return;
+                }
+                const rec = await findUserByEmail(email);
+                if(!rec) throw new Error('邮箱不存在');
+                await airReq('PATCH', `Users/${rec.id}`, { fields: { Password: CryptoJS.SHA256(newPass).toString() } });
+            }
+            async function updateUserRole(userId, newRole){
+                if(isLocalFile){
+                    let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    const user = users.find(u => u.email === userId);
+                    if(user) user.role = newRole;
+                    localStorage.setItem('lezhe_users', JSON.stringify(users));
+                    return;
+                }
+                await airReq('PATCH', `Users/${userId}`, { fields: { Role: newRole } });
+            }
+            async function getAllUsers(){
+                if(isLocalFile){
+                    return JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(u => ({ id: u.email, fields: u }));
+                }
+                const data = await airReq('GET', 'Users?maxRecords=100');
+                return data.records.map(r=>({ id: r.id, fields: r.fields }));
+            }
+
+            // 图标渲染
+            function getStdAbbr(n){
+                if(!n) return 'SW';
+                const l = n.toLowerCase();
+                const map = { 'photoshop':'PS','illustrator':'AI','premiere pro':'PR','after effects':'AE','lightroom':'LR','indesign':'ID','cinema 4d':'C4D','c4d':'C4D','autocad':'AC','cad':'CAD','3ds max':'3DS','maya':'MA','sketchup':'SU','rhino':'RH','blender':'BL' };
+                if(map[l]) return map[l];
+                for(let k in map) if(l.includes(k)) return map[k];
+                return n.slice(0,2).toUpperCase();
+            }
+            function getColor(n){
+                let h=0;
+                for(let i=0;i<n.length;i++) h = n.charCodeAt(i) + ((h<<5)-h);
+                return `hsl(${Math.abs(h)%360},70%,55%)`;
+            }
+            function parseIcon(iconField, name){
+                if(!iconField) return { type:'text', value: getStdAbbr(name) };
+                if(Array.isArray(iconField) && iconField[0]?.url) return { type:'image', value: iconField[0].url };
+                if(typeof iconField === 'string'){
+                    if(iconField.startsWith('http') || iconField.startsWith('data:image')) return { type:'image', value: iconField };
+                    if(iconField.startsWith('fa-') || iconField.startsWith('fas ')) return { type:'icon', value: iconField };
+                    return { type:'text', value: iconField };
+                }
+                return { type:'text', value: getStdAbbr(name) };
+            }
+            function renderIconHtml(icon, name){
+                const parsed = parseIcon(icon, name);
+                if(parsed.type === 'image') return `<img src="${esc(parsed.value)}" style="width:100%;height:100%;object-fit:cover;border:none;outline:none;display:block;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="icon-fallback" style="background:${getColor(name)};display:none;">${getStdAbbr(name)}</div>`;
+                if(parsed.type === 'icon') return `<i class="fas ${esc(parsed.value)}"></i>`;
+                return `<div class="icon-fallback" style="background:${getColor(name)};">${esc(parsed.value || getStdAbbr(name))}</div>`;
+            }
+
+            // ==================== UI 渲染 ====================
+            const CAT_MAP = { 'adobe':'Adobe系列','autodesk':'Autodesk系列','c4d':'Cinema 4D','sketchup':'草图大师','rhino':'犀牛软件','plugin':'插件工具','other':'其他' };
+            function renderCats(){
+                const el = document.getElementById('categoryTabs');
+                const map = new Map();
+                softwares.forEach(s => map.set(CAT_MAP[s.category]||s.category, s.category));
+                let html = `<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all">全部</button>`;
+                [...map.entries()].sort().forEach(([d,k])=> html += `<button class="cat-chip ${currentCategory===k?'active':''}" data-cat="${k}">${d}</button>`);
+                el.innerHTML = html;
+                document.querySelectorAll('.cat-chip').forEach(btn=>btn.addEventListener('click',()=>{
+                    currentCategory = btn.dataset.cat;
+                    showAll = false;
+                    renderCats();
+                    renderGrid();
+                }));
+            }
+            function renderGrid(){
+                const filtered = softwares.filter(s => (currentCategory==='all'||s.category===currentCategory) && s.name.toLowerCase().includes(searchKeyword.toLowerCase()));
+                const items = showAll ? filtered : filtered.slice(0, DEFAULT_LIMIT);
+                const container = document.getElementById('softwareGridContainer');
+                if(!items.length){
+                    container.innerHTML = '<div class="no-results"><i class="fas fa-box-open"></i> 没有找到相关软件</div>';
+                    document.getElementById('loadMoreContainer').style.display = 'none';
+                    return;
+                }
+                container.innerHTML = items.map(sw => {
+                    const isNew = (new Date() - new Date(sw.addedDate||'2024-01-01')) < 7*86400000;
+                    const isHot = sw.downloads > 2000;
+                    return `<div class="software-card" data-name="${esc(sw.name)}">
+                        ${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}
+                        <div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon, sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div>
+                        <div class="version">版本 ${esc(sw.version)}</div>
+                        <div class="description">${esc(sw.description)}</div>
+                        <div class="os-tags">${sw.os.map(o=>`<span class="os-badge">${o==='Windows'?'<i class="fab fa-windows"></i>':'<i class="fab fa-apple"></i>'} ${o}</span>`).join('')}</div>
+                        <div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div>
+                    </div>`;
+                }).join('');
+                document.getElementById('loadMoreContainer').style.display = (!showAll && filtered.length > DEFAULT_LIMIT) ? 'block' : 'none';
+                document.querySelectorAll('.software-card').forEach(card=>card.addEventListener('click',()=>{
+                    const sw = softwares.find(s=>s.name === card.dataset.name);
+                    if(sw) downloadSoftware(sw);
+                }));
+            }
+            window._loadMore = ()=>{ showAll = true; renderGrid(); };
+
+            async function downloadSoftware(sw){
+                if(!currentUser){
+                    showToast('请先登录后再下载软件', 'error');
+                    openAuth('login');
+                    return;
+                }
+                if(!canDownload(currentUser)){
+                    showToast(`本月下载次数已用完（30次/月），邀请好友可获额外次数，或联系管理员升级VIP`, 'warning');
+                    return;
+                }
+                recordDownload(currentUser);
+                updateUserUI();
+                addHistory(sw);
+                window.open(sw.url,'_blank');
+                if(sw.id && !sw.id.startsWith('b')) incDownloadCount(sw.id);
+                showToast(`下载成功！剩余${getRemainingCount(currentUser)===Infinity?'∞':getRemainingCount(currentUser)}次`, 'success');
+            }
+
+            function addHistory(sw){
+                let h = JSON.parse(localStorage.getItem('browseHistory')||'[]');
+                h = h.filter(i=>i.name !== sw.name);
+                h.unshift({ name: sw.name });
+                if(h.length>10) h.pop();
+                localStorage.setItem('browseHistory', JSON.stringify(h));
+                renderHistory();
+            }
+            function renderHistory(){
+                const h = JSON.parse(localStorage.getItem('browseHistory')||'[]');
+                document.getElementById('historyList').innerHTML = h.length ? h.map(i=>`<div class="history-item">${esc(i.name)}</div>`).join('') : '<div style="color:var(--text-muted);">暂无</div>';
+            }
+            document.getElementById('clearHistoryBtn').addEventListener('click',()=>{ localStorage.removeItem('browseHistory'); renderHistory(); });
+
+            async function incDownloadCount(id){
+                if(isLocalFile) return;
+                try{
+                    const r = await airReq('GET', `softwares/${id}`);
+                    await airReq('PATCH', `softwares/${id}`, { fields: { downloads: (r.fields.downloads||0)+1 } });
+                    const sw = softwares.find(s=>s.id===id);
+                    if(sw) sw.downloads++;
+                    renderRank();
+                }catch(e){}
+            }
+            function renderRank(){
+                const sorted = [...softwares].sort((a,b)=>(b.downloads||0)-(a.downloads||0));
+                document.getElementById('rankList').innerHTML = sorted.slice(0,5).map((sw,i)=>`<div class="rank-item"><span class="rank-index ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</span> ${esc(sw.name)}</div>`).join('');
+            }
+
+            // 热门推荐轮播
+            const hotScroll = document.getElementById('hotScroll'); let hotInt = null;
+            function startHot(){
+                if(!hotScroll) return;
+                clearInterval(hotInt);
+                hotInt = setInterval(()=>{
+                    if(hotScroll.scrollLeft >= hotScroll.scrollWidth - hotScroll.clientWidth - 10) hotScroll.scrollTo({ left:0, behavior:'smooth' });
+                    else hotScroll.scrollBy({ left:200, behavior:'smooth' });
+                }, 2000);
+            }
+            function stopHot(){ clearInterval(hotInt); }
+            document.getElementById('hotArrowLeft').addEventListener('click',()=>{ hotScroll.scrollBy({ left:-200 }); stopHot(); startHot(); });
+            document.getElementById('hotArrowRight').addEventListener('click',()=>{ hotScroll.scrollBy({ left:200 }); stopHot(); startHot(); });
+            function renderHot(){
+                if(!softwares.length) return;
+                const hotItems = [...softwares].sort((a,b)=>(b.downloads||0)-(a.downloads||0)).slice(0,6);
+                hotScroll.innerHTML = hotItems.map(sw=>`<div class="hot-card" data-name="${esc(sw.name)}"><div class="hot-icon">${renderIconHtml(sw.icon, sw.name)}</div><div class="hot-name">${esc(sw.name)}</div><div class="hot-meta"><span>${sw.os.join(' · ')}</span><span class="hot-downloads"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`).join('');
+                hotScroll.querySelectorAll('.hot-card').forEach(c=>c.addEventListener('click',()=>{
+                    const sw = softwares.find(s=>s.name === c.dataset.name);
+                    if(sw) downloadSoftware(sw);
+                }));
+                hotScroll.addEventListener('mouseenter', stopHot);
+                hotScroll.addEventListener('mouseleave', startHot);
+                startHot();
+            }
+
+            // 留言板
+            async function renderFeedback(){
+                if(isLocalFile){
+                    const list = JSON.parse(localStorage.getItem('feedback_list')||'[]');
+                    const container = document.getElementById('feedbackListContainer');
+                    if(list.length){
+                        container.innerHTML = list.map(m=>`<div style="padding:8px 0;border-bottom:1px solid var(--border-light);"><strong>${esc(m.name)}</strong><div style="font-size:0.7rem;margin-top:4px;">${esc(m.message)}</div></div>`).join('');
+                    }else{
+                        container.innerHTML = '<div style="color:var(--text-muted);">暂无留言</div>';
+                    }
+                    return;
+                }
+                try{
+                    const data = await airReq('GET', 'Messages?maxRecords=30&sort[0][field]=CreatedAt&sort[0][direction]=desc');
+                    const container = document.getElementById('feedbackListContainer');
+                    if(data.records && data.records.length){
+                        container.innerHTML = data.records.map(r=>`<div style="padding:8px 0;border-bottom:1px solid var(--border-light);"><strong>${esc(r.fields.Name||'网友')}</strong><div style="font-size:0.7rem;margin-top:4px;">${esc(r.fields.Message||'')}</div></div>`).join('');
+                    }else{
+                        container.innerHTML = '<div style="color:var(--text-muted);">暂无留言</div>';
+                    }
+                }catch(e){
+                    document.getElementById('feedbackListContainer').innerHTML = '<div style="color:var(--text-muted);">加载留言失败</div>';
+                }
+            }
+
+            // 文章管理 UI
+            function renderAdmin(){
+                const el = document.getElementById('articleAdminList');
+                if(!articles.length){ el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章</div>'; return; }
+                el.innerHTML = `<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></tr></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody></table>`;
+                el.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{ const art = articles.find(a=>a.id===b.dataset.id); if(art) showArtForm(art); }));
+                el.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',async()=>{ if(confirm('确定删除？')){ await deleteArticle(b.dataset.id); articles = await fetchArticles(); renderAdmin(); renderArtsList(); } }));
+            }
+            function showArtForm(art=null){
+                editingArticleId = art ? art.id : null;
+                document.getElementById('articleTitle').value = art?.title || '';
+                document.getElementById('articleCover').value = art?.cover || '';
+                document.getElementById('articleExcerpt').value = art?.excerpt || '';
+                document.getElementById('articleContent').value = art?.content || '';
+                document.getElementById('articleTags').value = art?.tags || '';
+                document.getElementById('articleFormContainer').style.display = 'block';
+            }
+            async function saveArt(){
+                const title = document.getElementById('articleTitle').value.trim();
+                if(!title) return showToast('标题不能为空','error');
+                const fields = {
+                    Title: title,
+                    Cover: document.getElementById('articleCover').value,
+                    Excerpt: document.getElementById('articleExcerpt').value,
+                    Content: document.getElementById('articleContent').value,
+                    Tags: document.getElementById('articleTags').value
+                };
+                try{
+                    if(editingArticleId) await updateArticle(editingArticleId, fields);
+                    else await createArticle(fields);
+                    articles = await fetchArticles();
+                    renderAdmin();
+                    renderArtsList();
+                    document.getElementById('articleFormContainer').style.display = 'none';
+                    showToast('保存成功');
+                }catch(e){ showToast('保存失败','error'); }
+            }
+            function renderArtsList(){
+                const el = document.getElementById('articlesList');
+                if(!articles.length){ el.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>'; return; }
+                el.innerHTML = articles.map(a=>`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}"><div class="article-cover-sm" style="overflow:hidden;">${a.cover?`<img src="${esc(a.cover)}" style="width:100%;height:100%;object-fit:cover;border:none;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div style="display:none;width:100%;height:100%;background:#e8ecf3;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-image"></i></div>`:`<div style="width:100%;height:100%;background:#e8ecf3;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-file"></i></div>`}</div><div style="flex:1;min-width:0;"><div style="font-weight:550;font-size:0.85rem;">${esc(a.title)}</div><div style="font-size:0.6rem;color:var(--text-muted);">${new Date(a.createdAt).toLocaleDateString()}</div></div></div>`).join('');
+                el.querySelectorAll('[data-id]').forEach(item=>item.addEventListener('click',()=>{
+                    const art = articles.find(a=>a.id===item.dataset.id);
+                    if(art){
+                        document.getElementById('articleDetailTitle').innerText = art.title;
+                        document.getElementById('articleDetailCover').src = art.cover || '';
+                        document.getElementById('articleDetailContent').innerHTML = art.content?.replace(/\n/g,'<br>') || '暂无正文';
+                        document.getElementById('articleDetailModal').classList.add('active');
+                    }
+                }));
+            }
+
+            // 插件商店
+            const plugins = [
+                { name: 'AE 特效套装', software: 'After Effects' },
+                { name: 'PS 磨皮润色', software: 'Photoshop' },
+                { name: 'AI 矢量增强', software: 'Illustrator' },
+                { name: 'PR 转场大师', software: 'Premiere Pro' },
+                { name: 'LR 批量调色', software: 'Lightroom' },
+                { name: '达芬奇 LUTs', software: 'DaVinci Resolve' }
+            ];
+            const PAY_CODES = { wechat: 'https://img.cdn1.vip/i/69ec0bb88e003_1777077176.webp', alipay: 'https://img.cdn1.vip/i/69ec0bdf4d571_1777077215.webp' };
+            let payMethod = 'wechat';
+            document.getElementById('pluginListContainer').innerHTML = plugins.map(p=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light);"><div><strong>${p.name}</strong><div style="font-size:0.7rem;color:var(--text-muted);">适用：${p.software}</div></div><div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--success);font-weight:700;">¥30</span><button onclick="window._openPay('${p.name}')" style="background:var(--primary);color:#fff;border:none;border-radius:15px;padding:5px 14px;cursor:pointer;">购买</button></div></div>`).join('');
+            window._openPay = function(name){
+                document.getElementById('payPluginName').innerText = name;
+                document.getElementById('payQrImage').src = PAY_CODES[payMethod];
+                document.getElementById('payModal').classList.add('active');
+            };
+            document.getElementById('closePluginModal').addEventListener('click',()=>document.getElementById('pluginModal').classList.remove('active'));
+            document.getElementById('closePayModal').addEventListener('click',()=>document.getElementById('payModal').classList.remove('active'));
+            document.querySelectorAll('.pay-tab').forEach(t=>t.addEventListener('click',function(){
+                document.querySelectorAll('.pay-tab').forEach(x=>x.style.background='transparent');
+                this.style.background = 'var(--primary)';
+                this.style.color = '#fff';
+                payMethod = this.dataset.method;
+                document.getElementById('payQrImage').src = PAY_CODES[payMethod];
+            }));
+
+            // ==================== 轮播图 ====================
+            let bannerInt = null, sidebarInt = null, curB = 0, curS = 0;
+            function renderCarousel(slides, dots, ads, isB){
+                slides.innerHTML = ads.map((a,i)=>`<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="${i===0?'eager':'lazy'}" onload="this.classList.add('loaded')" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join('');
+                if(ads.length<=1){ dots.style.display='none'; return; }
+                dots.style.display='flex';
+                dots.innerHTML = ads.map((_,i)=>`<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join('');
+                const update = (idx)=>{ if(isB) curB=idx; else curS=idx; slides.style.transform=`translateX(-${idx*100}%)`; dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===idx)); };
+                dots.querySelectorAll('.carousel-dot').forEach(d=>d.addEventListener('click',e=>{ update(parseInt(e.target.dataset.index)); resetCar(isB); }));
+                return update;
+            }
+            function startCar(isB){
+                clearInterval(isB ? bannerInt : sidebarInt);
+                const ads = isB ? bannerAds : sidebarAds;
+                if(ads.length<=1) return;
+                const int = setInterval(()=>{
+                    const nxt = ((isB?curB:curS)+1) % ads.length;
+                    if(isB) curB = nxt; else curS = nxt;
+                    const slides = isB ? document.getElementById('categoryBannerSlides') : document.getElementById('sidebarCarouselSlides');
+                    const dots = isB ? document.getElementById('categoryBannerDots') : document.getElementById('sidebarCarouselDots');
+                    slides.style.transform = `translateX(-${nxt*100}%)`;
+                    dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active', i===nxt));
+                }, 4000);
+                if(isB) bannerInt = int; else sidebarInt = int;
+            }
+            function resetCar(isB){ clearInterval(isB ? bannerInt : sidebarInt); startCar(isB); }
+
+            // ==================== 用户界面与认证 ====================
+            function updateUserUI(){
+                const area = document.getElementById('userArea');
+                if(currentUser){
+                    const remaining = getRemainingCount(currentUser);
+                    const remainingText = currentUser.role === 'vip' ? '∞' : remaining;
+                    area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${currentUser.role==='vip'?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;
+                    document.getElementById('userMenuBtn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
+                    document.getElementById('logoutBtn').addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出'); location.reload(); });
+                    document.getElementById('profileBtn').addEventListener('click', openProfileModal);
+                    if(currentUser.role === 'admin') document.getElementById('adminBtn').addEventListener('click', openAdminModal);
+                    if(currentUser.role === 'admin') document.getElementById('manageArticlesBtn').style.display = 'block';
+                } else {
+                    area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>';
+                    document.getElementById('showAuthBtn').addEventListener('click', ()=>openAuth('login'));
+                    document.getElementById('manageArticlesBtn').style.display = 'none';
+                }
+            }
+
+            async function openProfileModal(){
+                document.getElementById('profileUsername').innerText = currentUser.username;
+                document.getElementById('profileRole').innerHTML = currentUser.role === 'vip' ? 'VIP会员（无限下载）' : '普通会员（30次/月）';
+                document.getElementById('profileRemaining').innerText = currentUser.role === 'vip' ? '∞' : getRemainingCount(currentUser);
+                document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无';
+                document.getElementById('profileModal').classList.add('active');
+            }
+
+            // 美化版管理后台
+            async function openAdminModal(){
+                const container = document.getElementById('adminUserList');
+                // 显示加载动画
+                container.innerHTML = '<div class="admin-loading"><div class="loading-spinner" style="width:30px;height:30px;"></div> 加载用户列表中...</div>';
+                try {
+                    const users = await getAllUsers();
+                    if(users.length === 0){
+                        container.innerHTML = '<div class="admin-loading">暂无用户</div>';
+                        document.getElementById('adminModal').classList.add('active');
+                        return;
+                    }
+                    let html = '';
+                    for(let u of users){
+                        const role = u.fields.Role || 'user';
+                        const isVip = role === 'vip';
+                        const isAdmin = role === 'admin';
+                        const avatarIcon = isAdmin ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
+                        html += `
+                            <div class="admin-user-card" data-id="${u.id}">
+                                <div class="admin-user-info">
+                                    <div class="admin-user-avatar">${avatarIcon}</div>
+                                    <div class="admin-user-details">
+                                        <div class="admin-user-email">${esc(u.fields.Email)}</div>
+                                        <div class="admin-user-name">${esc(u.fields.Username || '未设置')}</div>
+                                    </div>
+                                    <div class="admin-user-role ${isVip ? 'vip' : (isAdmin ? 'admin' : '')}">${role === 'vip' ? 'VIP会员' : (role === 'admin' ? '管理员' : '普通会员')}</div>
+                                </div>
+                                <button class="admin-action-btn upgrade-vip-btn" data-id="${u.id}" data-role="${role}">
+                                    ${role === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级为普通' : (role === 'admin' ? '<i class="fas fa-lock"></i> 不可降级' : '<i class="fas fa-crown"></i> 升级为VIP')}
+                                </button>
+                            </div>
+                        `;
+                    }
+                    container.innerHTML = html;
+                    // 绑定升级/降级按钮事件（管理员不可操作自己降级，但可以降级普通用户为VIP或反转）
+                    container.querySelectorAll('.upgrade-vip-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            e.stopPropagation();
+                            const userId = btn.dataset.id;
+                            const currentRole = btn.dataset.role;
+                            // 管理员角色不可在前端修改（安全限制，由后端控制）
+                            if(currentRole === 'admin'){
+                                showToast('管理员角色不能通过此界面修改', 'error');
+                                return;
+                            }
+                            const newRole = currentRole === 'vip' ? 'user' : 'vip';
+                            // 添加按钮加载状态
+                            const originalText = btn.innerHTML;
+                            btn.innerHTML = '<span class="loading-spinner" style="width:14px;height:14px;"></span> 处理中...';
+                            btn.disabled = true;
+                            try {
+                                await updateUserRole(userId, newRole);
+                                showToast(`用户已${newRole === 'vip' ? '升级为VIP' : '降级为普通会员'}`, 'success');
+                                // 重新打开模态框刷新列表
+                                await openAdminModal();
+                            } catch(err) {
+                                showToast('操作失败，请重试', 'error');
+                                btn.innerHTML = originalText;
+                                btn.disabled = false;
+                            }
+                        });
+                    });
+                } catch(err){
+                    container.innerHTML = '<div class="admin-loading">加载失败，请重试</div>';
+                    console.error(err);
+                }
+                document.getElementById('adminModal').classList.add('active');
+            }
+
+            function openAuth(tab='login'){
+                const m = document.getElementById('authModal');
+                document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
+                document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
+                document.getElementById('forgotForm').style.display = tab==='forgot'?'block':'none';
+                document.getElementById('authModalTitle').innerText = tab==='register'?'注册':(tab==='forgot'?'找回密码':'登录');
+                m.classList.add('active');
+                if(tab==='login') refCap('loginCaptchaQuestion','loginCaptchaInput');
+                else if(tab==='register') refCap('regCaptchaQuestion','regCaptchaInput');
+                else refCap('forgotCaptchaQuestion','forgotCaptchaInput');
+            }
+
+            function bindAuthEvents(){
                 document.getElementById('refreshLoginCaptcha').addEventListener('click',()=>refCap('loginCaptchaQuestion','loginCaptchaInput'));
                 document.getElementById('refreshRegCaptcha').addEventListener('click',()=>refCap('regCaptchaQuestion','regCaptchaInput'));
                 document.getElementById('refreshForgotCaptcha').addEventListener('click',()=>refCap('forgotCaptchaQuestion','forgotCaptchaInput'));
-                document.getElementById('registerBtn').addEventListener('click',async()=>{const un=document.getElementById('regUsername').value.trim(),em=document.getElementById('regEmail').value.trim(),pw=document.getElementById('regPassword').value,cf=document.getElementById('regConfirm').value,cap=document.getElementById('regCaptchaInput').value.trim();if(!un||!em||pw!==cf||pw.length<6)return showToast('信息不正确','error');if(!cap||parseInt(cap)!==currentCaptcha.answer)return showToast('验证码错误','error');try{if(await findUser(em))return showToast('邮箱已注册','error');await registerUser(em,pw,un);showToast('注册成功，请登录');openAuth('login');}catch(e){showToast(e.message,'error');}});
-                document.getElementById('loginBtn').addEventListener('click',async()=>{const em=document.getElementById('loginEmail').value.trim(),pw=document.getElementById('loginPassword').value,cap=document.getElementById('loginCaptchaInput').value.trim();if(!cap||parseInt(cap)!==currentCaptcha.answer)return showToast('验证码错误','error');try{currentUser=await loginUser(em,pw);localStorage.setItem('lezhe_user',JSON.stringify(currentUser));updateUserUI();document.getElementById('authModal').classList.remove('active');showToast('登录成功');location.reload();}catch(e){showToast(e.message,'error');}});
-                document.getElementById('resetPasswordBtn').addEventListener('click',async()=>{const em=document.getElementById('forgotEmail').value.trim(),np=document.getElementById('newPassword').value,cf=document.getElementById('confirmNewPassword').value,cap=document.getElementById('forgotCaptchaInput').value.trim();if(!em||np!==cf||np.length<6)return showToast('信息不正确','error');if(!cap||parseInt(cap)!==currentCaptcha.answer)return showToast('验证码错误','error');try{await updatePw(em,np);showToast('密码已重置');openAuth('login');}catch(e){showToast(e.message,'error');}});
+                document.getElementById('registerBtn').addEventListener('click', async ()=>{
+                    const username = document.getElementById('regUsername').value.trim();
+                    const email = document.getElementById('regEmail').value.trim();
+                    const pwd = document.getElementById('regPassword').value;
+                    const confirm = document.getElementById('regConfirm').value;
+                    const inviteCode = document.getElementById('regInviteCode').value.trim();
+                    const cap = document.getElementById('regCaptchaInput').value.trim();
+                    if(!username || !email || pwd !== confirm || pwd.length<6) return showToast('信息不正确','error');
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误','error');
+                    try{
+                        if(await findUserByEmail(email)) return showToast('邮箱已注册','error');
+                        await registerUser(email, pwd, username, inviteCode);
+                        showToast('注册成功，请登录','success');
+                        openAuth('login');
+                    }catch(e){ showToast(e.message,'error'); }
+                });
+                document.getElementById('loginBtn').addEventListener('click', async ()=>{
+                    const email = document.getElementById('loginEmail').value.trim();
+                    const pwd = document.getElementById('loginPassword').value;
+                    const cap = document.getElementById('loginCaptchaInput').value.trim();
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误','error');
+                    try{
+                        currentUser = await loginUser(email, pwd);
+                        localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
+                        updateUserUI();
+                        document.getElementById('authModal').classList.remove('active');
+                        showToast('登录成功','success');
+                        location.reload();
+                    }catch(e){ showToast(e.message,'error'); }
+                });
+                document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
+                    const email = document.getElementById('forgotEmail').value.trim();
+                    const newPwd = document.getElementById('newPassword').value;
+                    const confirm = document.getElementById('confirmNewPassword').value;
+                    const cap = document.getElementById('forgotCaptchaInput').value.trim();
+                    if(!email || newPwd !== confirm || newPwd.length<6) return showToast('信息不正确','error');
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误','error');
+                    try{
+                        await updatePassword(email, newPwd);
+                        showToast('密码重置成功，请登录','success');
+                        openAuth('login');
+                    }catch(e){ showToast(e.message,'error'); }
+                });
                 document.getElementById('showForgotBtn').addEventListener('click',()=>openAuth('forgot'));
                 document.getElementById('backToLoginFromForgot').addEventListener('click',()=>openAuth('login'));
                 document.getElementById('closeAuthModal').addEventListener('click',()=>document.getElementById('authModal').classList.remove('active'));
                 document.querySelectorAll('.auth-tab').forEach(t=>t.addEventListener('click',()=>openAuth(t.dataset.tab)));
-                document.getElementById('manageArticlesBtn').addEventListener('click',()=>{document.getElementById('articleManageModal').classList.add('active');renderAdmin();});
-                document.getElementById('closeArticleModal').addEventListener('click',()=>{document.getElementById('articleManageModal').classList.remove('active');document.getElementById('articleFormContainer').style.display='none';});
+                document.getElementById('manageArticlesBtn').addEventListener('click',()=>{
+                    document.getElementById('articleManageModal').classList.add('active');
+                    renderAdmin();
+                });
+                document.getElementById('closeArticleModal').addEventListener('click',()=>{
+                    document.getElementById('articleManageModal').classList.remove('active');
+                    document.getElementById('articleFormContainer').style.display='none';
+                });
                 document.getElementById('addNewArticleBtn').addEventListener('click',()=>showArtForm(null));
                 document.getElementById('saveArticleBtn').addEventListener('click',saveArt);
-                document.getElementById('cancelArticleBtn').addEventListener('click',()=>{document.getElementById('articleFormContainer').style.display='none';});
+                document.getElementById('cancelArticleBtn').addEventListener('click',()=>{ document.getElementById('articleFormContainer').style.display='none'; });
                 document.getElementById('closeDetailModal').addEventListener('click',()=>document.getElementById('articleDetailModal').classList.remove('active'));
+                document.getElementById('closeProfileModal').addEventListener('click',()=>document.getElementById('profileModal').classList.remove('active'));
+                document.getElementById('saveProfileBtn').addEventListener('click', async function(){
+                    const newPwd = document.getElementById('profileNewPwd').value;
+                    const confirm = document.getElementById('profileConfirmPwd').value;
+                    if(newPwd && newPwd !== confirm) return showToast('两次密码不一致','error');
+                    if(newPwd && newPwd.length<6) return showToast('密码至少6位','error');
+                    try{
+                        if(newPwd) await updatePassword(currentUser.email, newPwd);
+                        showToast('资料更新成功','success');
+                        document.getElementById('profileModal').classList.remove('active');
+                    }catch(e){ showToast('更新失败','error'); }
+                });
+                document.getElementById('closeAdminModal').addEventListener('click',()=>document.getElementById('adminModal').classList.remove('active'));
+                document.getElementById('submitFeedbackBtn').addEventListener('click', async function(){
+                    const msg = document.getElementById('feedbackMessage').value.trim();
+                    if(!msg) return showToast('请填写内容','error');
+                    this.disabled = true;
+                    try{
+                        if(isLocalFile){
+                            let list = JSON.parse(localStorage.getItem('feedback_list')||'[]');
+                            list.unshift({ name: document.getElementById('feedbackName').value||'网友', message: msg, time: new Date().toLocaleString() });
+                            if(list.length>20) list.pop();
+                            localStorage.setItem('feedback_list', JSON.stringify(list));
+                            showToast('留言成功');
+                            document.getElementById('feedbackMessage').value = '';
+                            renderFeedback();
+                        }else{
+                            await airReq('POST', 'Messages', { fields: { Name: document.getElementById('feedbackName').value||'网友', Message: msg } });
+                            showToast('留言成功');
+                            document.getElementById('feedbackMessage').value = '';
+                            renderFeedback();
+                        }
+                    }catch(e){ showToast('提交失败','error'); }
+                    finally{ this.disabled = false; }
+                });
             }
 
-            function renderAdmin(){const el=document.getElementById('articleAdminList');if(!articles.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章</div>';return;}el.innerHTML=`<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></tr></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody></table>`;el.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{const art=articles.find(a=>a.id===b.dataset.id);if(art)showArtForm(art);}));el.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',async()=>{if(confirm('确定删除？')){await deleteArticle(b.dataset.id);articles=await fetchArticles();renderAdmin();renderArtsList();}}));}
-            function showArtForm(art=null){editingArticleId=art?art.id:null;document.getElementById('articleTitle').value=art?.title||'';document.getElementById('articleCover').value=art?.cover||'';document.getElementById('articleExcerpt').value=art?.excerpt||'';document.getElementById('articleContent').value=art?.content||'';document.getElementById('articleTags').value=art?.tags||'';document.getElementById('articleFormContainer').style.display='block';}
-            async function saveArt(){const title=document.getElementById('articleTitle').value.trim();if(!title)return showToast('标题不能为空','error');const fields={Title:title,Cover:document.getElementById('articleCover').value,Excerpt:document.getElementById('articleExcerpt').value,Content:document.getElementById('articleContent').value,Tags:document.getElementById('articleTags').value};try{if(editingArticleId)await updateArticle(editingArticleId,fields);else await createArticle(fields);articles=await fetchArticles();renderAdmin();renderArtsList();document.getElementById('articleFormContainer').style.display='none';showToast('保存成功');}catch(e){showToast('保存失败','error');}}
-            function renderArtsList(){const el=document.getElementById('articlesList');if(!articles.length){el.innerHTML='<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>';return;}el.innerHTML=articles.map(a=>`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}"><div class="article-cover-sm" style="overflow:hidden;">${a.cover?`<img src="${esc(a.cover)}" style="width:100%;height:100%;object-fit:cover;border:none;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div style="display:none;width:100%;height:100%;background:#e8ecf3;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-image"></i></div>`:`<div style="width:100%;height:100%;background:#e8ecf3;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-file"></i></div>`}</div><div style="flex:1;min-width:0;"><div style="font-weight:550;font-size:0.85rem;">${esc(a.title)}</div><div style="font-size:0.6rem;color:var(--text-muted);">${new Date(a.createdAt).toLocaleDateString()}</div></div></div>`).join('');el.querySelectorAll('[data-id]').forEach(item=>item.addEventListener('click',()=>{const art=articles.find(a=>a.id===item.dataset.id);if(art){document.getElementById('articleDetailTitle').innerText=art.title;document.getElementById('articleDetailCover').src=art.cover||'';document.getElementById('articleDetailContent').innerHTML=art.content?.replace(/\n/g,'<br>')||'暂无正文';document.getElementById('articleDetailModal').classList.add('active');}}));}
+            // 搜索
+            const searchInput = document.getElementById('searchInput');
+            const searchSug = document.getElementById('searchSuggestions');
+            searchInput.addEventListener('input', e=>{
+                searchKeyword = e.target.value;
+                renderGrid();
+                const v = searchKeyword.toLowerCase().trim();
+                if(!v) { searchSug.classList.remove('active'); return; }
+                const matches = softwares.filter(s=>s.name.toLowerCase().includes(v)).slice(0,5);
+                if(!matches.length) { searchSug.classList.remove('active'); return; }
+                searchSug.innerHTML = matches.map(s=>`<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join('');
+                searchSug.classList.add('active');
+            });
+            document.addEventListener('click', e=>{ if(!searchSug.contains(e.target) && e.target!==searchInput) searchSug.classList.remove('active'); });
+            searchSug.addEventListener('click', e=>{
+                const item = e.target.closest('.suggestion-item');
+                if(item){
+                    searchInput.value = item.dataset.name;
+                    searchKeyword = item.dataset.name;
+                    searchSug.classList.remove('active');
+                    renderGrid();
+                }
+            });
+            document.getElementById('searchBtn').addEventListener('click', ()=>{ searchKeyword = searchInput.value; renderGrid(); });
 
-            const CAT_MAP={'adobe':'Adobe系列','autodesk':'Autodesk系列','c4d':'Cinema 4D','sketchup':'草图大师','rhino':'犀牛软件','plugin':'插件工具','other':'其他'};
-            function renderCats(){const el=document.getElementById('categoryTabs'),map=new Map();softwares.forEach(s=>map.set(CAT_MAP[s.category]||s.category,s.category));let h=`<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all">全部</button>`;[...map.entries()].sort().forEach(([d,k])=>h+=`<button class="cat-chip ${currentCategory===k?'active':''}" data-cat="${k}">${d}</button>`);el.innerHTML=h;el.querySelectorAll('.cat-chip').forEach(b=>b.addEventListener('click',()=>{currentCategory=b.dataset.cat;showAll=false;renderCats();renderGrid();}));}
-            function renderGrid(){const filtered=softwares.filter(s=>(currentCategory==='all'||s.category===currentCategory)&&s.name.toLowerCase().includes(searchKeyword.toLowerCase()));const items=showAll?filtered:filtered.slice(0,DEFAULT_LIMIT);const container=document.getElementById('softwareGridContainer');if(!items.length){container.innerHTML='<div class="no-results"><i class="fas fa-box-open"></i> 没有找到相关软件</div>';document.getElementById('loadMoreContainer').style.display='none';return;}container.innerHTML=items.map(sw=>{const isNew=(new Date()-new Date(sw.addedDate||'2024-01-01'))<7*86400000,isHot=sw.downloads>2000;return`<div class="software-card" data-name="${esc(sw.name)}">${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}<div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon,sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div><div class="version">版本 ${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${sw.os.map(o=>`<span class="os-badge">${o==='Windows'?'<i class="fab fa-windows"></i>':'<i class="fab fa-apple"></i>'} ${o}</span>`).join('')}</div><div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`;}).join('');document.getElementById('loadMoreContainer').style.display=(!showAll&&filtered.length>DEFAULT_LIMIT)?'block':'none';container.querySelectorAll('.software-card').forEach(c=>c.addEventListener('click',e=>{const sw=softwares.find(s=>s.name===c.dataset.name);if(sw)download(sw);}));}
-            window._loadMore=()=>{showAll=true;renderGrid();};
-            function download(sw){addHist(sw);window.open(sw.url,'_blank');if(sw.id&&!sw.id.startsWith('b'))incDl(sw.id);}
-            function addHist(sw){let h=JSON.parse(localStorage.getItem('browseHistory')||'[]');h=h.filter(i=>i.name!==sw.name);h.unshift({name:sw.name});if(h.length>10)h.pop();localStorage.setItem('browseHistory',JSON.stringify(h));renderHist();}
-            function renderHist(){const h=JSON.parse(localStorage.getItem('browseHistory')||'[]');document.getElementById('historyList').innerHTML=h.length?h.map(i=>`<div class="history-item">${esc(i.name)}</div>`).join(''):'<div style="color:var(--text-muted);">暂无</div>';}
-            document.getElementById('clearHistoryBtn').addEventListener('click',()=>{localStorage.removeItem('browseHistory');renderHist();});
-            async function incDl(id){try{const r=await airReq('GET',`softwares/${id}`);await airReq('PATCH',`softwares/${id}`,{fields:{downloads:(r.fields.downloads||0)+1}});const sw=softwares.find(s=>s.id===id);if(sw)sw.downloads++;renderRank();}catch(e){}}
-            function renderRank(){const sorted=[...softwares].sort((a,b)=>(b.downloads||0)-(a.downloads||0));document.getElementById('rankList').innerHTML=sorted.slice(0,5).map((sw,i)=>`<div class="rank-item"><span class="rank-index ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</span> ${esc(sw.name)}</div>`).join('');}
-
-            const hotScroll=document.getElementById('hotScroll');let hotInt=null;
-            function startHot(){if(!hotScroll)return;clearInterval(hotInt);hotInt=setInterval(()=>{if(hotScroll.scrollLeft>=hotScroll.scrollWidth-hotScroll.clientWidth-10)hotScroll.scrollTo({left:0,behavior:'smooth'});else hotScroll.scrollBy({left:200,behavior:'smooth'});},2000);}
-            function stopHot(){clearInterval(hotInt);}
-            document.getElementById('hotArrowLeft').addEventListener('click',()=>{hotScroll.scrollBy({left:-200});stopHot();startHot();});
-            document.getElementById('hotArrowRight').addEventListener('click',()=>{hotScroll.scrollBy({left:200});stopHot();startHot();});
-            function renderHot(){if(!softwares.length)return;hotScroll.innerHTML=[...softwares].sort((a,b)=>(b.downloads||0)-(a.downloads||0)).slice(0,6).map(sw=>`<div class="hot-card" data-name="${esc(sw.name)}"><div class="hot-icon">${renderIconHtml(sw.icon,sw.name)}</div><div class="hot-name">${esc(sw.name)}</div><div class="hot-meta"><span>${sw.os.join(' · ')}</span><span class="hot-downloads"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`).join('');hotScroll.querySelectorAll('.hot-card').forEach(c=>c.addEventListener('click',()=>{const sw=softwares.find(s=>s.name===c.dataset.name);if(sw)download(sw);}));hotScroll.addEventListener('mouseenter',stopHot);hotScroll.addEventListener('mouseleave',startHot);startHot();}
-
-            const searchInput=document.getElementById('searchInput'),searchSug=document.getElementById('searchSuggestions');
-            searchInput.addEventListener('input',e=>{searchKeyword=e.target.value;renderGrid();const v=searchKeyword.toLowerCase().trim();if(!v)return searchSug.classList.remove('active');const matches=softwares.filter(s=>s.name.toLowerCase().includes(v)).slice(0,5);if(!matches.length)return searchSug.classList.remove('active');searchSug.innerHTML=matches.map(s=>`<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join('');searchSug.classList.add('active');});
-            document.addEventListener('click',e=>{if(!searchSug.contains(e.target)&&e.target!==searchInput)searchSug.classList.remove('active');});
-            searchSug.addEventListener('click',e=>{const item=e.target.closest('.suggestion-item');if(item){searchInput.value=item.dataset.name;searchKeyword=item.dataset.name;searchSug.classList.remove('active');renderGrid();}});
-            document.getElementById('submitFeedbackBtn').addEventListener('click',async function(){const msg=document.getElementById('feedbackMessage').value.trim();if(!msg)return showToast('请填写内容','error');this.disabled=true;try{await airReq('POST','Messages',{fields:{Name:document.getElementById('feedbackName').value||'网友',Message:msg}});showToast('留言成功');document.getElementById('feedbackMessage').value='';}catch(e){showToast('提交失败','error');}finally{this.disabled=false;}});
-
-            const plugins=[{name:'AE 特效套装',software:'After Effects'},{name:'PS 磨皮润色',software:'Photoshop'},{name:'AI 矢量增强',software:'Illustrator'},{name:'PR 转场大师',software:'Premiere Pro'},{name:'LR 批量调色',software:'Lightroom'},{name:'达芬奇 LUTs',software:'DaVinci Resolve'}];
-            const PAY_CODES={wechat:'https://img.cdn1.vip/i/69ec0bb88e003_1777077176.webp',alipay:'https://img.cdn1.vip/i/69ec0bdf4d571_1777077215.webp'};let payMethod='wechat';
-            document.getElementById('pluginListContainer').innerHTML=plugins.map(p=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light);"><div><strong>${p.name}</strong><div style="font-size:0.7rem;color:var(--text-muted);">适用：${p.software}</div></div><div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--success);font-weight:700;">¥30</span><button onclick="window._openPay('${p.name}')" style="background:var(--primary);color:#fff;border:none;border-radius:15px;padding:5px 14px;cursor:pointer;">购买</button></div></div>`).join('');
-            window._openPay=function(name){document.getElementById('payPluginName').innerText=name;document.getElementById('payQrImage').src=PAY_CODES[payMethod];document.getElementById('payModal').classList.add('active');};
-            document.getElementById('closePluginModal').addEventListener('click',()=>document.getElementById('pluginModal').classList.remove('active'));
-            document.getElementById('closePayModal').addEventListener('click',()=>document.getElementById('payModal').classList.remove('active'));
-            document.querySelectorAll('.pay-tab').forEach(t=>t.addEventListener('click',function(){document.querySelectorAll('.pay-tab').forEach(x=>x.style.background='transparent');this.style.background='var(--primary)';this.style.color='#fff';payMethod=this.dataset.method;document.getElementById('payQrImage').src=PAY_CODES[payMethod];}));
-
-            let bannerInt=null,sidebarInt=null,curB=0,curS=0;
-            function renderCarousel(slides,dots,ads,isB){slides.innerHTML=ads.map((a,i)=>`<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="${i===0?'eager':'lazy'}" onload="this.classList.add('loaded')" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join('');if(ads.length<=1){dots.style.display='none';return;}dots.style.display='flex';dots.innerHTML=ads.map((_,i)=>`<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join('');const update=(idx)=>{if(isB)curB=idx;else curS=idx;slides.style.transform=`translateX(-${idx*100}%)`;dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));};dots.querySelectorAll('.carousel-dot').forEach(d=>d.addEventListener('click',e=>{update(parseInt(e.target.dataset.index));resetCar(isB);}));return update;}
-            function startCar(isB){clearInterval(isB?bannerInt:sidebarInt);const ads=isB?bannerAds:sidebarAds;if(ads.length<=1)return;const int=setInterval(()=>{const nxt=((isB?curB:curS)+1)%ads.length;if(isB)curB=nxt;else curS=nxt;const slides=isB?document.getElementById('categoryBannerSlides'):document.getElementById('sidebarCarouselSlides');slides.style.transform=`translateX(-${nxt*100}%)`;const dots=isB?document.getElementById('categoryBannerDots'):document.getElementById('sidebarCarouselDots');dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===nxt));},4000);if(isB)bannerInt=int;else sidebarInt=int;}
-            function resetCar(isB){clearInterval(isB?bannerInt:sidebarInt);startCar(isB);}
-
+            // ==================== 加载数据（缓存优先） ====================
             function renderAllFromCache(){
                 const cachedSoft = localStorage.getItem('cachedSoft');
                 const cachedAds = localStorage.getItem('cachedAds');
-                if(cachedSoft) {
-                    try {
+                if(cachedSoft){
+                    try{
                         softwares = JSON.parse(cachedSoft);
-                        if(softwares.length) {
+                        if(softwares.length){
                             renderCats();
                             renderGrid();
                             renderHot();
                             renderRank();
-                            renderHist();
+                            renderHistory();
                         }
-                    } catch(e) {}
+                    }catch(e){}
                 }
-                if(cachedAds) {
-                    try {
+                if(cachedAds){
+                    try{
                         const ads = JSON.parse(cachedAds);
-                        if(Array.isArray(ads)) {
+                        if(Array.isArray(ads)){
                             const bn = ads.filter(a => a.position === 'banner');
                             const sb = ads.filter(a => a.position === 'sidebar');
-                            if(bn.length) {
+                            if(bn.length){
                                 bannerAds = bn;
                                 renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true);
                                 startCar(true);
                             }
-                            if(sb.length) {
+                            if(sb.length){
                                 sidebarAds = sb;
                                 renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false);
                                 startCar(false);
                             }
                         }
-                    } catch(e) {}
+                    }catch(e){}
                 }
             }
 
             async function loadAll(){
                 renderAllFromCache();
-                try {
-                    const [swData, adData] = await Promise.all([fetchSoftwares(), fetchAds()]);
-                    if(swData.length) softwares = swData;
-                    const bn = adData.filter(a => a.position === 'banner');
-                    const sb = adData.filter(a => a.position === 'sidebar');
-                    if(bn.length) {
-                        bannerAds = bn;
-                        renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true);
-                        startCar(true);
+                if(!isLocalFile){
+                    try{
+                        const [swData, adData] = await Promise.all([fetchSoftwares(), fetchAds()]);
+                        if(swData.length) softwares = swData;
+                        const bn = adData.filter(a => a.position === 'banner');
+                        const sb = adData.filter(a => a.position === 'sidebar');
+                        if(bn.length){
+                            bannerAds = bn;
+                            renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true);
+                            startCar(true);
+                        }
+                        if(sb.length){
+                            sidebarAds = sb;
+                            renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false);
+                            startCar(false);
+                        }
+                        renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory();
+                    }catch(e){
+                        console.warn('网络数据加载失败，保留缓存显示', e);
                     }
-                    if(sb.length) {
-                        sidebarAds = sb;
-                        renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false);
+                } else {
+                    // 本地模式，确保默认广告和软件已加载
+                    if(!bannerAds.length || !sidebarAds.length){
+                        const ads = await fetchAds();
+                        bannerAds = ads.filter(a => a.position === 'banner');
+                        sidebarAds = ads.filter(a => a.position === 'sidebar');
+                        renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds, true);
+                        startCar(true);
+                        renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds, false);
                         startCar(false);
                     }
-                    renderCats(); renderGrid(); renderHot(); renderRank(); renderHist();
-                } catch(e) {
-                    console.warn('网络数据加载失败，保留缓存显示', e);
+                    if(!softwares.length){
+                        softwares = await fetchSoftwares();
+                        renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory();
+                    }
                 }
                 articles = await fetchArticles();
                 renderArtsList();
+                await renderFeedback();
             }
 
-            if(localStorage.getItem('lezhe_user')){try{currentUser=JSON.parse(localStorage.getItem('lezhe_user'));}catch(e){}}
-            updateUserUI(); bindEvents(); refCap('loginCaptchaQuestion','loginCaptchaInput'); loadAll();
-            window.addEventListener('scroll',()=>document.getElementById('backToTop').classList.toggle('show',window.scrollY>500));
-            document.getElementById('backToTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+            // 初始化
+            if(localStorage.getItem('lezhe_user')){
+                try{ currentUser = JSON.parse(localStorage.getItem('lezhe_user')); }catch(e){}
+            }
+            updateUserUI();
+            bindAuthEvents();
+            refCap('loginCaptchaQuestion','loginCaptchaInput');
+            loadAll();
+
+            window.addEventListener('scroll', ()=>document.getElementById('backToTop').classList.toggle('show', window.scrollY>500));
+            document.getElementById('backToTop').addEventListener('click', ()=>window.scrollTo({ top:0, behavior:'smooth' }));
         })();
     </script>
 </body>
