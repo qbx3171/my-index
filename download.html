@@ -726,7 +726,7 @@
             async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地模式不支持更新文章'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
             async function deleteArticle(id){ if(isLocalFile) throw new Error('本地模式不支持删除文章'); return await airReq('DELETE',`Articles/${id}`); }
 
-            // ==================== 用户相关（本地模拟 + Airtable），重点修复邀请码显示 ====================
+            // ==================== 用户相关（关键修复：确保邀请码显示） ====================
             async function findUserByEmail(email){
                 if(isLocalFile){
                     const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -800,19 +800,26 @@
                         email: user.email,
                         username: user.username,
                         role: user.role || 'user',
-                        inviteCode: user.inviteCode || ''
+                        inviteCode: user.inviteCode
                     };
                 }
                 const rec = await findUserByEmail(email);
                 if(!rec) throw new Error('邮箱未注册');
                 const hash = CryptoJS.SHA256(password).toString();
                 if(rec.fields.Password !== hash) throw new Error('密码错误');
+                let inviteCode = rec.fields.InviteCode || '';
+                // 如果 Airtable 中没有邀请码，自动生成并更新
+                if(!inviteCode){
+                    inviteCode = Math.random().toString(36).substring(2,10).toUpperCase();
+                    await airReq('PATCH', `Users/${rec.id}`, { fields: { InviteCode: inviteCode } });
+                    showToast('已为您生成邀请码，请刷新个人中心查看', 'success');
+                }
                 return {
                     id: rec.id,
                     email: rec.fields.Email,
                     username: rec.fields.Username || email.split('@')[0],
                     role: rec.fields.Role || 'user',
-                    inviteCode: rec.fields.InviteCode || ''
+                    inviteCode: inviteCode
                 };
             }
             async function updatePassword(email, newPass){
@@ -1033,7 +1040,7 @@
             function renderAdmin(){
                 const el = document.getElementById('articleAdminList');
                 if(!articles.length){ el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章</div>'; return; }
-                el.innerHTML = `<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th><tr></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody></table>`;
+                el.innerHTML = `<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></tr></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody></table>`;
                 el.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{ const art = articles.find(a=>a.id===b.dataset.id); if(art) showArtForm(art); }));
                 el.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',async()=>{ if(confirm('确定删除？')){ await deleteArticle(b.dataset.id); articles = await fetchArticles(); renderAdmin(); renderArtsList(); } }));
             }
@@ -1158,7 +1165,7 @@
                 document.getElementById('profileUsername').innerText = currentUser.username;
                 document.getElementById('profileRole').innerHTML = currentUser.role === 'vip' ? 'VIP会员（无限下载）' : '普通会员（30次/月）';
                 document.getElementById('profileRemaining').innerText = currentUser.role === 'vip' ? '∞' : getRemainingCount(currentUser);
-                document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无';
+                document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无（请重新登录）';
                 document.getElementById('profileModal').classList.add('active');
             }
 
