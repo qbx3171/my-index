@@ -213,63 +213,9 @@
     </div>
 
     <!-- 模态框 -->
-    <div id="authModal" class="modal-overlay">
-        <div class="modal-card" style="max-width:440px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
-            <div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div>
-            <div id="loginForm">
-                <input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div>
-                <button id="showForgotBtn" style="background:none;border:none;color:var(--primary);margin-bottom:12px;">忘记密码？</button>
-                <button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">登录</button>
-            </div>
-            <div id="registerForm" style="display:none;">
-                <input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div>
-                <button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">注册</button>
-            </div>
-            <div id="forgotForm" style="display:none;">
-                <input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="forgotCaptchaQuestion"></span><button id="refreshForgotCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div>
-                <button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">重置密码</button>
-                <button id="backToLoginFromForgot" style="background:none;border:none;color:var(--primary);margin-top:10px;">返回登录</button>
-            </div>
-        </div>
-    </div>
-    <div id="articleManageModal" class="modal-overlay">
-        <div class="modal-card" style="max-width:700px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-weight:700;">文章管理</h3><button id="closeArticleModal" style="background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
-            <button id="addNewArticleBtn" class="admin-btn admin-btn-add" style="margin-bottom:16px; background:var(--success); color:#fff; padding:8px 18px; border-radius:20px; border:none; cursor:pointer; font-weight:600;">+ 新增文章</button>
-            <div id="articleAdminList"></div>
-            <div id="articleFormContainer" style="display:none; margin-top:16px; background:var(--bg); border-radius:16px; padding:20px;">
-                <h4 style="margin-bottom:14px;">编辑/新增文章</h4>
-                <div class="article-form-group"><label>标题</label><input type="text" id="articleTitle" placeholder="文章标题" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div>
-                <div class="article-form-group"><label>封面图片URL</label><input type="text" id="articleCover" placeholder="图片链接" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div>
-                <div class="article-form-group"><label>摘要</label><textarea id="articleExcerpt" rows="2" placeholder="简短摘要" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div>
-                <div class="article-form-group"><label>正文内容</label><textarea id="articleContent" rows="5" placeholder="详细内容..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div>
-                <div class="article-form-group"><label>标签 (逗号分隔)</label><input type="text" id="articleTags" placeholder="教程, 技巧" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div>
-                <div style="display:flex; gap:8px; margin-top:16px;">
-                    <button id="saveArticleBtn" style="background:var(--success); color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">保存</button>
-                    <button id="cancelArticleBtn" style="background:#94a3b8; color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">取消</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="articleDetailModal" class="modal-overlay">
-        <div class="modal-card" style="max-width:600px;">
-            <button id="closeDetailModal" style="float:right; background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button>
-            <h3 id="articleDetailTitle"></h3>
-            <img id="articleDetailCover" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin:10px 0;">
-            <div id="articleDetailContent" style="line-height:1.7;"></div>
-            <div id="articleDetailMeta" style="margin-top:12px; font-size:0.7rem; color:var(--text-muted);"></div>
-        </div>
-    </div>
+    <div id="authModal" class="modal-overlay"><div class="modal-card" style="max-width:440px;"><div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div><div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div><button id="showForgotBtn" style="background:none;border:none;color:var(--primary);margin-bottom:12px;">忘记密码？</button><button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">登录</button></div><div id="registerForm" style="display:none;"><input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div><button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">注册</button></div><div id="forgotForm" style="display:none;"><input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="forgotCaptchaQuestion"></span><button id="refreshForgotCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div><button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">重置密码</button><button id="backToLoginFromForgot" style="background:none;border:none;color:var(--primary);margin-top:10px;">返回登录</button></div></div></div>
+    <div id="articleManageModal" class="modal-overlay"><div class="modal-card" style="max-width:700px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-weight:700;">文章管理</h3><button id="closeArticleModal" style="background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button></div><button id="addNewArticleBtn" class="admin-btn admin-btn-add" style="margin-bottom:16px; background:var(--success); color:#fff; padding:8px 18px; border-radius:20px; border:none; cursor:pointer; font-weight:600;">+ 新增文章</button><div id="articleAdminList"></div><div id="articleFormContainer" style="display:none; margin-top:16px; background:var(--bg); border-radius:16px; padding:20px;"><h4 style="margin-bottom:14px;">编辑/新增文章</h4><div class="article-form-group"><label>标题</label><input type="text" id="articleTitle" placeholder="文章标题" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div class="article-form-group"><label>封面图片URL</label><input type="text" id="articleCover" placeholder="图片链接" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div class="article-form-group"><label>摘要</label><textarea id="articleExcerpt" rows="2" placeholder="简短摘要" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div><div class="article-form-group"><label>正文内容</label><textarea id="articleContent" rows="5" placeholder="详细内容..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div><div class="article-form-group"><label>标签 (逗号分隔)</label><input type="text" id="articleTags" placeholder="教程, 技巧" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div style="display:flex; gap:8px; margin-top:16px;"><button id="saveArticleBtn" style="background:var(--success); color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">保存</button><button id="cancelArticleBtn" style="background:#94a3b8; color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">取消</button></div></div></div></div>
+    <div id="articleDetailModal" class="modal-overlay"><div class="modal-card" style="max-width:600px;"><button id="closeDetailModal" style="float:right; background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h3 id="articleDetailTitle"></h3><img id="articleDetailCover" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin:10px 0;"><div id="articleDetailContent" style="line-height:1.7;"></div><div id="articleDetailMeta" style="margin-top:12px; font-size:0.7rem; color:var(--text-muted);"></div></div></div>
     <div id="pluginModal" class="modal-overlay"><div class="modal-card" style="max-width:500px;"><button id="closePluginModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>插件商店</h2><div id="pluginListContainer"></div></div></div>
     <div id="payModal" class="modal-overlay"><div class="modal-card" style="max-width:400px;text-align:center;"><button id="closePayModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>购买插件</h2><p id="payPluginName"></p><div style="display:flex;gap:8px;justify-content:center;margin:14px 0;"><button class="pay-tab active" data-method="wechat" style="padding:8px 18px;border-radius:20px;background:var(--primary);color:#fff;border:none;">微信</button><button class="pay-tab" data-method="alipay" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);color:var(--text);">支付宝</button></div><img id="payQrImage" style="width:180px;height:180px;margin:10px auto;display:block;border-radius:12px;"><p style="font-weight:bold;">¥30.00</p><p>客服微信：Win_Mac_123</p></div></div>
     <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
@@ -309,6 +255,41 @@
             function getField(f,p,def=''){for(let n of p)if(f[n]!==undefined)return f[n];return def;}
             function parseIcon(iconField,name){if(!iconField)return{type:'text',value:getStdAbbr(name)};if(Array.isArray(iconField)&&iconField[0]?.url)return{type:'image',value:iconField[0].url};if(typeof iconField==='string'){if(iconField.startsWith('http')||iconField.startsWith('data:image'))return{type:'image',value:iconField};if(iconField.startsWith('fa-')||iconField.startsWith('fas '))return{type:'icon',value:iconField};return{type:'text',value:iconField};}return{type:'text',value:getStdAbbr(name)};}
 
+            // 立即从缓存加载（秒开）
+            const cachedSoft = localStorage.getItem('cachedSoft');
+            const cachedAds = localStorage.getItem('cachedAds');
+            if(cachedSoft) {
+                try {
+                    softwares = JSON.parse(cachedSoft);
+                    if(softwares.length) {
+                        renderCats();
+                        renderGrid();
+                        renderHot();
+                        renderRank();
+                        renderHist();
+                    }
+                } catch(e) {}
+            }
+            if(cachedAds) {
+                try {
+                    const ads = JSON.parse(cachedAds);
+                    if(Array.isArray(ads)) {
+                        const bn = ads.filter(a => a.position === 'banner');
+                        const sb = ads.filter(a => a.position === 'sidebar');
+                        if(bn.length) {
+                            bannerAds = bn;
+                            renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true);
+                            startCar(true);
+                        }
+                        if(sb.length) {
+                            sidebarAds = sb;
+                            renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false);
+                            startCar(false);
+                        }
+                    }
+                } catch(e) {}
+            }
+
             async function fetchSoftwares(){try{const data=await airReq('GET','softwares?maxRecords=100');const result=data.records.map(rec=>{const f=rec.fields;const name=getField(f,['A name','name','Name'],'未命名');return{id:rec.id,name,category:getField(f,['A category','category','Category'],'other'),version:getField(f,['version','Version'],''),description:getField(f,['description','Description'],''),icon:parseIcon(getField(f,['icon','Icon'],null),name),url:getField(f,['url','URL'],'#'),addedDate:getField(f,['addedDate','AddedDate'],new Date().toISOString().split('T')[0]),downloads:Number(getField(f,['downloads','Downloads'],Math.floor(Math.random()*4000)+100)),os:(()=>{let o=getField(f,['os','OS'],null);return o?(Array.isArray(o)?o:o.split(',').map(s=>s.trim())):['Windows','Mac'];})()};});localStorage.setItem('cachedSoft',JSON.stringify(result));return result;}catch(e){const cached=localStorage.getItem('cachedSoft');return cached?JSON.parse(cached):[];}}
             async function fetchAds(){try{const data=await airReq('GET','Ads?maxRecords=50');const result=data.records.map(r=>{const f=r.fields;let img=f.Image||f.image||'';if(Array.isArray(img)&&img[0]&&img[0].url)img=img[0].url;return{image:img,link:f.Link||f.link||'#',title:f.Title||f.title||'',position:(f.Position||f.position||'sidebar').toLowerCase(),enabled:f.Enabled!==false};}).filter(a=>a.enabled&&a.image&&a.link);localStorage.setItem('cachedAds',JSON.stringify(result));return result;}catch(e){const cached=localStorage.getItem('cachedAds');return cached?JSON.parse(cached):[];}}
             async function fetchArticles(){try{const data=await airReq('GET','Articles?maxRecords=50&sort[0][field]=CreatedAt&sort[0][direction]=desc');return data.records.map(rec=>({id:rec.id,title:rec.fields.Title||'无标题',cover:rec.fields.Cover||'',excerpt:rec.fields.Excerpt||'',content:rec.fields.Content||'',tags:rec.fields.Tags||'',createdAt:rec.fields.CreatedAt||new Date().toISOString()}));}catch(e){return[];}}
@@ -342,7 +323,7 @@
                 document.getElementById('closeDetailModal').addEventListener('click',()=>document.getElementById('articleDetailModal').classList.remove('active'));
             }
 
-            function renderAdmin(){const el=document.getElementById('articleAdminList');if(!articles.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章</div>';return;}el.innerHTML=`<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody></table>`;el.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{const art=articles.find(a=>a.id===b.dataset.id);if(art)showArtForm(art);}));el.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',async()=>{if(confirm('确定删除？')){await deleteArticle(b.dataset.id);articles=await fetchArticles();renderAdmin();renderArtsList();}}));}
+            function renderAdmin(){const el=document.getElementById('articleAdminList');if(!articles.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章</div>';return;}el.innerHTML=`<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody>在美国`;el.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{const art=articles.find(a=>a.id===b.dataset.id);if(art)showArtForm(art);}));el.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',async()=>{if(confirm('确定删除？')){await deleteArticle(b.dataset.id);articles=await fetchArticles();renderAdmin();renderArtsList();}}));}
             function showArtForm(art=null){editingArticleId=art?art.id:null;document.getElementById('articleTitle').value=art?.title||'';document.getElementById('articleCover').value=art?.cover||'';document.getElementById('articleExcerpt').value=art?.excerpt||'';document.getElementById('articleContent').value=art?.content||'';document.getElementById('articleTags').value=art?.tags||'';document.getElementById('articleFormContainer').style.display='block';}
             async function saveArt(){const title=document.getElementById('articleTitle').value.trim();if(!title)return showToast('标题不能为空','error');const fields={Title:title,Cover:document.getElementById('articleCover').value,Excerpt:document.getElementById('articleExcerpt').value,Content:document.getElementById('articleContent').value,Tags:document.getElementById('articleTags').value};try{if(editingArticleId)await updateArticle(editingArticleId,fields);else await createArticle(fields);articles=await fetchArticles();renderAdmin();renderArtsList();document.getElementById('articleFormContainer').style.display='none';showToast('保存成功');}catch(e){showToast('保存失败','error');}}
             function renderArtsList(){const el=document.getElementById('articlesList');if(!articles.length){el.innerHTML='<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>';return;}el.innerHTML=articles.map(a=>`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}"><div class="article-cover-sm" style="overflow:hidden;">${a.cover?`<img src="${esc(a.cover)}" style="width:100%;height:100%;object-fit:cover;border:none;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div style="display:none;width:100%;height:100%;background:#e8ecf3;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-image"></i></div>`:`<div style="width:100%;height:100%;background:#e8ecf3;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-file"></i></div>`}</div><div style="flex:1;min-width:0;"><div style="font-weight:550;font-size:0.85rem;">${esc(a.title)}</div><div style="font-size:0.6rem;color:var(--text-muted);">${new Date(a.createdAt).toLocaleDateString()}</div></div></div>`).join('');el.querySelectorAll('[data-id]').forEach(item=>item.addEventListener('click',()=>{const art=articles.find(a=>a.id===item.dataset.id);if(art){document.getElementById('articleDetailTitle').innerText=art.title;document.getElementById('articleDetailCover').src=art.cover||'';document.getElementById('articleDetailContent').innerHTML=art.content?.replace(/\n/g,'<br>')||'暂无正文';document.getElementById('articleDetailModal').classList.add('active');}}));}
@@ -352,7 +333,6 @@
             function renderGrid(){const filtered=softwares.filter(s=>(currentCategory==='all'||s.category===currentCategory)&&s.name.toLowerCase().includes(searchKeyword.toLowerCase()));const items=showAll?filtered:filtered.slice(0,DEFAULT_LIMIT);const container=document.getElementById('softwareGridContainer');if(!items.length){container.innerHTML='<div class="no-results"><i class="fas fa-box-open"></i> 没有找到相关软件</div>';document.getElementById('loadMoreContainer').style.display='none';return;}container.innerHTML=items.map(sw=>{const isNew=(new Date()-new Date(sw.addedDate||'2024-01-01'))<7*86400000,isHot=sw.downloads>2000;return`<div class="software-card" data-name="${esc(sw.name)}">${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}<div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon,sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div><div class="version">版本 ${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${sw.os.map(o=>`<span class="os-badge">${o==='Windows'?'<i class="fab fa-windows"></i>':'<i class="fab fa-apple"></i>'} ${o}</span>`).join('')}</div><div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`;}).join('');document.getElementById('loadMoreContainer').style.display=(!showAll&&filtered.length>DEFAULT_LIMIT)?'block':'none';container.querySelectorAll('.software-card').forEach(c=>c.addEventListener('click',e=>{const sw=softwares.find(s=>s.name===c.dataset.name);if(sw)download(sw);}));}
             window._loadMore=()=>{showAll=true;renderGrid();};
             
-            // ========== 修复点：未登录时弹出登录窗口 ==========
             function download(sw){
                 if (!currentUser) {
                     showToast('请先登录后再下载软件', 'error');
@@ -363,7 +343,6 @@
                 window.open(sw.url,'_blank');
                 if(sw.id&&!sw.id.startsWith('b'))incDl(sw.id);
             }
-            // =============================================
             
             function addHist(sw){let h=JSON.parse(localStorage.getItem('browseHistory')||'[]');h=h.filter(i=>i.name!==sw.name);h.unshift({name:sw.name});if(h.length>10)h.pop();localStorage.setItem('browseHistory',JSON.stringify(h));renderHist();}
             function renderHist(){const h=JSON.parse(localStorage.getItem('browseHistory')||'[]');document.getElementById('historyList').innerHTML=h.length?h.map(i=>`<div class="history-item">${esc(i.name)}</div>`).join(''):'<div style="color:var(--text-muted);">暂无</div>';}
@@ -397,71 +376,49 @@
             function startCar(isB){clearInterval(isB?bannerInt:sidebarInt);const ads=isB?bannerAds:sidebarAds;if(ads.length<=1)return;const int=setInterval(()=>{const nxt=((isB?curB:curS)+1)%ads.length;if(isB)curB=nxt;else curS=nxt;const slides=isB?document.getElementById('categoryBannerSlides'):document.getElementById('sidebarCarouselSlides');slides.style.transform=`translateX(-${nxt*100}%)`;const dots=isB?document.getElementById('categoryBannerDots'):document.getElementById('sidebarCarouselDots');dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===nxt));},4000);if(isB)bannerInt=int;else sidebarInt=int;}
             function resetCar(isB){clearInterval(isB?bannerInt:sidebarInt);startCar(isB);}
 
-            function renderAllFromCache(){
-                const cachedSoft = localStorage.getItem('cachedSoft');
-                const cachedAds = localStorage.getItem('cachedAds');
-                if(cachedSoft) {
-                    try {
-                        softwares = JSON.parse(cachedSoft);
-                        if(softwares.length) {
-                            renderCats();
-                            renderGrid();
-                            renderHot();
-                            renderRank();
-                            renderHist();
-                        }
-                    } catch(e) {}
-                }
-                if(cachedAds) {
-                    try {
-                        const ads = JSON.parse(cachedAds);
-                        if(Array.isArray(ads)) {
-                            const bn = ads.filter(a => a.position === 'banner');
-                            const sb = ads.filter(a => a.position === 'sidebar');
-                            if(bn.length) {
-                                bannerAds = bn;
-                                renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true);
-                                startCar(true);
-                            }
-                            if(sb.length) {
-                                sidebarAds = sb;
-                                renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false);
-                                startCar(false);
-                            }
-                        }
-                    } catch(e) {}
-                }
-            }
-
+            // 后台静默更新数据（不阻塞页面）
             async function loadAll(){
-                renderAllFromCache();
                 try {
                     const [swData, adData] = await Promise.all([fetchSoftwares(), fetchAds()]);
-                    if(swData.length) softwares = swData;
+                    if(swData.length && JSON.stringify(swData) !== JSON.stringify(softwares)) {
+                        softwares = swData;
+                        renderCats(); renderGrid(); renderHot(); renderRank();
+                    }
                     const bn = adData.filter(a => a.position === 'banner');
                     const sb = adData.filter(a => a.position === 'sidebar');
-                    if(bn.length) {
+                    if(bn.length && JSON.stringify(bn) !== JSON.stringify(bannerAds)) {
                         bannerAds = bn;
                         renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true);
                         startCar(true);
                     }
-                    if(sb.length) {
+                    if(sb.length && JSON.stringify(sb) !== JSON.stringify(sidebarAds)) {
                         sidebarAds = sb;
                         renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false);
                         startCar(false);
                     }
-                    renderCats(); renderGrid(); renderHot(); renderRank(); renderHist();
                 } catch(e) {
-                    console.warn('网络数据加载失败，保留缓存显示', e);
+                    console.warn('后台更新失败，保留缓存显示', e);
                 }
                 articles = await fetchArticles();
                 renderArtsList();
             }
 
             if(localStorage.getItem('lezhe_user')){try{currentUser=JSON.parse(localStorage.getItem('lezhe_user'));}catch(e){}}
-            updateUserUI(); bindEvents(); refCap('loginCaptchaQuestion','loginCaptchaInput'); loadAll();
+            updateUserUI(); bindEvents(); refCap('loginCaptchaQuestion','loginCaptchaInput'); 
+            loadAll();  // 后台静默更新
+            
             window.addEventListener('scroll',()=>document.getElementById('backToTop').classList.toggle('show',window.scrollY>500));
             document.getElementById('backToTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+        })();
+    </script>
+    
+    <!-- 百度自动推送（每天自动提交页面到百度收录） -->
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(bp, s);
         })();
     </script>
 </body>
