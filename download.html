@@ -584,7 +584,10 @@
                 for(let i=0;i<=retries;i++){
                     try{
                         const r = await fetchWithTimeout(url, opts, 5000);
-                        if(!r.ok) throw new Error(`HTTP ${r.status}`);
+                        if(!r.ok){
+                            const errText = await r.text();
+                            throw new Error(`HTTP ${r.status}: ${errText.substring(0,100)}`);
+                        }
                         return await r.json();
                     }catch(e){
                         if(i===retries) throw e;
@@ -726,7 +729,7 @@
             async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地模式不支持更新文章'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
             async function deleteArticle(id){ if(isLocalFile) throw new Error('本地模式不支持删除文章'); return await airReq('DELETE',`Articles/${id}`); }
 
-            // ==================== 用户相关（关键修复：确保邀请码显示） ====================
+            // ==================== 用户相关（关键修复：确保邀请码显示，修复422错误） ====================
             async function findUserByEmail(email){
                 if(isLocalFile){
                     const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -773,7 +776,9 @@
                     const inviter = await findUserByInviteCode(inviteCode);
                     if(inviter){
                         fields.InvitedBy = inviter.fields.Email;
-                        const newBonus = (inviter.fields.InviteBonus || 0) + 5;
+                        // 修复422错误：安全获取并更新 InviteBonus
+                        let currentBonus = (inviter.fields.InviteBonus !== undefined && inviter.fields.InviteBonus !== null) ? Number(inviter.fields.InviteBonus) : 0;
+                        let newBonus = currentBonus + 5;
                         await airReq('PATCH', `Users/${inviter.id}`, { fields: { InviteBonus: newBonus } });
                         addDownloadBonus(inviter.fields.Email, 5);
                         showToast(`邀请成功！您获得了5次额外下载`, 'success');
@@ -790,7 +795,6 @@
                     if(!user) throw new Error('邮箱未注册');
                     const hash = CryptoJS.SHA256(password).toString();
                     if(user.password !== hash) throw new Error('密码错误');
-                    // 确保用户有邀请码（旧用户可能没有）
                     if(!user.inviteCode){
                         user.inviteCode = Math.random().toString(36).substring(2,10).toUpperCase();
                         localStorage.setItem('lezhe_users', JSON.stringify(users));
@@ -808,7 +812,6 @@
                 const hash = CryptoJS.SHA256(password).toString();
                 if(rec.fields.Password !== hash) throw new Error('密码错误');
                 let inviteCode = rec.fields.InviteCode || '';
-                // 如果 Airtable 中没有邀请码，自动生成并更新
                 if(!inviteCode){
                     inviteCode = Math.random().toString(36).substring(2,10).toUpperCase();
                     await airReq('PATCH', `Users/${rec.id}`, { fields: { InviteCode: inviteCode } });
