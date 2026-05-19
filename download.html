@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>乐哲软件 | 原版软件下载推荐 · 创意工具库</title>
     <meta name="description" content="乐哲软件提供 Adobe、Autodesk、C4D、草图大师、犀牛等主流软件的原版安装包推荐与下载指引。">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,30 +12,33 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Inter',system-ui,sans-serif; background:#f3f4f8; color:#1a1d2e; }
         .app-wrapper { max-width:1300px; margin:0 auto; padding:20px; }
+        @media (max-width:640px) { .app-wrapper { padding:12px; } }
+        
+        /* 顶部导航 */
         .top-nav { position:sticky; top:0; z-index:1000; background:rgba(255,255,255,0.85); backdrop-filter:blur(12px); border-radius:60px; padding:8px 20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
         .logo { font-size:1.4rem; font-weight:800; background:linear-gradient(135deg,#1a1d2e,#4f6ef6); -webkit-background-clip:text; background-clip:text; color:transparent; }
         .nav-links { display:flex; gap:6px; flex-wrap:wrap; }
-        .nav-links a { text-decoration:none; color:#4a5068; font-weight:500; padding:8px 18px; border-radius:40px; transition:0.2s; }
+        .nav-links a { text-decoration:none; color:#4a5068; font-weight:500; padding:8px 18px; border-radius:40px; transition:0.2s; font-size:0.85rem; }
         .nav-links a.active, .nav-links a:hover { background:#eef1fd; color:#4f6ef6; }
         .user-area { position:relative; }
-        /* 液态玻璃按钮 */
+        
+        /* 液态玻璃按钮 (登录/注册) - 强制覆盖样式 */
         .auth-btn {
-            background: linear-gradient(135deg, #5a7cff, #2f54eb);
-            border: none;
-            padding: 10px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            box-shadow: 0 6px 18px rgba(47,84,235,0.3);
-            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(2px);
+            background: linear-gradient(135deg, #5a7cff, #2f54eb) !important;
+            border: none !important;
+            padding: 10px 24px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            color: white !important;
+            box-shadow: 0 6px 18px rgba(47,84,235,0.3) !important;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1) !important;
+            position: relative !important;
+            overflow: hidden !important;
         }
         .auth-btn::before {
             content: '';
@@ -49,18 +52,10 @@
             transition: all 0.5s ease;
             opacity: 0;
         }
-        .auth-btn:hover::before {
-            left: 120%;
-            opacity: 1;
-        }
-        .auth-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 28px rgba(47,84,235,0.45);
-            background: linear-gradient(135deg, #6b8aff, #3f66f0);
-        }
-        .auth-btn:active {
-            transform: translateY(1px);
-        }
+        .auth-btn:hover::before { left: 120%; opacity: 1; }
+        .auth-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 28px rgba(47,84,235,0.45); background: linear-gradient(135deg, #6b8aff, #3f66f0) !important; }
+        .auth-btn:active { transform: translateY(1px); }
+        
         .user-name-btn {
             background: white;
             border: 1px solid #e8ecf3;
@@ -71,25 +66,22 @@
             gap: 10px;
             cursor: pointer;
             font-weight: 500;
-            color: #1a1d2e;
-            transition: 0.2s;
+            font-size: 0.85rem;
         }
-        .user-name-btn:hover {
-            background: #f8f9fc;
-            border-color: #4f6ef6;
-        }
+        .user-name-btn:hover { background:#f8f9fc; border-color:#4f6ef6; }
         .download-badge { background:#f59e0b; color:#fff; padding:2px 8px; border-radius:20px; font-size:0.6rem; margin-left:8px; }
         .vip-badge { background:linear-gradient(135deg,#d4af37,#f5b041); color:#fff; padding:2px 8px; border-radius:20px; font-size:0.6rem; margin-left:8px; }
-        .dropdown { display:none; position:absolute; right:0; top:48px; background:white; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.1); padding:8px; min-width:150px; z-index:200; }
+        .dropdown { display:none; position:absolute; right:0; top:48px; background:white; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.1); padding:8px; min-width:140px; z-index:200; }
         .dropdown.show { display:block; }
         .dropdown button { display:block; width:100%; padding:10px 12px; background:none; border:none; text-align:left; border-radius:12px; cursor:pointer; font-size:0.8rem; }
         .dropdown button:hover { background:#f3f4f8; color:#4f6ef6; }
+        
         .content { display:flex; gap:24px; margin-top:10px; }
-        .main-content { flex:1; }
-        .sidebar { width:280px; }
+        .main-content { flex:1; min-width:0; }
+        .sidebar { width:280px; flex-shrink:0; }
         @media (max-width:800px) { .content { flex-direction:column; } .sidebar { width:100%; } }
         
-        /* 轮播图样式 */
+        /* 轮播图 */
         .carousel-container { position:relative; width:100%; aspect-ratio:21/9; background:#e8ecf3; border-radius:28px; overflow:hidden; margin-bottom:20px; border:1px solid #e8ecf3; }
         .carousel-slides { display:flex; height:100%; transition:transform 0.5s ease; }
         .carousel-slide { flex:0 0 100%; height:100%; }
@@ -101,7 +93,9 @@
         .category-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
         .cat-chip { background:white; border:1px solid #e8ecf3; padding:6px 16px; border-radius:40px; cursor:pointer; font-size:0.8rem; transition:0.2s; }
         .cat-chip.active { background:#4f6ef6; color:white; border-color:#4f6ef6; }
+        
         .software-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+        @media (max-width:560px) { .software-grid { grid-template-columns:repeat(2,1fr); gap:12px; } }
         .software-card { background:white; border-radius:24px; padding:16px; cursor:pointer; border:1px solid #e8ecf3; transition:0.2s; }
         .software-card:hover { transform:translateY(-4px); box-shadow:0 12px 24px rgba(0,0,0,0.08); }
         .card-icon { width:42px; height:42px; background:#eef1fd; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; color:#4f6ef6; margin-bottom:12px; overflow:hidden; }
@@ -109,82 +103,62 @@
         .software-name { font-weight:700; font-size:1rem; }
         .version { font-size:0.65rem; background:#eef1fd; display:inline-block; padding:2px 8px; border-radius:20px; margin:6px 0; }
         .description { font-size:0.7rem; color:#6c757d; margin:6px 0; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-        .os-tags { display:flex; gap:6px; margin:8px 0; }
+        .os-tags { display:flex; gap:6px; margin:8px 0; flex-wrap:wrap; }
         .os-badge { background:#f3f4f8; padding:2px 8px; border-radius:20px; font-size:0.6rem; }
         .card-footer { border-top:1px solid #e8ecf3; padding-top:10px; margin-top:8px; display:flex; justify-content:space-between; font-size:0.65rem; color:#8b90a5; }
+        
         .sidebar-card { background:white; border-radius:24px; padding:16px; margin-bottom:16px; border:1px solid #e8ecf3; }
         .search-bar { display:flex; align-items:center; background:white; border-radius:60px; padding:4px 4px 4px 16px; border:1px solid #e8ecf3; margin-bottom:16px; }
         .search-bar input { flex:1; border:none; background:transparent; padding:8px; outline:none; font-size:0.8rem; }
         .search-bar button { background:#4f6ef6; border:none; color:white; padding:6px 14px; border-radius:40px; cursor:pointer; }
-        .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:10px 20px; border-radius:40px; z-index:1000; animation:fadeOut 3s forwards; }
-        .toast.error { background:#ef4444; }
-        @keyframes fadeOut { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0;visibility:hidden} }
+        
+        /* 排行榜和最近浏览 */
+        .rank-item, .history-item { display:flex; align-items:center; gap:12px; padding:10px 8px; border-radius:16px; margin-bottom:6px; background:#fafbfe; transition:0.2s; cursor:pointer; }
+        .rank-item:hover, .history-item:hover { background:#eef1fd; transform:translateX(4px); }
+        .rank-number { width:28px; height:28px; background:#e8ecf3; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.7rem; color:#4a5068; }
+        .rank-number.top1 { background:#fef3c7; color:#b45309; }
+        .rank-number.top2 { background:#e2e8f0; color:#475569; }
+        .rank-number.top3 { background:#fde8d0; color:#9a3412; }
+        .rank-name { flex:1; font-weight:500; font-size:0.75rem; color:#1a1d2e; }
+        .rank-downloads { font-size:0.65rem; color:#8b90a5; background:#f3f4f8; padding:2px 8px; border-radius:20px; }
+        .history-item i { width:24px; color:#4f6ef6; font-size:0.7rem; }
+        .history-name { flex:1; font-size:0.7rem; color:#4a5068; }
+        
+        /* 验证码行 */
+        .captcha-row { display:flex; align-items:center; gap:10px; margin:10px 0 12px 0; flex-wrap:wrap; }
+        .captcha-question { background:#f0f4fe; padding:9px 14px; border-radius:40px; font-weight:600; font-size:0.9rem; color:#1a1d2e; font-family:monospace; }
+        .captcha-refresh { background:#f3f4f8; border:none; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#4f6ef6; transition:0.2s; }
+        .captcha-refresh:hover { background:#e2e8f0; transform:rotate(15deg); }
+        .captcha-input { flex:1; padding:10px 12px; border:1px solid #e8ecf3; border-radius:40px; font-size:0.85rem; outline:none; min-width:100px; }
+        .captcha-input:focus { border-color:#4f6ef6; box-shadow:0 0 0 2px rgba(79,110,246,0.1); }
+        
+        /* 日历 */
+        .calendar-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+        .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; font-size:0.7rem; }
+        .calendar-day-name { font-weight:600; color:#4a5068; padding:4px 0; }
+        .calendar-day { padding:6px 0; border-radius:30px; cursor:pointer; transition:0.2s; }
+        .calendar-day.today { background:#4f6ef6; color:white; }
+        .calendar-day.signed { background:#10b981; color:white; }
+        .calendar-day.empty { cursor:default; opacity:0.3; }
+        .sign-btn { width:100%; margin-top:12px; padding:8px; background:linear-gradient(135deg,#4f6ef6,#2f54eb); color:white; border:none; border-radius:40px; cursor:pointer; font-weight:600; font-size:0.8rem; }
+        
+        /* 模态框 */
         .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center; }
         .modal.active { display:flex; }
         .modal-card { background:white; border-radius:32px; padding:24px; width:90%; max-width:450px; max-height:85vh; overflow-y:auto; }
         .invite-code-box { background:#f0f4fe; border:1px solid #4f6ef6; border-radius:12px; padding:12px; text-align:center; font-weight:600; margin:8px 0; }
-        input, textarea { width:100%; padding:10px; border:1px solid #e8ecf3; border-radius:16px; margin-bottom:12px; font-family:inherit; }
+        input, textarea { width:100%; padding:10px; border:1px solid #e8ecf3; border-radius:16px; margin-bottom:12px; font-family:inherit; font-size:0.85rem; }
         button { font-family:inherit; }
         .admin-table { width:100%; border-collapse:collapse; }
-        .admin-table th, .admin-table td { padding:10px; text-align:left; border-bottom:1px solid #e8ecf3; }
+        .admin-table th, .admin-table td { padding:10px; text-align:left; border-bottom:1px solid #e8ecf3; font-size:0.8rem; }
+        
+        .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:10px 20px; border-radius:40px; z-index:1000; animation:fadeOut 3s forwards; font-size:0.8rem; }
+        .toast.error { background:#ef4444; }
+        @keyframes fadeOut { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0;visibility:hidden} }
+        
         .back-to-top { position:fixed; bottom:20px; right:20px; width:40px; height:40px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1); opacity:0; visibility:hidden; transition:0.2s; }
         .back-to-top.show { opacity:1; visibility:visible; }
         footer { text-align:center; margin-top:30px; color:#8b90a5; font-size:0.7rem; }
-        
-        /* 美化排行榜和最近浏览 */
-        .rank-item, .history-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 8px;
-            border-radius: 16px;
-            margin-bottom: 6px;
-            background: #fafbfe;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .rank-item:hover, .history-item:hover {
-            background: #eef1fd;
-            transform: translateX(4px);
-        }
-        .rank-number {
-            width: 28px;
-            height: 28px;
-            background: #e8ecf3;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.7rem;
-            color: #4a5068;
-        }
-        .rank-number.top1 { background: #fef3c7; color: #b45309; }
-        .rank-number.top2 { background: #e2e8f0; color: #475569; }
-        .rank-number.top3 { background: #fde8d0; color: #9a3412; }
-        .rank-name {
-            flex: 1;
-            font-weight: 500;
-            font-size: 0.75rem;
-            color: #1a1d2e;
-        }
-        .rank-downloads {
-            font-size: 0.65rem;
-            color: #8b90a5;
-            background: #f3f4f8;
-            padding: 2px 8px;
-            border-radius: 20px;
-        }
-        .history-item i {
-            width: 24px;
-            color: #4f6ef6;
-            font-size: 0.7rem;
-        }
-        .history-name {
-            flex: 1;
-            font-size: 0.7rem;
-            color: #4a5068;
-        }
     </style>
 </head>
 <body>
@@ -200,7 +174,6 @@
     </div>
     <div class="content">
         <div class="main-content">
-            <!-- 顶部Banner广告位 -->
             <div class="carousel-container" id="bannerCarousel">
                 <div class="carousel-slides" id="bannerSlides"></div>
                 <div class="carousel-dots" id="bannerDots"></div>
@@ -210,10 +183,21 @@
         </div>
         <div class="sidebar">
             <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="搜索软件..."><button id="searchBtn">搜索</button></div>
-            <!-- 侧边栏广告位 -->
             <div class="carousel-container" id="sidebarCarousel">
                 <div class="carousel-slides" id="sidebarSlides"></div>
                 <div class="carousel-dots" id="sidebarDots"></div>
+            </div>
+            <!-- 日历签到卡片 -->
+            <div class="sidebar-card">
+                <div class="calendar-header">
+                    <span id="calendarMonthYear"></span>
+                    <div>
+                        <button id="prevMonth" style="background:none; border:none; cursor:pointer;"><i class="fas fa-chevron-left"></i></button>
+                        <button id="nextMonth" style="background:none; border:none; cursor:pointer;"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarDays"></div>
+                <button class="sign-btn" id="dailySignBtn"><i class="fas fa-calendar-check"></i> 每日签到 +5次下载</button>
             </div>
             <div class="sidebar-card"><h3><i class="fas fa-chart-line"></i> 下载排行榜</h3><div id="rankList"></div></div>
             <div class="sidebar-card"><h3><i class="fas fa-history"></i> 最近浏览</h3><div id="historyList"></div><div style="font-size:0.6rem;color:#4f6ef6;cursor:pointer;margin-top:6px;" id="clearHistory">清空历史</div></div>
@@ -224,7 +208,7 @@
 </div>
 
 <!-- 模态框 -->
-<div id="authModal" class="modal"><div class="modal-card"><div style="display:flex;justify-content:space-between;"><span id="authTitle">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:20px;">&times;</button></div><div style="display:flex;gap:12px;margin:15px 0;"><button class="auth-tab active" data-tab="login">登录</button><button class="auth-tab" data-tab="register">注册</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="邮箱"><input type="password" id="loginPassword" placeholder="密码"><div style="display:flex;gap:8px;"><span id="loginCaptchaQ"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:#4f6ef6;">⟳</button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;"></div><button id="loginBtn" style="width:100%;background:#4f6ef6;color:white;border:none;padding:10px;border-radius:40px;margin-top:12px;">登录</button><button id="showForgotBtn" style="background:none;border:none;color:#4f6ef6;margin-top:8px;">忘记密码？</button></div><div id="registerForm" style="display:none;"><input type="text" id="regUsername" placeholder="用户名"><input type="email" id="regEmail" placeholder="邮箱"><input type="password" id="regPassword" placeholder="密码"><input type="password" id="regConfirm" placeholder="确认密码"><input type="text" id="regInviteCode" placeholder="邀请码（选填）"><div style="display:flex;gap:8px;"><span id="regCaptchaQ"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:#4f6ef6;">⟳</button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;"></div><button id="registerBtn" style="width:100%;background:#4f6ef6;color:white;border:none;padding:10px;border-radius:40px;margin-top:12px;">注册</button></div><div id="forgotForm" style="display:none;"><input type="email" id="forgotEmail" placeholder="邮箱"><input type="password" id="forgotNewPwd" placeholder="新密码"><input type="password" id="forgotConfirmPwd" placeholder="确认新密码"><div style="display:flex;gap:8px;"><span id="forgotCaptchaQ"></span><button id="refreshForgotCaptcha" style="background:none;border:none;color:#4f6ef6;">⟳</button><input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;"></div><button id="resetPwdBtn" style="width:100%;background:#4f6ef6;color:white;border:none;padding:10px;border-radius:40px;">重置密码</button><button id="backToLoginBtn" style="background:none;border:none;color:#4f6ef6;margin-top:8px;">返回登录</button></div></div></div>
+<div id="authModal" class="modal"><div class="modal-card"><div style="display:flex;justify-content:space-between;"><span id="authTitle">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:20px;">&times;</button></div><div style="display:flex;gap:12px;margin:15px 0;"><button class="auth-tab active" data-tab="login">登录</button><button class="auth-tab" data-tab="register">注册</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="邮箱"><input type="password" id="loginPassword" placeholder="密码"><div class="captcha-row"><span class="captcha-question" id="loginCaptchaQ"></span><button class="captcha-refresh" id="refreshLoginCaptcha"><i class="fas fa-sync-alt"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" class="captcha-input"></div><button id="loginBtn" style="width:100%;background:#4f6ef6;color:white;border:none;padding:10px;border-radius:40px;margin-top:12px;">登录</button><button id="showForgotBtn" style="background:none;border:none;color:#4f6ef6;margin-top:8px;">忘记密码？</button></div><div id="registerForm" style="display:none;"><input type="text" id="regUsername" placeholder="用户名"><input type="email" id="regEmail" placeholder="邮箱"><input type="password" id="regPassword" placeholder="密码"><input type="password" id="regConfirm" placeholder="确认密码"><input type="text" id="regInviteCode" placeholder="邀请码（选填）"><div class="captcha-row"><span class="captcha-question" id="regCaptchaQ"></span><button class="captcha-refresh" id="refreshRegCaptcha"><i class="fas fa-sync-alt"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" class="captcha-input"></div><button id="registerBtn" style="width:100%;background:#4f6ef6;color:white;border:none;padding:10px;border-radius:40px;margin-top:12px;">注册</button></div><div id="forgotForm" style="display:none;"><input type="email" id="forgotEmail" placeholder="邮箱"><input type="password" id="forgotNewPwd" placeholder="新密码"><input type="password" id="forgotConfirmPwd" placeholder="确认新密码"><div class="captcha-row"><span class="captcha-question" id="forgotCaptchaQ"></span><button class="captcha-refresh" id="refreshForgotCaptcha"><i class="fas fa-sync-alt"></i></button><input type="text" id="forgotCaptchaInput" placeholder="验证码" class="captcha-input"></div><button id="resetPwdBtn" style="width:100%;background:#4f6ef6;color:white;border:none;padding:10px;border-radius:40px;">重置密码</button><button id="backToLoginBtn" style="background:none;border:none;color:#4f6ef6;margin-top:8px;">返回登录</button></div></div></div>
 
 <div id="profileModal" class="modal"><div class="modal-card"><div style="display:flex;justify-content:space-between;"><span>个人中心</span><button id="closeProfileModal" style="background:none;border:none;font-size:20px;">&times;</button></div><div><strong>用户名：</strong> <span id="profileUsername"></span></div><div><strong>会员等级：</strong> <span id="profileRole"></span></div><div><strong>本月剩余下载：</strong> <span id="profileRemaining"></span> 次</div><div><strong>我的邀请码：</strong><div class="invite-code-box" id="myInviteCode"></div><div style="font-size:0.7rem;color:#8b90a5;">邀请好友注册，双方各得5次下载机会</div></div><div style="margin-top:12px;"><strong>修改密码（选填）</strong></div><input type="password" id="profileNewPwd" placeholder="新密码"><input type="password" id="profileConfirmPwd" placeholder="确认新密码"><button id="saveProfileBtn" style="width:100%;background:#4f6ef6;color:white;border:none;padding:10px;border-radius:40px;">保存修改</button></div></div>
 
@@ -234,32 +218,40 @@
 
 <script>
 (function(){
-    // 环境检测
+    // 配置
     const isLocalFile = window.location.protocol === 'file:';
     const AIRTABLE_TOKEN = 'pat9BdIPuJKKqjBps.608e5055b9a5171435f172928c955a1bf67c8f10e6b42c34cc623f49cf1d5e43';
     const AIRTABLE_BASE_ID = 'appM4Ty76lOlslpU9';
     
-    // 全局
-    let softwares = [];
-    let bannerAds = [];
-    let sidebarAds = [];
-    let currentCategory = "all";
-    let searchKeyword = "";
-    let showAll = false;
-    let currentUser = null;
-    let users = [];
+    // 全局变量
+    let softwares = [], bannerAds = [], sidebarAds = [];
+    let currentCategory = "all", searchKeyword = "", showAll = false;
+    let currentUser = null, users = [];
     let currentCaptcha = { question: '', answer: 0 };
     let bannerInt, sidebarInt, curBanner=0, curSidebar=0;
+    let currentCalendarDate = new Date();
+    let signedDates = [];
     
-    // 默认广告（本地环境使用）
+    // 默认数据（本地 / 网络失败时使用）
     const DEFAULT_BANNER_ADS = [
-        { image: "https://picsum.photos/800/400?random=101", link: "#", title: "广告1" },
-        { image: "https://picsum.photos/800/400?random=102", link: "#", title: "广告2" },
-        { image: "https://picsum.photos/800/400?random=103", link: "#", title: "广告3" }
+        { image: "https://picsum.photos/800/400?random=1", link: "#", title: "广告1" },
+        { image: "https://picsum.photos/800/400?random=2", link: "#", title: "广告2" },
+        { image: "https://picsum.photos/800/400?random=3", link: "#", title: "广告3" }
     ];
     const DEFAULT_SIDEBAR_ADS = [
-        { image: "https://picsum.photos/300/200?random=201", link: "#", title: "侧边广告1" },
-        { image: "https://picsum.photos/300/200?random=202", link: "#", title: "侧边广告2" }
+        { image: "https://picsum.photos/300/200?random=4", link: "#", title: "侧边广告1" },
+        { image: "https://picsum.photos/300/200?random=5", link: "#", title: "侧边广告2" }
+    ];
+    const DEFAULT_SOFTWARES = [
+        { name: "Adobe Camera RAW", category: "adobe", version: "全版本", description: "用于处理RAW格式图像的工具", os: ["Windows","Mac"], downloads: 2035, addedDate: "2026-04-22", icon: "fa-camera", url: "#" },
+        { name: "DaVinci Resolve", category: "other", version: "最新", description: "视频调色软件", os: ["Windows","Mac"], downloads: 1674, addedDate: "2026-04-21", icon: "fa-video", url: "#" },
+        { name: "Acrobat DC", category: "adobe", version: "AcrXi Pro-2026", description: "PDF编辑与转换", os: ["Windows","Mac"], downloads: 1909, addedDate: "2026-04-23", icon: "fa-file-pdf", url: "#" },
+        { name: "PhotoShop", category: "adobe", version: "CS6-2026", description: "图像处理软件", os: ["Windows","Mac"], downloads: 1273, addedDate: "2026-04-23", icon: "fa-image", url: "#" },
+        { name: "Illustrator", category: "adobe", version: "CS6-2026", description: "矢量图形设计", os: ["Windows","Mac"], downloads: 2089, addedDate: "2026-04-22", icon: "fa-paint-brush", url: "#" },
+        { name: "Premiere Pro", category: "adobe", version: "CS6-2026", description: "视频编辑软件", os: ["Windows","Mac"], downloads: 2052, addedDate: "2026-04-23", icon: "fa-film", url: "#" },
+        { name: "AutoCAD", category: "autodesk", version: "2025", description: "计算机辅助设计", os: ["Windows","Mac"], downloads: 1567, addedDate: "2026-04-18", icon: "fa-cube", url: "#" },
+        { name: "Cinema 4D", category: "c4d", version: "R19-2025", description: "三维建模、动画", os: ["Windows","Mac"], downloads: 1432, addedDate: "2026-04-16", icon: "fa-cube", url: "#" },
+        { name: "Rhino 7/8", category: "rhino", version: "5.0-8.28", description: "工业设计、建筑设计", os: ["Windows","Mac"], downloads: 876, addedDate: "2026-04-14", icon: "fa-ruler-combined", url: "#" }
     ];
     
     // 辅助函数
@@ -289,7 +281,7 @@
     function recordDownload(user) { if (!user || user.role === 'vip') return true; let data = getUserDownloadData(user.email); saveUserDownloadData(user.email, data.count + 1); return data.count + 1 <= 30; }
     function getRemainingCount(user) { if (!user) return 0; if (user.role === 'vip') return Infinity; return 30 - getUserDownloadData(user.email).count; }
     
-    // 用户存储 (localStorage)
+    // 用户存储
     function loadUsers() { let stored = localStorage.getItem('lezhe_users'); if (stored) { try { users = JSON.parse(stored); } catch(e) {} } else { users = []; } }
     function saveUsers() { localStorage.setItem('lezhe_users', JSON.stringify(users)); }
     function findUserByEmail(email) { return users.find(u => u.email === email); }
@@ -307,9 +299,7 @@
                 addDownloadBonus(inviter.email, 5);
                 showToast(`邀请成功！您获得了5次额外下载`, 'success');
                 saveUsers();
-            } else {
-                showToast('邀请码无效', 'warning');
-            }
+            } else { showToast('邀请码无效', 'warning'); }
         }
         users.push(newUser);
         saveUsers();
@@ -320,213 +310,175 @@
         if (user.password !== CryptoJS.SHA256(password).toString()) throw new Error('密码错误');
         return { id: user.email, email: user.email, username: user.username, role: user.role, inviteCode: user.inviteCode };
     }
-    function updateUserRole(email, newRole) {
-        let user = findUserByEmail(email);
-        if (user) { user.role = newRole; saveUsers(); }
-    }
-    function updatePassword(email, newPass) {
-        let user = findUserByEmail(email);
-        if (!user) throw new Error('邮箱不存在');
-        user.password = CryptoJS.SHA256(newPass).toString();
-        saveUsers();
-    }
+    function updateUserRole(email, newRole) { let user = findUserByEmail(email); if(user) { user.role = newRole; saveUsers(); } }
+    function updatePassword(email, newPass) { let user = findUserByEmail(email); if(!user) throw new Error('邮箱不存在'); user.password = CryptoJS.SHA256(newPass).toString(); saveUsers(); }
     function ensureAdmin() {
         if (users.length === 0) {
             registerUser('admin@lezhe.com', 'admin123', '管理员', '');
             let admin = findUserByEmail('admin@lezhe.com');
-            if (admin) admin.role = 'admin';
+            if(admin) admin.role = 'admin';
             saveUsers();
-            console.log('默认管理员账号: admin@lezhe.com / admin123');
         }
     }
     
-    // 默认软件数据
-    const DEFAULT_SOFTWARES = [
-        { name: "Adobe Camera RAW", category: "adobe", version: "全版本", description: "用于处理RAW格式图像的工具，能够提供无损编辑和丰富的调整选项", os: ["Windows","Mac"], downloads: 2035, addedDate: "2026-04-22", icon: "fa-camera", url: "#" },
-        { name: "DaVinci Resolve", category: "other", version: "最新", description: "视频调色软件，专业级剪辑和调色工具", os: ["Windows","Mac"], downloads: 1674, addedDate: "2026-04-21", icon: "fa-video", url: "#" },
-        { name: "Acrobat DC", category: "adobe", version: "AcrXi Pro-2026", description: "PDF编辑与转换，文档处理专家", os: ["Windows","Mac"], downloads: 1909, addedDate: "2026-04-23", icon: "fa-file-pdf", url: "#" },
-        { name: "PhotoShop", category: "adobe", version: "CS6-2026", description: "图像处理软件，专业图像编辑与设计", os: ["Windows","Mac"], downloads: 1273, addedDate: "2026-04-23", icon: "fa-image", url: "#" },
-        { name: "InDesign", category: "adobe", version: "CS6-2026", description: "页面设计使用的专业排版设计软件", os: ["Windows","Mac"], downloads: 1371, addedDate: "2026-04-21", icon: "fa-book", url: "#" },
-        { name: "Illustrator", category: "adobe", version: "CS6-2026", description: "矢量图形设计，标志、插画、排版全能", os: ["Windows","Mac"], downloads: 2089, addedDate: "2026-04-22", icon: "fa-paint-brush", url: "#" },
-        { name: "Lightroom", category: "adobe", version: "CS6-2026", description: "摄影后期调色与管理，高效批量处理", os: ["Windows","Mac"], downloads: 1864, addedDate: "2026-04-28", icon: "fa-camera", url: "#" },
-        { name: "Premiere Pro", category: "adobe", version: "CS6-2026", description: "视频编辑软件，专业视频剪辑", os: ["Windows","Mac"], downloads: 2052, addedDate: "2026-04-23", icon: "fa-film", url: "#" },
-        { name: "AutoCAD", category: "autodesk", version: "2025", description: "计算机辅助设计，二维绘图与三维建模", os: ["Windows","Mac"], downloads: 1567, addedDate: "2026-04-18", icon: "fa-cube", url: "#" },
-        { name: "3ds Max", category: "autodesk", version: "2025", description: "专业三维建模、动画与渲染", os: ["Windows"], downloads: 1123, addedDate: "2026-04-17", icon: "fa-cubes", url: "#" },
-        { name: "Cinema 4D", category: "c4d", version: "R19-2025", description: "三维建模、动画、渲染，影视后期必备", os: ["Windows","Mac"], downloads: 1432, addedDate: "2026-04-16", icon: "fa-cube", url: "#" },
-        { name: "草图大师 SketchUp", category: "sketchup", version: "2015-2026", description: "建筑设计、室内设计、园林景观", os: ["Windows","Mac"], downloads: 987, addedDate: "2026-04-15", icon: "fa-drafting-compass", url: "#" },
-        { name: "Rhino 7/8", category: "rhino", version: "5.0-8.28", description: "工业设计、建筑设计、珠宝设计", os: ["Windows","Mac"], downloads: 876, addedDate: "2026-04-14", icon: "fa-ruler-combined", url: "#" }
-    ];
+    // 签到
+    function loadSignedDates() {
+        let stored = localStorage.getItem('signedDates');
+        if(stored) signedDates = JSON.parse(stored);
+        else signedDates = [];
+    }
+    function saveSignedDates() { localStorage.setItem('signedDates', JSON.stringify(signedDates)); }
+    function isTodaySigned(email) {
+        let today = new Date().toISOString().split('T')[0];
+        return signedDates.includes(`${email}_${today}`);
+    }
+    async function performSign(email) {
+        if(isTodaySigned(email)) throw new Error('今日已签到');
+        let today = new Date().toISOString().split('T')[0];
+        signedDates.push(`${email}_${today}`);
+        saveSignedDates();
+        addDownloadBonus(email, 5);
+        renderCalendar();
+        return true;
+    }
     
-    // 从Airtable获取软件数据（线上）
+    // 网络请求（带超时，3秒）
+    async function fetchWithTimeout(url, options, timeout=3000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+        try {
+            const response = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(id);
+            return response;
+        } catch(e) { clearTimeout(id); throw e; }
+    }
     async function fetchSoftwaresFromAirtable() {
         try {
             let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/softwares?maxRecords=100`;
-            let res = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` } });
+            let res = await fetchWithTimeout(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` } }, 3000);
             if (!res.ok) throw new Error('Network error');
             let data = await res.json();
             return data.records.map(rec => {
                 let f = rec.fields;
                 let name = f['A name'] || f.name || '未命名';
-                return {
-                    name: name,
-                    category: f['A category'] || f.category || 'other',
-                    version: f.version || '',
-                    description: f.description || '',
-                    os: f.os || ['Windows','Mac'],
-                    downloads: Math.floor(Math.random()*3000)+500,
-                    addedDate: f.addedDate || new Date().toISOString().split('T')[0],
-                    icon: f.icon || f['Icon'] || 'fa-cube',
-                    url: f.url || '#'
-                };
+                return { name, category: f['A category'] || f.category || 'other', version: f.version || '', description: f.description || '', os: f.os || ['Windows','Mac'], downloads: Math.floor(Math.random()*3000)+500, addedDate: f.addedDate || new Date().toISOString().split('T')[0], icon: f.icon || f['Icon'] || 'fa-cube', url: f.url || '#' };
             });
         } catch(e) { throw e; }
     }
-    
-    // 从Airtable获取广告数据（线上）
     async function fetchAdsFromAirtable() {
         try {
             let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Ads?maxRecords=50`;
-            let res = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` } });
+            let res = await fetchWithTimeout(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` } }, 3000);
             if (!res.ok) throw new Error('Network error');
             let data = await res.json();
             let banner = [], sidebar = [];
-            for (let rec of data.records) {
+            for(let rec of data.records) {
                 let f = rec.fields;
                 let img = f.Image || f.image || '';
-                if (Array.isArray(img) && img[0] && img[0].url) img = img[0].url;
-                if (!img) continue;
+                if(Array.isArray(img) && img[0] && img[0].url) img = img[0].url;
+                if(!img) continue;
                 let ad = { image: img, link: f.Link || f.link || '#', title: f.Title || f.title || '' };
                 let pos = (f.Position || f.position || 'sidebar').toLowerCase();
-                if (pos === 'banner') banner.push(ad);
+                if(pos === 'banner') banner.push(ad);
                 else sidebar.push(ad);
             }
             return { banner, sidebar };
         } catch(e) { throw e; }
     }
     
-    async function loadSoftwaresAndAds() {
-        if (isLocalFile) {
-            softwares = [...DEFAULT_SOFTWARES];
-            bannerAds = [...DEFAULT_BANNER_ADS];
-            sidebarAds = [...DEFAULT_SIDEBAR_ADS];
-        } else {
-            let cachedSoft = localStorage.getItem('cachedSoftwares');
-            let cachedBanner = localStorage.getItem('cachedBannerAds');
-            let cachedSidebar = localStorage.getItem('cachedSidebarAds');
-            if (cachedSoft) { try { softwares = JSON.parse(cachedSoft); } catch(e) {} }
-            if (cachedBanner) { try { bannerAds = JSON.parse(cachedBanner); } catch(e) {} }
-            if (cachedSidebar) { try { sidebarAds = JSON.parse(cachedSidebar); } catch(e) {} }
-            try {
-                let [sw, ads] = await Promise.all([fetchSoftwaresFromAirtable(), fetchAdsFromAirtable()]);
-                if (sw && sw.length) { softwares = sw; localStorage.setItem('cachedSoftwares', JSON.stringify(sw)); }
-                if (ads.banner && ads.banner.length) { bannerAds = ads.banner; localStorage.setItem('cachedBannerAds', JSON.stringify(bannerAds)); }
-                if (ads.sidebar && ads.sidebar.length) { sidebarAds = ads.sidebar; localStorage.setItem('cachedSidebarAds', JSON.stringify(sidebarAds)); }
-            } catch(e) {
-                console.warn('Airtable加载失败，使用缓存数据', e);
-                if (!softwares.length) softwares = [...DEFAULT_SOFTWARES];
-                if (!bannerAds.length) bannerAds = [...DEFAULT_BANNER_ADS];
-                if (!sidebarAds.length) sidebarAds = [...DEFAULT_SIDEBAR_ADS];
-            }
-        }
-        renderAll();
+    // 加载数据（秒开优先缓存，后台静默更新）
+    function loadCachedData() {
+        let cachedSoft = localStorage.getItem('cachedSoftwares');
+        let cachedBanner = localStorage.getItem('cachedBannerAds');
+        let cachedSidebar = localStorage.getItem('cachedSidebarAds');
+        let loaded = false;
+        if(cachedSoft) { try { softwares = JSON.parse(cachedSoft); loaded = true; } catch(e){} }
+        if(cachedBanner) { try { bannerAds = JSON.parse(cachedBanner); } catch(e){} }
+        if(cachedSidebar) { try { sidebarAds = JSON.parse(cachedSidebar); } catch(e){} }
+        if(!softwares.length) { softwares = [...DEFAULT_SOFTWARES]; loaded = true; }
+        if(!bannerAds.length) bannerAds = [...DEFAULT_BANNER_ADS];
+        if(!sidebarAds.length) sidebarAds = [...DEFAULT_SIDEBAR_ADS];
+        if(loaded) renderAll();
+        return loaded;
+    }
+    async function updateDataFromNetwork() {
+        try {
+            let [sw, ads] = await Promise.all([fetchSoftwaresFromAirtable(), fetchAdsFromAirtable()]);
+            if(sw && sw.length) { softwares = sw; localStorage.setItem('cachedSoftwares', JSON.stringify(sw)); }
+            if(ads.banner && ads.banner.length) { bannerAds = ads.banner; localStorage.setItem('cachedBannerAds', JSON.stringify(bannerAds)); }
+            if(ads.sidebar && ads.sidebar.length) { sidebarAds = ads.sidebar; localStorage.setItem('cachedSidebarAds', JSON.stringify(sidebarAds)); }
+            renderAll();
+        } catch(e) { console.warn('网络更新失败，保留缓存', e); }
     }
     
-    // 轮播图渲染
+    // 轮播图
     function renderCarousel(slidesId, dotsId, ads, isBanner, startFn) {
         let slidesEl = document.getElementById(slidesId);
         let dotsEl = document.getElementById(dotsId);
-        if (!slidesEl || !dotsEl) return;
+        if(!slidesEl || !dotsEl) return;
         slidesEl.innerHTML = ads.map((a,i) => `<div class="carousel-slide"><a href="${a.link}" target="_blank"><img src="${a.image}" loading="lazy" alt="广告"></a></div>`).join('');
-        if (ads.length <= 1) {
-            dotsEl.style.display = 'none';
-            return;
-        }
+        if(ads.length <= 1) { dotsEl.style.display = 'none'; return; }
         dotsEl.style.display = 'flex';
         dotsEl.innerHTML = ads.map((_,i) => `<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join('');
-        let update = (idx) => {
-            if (isBanner) curBanner = idx; else curSidebar = idx;
-            slidesEl.style.transform = `translateX(-${idx*100}%)`;
-            dotsEl.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
-        };
-        dotsEl.querySelectorAll('.carousel-dot').forEach(d => d.addEventListener('click', (e) => {
-            update(parseInt(e.target.dataset.index));
-            resetCarousel(isBanner);
-        }));
-        if (startFn) startFn(isBanner);
+        let update = (idx) => { if(isBanner) curBanner=idx; else curSidebar=idx; slidesEl.style.transform = `translateX(-${idx*100}%)`; dotsEl.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active', i===idx)); };
+        dotsEl.querySelectorAll('.carousel-dot').forEach(d => d.addEventListener('click', e => { update(parseInt(e.target.dataset.index)); resetCarousel(isBanner); }));
+        if(startFn) startFn(isBanner);
         return update;
     }
     function startCarousel(isBanner) {
         clearInterval(isBanner ? bannerInt : sidebarInt);
         let ads = isBanner ? bannerAds : sidebarAds;
-        if (ads.length <= 1) return;
+        if(ads.length <= 1) return;
         let int = setInterval(() => {
             let nxt = ((isBanner ? curBanner : curSidebar) + 1) % ads.length;
             let slidesId = isBanner ? 'bannerSlides' : 'sidebarSlides';
             let dotsId = isBanner ? 'bannerDots' : 'sidebarDots';
             let slidesEl = document.getElementById(slidesId);
             let dotsEl = document.getElementById(dotsId);
-            if (slidesEl && dotsEl) {
+            if(slidesEl && dotsEl) {
                 slidesEl.style.transform = `translateX(-${nxt*100}%)`;
-                dotsEl.querySelectorAll('.carousel-dot').forEach((d,i) => d.classList.toggle('active', i===nxt));
+                dotsEl.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active', i===nxt));
             }
-            if (isBanner) curBanner = nxt; else curSidebar = nxt;
+            if(isBanner) curBanner = nxt; else curSidebar = nxt;
         }, 4000);
-        if (isBanner) bannerInt = int; else sidebarInt = int;
+        if(isBanner) bannerInt = int; else sidebarInt = int;
     }
     function resetCarousel(isBanner) { clearInterval(isBanner ? bannerInt : sidebarInt); startCarousel(isBanner); }
     
     // 图标渲染
     function renderIcon(icon) {
-        if (!icon) return '<i class="fas fa-cube"></i>';
-        if (typeof icon === 'string') {
-            if (icon.startsWith('http')) return `<img src="${icon}" style="width:100%;height:100%;object-fit:cover;">`;
-            if (icon.startsWith('fa-') || icon.startsWith('fas ') || icon.startsWith('far ') || icon.startsWith('fab ')) {
-                return `<i class="fas ${icon}"></i>`;
-            }
+        if(!icon) return '<i class="fas fa-cube"></i>';
+        if(typeof icon === 'string') {
+            if(icon.startsWith('http')) return `<img src="${icon}" style="width:100%;height:100%;object-fit:cover;">`;
+            if(icon.startsWith('fa-') || icon.startsWith('fas ') || icon.startsWith('far ') || icon.startsWith('fab ')) return `<i class="fas ${icon}"></i>`;
             return `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#eef1fd;border-radius:12px;font-weight:bold;">${icon.slice(0,2).toUpperCase()}</div>`;
         }
         return '<i class="fas fa-cube"></i>';
     }
     
-    const CAT_MAP = { 'adobe':'Adobe系列','autodesk':'Autodesk系列','c4d':'Cinema 4D','sketchup':'草图大师','rhino':'犀牛软件','plugin':'插件工具','other':'其他' };
+    const CAT_MAP = { 'adobe':'Adobe系列','autodesk':'Autodesk系列','c4d':'Cinema 4D','sketchup':'草图大师','rhino':'犀牛软件','other':'其他' };
     function renderCats() {
         let cats = new Map();
         softwares.forEach(s => cats.set(CAT_MAP[s.category]||s.category, s.category));
         let html = `<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all">全部</button>`;
-        for (let [disp, cat] of cats) html += `<button class="cat-chip ${currentCategory===cat?'active':''}" data-cat="${cat}">${disp}</button>`;
+        for(let [disp, cat] of cats) html += `<button class="cat-chip ${currentCategory===cat?'active':''}" data-cat="${cat}">${disp}</button>`;
         document.getElementById('categoryTabs').innerHTML = html;
-        document.querySelectorAll('.cat-chip').forEach(btn => btn.addEventListener('click', () => {
-            currentCategory = btn.dataset.cat;
-            renderCats();
-            renderGrid();
-        }));
+        document.querySelectorAll('.cat-chip').forEach(btn => btn.addEventListener('click', () => { currentCategory = btn.dataset.cat; showAll=false; renderCats(); renderGrid(); }));
     }
     function renderGrid() {
         let filtered = softwares.filter(s => (currentCategory==='all'||s.category===currentCategory) && s.name.toLowerCase().includes(searchKeyword.toLowerCase()));
         let items = showAll ? filtered : filtered.slice(0, 12);
         let grid = document.getElementById('softwareGrid');
-        if (!items.length) { grid.innerHTML = '<div>没有找到相关软件</div>'; return; }
-        grid.innerHTML = items.map(sw => `
-            <div class="software-card" data-name="${esc(sw.name)}">
-                <div class="card-icon">${renderIcon(sw.icon)}</div>
-                <div class="software-name">${esc(sw.name)}</div>
-                <div class="version">${esc(sw.version)}</div>
-                <div class="description">${esc(sw.description)}</div>
-                <div class="os-tags">${sw.os.map(o=>`<span class="os-badge">${o}</span>`).join('')}</div>
-                <div class="card-footer"><span>${sw.addedDate}</span><span><i class="fas fa-download"></i> ${sw.downloads}</span></div>
-            </div>
-        `).join('');
-        document.querySelectorAll('.software-card').forEach(card => card.addEventListener('click', () => {
-            let sw = softwares.find(s => s.name === card.dataset.name);
-            if (sw) downloadSoftware(sw);
-        }));
+        if(!items.length) { grid.innerHTML = '<div class="no-results">没有找到相关软件</div>'; return; }
+        grid.innerHTML = items.map(sw => `<div class="software-card" data-name="${esc(sw.name)}"><div class="card-icon">${renderIcon(sw.icon)}</div><div class="software-name">${esc(sw.name)}</div><div class="version">${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${sw.os.map(o=>`<span class="os-badge">${o}</span>`).join('')}</div><div class="card-footer"><span>${sw.addedDate}</span><span><i class="fas fa-download"></i> ${sw.downloads}</span></div></div>`).join('');
+        document.querySelectorAll('.software-card').forEach(card => card.addEventListener('click', () => { let sw = softwares.find(s => s.name === card.dataset.name); if(sw) downloadSoftware(sw); }));
     }
     function downloadSoftware(sw) {
-        if (!currentUser) { showToast('请先登录', 'error'); openAuthModal('login'); return; }
-        if (!canDownload(currentUser)) { showToast(`本月下载次数已用完（30次/月），邀请好友可获额外次数`, 'warning'); return; }
+        if(!currentUser) { showToast('请先登录', 'error'); openAuthModal('login'); return; }
+        if(!canDownload(currentUser)) { showToast(`本月下载次数已用完（30次/月），邀请好友可获额外次数`, 'warning'); return; }
         recordDownload(currentUser);
         updateUserUI();
-        if (sw.url && sw.url !== '#') window.open(sw.url, '_blank');
+        if(sw.url && sw.url !== '#') window.open(sw.url, '_blank');
         else showToast(`演示模式：您已消耗1次下载机会`, 'success');
         addHistory(sw.name);
         renderRank();
@@ -535,41 +487,60 @@
         let h = JSON.parse(localStorage.getItem('browseHistory')||'[]');
         h = h.filter(i => i !== name);
         h.unshift(name);
-        if (h.length > 10) h.pop();
+        if(h.length > 10) h.pop();
         localStorage.setItem('browseHistory', JSON.stringify(h));
         renderHistory();
     }
     function renderHistory() {
         let h = JSON.parse(localStorage.getItem('browseHistory')||'[]');
         let container = document.getElementById('historyList');
-        if (!h.length) { container.innerHTML = '<div style="color:#8b90a5; padding:8px;">暂无浏览记录</div>'; return; }
+        if(!h.length) { container.innerHTML = '<div style="color:#8b90a5;">暂无浏览记录</div>'; return; }
         container.innerHTML = h.map(n => `<div class="history-item"><i class="fas fa-clock"></i><span class="history-name">${esc(n)}</span></div>`).join('');
     }
     function renderRank() {
         let sorted = [...softwares].sort((a,b) => b.downloads - a.downloads);
         let container = document.getElementById('rankList');
-        if (!sorted.length) { container.innerHTML = '<div style="color:#8b90a5; padding:8px;">暂无排行数据</div>'; return; }
-        container.innerHTML = sorted.slice(0,8).map((sw,i) => `
-            <div class="rank-item">
-                <div class="rank-number ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div>
-                <div class="rank-name">${esc(sw.name)}</div>
-                <div class="rank-downloads"><i class="fas fa-download"></i> ${sw.downloads}</div>
-            </div>
-        `).join('');
+        if(!sorted.length) { container.innerHTML = '<div>暂无排行数据</div>'; return; }
+        container.innerHTML = sorted.slice(0,8).map((sw,i) => `<div class="rank-item"><div class="rank-number ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</div><div class="rank-name">${esc(sw.name)}</div><div class="rank-downloads"><i class="fas fa-download"></i> ${sw.downloads}</div></div>`).join('');
+    }
+    
+    // 日历
+    function renderCalendar() {
+        let y = currentCalendarDate.getFullYear(), m = currentCalendarDate.getMonth();
+        let firstDay = new Date(y,m,1).getDay();
+        let daysInMonth = new Date(y,m+1,0).getDate();
+        let monthNames = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+        document.getElementById('calendarMonthYear').innerText = `${y}年 ${monthNames[m]}`;
+        let html = '<div class="calendar-day-name">一</div><div class="calendar-day-name">二</div><div class="calendar-day-name">三</div><div class="calendar-day-name">四</div><div class="calendar-day-name">五</div><div class="calendar-day-name">六</div><div class="calendar-day-name">日</div>';
+        let day = 1;
+        for(let i=0;i<6;i++) {
+            for(let j=0;j<7;j++) {
+                if(i===0 && j < (firstDay===0?6:firstDay-1)) html += '<div class="calendar-day empty"></div>';
+                else if(day > daysInMonth) html += '<div class="calendar-day empty"></div>';
+                else {
+                    let dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                    let isToday = (day === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear());
+                    let isSigned = currentUser && signedDates.includes(`${currentUser.email}_${dateStr}`);
+                    html += `<div class="calendar-day ${isToday?'today':''} ${isSigned?'signed':''}">${day}</div>`;
+                    day++;
+                }
+            }
+        }
+        document.getElementById('calendarDays').innerHTML = html;
     }
     
     // 用户界面
     function updateUserUI() {
         let area = document.getElementById('userArea');
-        if (currentUser) {
+        if(currentUser) {
             let remaining = getRemainingCount(currentUser);
             let badge = `<span class="download-badge">${remaining===Infinity?'∞':remaining}</span>`;
             let vip = currentUser.role === 'vip' ? '<span class="vip-badge">VIP</span>' : '';
             area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} ${badge} ${vip} <i class="fas fa-chevron-down"></i></button><div class="dropdown" id="userDropdown"><button id="profileBtn">个人中心</button><button id="adminBtn" style="${currentUser.role==='admin'?'display:block':'display:none'}">管理后台</button><button id="logoutBtn">退出登录</button></div></div>`;
             document.getElementById('userMenuBtn').onclick = (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); };
-            document.getElementById('logoutBtn').onclick = () => { currentUser = null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出'); };
+            document.getElementById('logoutBtn').onclick = () => { currentUser = null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出'); location.reload(); };
             document.getElementById('profileBtn').onclick = openProfileModal;
-            if (currentUser.role === 'admin') document.getElementById('adminBtn').onclick = openAdminModal;
+            if(currentUser.role === 'admin') document.getElementById('adminBtn').onclick = openAdminModal;
         } else {
             area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>';
             document.getElementById('showAuthBtn').onclick = () => openAuthModal('login');
@@ -584,7 +555,7 @@
     }
     function openAdminModal() {
         let html = '<table class="admin-table"><thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>操作</th></tr></thead><tbody>';
-        for (let u of users) {
+        for(let u of users) {
             let role = u.role || 'user';
             html += `<tr><td>${esc(u.email)}</td><td>${esc(u.username)}</td><td>${role}</td><td><button class="changeRoleBtn" data-email="${u.email}" data-role="${role}">${role==='vip'?'降级为普通':'升级为VIP'}</button></td></tr>`;
         }
@@ -607,8 +578,9 @@
         document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
         document.getElementById('forgotForm').style.display = 'none';
         authModal.classList.add('active');
-        if (tab==='login') refreshCaptcha('loginCaptchaQ','loginCaptchaInput');
-        else refreshCaptcha('regCaptchaQ','regCaptchaInput');
+        if(tab==='login') refreshCaptcha('loginCaptchaQ','loginCaptchaInput');
+        else if(tab==='register') refreshCaptcha('regCaptchaQ','regCaptchaInput');
+        else refreshCaptcha('forgotCaptchaQ','forgotCaptchaInput');
     }
     function bindEvents() {
         document.getElementById('closeAuthModal').onclick = () => authModal.classList.remove('active');
@@ -624,13 +596,14 @@
             let email = document.getElementById('loginEmail').value.trim();
             let pwd = document.getElementById('loginPassword').value;
             let cap = document.getElementById('loginCaptchaInput').value.trim();
-            if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误','error');
+            if(!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误','error');
             try {
                 currentUser = loginUser(email, pwd);
                 localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
                 updateUserUI();
                 authModal.classList.remove('active');
                 showToast('登录成功');
+                location.reload();
             } catch(e) { showToast(e.message,'error'); }
         };
         document.getElementById('registerBtn').onclick = () => {
@@ -640,8 +613,8 @@
             let conf = document.getElementById('regConfirm').value;
             let invite = document.getElementById('regInviteCode').value.trim();
             let cap = document.getElementById('regCaptchaInput').value.trim();
-            if (!username || !email || pwd !== conf || pwd.length<6) return showToast('信息有误','error');
-            if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误','error');
+            if(!username || !email || pwd !== conf || pwd.length<6) return showToast('信息有误','error');
+            if(!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误','error');
             try {
                 registerUser(email, pwd, username, invite);
                 showToast('注册成功，请登录');
@@ -653,8 +626,8 @@
             let newPwd = document.getElementById('forgotNewPwd').value;
             let conf = document.getElementById('forgotConfirmPwd').value;
             let cap = document.getElementById('forgotCaptchaInput').value.trim();
-            if (!email || newPwd !== conf || newPwd.length<6) return showToast('信息错误','error');
-            if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误','error');
+            if(!email || newPwd !== conf || newPwd.length<6) return showToast('信息错误','error');
+            if(!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误','error');
             try {
                 updatePassword(email, newPwd);
                 showToast('密码重置成功，请登录');
@@ -664,9 +637,9 @@
         document.getElementById('saveProfileBtn').onclick = () => {
             let newPwd = document.getElementById('profileNewPwd').value;
             let conf = document.getElementById('profileConfirmPwd').value;
-            if (newPwd && newPwd !== conf) return showToast('两次密码不一致','error');
-            if (newPwd && newPwd.length<6) return showToast('密码至少6位','error');
-            if (newPwd) {
+            if(newPwd && newPwd !== conf) return showToast('两次密码不一致','error');
+            if(newPwd && newPwd.length<6) return showToast('密码至少6位','error');
+            if(newPwd) {
                 try {
                     updatePassword(currentUser.email, newPwd);
                     showToast('密码已更新');
@@ -678,20 +651,32 @@
         document.getElementById('submitFeedback').onclick = () => {
             let name = document.getElementById('feedbackName').value.trim() || '网友';
             let msg = document.getElementById('feedbackMessage').value.trim();
-            if (!msg) return showToast('请输入留言内容','error');
+            if(!msg) return showToast('请输入留言内容','error');
             let list = JSON.parse(localStorage.getItem('feedback_list')||'[]');
             list.unshift({ name, message: msg, time: new Date().toLocaleString() });
-            if (list.length > 20) list.pop();
+            if(list.length > 20) list.pop();
             localStorage.setItem('feedback_list', JSON.stringify(list));
             document.getElementById('feedbackMessage').value = '';
             renderFeedback();
             showToast('留言成功');
         };
+        // 日历按钮
+        document.getElementById('dailySignBtn').onclick = async () => {
+            if(!currentUser) { showToast('请先登录', 'error'); openAuthModal('login'); return; }
+            try {
+                await performSign(currentUser.email);
+                updateUserUI();
+                renderCalendar();
+                showToast('签到成功！获得5次下载机会', 'success');
+            } catch(e) { showToast(e.message, 'error'); }
+        };
+        document.getElementById('prevMonth').onclick = () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth()-1); renderCalendar(); };
+        document.getElementById('nextMonth').onclick = () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth()+1); renderCalendar(); };
     }
     function renderFeedback() {
         let list = JSON.parse(localStorage.getItem('feedback_list')||'[]');
         let container = document.getElementById('feedbackList');
-        if (!list.length) { container.innerHTML = '<div style="color:#8b90a5;">暂无留言</div>'; return; }
+        if(!list.length) { container.innerHTML = '<div style="color:#8b90a5;">暂无留言</div>'; return; }
         container.innerHTML = list.map(m => `<div style="padding:8px 0;border-bottom:1px solid #e8ecf3;"><strong>${esc(m.name)}</strong><div style="font-size:0.7rem;margin-top:4px;">${esc(m.message)}</div></div>`).join('');
     }
     
@@ -713,16 +698,25 @@
         renderCarousel('sidebarSlides', 'sidebarDots', sidebarAds, false, null);
         startCarousel(true);
         startCarousel(false);
+        renderCalendar();
     }
     
     // 初始化
     loadUsers();
     ensureAdmin();
+    loadSignedDates();
     let savedUser = localStorage.getItem('lezhe_user');
-    if (savedUser) { try { currentUser = JSON.parse(savedUser); } catch(e) {} }
+    if(savedUser) { try { currentUser = JSON.parse(savedUser); } catch(e){} }
     updateUserUI();
     bindEvents();
-    loadSoftwaresAndAds();
+    let hasCache = loadCachedData();  // 立即渲染缓存内容（秒开）
+    if(hasCache) {
+        // 后台静默更新
+        setTimeout(() => updateDataFromNetwork(), 100);
+    } else {
+        // 无缓存时强制更新
+        updateDataFromNetwork();
+    }
 })();
 </script>
 </body>
