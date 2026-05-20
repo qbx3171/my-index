@@ -13,12 +13,12 @@
         body { font-family:'Inter',sans-serif; background:#f3f4f8; color:#1a1d2e; }
         .app-wrapper { max-width:1300px; margin:0 auto; padding:20px; }
         @media (max-width:640px) { .app-wrapper { padding:12px; } }
+        /* 导航栏样式 - 非空白，有背景色和阴影 */
         .top-nav {
             position: sticky;
             top: 0;
             z-index: 1000;
-            background: rgba(255,255,255,0.96);
-            backdrop-filter: blur(8px);
+            background: white;
             border-radius: 60px;
             padding: 8px 20px;
             margin-bottom: 20px;
@@ -28,8 +28,8 @@
             flex-wrap: wrap;
             gap: 12px;
             transition: transform 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border: 1px solid #eef2f6;
         }
         .top-nav.hide { transform: translateY(-100%); }
         .logo { font-size:1.4rem; font-weight:800; background:linear-gradient(135deg,#1a1d2e,#4f6ef6); -webkit-background-clip:text; background-clip:text; color:transparent; }
@@ -158,7 +158,6 @@
         .admin-user-role { background:#f3f4f8; padding:4px 12px; border-radius:30px; font-size:0.7rem; font-weight:600; display:inline-block; }
         .admin-user-role.vip { background:#fef3c7; color:#b45309; }
         .admin-user-role.admin { background:#eef2ff; color:#4f6ef6; }
-        .admin-user-role.monthly { background:#dbeafe; color:#1e40af; }
         .admin-btns { display:flex; gap:8px; flex-wrap:wrap; }
         .admin-btns button { padding:6px 12px; border-radius:40px; border:none; cursor:pointer; font-size:0.7rem; font-weight:500; }
         .btn-add-count { background:#10b981; color:white; }
@@ -171,8 +170,6 @@
         .copy-btn { background:#4f6ef6; color:white; border:none; padding:4px 12px; border-radius:30px; cursor:pointer; font-size:0.7rem; margin-left:8px; }
         .plans { background:#f8fafc; border-radius:16px; padding:12px; margin-top:12px; }
         .plan-item { display:flex; justify-content:space-between; padding:6px 0; font-size:0.8rem; }
-        .insufficient-modal .plan-buttons { display:flex; flex-direction:column; gap:10px; margin:12px 0; }
-        .insufficient-modal .buy-btn { background:#4f6ef6; color:white; border:none; padding:8px; border-radius:40px; cursor:pointer; font-weight:500; }
     </style>
 </head>
 <body>
@@ -213,7 +210,7 @@
 
     <div id="profileModal" class="modal"><div class="modal-card"><div style="display:flex;justify-content:space-between;"><span>个人中心</span><button id="closeProfileModal">&times;</button></div><div><strong>用户名：</strong> <span id="profileUsername"></span></div><div><strong>会员等级：</strong> <span id="profileRole"></span></div><div><strong>本月剩余下载：</strong> <span id="profileRemaining"></span> 次</div><div><strong>我的邀请码：</strong><div class="invite-code-box" id="myInviteCode"></div><div style="font-size:0.7rem;color:#8b90a5;">邀请好友注册，双方各得5次下载机会</div></div><div style="margin-top:12px;"><strong>修改密码（选填）</strong></div><input type="password" id="profileNewPwd" placeholder="新密码"><input type="password" id="profileConfirmPwd" placeholder="确认新密码"><button id="saveProfileBtn" style="width:100%;background:#4f6ef6;color:white;border:none;padding:10px;border-radius:40px;">保存修改</button></div></div>
 
-    <!-- 管理后台模态框（含系统设置） -->
+    <!-- 管理后台模态框 -->
     <div id="adminModal" class="modal"><div class="modal-card" style="max-width:800px;"><div style="display:flex;justify-content:space-between;"><h3><i class="fas fa-users"></i> 用户管理</h3><button id="closeAdminModal">&times;</button></div><div id="adminUserList" style="max-height:50vh;overflow-y:auto;padding-right:4px;"></div><div class="settings-section"><h4><i class="fas fa-cog"></i> 系统设置</h4><div class="settings-item"><label>普通会员每月基础次数：</label><input type="number" id="quotaInput" class="settings-input" min="1" max="100" step="1"><button id="saveQuotaBtn" style="background:#10b981;color:white;border:none;border-radius:30px;padding:6px 16px;">保存</button></div><div class="plans"><div class="plan-item"><span>📦 10次/2元</span><span>联系客服</span></div><div class="plan-item"><span>📦 50次/5元</span><span>联系客服</span></div><div class="plan-item"><span>👑 永久无限/50元</span><span>联系客服</span></div><div style="font-size:0.7rem;margin-top:8px;">客服微信：<strong style="color:#4f6ef6;">Win_Mac_123</strong><button class="copy-btn" data-copy="Win_Mac_123">复制</button></div></div></div></div></div>
 
     <!-- 次数不足弹窗 -->
@@ -223,10 +220,10 @@
 
     <script>
         (function(){
-            // 粒子动画
+            // 粒子动画（保留）
             const c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');let w,h,m={x:-1e3,y:-1e3},p=[];function r(){w=innerWidth;h=innerHeight;c.width=w;c.height=h}window.addEventListener('resize',r);r();document.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY});document.addEventListener('mouseleave',()=>{m.x=-1e3;m.y=-1e3});class P{constructor(){this.reset();this.y=Math.random()*h}reset(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.rad=Math.random()*1.8+0.4;this.op=Math.random()*0.4+0.1}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;const dx=m.x-this.x,dy=m.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150&&m.x>0){const force=(1-dist/150)*0.03;this.x+=dx*force;this.y+=dy*force;this.rad=Math.min(this.rad+0.01,2.5);this.op=Math.min(this.op+0.01,0.8)}else{this.rad=Math.max(this.rad-0.003,0.4);this.op=Math.max(this.op-0.002,0.1)}}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.rad,0,Math.PI*2);ctx.fillStyle=`rgba(79,110,246,${this.op})`;ctx.fill()}}for(let i=0;i<60;i++)p.push(new P());function conn(){for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<90){ctx.beginPath();ctx.strokeStyle=`rgba(79,110,246,${0.06*(1-dist/90)})`;ctx.lineWidth=0.4;ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.stroke()}}}function anim(){ctx.clearRect(0,0,w,h);p.forEach(v=>{v.update();v.draw()});conn();requestAnimationFrame(anim)}anim();
 
-            // 配置（保留Airtable，但本地模拟优先）
+            // 配置（保留Airtable兼容，但本地模拟为主）
             const isLocalFile = window.location.protocol === 'file:';
             const AIRTABLE_TOKEN = 'pat9BdIPuJKKqjBps.608e5055b9a5171435f172928c955a1bf67c8f10e6b42c34cc623f49cf1d5e43';
             const AIRTABLE_BASE_ID = 'appM4Ty76lOlslpU9';
@@ -236,20 +233,19 @@
             let currentUser = null;
             let currentCaptcha = { question: '', answer: 0 };
             let DEFAULT_FREE_QUOTA = 5;  // 每月基础次数，可全局调整
-            let users = [];               // 本地用户列表（模拟）
+            let users = [];
 
-            // 辅助函数
             function showToast(msg, type='success'){ let t=document.createElement('div'); t.className=`toast ${type}`; t.innerText=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
             function esc(s){ return String(s).replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
             function genCap(){ let a=Math.floor(Math.random()*10)+1,b=Math.floor(Math.random()*10)+1,op=Math.random()>0.5?'+':'-',ans=op==='+'?a+b:a-b; if(ans<0) return genCap(); return {question:`${a} ${op} ${b} = ?`, answer:ans}; }
             function refCap(q,i){ let c=genCap(); currentCaptcha=c; document.getElementById(q).innerText=c.question; document.getElementById(i).value=''; }
 
-            // 用户会员与次数管理（核心）
+            // 会员与额外次数管理（核心新增）
             function getUserMembership(email){
                 let key = `membership_${email}`;
                 let data = localStorage.getItem(key);
                 if(data) try{ return JSON.parse(data); }catch(e){}
-                return { type: 'none', expire: 0, extraCount: 0 }; // extraCount: 管理员单独充值的额外次数
+                return { type: 'none', expire: 0, extraCount: 0 };
             }
             function saveUserMembership(email, mem){ localStorage.setItem(`membership_${email}`, JSON.stringify(mem)); }
             function getCurrentMonthKey(){ let d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
@@ -260,7 +256,6 @@
                 try{ let p=JSON.parse(data); if(p.month!==getCurrentMonthKey()) return { month: getCurrentMonthKey(), used: 0 }; return p; }catch(e){ return { month: getCurrentMonthKey(), used: 0 }; }
             }
             function saveUserDownloadData(email, used){ localStorage.setItem(`download_${email}`, JSON.stringify({ month: getCurrentMonthKey(), used: used })); }
-            // 获取用户总剩余次数（基础额度+额外次数-已用次数）
             function getRemainingCount(user){
                 if(!user) return 0;
                 let mem = getUserMembership(user.email);
@@ -281,7 +276,6 @@
                 saveUserDownloadData(user.email, data.used + 1);
                 return true;
             }
-            // 管理员增加额外次数（独立于月度重置）
             function addExtraCount(email, amount){
                 let mem = getUserMembership(email);
                 mem.extraCount = (mem.extraCount || 0) + amount;
@@ -300,7 +294,7 @@
                 saveUserMembership(email, mem);
             }
 
-            // 用户认证（本地模拟，线上使用Airtable）
+            // 用户认证（本地模拟为主，保留Airtable兼容）
             async function findUserByEmail(email){
                 if(isLocalFile){
                     let stored = localStorage.getItem('lezhe_users');
@@ -350,7 +344,6 @@
                     localStorage.setItem('lezhe_users', JSON.stringify(users));
                     return;
                 }
-                // 线上模式
                 let hash = CryptoJS.SHA256(password).toString();
                 let userCode = Math.random().toString(36).substring(2,10).toUpperCase();
                 let fields = { Email: email, Password: hash, Username: username, Role: 'user', InviteCode: userCode };
@@ -422,7 +415,7 @@
                 return data.records.map(r=>({ id: r.id, fields: r.fields }));
             }
 
-            // 软件/广告等数据（保持不变，使用缓存）
+            // 软件/广告等数据（与原版相同）
             async function fetchSoftwares(){
                 if(isLocalFile){
                     let cached = localStorage.getItem('cachedSoft');
@@ -495,7 +488,7 @@
                 return `<div class="icon-text">${name.slice(0,2).toUpperCase()}</div>`;
             }
 
-            // UI渲染（软件、分类等与原来一致）
+            // UI渲染（与原版相同）
             const CAT_MAP = { 'adobe':'Adobe系列','autodesk':'Autodesk系列','c4d':'Cinema 4D','sketchup':'草图大师','rhino':'犀牛软件','plugin':'插件工具','other':'其他' };
             function renderCats(){
                 let cats = new Map();
@@ -517,7 +510,6 @@
             async function downloadSoftware(sw){
                 if(!currentUser){ showToast('请先登录','error'); openAuthModal('login'); return; }
                 if(!canDownload(currentUser)){
-                    // 打开次数不足弹窗
                     document.getElementById('insufficientModal').classList.add('active');
                     return;
                 }
@@ -551,7 +543,6 @@
             document.getElementById('nextMonth').onclick=()=>{ currentCalendarDate.setMonth(currentCalendarDate.getMonth()+1); renderCalendar(); };
             renderCalendar();
 
-            // 轮播图
             let bannerInt, sidebarInt, curB=0, curS=0;
             function renderCarousel(slidesId, dotsId, ads, isB){
                 let slidesEl=document.getElementById(slidesId), dotsEl=document.getElementById(dotsId);
@@ -577,7 +568,6 @@
             }
             function resetCar(isB){ clearInterval(isB?bannerInt:sidebarInt); startCar(isB); }
 
-            // 用户界面
             function updateUserUI(){
                 let area=document.getElementById('userArea');
                 if(currentUser){
@@ -607,7 +597,7 @@
                 document.getElementById('profileModal').classList.add('active');
             }
 
-            // 管理后台（支持单独控制每个用户的额外次数）
+            // 管理后台（核心新增功能：单独控制额外次数、月卡、永久VIP）
             async function openAdminModal(){
                 let usersList = await getAllUsers();
                 let container=document.getElementById('adminUserList');
@@ -781,9 +771,6 @@
                 let container=document.getElementById('feedbackList');
                 container.innerHTML=msgs.map(m=>`<div style="padding:8px 0;border-bottom:1px solid #e8ecf3;"><strong>${esc(m.name)}</strong><div style="font-size:0.7rem;margin-top:4px;">${esc(m.message)}</div></div>`).join('');
                 if(!msgs.length) container.innerHTML='<div style="color:#8b90a5;">暂无留言</div>';
-            }
-            function showToast(msg, type='success'){
-                let t=document.createElement('div'); t.className=`toast ${type}`; t.innerText=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
             }
 
             // 初始化
