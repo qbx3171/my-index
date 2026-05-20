@@ -145,7 +145,7 @@
         .friend-links-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
         .friend-link-pill { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:25px; background:var(--surface); border:1px solid var(--border); color:var(--text-secondary); text-decoration:none; font-size:var(--font-xs); font-weight:500; transition:var(--transition-fast); box-shadow:var(--shadow-sm); }
         .friend-link-pill:hover { color:var(--primary); border-color:var(--primary); background:var(--primary-light); box-shadow:var(--shadow-md); transform:translateY(-1px); }
-        .toast-message { position:fixed; top:16px; left:50%; transform:translateX(-50%); padding:11px 22px; border-radius:30px; z-index:9999; color:#fff; box-shadow:0 8px 24px rgba(0,0,0,0.2); animation:toastIn 3s ease forwards; }
+        .toast-message { position:fixed; top:16px; left:50%; transform:translateX(-50%); padding:11px 22px; border-radius:30px; z-index:9999; color:#fff; font-weight:600; text-shadow:0 1px 2px rgba(0,0,0,0.2); box-shadow:0 8px 24px rgba(0,0,0,0.2); animation:toastIn 3s ease forwards; }
         .toast-message.success { background:#10b981; } .toast-message.error { background:#ef4444; }
         @keyframes toastIn { 0%{opacity:0;transform:translate(-50%,-10px)} 10%{opacity:1;transform:translate(-50%,0)} 90%{opacity:1} 100%{opacity:0;transform:translate(-50%,-10px)} }
         .back-to-top { position:fixed; bottom:24px; right:24px; width:42px; height:42px; background:var(--surface); color:var(--primary); border-radius:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; visibility:hidden; z-index:150; border:1px solid var(--border); box-shadow:var(--shadow-md); transition:0.3s; }
@@ -153,125 +153,30 @@
         .modal-overlay { display:none; position:fixed; inset:0; background:rgba(12,14,24,0.5); backdrop-filter:blur(12px); z-index:2000; align-items:center; justify-content:center; }
         .modal-overlay.active { display:flex; }
         .modal-card { background:var(--surface); border:1px solid var(--border-light); border-radius:var(--radius-xl); padding:26px 24px; width:92%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 40px rgba(0,0,0,0.1); }
+        /* 液态玻璃弹窗 */
+        .glass-modal { background:rgba(255,255,255,0.7); backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.3); box-shadow:0 25px 50px rgba(0,0,0,0.15); border-radius:32px; }
         .article-cover-sm { width:44px; height:44px; border-radius:10px; object-fit:cover; background:#e8ecf3; flex-shrink:0; border:none; outline:none; }
         @media (max-width:640px) {
             .calendar-day { width:24px; height:24px; font-size:0.55rem; }
         }
-        .admin-user-card {
-            background: var(--surface);
-            border-radius: var(--radius-xl);
-            padding: 16px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-light);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .admin-user-card:hover {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-        .admin-user-info {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex: 2;
-            min-width: 180px;
-        }
-        .admin-user-avatar {
-            width: 44px;
-            height: 44px;
-            background: var(--primary-light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-        .admin-user-details {
-            flex: 1;
-        }
-        .admin-user-email {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text);
-            word-break: break-all;
-        }
-        .admin-user-name {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-        .admin-user-role {
-            background: var(--bg);
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        .admin-user-role.vip {
-            background: #fef3c7;
-            color: #b45309;
-        }
-        .admin-user-role.admin {
-            background: #eef2ff;
-            color: #4f6ef6;
-        }
-        .admin-action-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 8px 18px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .admin-action-btn:hover {
-            transform: translateY(-2px);
-            background: var(--primary-hover);
-            box-shadow: 0 4px 10px rgba(79,110,246,0.3);
-        }
-        .admin-action-btn:active {
-            transform: translateY(1px);
-        }
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
+        .admin-user-card { background: var(--surface); border-radius: var(--radius-xl); padding: 16px; margin-bottom: 12px; border: 1px solid var(--border-light); transition: all 0.2s; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .admin-user-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .admin-user-info { display: flex; align-items: center; gap: 14px; flex: 2; min-width: 180px; }
+        .admin-user-avatar { width: 44px; height: 44px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; }
+        .admin-user-details { flex: 1; }
+        .admin-user-email { font-weight: 600; font-size: 0.9rem; color: var(--text); word-break: break-all; }
+        .admin-user-name { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+        .admin-user-role { background: var(--bg); padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); }
+        .admin-user-role.vip { background: #fef3c7; color: #b45309; }
+        .admin-user-role.admin { background: #eef2ff; color: #4f6ef6; }
+        .admin-action-btn { background: var(--primary); color: white; border: none; border-radius: 40px; padding: 8px 18px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .admin-action-btn:hover { transform: translateY(-2px); background: var(--primary-hover); box-shadow: 0 4px 10px rgba(79,110,246,0.3); }
+        .admin-action-btn:active { transform: translateY(1px); }
+        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .admin-loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-        }
-        .send-code-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .plan-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border-light);
-            font-size: 0.8rem;
-        }
+        .admin-loading { text-align: center; padding: 40px; color: var(--text-muted); }
+        .send-code-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .plan-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 0.8rem; }
         .plan-item:last-child { border-bottom: none; }
     </style>
 </head>
@@ -400,34 +305,42 @@
         </div>
     </div>
 
+    <!-- 次数不足液态玻璃弹窗 -->
     <div id="insufficientModal" class="modal-overlay">
-        <div class="modal-card" style="max-width:420px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
-                <h3 style="font-weight:700;">下载次数不足</h3>
+        <div class="modal-card glass-modal" style="max-width:420px; text-align:center;">
+            <div style="display:flex;justify-content:flex-end;">
                 <button id="closeInsufficientModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);">&times;</button>
             </div>
-            <p style="font-size:0.85rem; margin-bottom:12px;">您的本月下载次数已用完，可通过以下方式获得更多次数：</p>
-            <div style="background:var(--bg); border-radius:16px; padding:14px;">
+            <i class="fas fa-exclamation-triangle" style="font-size:2.5rem; color:var(--primary); margin-bottom:8px;"></i>
+            <h3 style="margin-bottom:10px;">下载次数不足</h3>
+            <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:16px;">您本月的免费下载次数已用完</p>
+            <div style="background:rgba(255,255,255,0.5); border-radius:20px; padding:14px; margin-bottom:12px;">
+                <div class="plan-item">
+                    <span><i class="fab fa-weixin" style="color:#07c160;"></i> 添加客服微信</span>
+                    <span style="font-weight:700; font-size:1rem;">Win_Mac_123</span>
+                    <button onclick="navigator.clipboard.writeText('Win_Mac_123');showToast('已复制客服微信','success')" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:4px 12px; cursor:pointer;">复制</button>
+                </div>
                 <div class="plan-item">
                     <span>📦 10次下载</span>
                     <span style="font-weight:600;">2元</span>
-                    <button class="buy-package" data-amount="10" data-price="2" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:4px 12px; cursor:pointer;">购买</button>
+                    <button class="buy-package" data-amount="10" data-price="2" style="background:var(--success); color:#fff; border:none; border-radius:20px; padding:4px 12px; cursor:pointer;">购买</button>
                 </div>
                 <div class="plan-item">
-                    <span>👑 永久VIP（无限下载）</span>
+                    <span>👑 永久VIP</span>
                     <span style="font-weight:600;">30元</span>
                     <button class="buy-package" data-permanent="true" data-price="30" style="background:#f59e0b; color:#fff; border:none; border-radius:20px; padding:4px 12px; cursor:pointer;">购买</button>
                 </div>
                 <div class="plan-item">
-                    <span>📋 邀请好友注册</span>
-                    <span>双方各得5次</span>
-                    <button id="copyInviteCodeInsufficient" style="background:var(--success); color:#fff; border:none; border-radius:20px; padding:4px 12px; cursor:pointer;">复制邀请码</button>
+                    <span>📋 邀请好友</span>
+                    <span>双方各+5次</span>
+                    <button id="copyInviteCodeInsufficient" style="background:#6c5ce7; color:#fff; border:none; border-radius:20px; padding:4px 12px; cursor:pointer;">复制邀请码</button>
                 </div>
             </div>
-            <p style="font-size:0.7rem; color:var(--text-muted); margin-top:12px; text-align:center;">购买后请联系客服微信 <strong style="color:var(--primary);">Win_Mac_123</strong> 付款，管理员将为您增加次数或升级VIP。</p>
+            <p style="font-size:0.7rem; color:var(--text-muted);">付款后联系客服，管理员将为您增加次数或升级VIP</p>
         </div>
     </div>
 
+    <!-- 其他模态框保持不变 -->
     <div id="articleManageModal" class="modal-overlay"><div class="modal-card" style="max-width:700px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-weight:700;">文章管理</h3><button id="closeArticleModal" style="background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button></div><button id="addNewArticleBtn" class="admin-btn admin-btn-add" style="margin-bottom:16px; background:var(--success); color:#fff; padding:8px 18px; border-radius:20px; border:none; cursor:pointer; font-weight:600;">+ 新增文章</button><div id="articleAdminList"></div><div id="articleFormContainer" style="display:none; margin-top:16px; background:var(--bg); border-radius:16px; padding:20px;"><h4 style="margin-bottom:14px;">编辑/新增文章</h4><div class="article-form-group"><label>标题</label><input type="text" id="articleTitle" placeholder="文章标题" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div class="article-form-group"><label>封面图片URL</label><input type="text" id="articleCover" placeholder="图片链接" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div class="article-form-group"><label>摘要</label><textarea id="articleExcerpt" rows="2" placeholder="简短摘要" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div><div class="article-form-group"><label>正文内容</label><textarea id="articleContent" rows="5" placeholder="详细内容..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div><div class="article-form-group"><label>标签 (逗号分隔)</label><input type="text" id="articleTags" placeholder="教程, 技巧" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div style="display:flex; gap:8px; margin-top:16px;"><button id="saveArticleBtn" style="background:var(--success); color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">保存</button><button id="cancelArticleBtn" style="background:#94a3b8; color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">取消</button></div></div></div></div>
     <div id="articleDetailModal" class="modal-overlay"><div class="modal-card" style="max-width:600px;"><button id="closeDetailModal" style="float:right; background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h3 id="articleDetailTitle"></h3><img id="articleDetailCover" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin:10px 0;"><div id="articleDetailContent" style="line-height:1.7;"></div><div id="articleDetailMeta" style="margin-top:12px; font-size:0.7rem; color:var(--text-muted);"></div></div></div>
     <div id="pluginModal" class="modal-overlay"><div class="modal-card" style="max-width:500px;"><button id="closePluginModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>插件商店</h2><div id="pluginListContainer"></div></div></div>
@@ -439,7 +352,6 @@
         emailjs.init('9VF7tzRthx9_nkchu');
 
         (function(){
-            // 粒子动画
             const c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');let w,h,m={x:-1e3,y:-1e3},p=[];function r(){w=innerWidth;h=innerHeight;c.width=w;c.height=h}window.addEventListener('resize',r);r();document.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY});document.addEventListener('mouseleave',()=>{m.x=-1e3;m.y=-1e3});class P{constructor(){this.reset();this.y=Math.random()*h}reset(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.rad=Math.random()*1.8+0.4;this.op=Math.random()*0.4+0.1}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;const dx=m.x-this.x,dy=m.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150&&m.x>0){const force=(1-dist/150)*0.03;this.x+=dx*force;this.y+=dy*force;this.rad=Math.min(this.rad+0.01,2.5);this.op=Math.min(this.op+0.01,0.8)}else{this.rad=Math.max(this.rad-0.003,0.4);this.op=Math.max(this.op-0.002,0.1)}}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.rad,0,Math.PI*2);ctx.fillStyle=`rgba(79,110,246,${this.op})`;ctx.fill()}}for(let i=0;i<60;i++)p.push(new P());function conn(){for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<90){ctx.beginPath();ctx.strokeStyle=`rgba(79,110,246,${0.06*(1-dist/90)})`;ctx.lineWidth=0.4;ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.stroke()}}}function anim(){ctx.clearRect(0,0,w,h);p.forEach(v=>{v.update();v.draw()});conn();requestAnimationFrame(anim)}anim();
 
             const CONFIG = {
@@ -460,7 +372,7 @@
             let articles = [], editingArticleId = null;
             let resetCode = '', resetCodeExpire = 0, resetEmail = '';
             const DEFAULT_MONTHLY_QUOTA = 2;
-            let cachedUsers = null; // 仅声明一次
+            let cachedUsers = null;
 
             function showToast(m, t='success'){
                 const d = document.createElement('div');
@@ -689,7 +601,6 @@
             async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
             async function deleteArticle(id){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('DELETE',`Articles/${id}`); }
 
-            // 用户相关
             async function findUserByEmail(email){
                 if(isLocalFile){
                     const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -769,7 +680,6 @@
                         downloadCount: user.downloadCount || 0
                     };
                 }
-                // 在线快速登录：优先使用缓存
                 const cachedUsersData = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
                 const cachedUser = cachedUsersData.find(u => u.email === email);
                 if(cachedUser && CryptoJS.SHA256(password).toString() === cachedUser.password){
@@ -806,7 +716,6 @@
                         downloadCount: cachedUser.downloadCount || 0
                     };
                 }
-                // 缓存未命中，网络验证
                 const rec = await findUserByEmail(email);
                 if(!rec) throw new Error('邮箱未注册');
                 const hash = CryptoJS.SHA256(password).toString();
@@ -898,22 +807,21 @@
             }
             function canDownload(user){
                 if(!user) return false;
-                if(user.role === 'vip') return true;
+                if(user.role === 'vip' || user.role === 'admin') return true;
                 return getUserDownloadData(user.email).count < DEFAULT_MONTHLY_QUOTA;
             }
             function recordDownload(user){
-                if(!user || user.role === 'vip') return true;
+                if(!user || user.role === 'vip' || user.role === 'admin') return true;
                 const data = getUserDownloadData(user.email);
                 saveUserDownloadData(user.email, data.count + 1);
                 return data.count + 1 <= DEFAULT_MONTHLY_QUOTA;
             }
             function getRemainingCount(user){
                 if(!user) return 0;
-                if(user.role === 'vip') return Infinity;
+                if(user.role === 'vip' || user.role === 'admin') return Infinity;
                 return Math.max(0, DEFAULT_MONTHLY_QUOTA - getUserDownloadData(user.email).count);
             }
 
-            // 图标渲染
             function getStdAbbr(n){
                 if(!n) return 'SW';
                 const l = n.toLowerCase();
@@ -1191,8 +1099,8 @@
                 const area = document.getElementById('userArea');
                 if(currentUser){
                     const remaining = getRemainingCount(currentUser);
-                    const remainingText = currentUser.role === 'vip' ? '∞' : remaining;
-                    area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${currentUser.role==='vip'?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;
+                    const remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining;
+                    area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;
                     document.getElementById('userMenuBtn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
                     document.getElementById('logoutBtn').addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出'); location.reload(); });
                     document.getElementById('profileBtn').addEventListener('click', openProfileModal);
@@ -1207,8 +1115,8 @@
 
             async function openProfileModal(){
                 document.getElementById('profileUsername').innerText = currentUser.username;
-                document.getElementById('profileRole').innerHTML = currentUser.role === 'vip' ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`;
-                document.getElementById('profileRemaining').innerText = currentUser.role === 'vip' ? '∞' : getRemainingCount(currentUser);
+                document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`;
+                document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser);
                 document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无（请重新登录）';
                 document.getElementById('profileModal').classList.add('active');
             }
@@ -1238,7 +1146,7 @@
                 let html = '';
                 for(let u of users){
                     const role = u.fields.Role || 'user';
-                    const isVip = role === 'vip';
+                    const isVip = role === 'vip' || role === 'admin';
                     const isAdmin = role === 'admin';
                     const avatarIcon = isAdmin ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
                     html += `
@@ -1249,11 +1157,11 @@
                                     <div class="admin-user-email">${esc(u.fields.Email)}</div>
                                     <div class="admin-user-name">${esc(u.fields.Username || '未设置')}</div>
                                 </div>
-                                <div class="admin-user-role ${isVip ? 'vip' : (isAdmin ? 'admin' : '')}">${role === 'vip' ? 'VIP会员' : (role === 'admin' ? '管理员' : '普通会员')}</div>
+                                <div class="admin-user-role ${isVip ? 'vip' : (isAdmin ? 'admin' : '')}">${isVip ? 'VIP会员' : (isAdmin ? '管理员' : '普通会员')}</div>
                             </div>
                             <div style="display:flex; gap:8px; flex-wrap:wrap;">
                                 <button class="admin-action-btn upgrade-vip-btn" data-id="${u.id}" data-role="${role}">
-                                    ${role === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级' : (role === 'admin' ? '<i class="fas fa-lock"></i> 不可降级' : '<i class="fas fa-crown"></i> 升级VIP')}
+                                    ${isVip ? '<i class="fas fa-arrow-down"></i> 降级' : (isAdmin ? '<i class="fas fa-lock"></i> 不可降级' : '<i class="fas fa-crown"></i> 升级VIP')}
                                 </button>
                                 <button class="admin-action-btn reset-download-btn" data-email="${u.fields.Email}" style="background:#10b981;">重置次数</button>
                                 <button class="admin-action-btn set-download-btn" data-email="${u.fields.Email}" style="background:#3b82f6;">设置次数</button>
