@@ -16,7 +16,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         :root {
@@ -404,7 +403,7 @@
         emailjs.init('9VF7tzRthx9_nkchu');
 
         (function(){
-            // 粒子动画
+            // 粒子动画（保持不变）
             const c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');let w,h,m={x:-1e3,y:-1e3},p=[];function r(){w=innerWidth;h=innerHeight;c.width=w;c.height=h}window.addEventListener('resize',r);r();document.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY});document.addEventListener('mouseleave',()=>{m.x=-1e3;m.y=-1e3});class P{constructor(){this.reset();this.y=Math.random()*h}reset(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.rad=Math.random()*1.8+0.4;this.op=Math.random()*0.4+0.1}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;const dx=m.x-this.x,dy=m.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150&&m.x>0){const force=(1-dist/150)*0.03;this.x+=dx*force;this.y+=dy*force;this.rad=Math.min(this.rad+0.01,2.5);this.op=Math.min(this.op+0.01,0.8)}else{this.rad=Math.max(this.rad-0.003,0.4);this.op=Math.max(this.op-0.002,0.1)}}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.rad,0,Math.PI*2);ctx.fillStyle=`rgba(79,110,246,${this.op})`;ctx.fill()}}for(let i=0;i<60;i++)p.push(new P());function conn(){for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<90){ctx.beginPath();ctx.strokeStyle=`rgba(79,110,246,${0.06*(1-dist/90)})`;ctx.lineWidth=0.4;ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.stroke()}}}function anim(){ctx.clearRect(0,0,w,h);p.forEach(v=>{v.update();v.draw()});conn();requestAnimationFrame(anim)}anim();
 
             const CONFIG = {
@@ -436,7 +435,6 @@
             function genCap(){ let a=Math.floor(Math.random()*10)+1,b=Math.floor(Math.random()*10)+1,op=Math.random()>0.5?'+':'-',ans=op==='+'?a+b:a-b; if(ans<0) return genCap(); return { question: `${a} ${op} ${b} = ?`, answer: ans }; }
             function refCap(q,i){ let c=genCap(); currentCaptcha=c; document.getElementById(q).innerText=c.question; document.getElementById(i).value=''; }
 
-            // 汉堡菜单
             const hamburger = document.getElementById('hamburgerBtn'), navLinks = document.getElementById('navLinks');
             if(hamburger && navLinks){
                 hamburger.addEventListener('click', ()=>{
@@ -449,7 +447,6 @@
                 }));
             }
 
-            // 日历
             let currentDate = new Date();
             function renderCalendar(){
                 const y = currentDate.getFullYear(), m = currentDate.getMonth();
@@ -477,7 +474,6 @@
             document.getElementById('nextMonth').addEventListener('click', ()=>{ currentDate.setMonth(currentDate.getMonth()+1); renderCalendar(); });
             renderCalendar();
 
-            // 网络请求封装
             async function fetchWithTimeout(url, opts, to=5000){
                 if(isLocalFile) throw new Error('本地跳过');
                 const controller = new AbortController();
@@ -512,7 +508,6 @@
                 }
             }
 
-            // 不区分大小写获取字段值
             function getFieldValue(fields, possibleNames, defaultValue=''){
                 for(let name of possibleNames){
                     if(fields[name] !== undefined) return fields[name];
@@ -524,7 +519,6 @@
                 return defaultValue;
             }
 
-            // 软件/广告/文章/留言
             async function fetchSoftwares(forceRefresh = false){
                 if(!forceRefresh){
                     const cached = localStorage.getItem('cachedSoft');
@@ -631,7 +625,7 @@
             async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
             async function deleteArticle(id){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('DELETE',`Articles/${id}`); }
 
-            // 用户操作（关键：避免422错误）
+            // ==================== 用户相关（无 InvitedBy 字段） ====================
             async function findUserByEmail(email){
                 if(isLocalFile){
                     const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -654,11 +648,10 @@
                     const hash = CryptoJS.SHA256(password).toString();
                     const userCode = Math.random().toString(36).substring(2,10).toUpperCase();
                     let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                    let newUser = { email, password: hash, username, role: 'user', inviteCode: userCode, invitedBy: '', inviteBonus: 0 };
+                    let newUser = { email, password: hash, username, role: 'user', inviteCode: userCode, inviteBonus: 0 };
                     if(inviteCode){
                         const inviter = users.find(u => u.inviteCode === inviteCode);
                         if(inviter){
-                            newUser.invitedBy = inviter.email;
                             inviter.inviteBonus = (inviter.inviteBonus || 0) + 5;
                             addDownloadBonus(inviter.email, 5);
                             showToast(`邀请成功！您获得了5次额外下载`, 'success');
@@ -673,16 +666,11 @@
                 if(await findUserByEmail(email)) throw new Error('邮箱已注册');
                 const hash = CryptoJS.SHA256(password).toString();
                 const userCode = Math.random().toString(36).substring(2,10).toUpperCase();
-                let fields = { Email: email, Password: hash, Username: username, Role: 'user', InviteCode: userCode, InvitedBy: '', InviteBonus: 0 };
+                let fields = { Email: email, Password: hash, Username: username, Role: 'user', InviteCode: userCode, InviteBonus: 0 };
                 if(inviteCode){
                     const inviter = await findUserByInviteCode(inviteCode);
                     if(inviter){
-                        fields.InvitedBy = inviter.fields.Email;
-                        // 安全更新 InviteBonus：确保该字段存在且为数字
-                        let currentBonus = 0;
-                        if(inviter.fields.InviteBonus !== undefined && inviter.fields.InviteBonus !== null){
-                            currentBonus = Number(inviter.fields.InviteBonus);
-                        }
+                        let currentBonus = (inviter.fields.InviteBonus !== undefined && inviter.fields.InviteBonus !== null) ? Number(inviter.fields.InviteBonus) : 0;
                         let newBonus = currentBonus + 5;
                         try {
                             await airReq('PATCH', `Users/${inviter.id}`, { fields: { InviteBonus: newBonus } });
@@ -690,7 +678,6 @@
                             showToast(`邀请成功！您获得了5次额外下载`, 'success');
                         } catch(e) {
                             console.warn('更新邀请人积分失败，可能字段不存在', e);
-                            // 即使更新失败，注册仍继续
                         }
                     } else {
                         showToast('邀请码无效', 'warning');
@@ -778,7 +765,7 @@
                 return code;
             }
 
-            // 下载次数管理（本地存储）
+            // 下载次数管理
             function getCurrentMonthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
             function getUserDownloadData(email){
                 const key = `download_${email}`;
@@ -843,7 +830,7 @@
                 return `<div class="icon-fallback" style="background:${getColor(name)};">${esc(parsed.value || getStdAbbr(name))}</div>`;
             }
 
-            // UI渲染
+            // ==================== UI 渲染 ====================
             const CAT_MAP = { 'adobe':'Adobe系列','autodesk':'Autodesk系列','c4d':'Cinema 4D','sketchup':'草图大师','rhino':'犀牛软件','plugin':'插件工具','other':'其他' };
             function renderCats(){
                 const el = document.getElementById('categoryTabs');
@@ -984,11 +971,10 @@
                 }
             }
 
-            // 文章管理 UI
             function renderAdmin(){
                 const el = document.getElementById('articleAdminList');
                 if(!articles.length){ el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章</div>'; return; }
-                el.innerHTML = `<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></tr></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody><table>`;
+                el.innerHTML = `<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></tr></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody></table>`;
                 el.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{ const art = articles.find(a=>a.id===b.dataset.id); if(art) showArtForm(art); }));
                 el.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',async()=>{ if(confirm('确定删除？')){ await deleteArticle(b.dataset.id); articles = await fetchArticles(); renderAdmin(); renderArtsList(); } }));
             }
@@ -1036,7 +1022,6 @@
                 }));
             }
 
-            // 插件商店
             const plugins = [
                 { name: 'AE 特效套装', software: 'After Effects' },
                 { name: 'PS 磨皮润色', software: 'Photoshop' },
@@ -1063,7 +1048,6 @@
                 document.getElementById('payQrImage').src = PAY_CODES[payMethod];
             }));
 
-            // 轮播图
             let bannerInt = null, sidebarInt = null, curB = 0, curS = 0;
             function renderCarousel(slides, dots, ads, isB){
                 slides.innerHTML = ads.map((a,i)=>`<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="lazy" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join('');
@@ -1090,7 +1074,6 @@
             }
             function resetCar(isB){ clearInterval(isB ? bannerInt : sidebarInt); startCar(isB); }
 
-            // 用户界面
             function updateUserUI(){
                 const area = document.getElementById('userArea');
                 if(currentUser){
@@ -1196,6 +1179,7 @@
                 document.getElementById('refreshLoginCaptcha').addEventListener('click',()=>refCap('loginCaptchaQuestion','loginCaptchaInput'));
                 document.getElementById('refreshRegCaptcha').addEventListener('click',()=>refCap('regCaptchaQuestion','regCaptchaInput'));
                 document.getElementById('refreshForgotCaptcha').addEventListener('click',()=>refCap('forgotCaptchaQuestion','forgotCaptchaInput'));
+                
                 document.getElementById('registerBtn').addEventListener('click', async ()=>{
                     const username = document.getElementById('regUsername').value.trim();
                     const email = document.getElementById('regEmail').value.trim();
@@ -1203,29 +1187,71 @@
                     const confirm = document.getElementById('regConfirm').value;
                     const inviteCode = document.getElementById('regInviteCode').value.trim();
                     const cap = document.getElementById('regCaptchaInput').value.trim();
-                    if(!username || !email || pwd !== confirm || pwd.length<6) return showToast('信息不正确','error');
-                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误','error');
+                    
+                    // 细化错误提示
+                    if(!username){
+                        showToast('用户名不能为空', 'error');
+                        return;
+                    }
+                    if(!email){
+                        showToast('邮箱不能为空', 'error');
+                        return;
+                    }
+                    if(pwd.length < 6){
+                        showToast('密码长度至少6位', 'error');
+                        return;
+                    }
+                    if(pwd !== confirm){
+                        showToast('两次输入的密码不一致', 'error');
+                        return;
+                    }
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer){
+                        showToast('验证码错误', 'error');
+                        refreshCaptcha('regCaptchaQuestion','regCaptchaInput');
+                        return;
+                    }
                     try{
-                        if(await findUserByEmail(email)) return showToast('邮箱已注册','error');
+                        if(await findUserByEmail(email)) return showToast('邮箱已注册', 'error');
                         await registerUser(email, pwd, username, inviteCode);
-                        showToast('注册成功，请登录','success');
+                        showToast('注册成功！请登录', 'success');
+                        // 清空注册表单
+                        document.getElementById('regUsername').value = '';
+                        document.getElementById('regEmail').value = '';
+                        document.getElementById('regPassword').value = '';
+                        document.getElementById('regConfirm').value = '';
+                        document.getElementById('regInviteCode').value = '';
+                        document.getElementById('regCaptchaInput').value = '';
+                        // 切换到登录标签页
                         openAuth('login');
-                    }catch(e){ showToast(e.message,'error'); }
+                        // 可选：自动填充邮箱（方便用户）
+                        document.getElementById('loginEmail').value = email;
+                    } catch(e){
+                        showToast(e.message || '注册失败，请稍后重试', 'error');
+                    }
                 });
+                
                 document.getElementById('loginBtn').addEventListener('click', async ()=>{
                     const email = document.getElementById('loginEmail').value.trim();
                     const pwd = document.getElementById('loginPassword').value;
                     const cap = document.getElementById('loginCaptchaInput').value.trim();
-                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误','error');
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer){
+                        showToast('验证码错误', 'error');
+                        refreshCaptcha('loginCaptchaQuestion','loginCaptchaInput');
+                        return;
+                    }
                     try{
                         currentUser = await loginUser(email, pwd);
                         localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
                         updateUserUI();
                         document.getElementById('authModal').classList.remove('active');
-                        showToast('登录成功','success');
+                        showToast('登录成功', 'success');
                         location.reload();
-                    }catch(e){ showToast(e.message,'error'); }
+                    } catch(e){
+                        showToast(e.message, 'error');
+                        refreshCaptcha('loginCaptchaQuestion','loginCaptchaInput');
+                    }
                 });
+                
                 let countdown = 0;
                 const sendBtn = document.getElementById('sendResetCodeBtn');
                 const resetCodeInput = document.getElementById('resetCodeInput');
@@ -1258,39 +1284,53 @@
                                 sendBtn.textContent = `${countdown}秒后重发`;
                             }
                         }, 1000);
-                    }catch(e){
+                    } catch(e){
                         showToast(e.message, 'error');
                         sendBtn.disabled = false;
                         sendBtn.textContent = '发送验证码';
                     }
                 });
+                
                 document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
                     const email = document.getElementById('forgotEmail').value.trim();
                     const code = resetCodeInput.value.trim();
                     const newPwd = document.getElementById('newPassword').value;
                     const confirm = document.getElementById('confirmNewPassword').value;
                     const cap = document.getElementById('forgotCaptchaInput').value.trim();
-                    if(!email || newPwd !== confirm || newPwd.length<6) return showToast('信息不正确','error');
-                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误','error');
+                    if(!email || newPwd !== confirm || newPwd.length<6){
+                        showToast('请正确填写信息（邮箱、新密码至少6位且一致）', 'error');
+                        return;
+                    }
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer){
+                        showToast('验证码错误', 'error');
+                        refreshCaptcha('forgotCaptchaQuestion','forgotCaptchaInput');
+                        return;
+                    }
                     if(email !== resetEmail){
-                        return showToast('邮箱与发送验证码的邮箱不一致', 'error');
+                        showToast('邮箱与发送验证码的邮箱不一致', 'error');
+                        return;
                     }
                     if(!code || code !== resetCode || Date.now() > resetCodeExpire){
-                        return showToast('验证码错误或已过期', 'error');
+                        showToast('验证码错误或已过期', 'error');
+                        return;
                     }
                     try{
                         await updatePassword(email, newPwd);
-                        showToast('密码重置成功，请登录','success');
+                        showToast('密码重置成功，请登录', 'success');
                         openAuth('login');
                         resetCode = '';
                         resetEmail = '';
                         resetCodeInput.value = '';
-                    }catch(e){ showToast(e.message,'error'); }
+                    } catch(e){
+                        showToast(e.message, 'error');
+                    }
                 });
+                
                 document.getElementById('showForgotBtn').addEventListener('click',()=>openAuth('forgot'));
                 document.getElementById('backToLoginFromForgot').addEventListener('click',()=>openAuth('login'));
                 document.getElementById('closeAuthModal').addEventListener('click',()=>document.getElementById('authModal').classList.remove('active'));
                 document.querySelectorAll('.auth-tab').forEach(t=>t.addEventListener('click',()=>openAuth(t.dataset.tab)));
+                
                 document.getElementById('manageArticlesBtn').addEventListener('click',()=>{
                     document.getElementById('articleManageModal').classList.add('active');
                     renderAdmin();
@@ -1307,18 +1347,29 @@
                 document.getElementById('saveProfileBtn').addEventListener('click', async function(){
                     const newPwd = document.getElementById('profileNewPwd').value;
                     const confirm = document.getElementById('profileConfirmPwd').value;
-                    if(newPwd && newPwd !== confirm) return showToast('两次密码不一致','error');
-                    if(newPwd && newPwd.length<6) return showToast('密码至少6位','error');
+                    if(newPwd && newPwd !== confirm){
+                        showToast('两次密码不一致', 'error');
+                        return;
+                    }
+                    if(newPwd && newPwd.length<6){
+                        showToast('密码至少6位', 'error');
+                        return;
+                    }
                     try{
                         if(newPwd) await updatePassword(currentUser.email, newPwd);
-                        showToast('资料更新成功','success');
+                        showToast('资料更新成功', 'success');
                         document.getElementById('profileModal').classList.remove('active');
-                    }catch(e){ showToast('更新失败','error'); }
+                    } catch(e){
+                        showToast('更新失败', 'error');
+                    }
                 });
                 document.getElementById('closeAdminModal').addEventListener('click',()=>document.getElementById('adminModal').classList.remove('active'));
                 document.getElementById('submitFeedbackBtn').addEventListener('click', async function(){
                     const msg = document.getElementById('feedbackMessage').value.trim();
-                    if(!msg) return showToast('请填写内容','error');
+                    if(!msg){
+                        showToast('请填写内容', 'error');
+                        return;
+                    }
                     this.disabled = true;
                     try{
                         if(isLocalFile){
@@ -1329,18 +1380,20 @@
                             showToast('留言成功');
                             document.getElementById('feedbackMessage').value = '';
                             renderFeedback();
-                        }else{
+                        } else {
                             await airReq('POST', 'Messages', { fields: { Name: document.getElementById('feedbackName').value||'网友', Message: msg } });
                             showToast('留言成功');
                             document.getElementById('feedbackMessage').value = '';
                             renderFeedback();
                         }
-                    }catch(e){ showToast('提交失败','error'); }
-                    finally{ this.disabled = false; }
+                    } catch(e){
+                        showToast('提交失败', 'error');
+                    } finally {
+                        this.disabled = false;
+                    }
                 });
             }
 
-            // 搜索
             const searchInput = document.getElementById('searchInput');
             const searchSug = document.getElementById('searchSuggestions');
             searchInput.addEventListener('input', e=>{
