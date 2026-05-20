@@ -6,7 +6,6 @@
     <title>乐哲软件 | 原版软件下载推荐 · 创意工具库</title>
     <meta name="description" content="乐哲软件博客提供 Adobe、Autodesk、C4D、草图大师、犀牛等主流软件的原版安装包推荐与下载指引，资源安全无捆绑，仅供个人学习使用。">
     <meta name="keywords" content="乐哲软件,软件下载,Adobe下载,Autodesk,正版软件推荐,Mac软件,Windows软件,C4D,草图大师,犀牛,插件">
-    <!-- 其他 meta 和 link 保持不变 -->
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="dns-prefetch" href="//api.airtable.com">
     <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
@@ -19,7 +18,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* 所有原有样式保持不变 */
         :root {
             --bg: #f3f4f8;
             --surface: #ffffff;
@@ -281,7 +279,6 @@
 <body>
     <canvas id="particles-canvas"></canvas>
     <div class="app-wrapper">
-        <!-- 导航栏 保持原样 -->
         <div class="top-nav" id="topNav">
             <div class="nav-inner">
                 <div class="logo-area"><span class="logo">乐哲软件</span></div>
@@ -310,6 +307,9 @@
                     <div class="sidebar-card">
                         <div class="calendar-header"><span id="calendarMonthYear"></span><div class="calendar-nav"><button id="prevMonth"><i class="fas fa-chevron-left"></i></button><button id="nextMonth"><i class="fas fa-chevron-right"></i></button></div></div>
                         <div class="calendar-grid" id="calendarDays"></div>
+                        <div style="text-align:center; margin-top:10px;">
+                            <button id="dailyCheckinBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:6px 16px; font-size:0.7rem; cursor:pointer;">📅 每日签到 (+1次)</button>
+                        </div>
                     </div>
                     <div class="feedback-section" id="sidebarFeedback">
                         <div style="font-weight:650;font-size:var(--font-base);margin-bottom:10px;display:flex;align-items:center;gap:7px;"><i class="fas fa-comment-dots"></i> 用户留言</div>
@@ -337,9 +337,8 @@
         </div>
     </div>
 
-    <!-- 各种模态框 保持原样 -->
+    <!-- 模态框 -->
     <div id="authModal" class="modal-overlay">
-        <!-- ... 登录/注册模态框内容不变 ... -->
         <div class="modal-card" style="max-width:440px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
             <div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div>
@@ -402,7 +401,6 @@
         </div>
     </div>
 
-    <!-- 下载次数不足弹窗（新增） -->
     <div id="insufficientModal" class="modal-overlay">
         <div class="modal-card" style="max-width:420px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
@@ -431,7 +429,6 @@
         </div>
     </div>
 
-    <!-- 其他模态框（文章管理、插件等）保持原样 -->
     <div id="articleManageModal" class="modal-overlay"><div class="modal-card" style="max-width:700px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-weight:700;">文章管理</h3><button id="closeArticleModal" style="background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button></div><button id="addNewArticleBtn" class="admin-btn admin-btn-add" style="margin-bottom:16px; background:var(--success); color:#fff; padding:8px 18px; border-radius:20px; border:none; cursor:pointer; font-weight:600;">+ 新增文章</button><div id="articleAdminList"></div><div id="articleFormContainer" style="display:none; margin-top:16px; background:var(--bg); border-radius:16px; padding:20px;"><h4 style="margin-bottom:14px;">编辑/新增文章</h4><div class="article-form-group"><label>标题</label><input type="text" id="articleTitle" placeholder="文章标题" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div class="article-form-group"><label>封面图片URL</label><input type="text" id="articleCover" placeholder="图片链接" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div class="article-form-group"><label>摘要</label><textarea id="articleExcerpt" rows="2" placeholder="简短摘要" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div><div class="article-form-group"><label>正文内容</label><textarea id="articleContent" rows="5" placeholder="详细内容..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div><div class="article-form-group"><label>标签 (逗号分隔)</label><input type="text" id="articleTags" placeholder="教程, 技巧" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div><div style="display:flex; gap:8px; margin-top:16px;"><button id="saveArticleBtn" style="background:var(--success); color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">保存</button><button id="cancelArticleBtn" style="background:#94a3b8; color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">取消</button></div></div></div></div>
     <div id="articleDetailModal" class="modal-overlay"><div class="modal-card" style="max-width:600px;"><button id="closeDetailModal" style="float:right; background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h3 id="articleDetailTitle"></h3><img id="articleDetailCover" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin:10px 0;"><div id="articleDetailContent" style="line-height:1.7;"></div><div id="articleDetailMeta" style="margin-top:12px; font-size:0.7rem; color:var(--text-muted);"></div></div></div>
     <div id="pluginModal" class="modal-overlay"><div class="modal-card" style="max-width:500px;"><button id="closePluginModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>插件商店</h2><div id="pluginListContainer"></div></div></div>
@@ -463,9 +460,10 @@
             let currentCaptcha = { question: '', answer: 0 };
             let articles = [], editingArticleId = null;
             let resetCode = '', resetCodeExpire = 0, resetEmail = '';
-
-            // 默认每月下载次数（可修改）
             const DEFAULT_MONTHLY_QUOTA = 2;
+
+            // 缓存用户列表，加速管理后台
+            let cachedUsers = null;
 
             function showToast(m, t='success'){
                 const d = document.createElement('div');
@@ -498,7 +496,6 @@
                 const mn = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
                 document.getElementById('calendarMonthYear').innerText = `${y}年 ${mn[m]}`;
                 const el = document.getElementById('calendarDays');
-                // 获取当前用户的签到记录
                 const signKey = currentUser ? `signin_${currentUser.email}_${y}-${m+1}` : null;
                 const signedDays = signKey ? JSON.parse(localStorage.getItem(signKey) || '[]') : [];
                 let h = '<div class="calendar-day-name">一</div><div class="calendar-day-name">二</div><div class="calendar-day-name">三</div><div class="calendar-day-name">四</div><div class="calendar-day-name">五</div><div class="calendar-day-name">六</div><div class="calendar-day-name">日</div>';
@@ -519,30 +516,29 @@
                     }
                 }
                 el.innerHTML = h;
-                // 绑定签到点击事件（仅当天且未签到）
-                if(currentUser && !isLocalFile || currentUser){
+                if(currentUser){
                     const todayDiv = el.querySelector('.calendar-day.today');
                     if(todayDiv && !todayDiv.classList.contains('signed')){
-                        todayDiv.addEventListener('click', ()=>{
-                            const day = parseInt(todayDiv.dataset.day);
-                            if(isNaN(day)) return;
-                            // 执行签到
-                            const signKey = `signin_${currentUser.email}_${y}-${m+1}`;
-                            let signed = JSON.parse(localStorage.getItem(signKey) || '[]');
-                            if(!signed.includes(day)){
-                                signed.push(day);
-                                localStorage.setItem(signKey, JSON.stringify(signed));
-                                addDownloadBonus(currentUser.email, 1);
-                                showToast('签到成功！获得1次下载机会', 'success');
-                                updateUserUI();
-                                renderCalendar();
-                            }
-                        });
+                        todayDiv.addEventListener('click', ()=> performCheckin());
                     }
                 }
             }
+            function performCheckin(){
+                if(!currentUser) { showToast('请先登录', 'error'); return; }
+                const y = currentDate.getFullYear(), m = currentDate.getMonth(), d = new Date().getDate();
+                const signKey = `signin_${currentUser.email}_${y}-${m+1}`;
+                let signed = JSON.parse(localStorage.getItem(signKey) || '[]');
+                if(signed.includes(d)) { showToast('今日已签到', 'warning'); return; }
+                signed.push(d);
+                localStorage.setItem(signKey, JSON.stringify(signed));
+                addDownloadBonus(currentUser.email, 1);
+                showToast('签到成功！获得1次下载机会', 'success');
+                updateUserUI();
+                renderCalendar();
+            }
             document.getElementById('prevMonth').addEventListener('click', ()=>{ currentDate.setMonth(currentDate.getMonth()-1); renderCalendar(); });
             document.getElementById('nextMonth').addEventListener('click', ()=>{ currentDate.setMonth(currentDate.getMonth()+1); renderCalendar(); });
+            document.getElementById('dailyCheckinBtn').addEventListener('click', performCheckin);
             renderCalendar();
 
             async function fetchWithTimeout(url, opts, to=5000){
@@ -696,7 +692,7 @@
             async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
             async function deleteArticle(id){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('DELETE',`Articles/${id}`); }
 
-            // 用户相关
+            // 用户相关（本地优先，网络同步后台）
             async function findUserByEmail(email){
                 if(isLocalFile){
                     const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -719,11 +715,11 @@
                     const hash = CryptoJS.SHA256(password).toString();
                     const userCode = Math.random().toString(36).substring(2,10).toUpperCase();
                     let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                    let newUser = { email, password: hash, username, role: 'user', inviteCode: userCode, inviteBonus: 0 };
+                    let newUser = { email, password: hash, username, role: 'user', inviteCode: userCode, downloadCount: 0 };
                     if(inviteCode){
                         const inviter = users.find(u => u.inviteCode === inviteCode);
                         if(inviter){
-                            inviter.inviteBonus = (inviter.inviteBonus || 0) + 5;
+                            inviter.downloadCount = Math.max(0, (inviter.downloadCount||0) - 5);
                             addDownloadBonus(inviter.email, 5);
                             showToast(`邀请成功！您获得了5次额外下载`, 'success');
                         } else {
@@ -737,18 +733,18 @@
                 if(await findUserByEmail(email)) throw new Error('邮箱已注册');
                 const hash = CryptoJS.SHA256(password).toString();
                 const userCode = Math.random().toString(36).substring(2,10).toUpperCase();
-                let fields = { Email: email, Password: hash, Username: username, Role: 'user', InviteCode: userCode, InviteBonus: 0 };
+                let fields = { Email: email, Password: hash, Username: username, Role: 'user', InviteCode: userCode, DownloadCount: 0 };
                 if(inviteCode){
                     const inviter = await findUserByInviteCode(inviteCode);
                     if(inviter){
-                        let currentBonus = (inviter.fields.InviteBonus !== undefined && inviter.fields.InviteBonus !== null) ? Number(inviter.fields.InviteBonus) : 0;
-                        let newBonus = currentBonus + 5;
+                        let currentCount = Number(inviter.fields.DownloadCount || 0);
+                        let newCount = Math.max(0, currentCount - 5);
                         try {
-                            await airReq('PATCH', `Users/${inviter.id}`, { fields: { InviteBonus: newBonus } });
+                            await airReq('PATCH', `Users/${inviter.id}`, { fields: { DownloadCount: newCount } });
                             addDownloadBonus(inviter.fields.Email, 5);
                             showToast(`邀请成功！您获得了5次额外下载`, 'success');
                         } catch(e) {
-                            console.warn('更新邀请人积分失败，可能字段不存在', e);
+                            console.warn('更新邀请人下载次数失败', e);
                         }
                     } else {
                         showToast('邀请码无效', 'warning');
@@ -757,6 +753,7 @@
                 await airReq('POST', 'Users', { fields });
             }
             async function loginUser(email, password){
+                // 优先本地缓存验证
                 if(isLocalFile){
                     let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
                     let user = users.find(u => u.email === email);
@@ -772,9 +769,51 @@
                         email: user.email,
                         username: user.username,
                         role: user.role || 'user',
-                        inviteCode: user.inviteCode
+                        inviteCode: user.inviteCode,
+                        downloadCount: user.downloadCount || 0
                     };
                 }
+                // 在线时先从缓存快速响应，然后异步验证更新
+                const cachedUsers = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
+                const cachedUser = cachedUsers.find(u => u.email === email);
+                if(cachedUser && CryptoJS.SHA256(password).toString() === cachedUser.password){
+                    // 立即返回缓存用户，不阻塞UI
+                    setTimeout(()=>{
+                        airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
+                            .then(data => {
+                                if(data.records.length){
+                                    const rec = data.records[0];
+                                    const syncedUser = {
+                                        id: rec.id,
+                                        email: rec.fields.Email,
+                                        username: rec.fields.Username || email.split('@')[0],
+                                        role: rec.fields.Role || 'user',
+                                        inviteCode: rec.fields.InviteCode || '',
+                                        downloadCount: Number(rec.fields.DownloadCount || 0)
+                                    };
+                                    // 更新缓存
+                                    const idx = cachedUsers.findIndex(u => u.email === email);
+                                    if(idx >= 0) cachedUsers[idx] = {...cachedUsers[idx], ...syncedUser, password: cachedUsers[idx].password};
+                                    else cachedUsers.push({...syncedUser, password: cachedUser.password});
+                                    localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsers));
+                                    // 如果当前用户仍是该用户，更新currentUser
+                                    if(currentUser && currentUser.email === email){
+                                        currentUser = syncedUser;
+                                        updateUserUI();
+                                    }
+                                }
+                            }).catch(()=>{});
+                    }, 0);
+                    return {
+                        id: cachedUser.id || email,
+                        email: cachedUser.email,
+                        username: cachedUser.username,
+                        role: cachedUser.role || 'user',
+                        inviteCode: cachedUser.inviteCode || '',
+                        downloadCount: cachedUser.downloadCount || 0
+                    };
+                }
+                // 缓存未命中或密码不匹配，走网络
                 const rec = await findUserByEmail(email);
                 if(!rec) throw new Error('邮箱未注册');
                 const hash = CryptoJS.SHA256(password).toString();
@@ -784,18 +823,23 @@
                     inviteCode = Math.random().toString(36).substring(2,10).toUpperCase();
                     try {
                         await airReq('PATCH', `Users/${rec.id}`, { fields: { InviteCode: inviteCode } });
-                        showToast('已为您生成邀请码，请刷新个人中心查看', 'success');
-                    } catch(e) {
-                        console.warn('更新邀请码失败', e);
-                    }
+                    } catch(e) { console.warn('更新邀请码失败', e); }
                 }
-                return {
+                const userData = {
                     id: rec.id,
                     email: rec.fields.Email,
                     username: rec.fields.Username || email.split('@')[0],
                     role: rec.fields.Role || 'user',
-                    inviteCode: inviteCode
+                    inviteCode: inviteCode,
+                    downloadCount: Number(rec.fields.DownloadCount || 0)
                 };
+                // 更新缓存
+                const cachedUsers = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
+                const existing = cachedUsers.findIndex(u => u.email === email);
+                if(existing >= 0) cachedUsers[existing] = {...userData, password: rec.fields.Password};
+                else cachedUsers.push({...userData, password: rec.fields.Password});
+                localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsers));
+                return userData;
             }
             async function updatePassword(email, newPass){
                 if(isLocalFile){
@@ -822,10 +866,13 @@
             }
             async function getAllUsers(){
                 if(isLocalFile){
-                    return JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(u => ({ id: u.email, fields: u }));
+                    return JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(u => ({ id: u.email, fields: { Email: u.email, Username: u.username, Role: u.role, DownloadCount: u.downloadCount || 0 } }));
                 }
                 const data = await airReq('GET', 'Users?maxRecords=100');
-                return data.records.map(r=>({ id: r.id, fields: r.fields }));
+                const users = data.records.map(r=>({ id: r.id, fields: r.fields }));
+                // 缓存用户列表
+                cachedUsers = users;
+                return users;
             }
 
             async function sendResetCode(email){
@@ -836,7 +883,7 @@
                 return code;
             }
 
-            // 下载次数管理
+            // 下载次数管理（同步到Airtable的DownloadCount字段）
             function getCurrentMonthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
             function getUserDownloadData(email){
                 const key = `download_${email}`;
@@ -848,7 +895,18 @@
                     return parsed;
                 }catch(e){ return { month: getCurrentMonthKey(), count: 0 }; }
             }
-            function saveUserDownloadData(email, count){ localStorage.setItem(`download_${email}`, JSON.stringify({ month: getCurrentMonthKey(), count: count })); }
+            function saveUserDownloadData(email, count){
+                localStorage.setItem(`download_${email}`, JSON.stringify({ month: getCurrentMonthKey(), count: count }));
+                // 同步到Airtable（异步）
+                if(!isLocalFile){
+                    airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
+                        .then(data => {
+                            if(data.records.length){
+                                airReq('PATCH', `Users/${data.records[0].id}`, { fields: { DownloadCount: count } });
+                            }
+                        }).catch(()=>{});
+                }
+            }
             function addDownloadBonus(email, bonus){
                 const data = getUserDownloadData(email);
                 saveUserDownloadData(email, Math.max(0, data.count - bonus));
@@ -870,7 +928,7 @@
                 return Math.max(0, DEFAULT_MONTHLY_QUOTA - getUserDownloadData(user.email).count);
             }
 
-            // 图标渲染
+            // 图标渲染（保持不变）
             function getStdAbbr(n){
                 if(!n) return 'SW';
                 const l = n.toLowerCase();
@@ -1172,95 +1230,124 @@
 
             async function openAdminModal(){
                 const container = document.getElementById('adminUserList');
-                container.innerHTML = '<div class="admin-loading"><div class="loading-spinner" style="width:30px;height:30px;"></div> 加载用户列表中...</div>';
+                // 如果有缓存，先显示缓存数据
+                if(cachedUsers && cachedUsers.length){
+                    renderAdminUserList(cachedUsers);
+                } else {
+                    container.innerHTML = '<div class="admin-loading"><div class="loading-spinner" style="width:30px;height:30px;"></div> 加载中...</div>';
+                }
                 try {
                     const users = await getAllUsers();
-                    if(users.length === 0){
-                        container.innerHTML = '<div class="admin-loading">暂无用户</div>';
-                        document.getElementById('adminModal').classList.add('active');
-                        return;
-                    }
-                    let html = '';
-                    for(let u of users){
-                        const role = u.fields.Role || 'user';
-                        const isVip = role === 'vip';
-                        const isAdmin = role === 'admin';
-                        const avatarIcon = isAdmin ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
-                        html += `
-                            <div class="admin-user-card" data-id="${u.id}">
-                                <div class="admin-user-info">
-                                    <div class="admin-user-avatar">${avatarIcon}</div>
-                                    <div class="admin-user-details">
-                                        <div class="admin-user-email">${esc(u.fields.Email)}</div>
-                                        <div class="admin-user-name">${esc(u.fields.Username || '未设置')}</div>
-                                    </div>
-                                    <div class="admin-user-role ${isVip ? 'vip' : (isAdmin ? 'admin' : '')}">${role === 'vip' ? 'VIP会员' : (role === 'admin' ? '管理员' : '普通会员')}</div>
-                                </div>
-                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                                    <button class="admin-action-btn upgrade-vip-btn" data-id="${u.id}" data-role="${role}">
-                                        ${role === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级' : (role === 'admin' ? '<i class="fas fa-lock"></i> 不可降级' : '<i class="fas fa-crown"></i> 升级VIP')}
-                                    </button>
-                                    <button class="admin-action-btn reset-download-btn" data-email="${u.fields.Email}" style="background:#10b981;">重置次数</button>
-                                    <button class="admin-action-btn set-download-btn" data-email="${u.fields.Email}" style="background:#3b82f6;">设置次数</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    container.innerHTML = html;
-                    // 升级/降级VIP
-                    container.querySelectorAll('.upgrade-vip-btn').forEach(btn => {
-                        btn.addEventListener('click', async (e) => {
-                            e.stopPropagation();
-                            const userId = btn.dataset.id;
-                            const currentRole = btn.dataset.role;
-                            if(currentRole === 'admin'){
-                                showToast('管理员角色不能通过此界面修改', 'error');
-                                return;
-                            }
-                            const newRole = currentRole === 'vip' ? 'user' : 'vip';
-                            btn.innerHTML = '<span class="loading-spinner" style="width:14px;height:14px;"></span> 处理中...';
-                            btn.disabled = true;
-                            try {
-                                await updateUserRole(userId, newRole);
-                                showToast(`用户已${newRole === 'vip' ? '升级为VIP' : '降级为普通会员'}`, 'success');
-                                await openAdminModal();
-                            } catch(err) {
-                                showToast('操作失败，请重试', 'error');
-                                btn.innerHTML = currentRole === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级' : '<i class="fas fa-crown"></i> 升级VIP';
-                                btn.disabled = false;
-                            }
-                        });
-                    });
-                    // 重置下载次数（将已用次数设为0）
-                    container.querySelectorAll('.reset-download-btn').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const email = btn.dataset.email;
-                            saveUserDownloadData(email, 0);
-                            showToast('已重置该用户本月下载次数', 'success');
-                            updateUserUI();
-                        });
-                    });
-                    // 设置下载次数（自定义已用次数）
-                    container.querySelectorAll('.set-download-btn').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            const email = btn.dataset.email;
-                            const currentData = getUserDownloadData(email);
-                            const newCount = prompt(`当前已用次数：${currentData.count}，剩余：${DEFAULT_MONTHLY_QUOTA - currentData.count}\n输入新的已用次数（0~${DEFAULT_MONTHLY_QUOTA}）`, currentData.count);
-                            if(newCount !== null && !isNaN(parseInt(newCount))) {
-                                const count = Math.max(0, Math.min(parseInt(newCount), DEFAULT_MONTHLY_QUOTA));
-                                saveUserDownloadData(email, count);
-                                showToast(`已设置该用户本月已用次数为 ${count}，剩余 ${DEFAULT_MONTHLY_QUOTA - count} 次`, 'success');
-                                updateUserUI();
-                            }
-                        });
-                    });
+                    renderAdminUserList(users);
                 } catch(err){
-                    container.innerHTML = '<div class="admin-loading">加载失败，请重试</div>';
-                    console.error(err);
+                    if(!cachedUsers) container.innerHTML = '<div class="admin-loading">加载失败，请重试</div>';
                 }
                 document.getElementById('adminModal').classList.add('active');
+            }
+
+            function renderAdminUserList(users){
+                const container = document.getElementById('adminUserList');
+                if(!users || users.length === 0){
+                    container.innerHTML = '<div class="admin-loading">暂无用户</div>';
+                    return;
+                }
+                let html = '';
+                for(let u of users){
+                    const role = u.fields.Role || 'user';
+                    const isVip = role === 'vip';
+                    const isAdmin = role === 'admin';
+                    const avatarIcon = isAdmin ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
+                    html += `
+                        <div class="admin-user-card" data-id="${u.id}">
+                            <div class="admin-user-info">
+                                <div class="admin-user-avatar">${avatarIcon}</div>
+                                <div class="admin-user-details">
+                                    <div class="admin-user-email">${esc(u.fields.Email)}</div>
+                                    <div class="admin-user-name">${esc(u.fields.Username || '未设置')}</div>
+                                </div>
+                                <div class="admin-user-role ${isVip ? 'vip' : (isAdmin ? 'admin' : '')}">${role === 'vip' ? 'VIP会员' : (role === 'admin' ? '管理员' : '普通会员')}</div>
+                            </div>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button class="admin-action-btn upgrade-vip-btn" data-id="${u.id}" data-role="${role}">
+                                    ${role === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级' : (role === 'admin' ? '<i class="fas fa-lock"></i> 不可降级' : '<i class="fas fa-crown"></i> 升级VIP')}
+                                </button>
+                                <button class="admin-action-btn reset-download-btn" data-email="${u.fields.Email}" style="background:#10b981;">重置次数</button>
+                                <button class="admin-action-btn set-download-btn" data-email="${u.fields.Email}" style="background:#3b82f6;">设置次数</button>
+                                <button class="admin-action-btn add-download-btn" data-email="${u.fields.Email}" style="background:#f59e0b;">增加次数</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+                // 升级/降级VIP
+                container.querySelectorAll('.upgrade-vip-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const userId = btn.dataset.id;
+                        const currentRole = btn.dataset.role;
+                        if(currentRole === 'admin'){
+                            showToast('管理员角色不能通过此界面修改', 'error');
+                            return;
+                        }
+                        const newRole = currentRole === 'vip' ? 'user' : 'vip';
+                        btn.innerHTML = '<span class="loading-spinner" style="width:14px;height:14px;"></span> 处理中...';
+                        btn.disabled = true;
+                        try {
+                            await updateUserRole(userId, newRole);
+                            // 更新缓存
+                            if(cachedUsers) {
+                                const user = cachedUsers.find(u => u.id === userId);
+                                if(user) user.fields.Role = newRole;
+                            }
+                            // 刷新列表
+                            renderAdminUserList(cachedUsers || []);
+                            showToast(`用户已${newRole === 'vip' ? '升级为VIP' : '降级为普通会员'}`, 'success');
+                        } catch(err) {
+                            showToast('操作失败，请重试', 'error');
+                            btn.innerHTML = currentRole === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级' : '<i class="fas fa-crown"></i> 升级VIP';
+                            btn.disabled = false;
+                        }
+                    });
+                });
+                // 重置下载次数
+                container.querySelectorAll('.reset-download-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const email = btn.dataset.email;
+                        saveUserDownloadData(email, 0);
+                        showToast('已重置该用户本月下载次数', 'success');
+                        updateUserUI();
+                    });
+                });
+                // 设置下载次数
+                container.querySelectorAll('.set-download-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const email = btn.dataset.email;
+                        const currentData = getUserDownloadData(email);
+                        const newCount = prompt(`当前已用次数：${currentData.count}，剩余：${DEFAULT_MONTHLY_QUOTA - currentData.count}\n输入新的已用次数（0~999）`, currentData.count);
+                        if(newCount !== null && !isNaN(parseInt(newCount))) {
+                            const count = Math.max(0, Math.min(parseInt(newCount), 999));
+                            saveUserDownloadData(email, count);
+                            showToast(`已设置该用户本月已用次数为 ${count}，剩余 ${DEFAULT_MONTHLY_QUOTA - count} 次`, 'success');
+                            updateUserUI();
+                        }
+                    });
+                });
+                // 增加下载次数（1-999）
+                container.querySelectorAll('.add-download-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const email = btn.dataset.email;
+                        const add = prompt('请输入要增加的下载次数（1~999）', '1');
+                        if(add !== null && !isNaN(parseInt(add))) {
+                            const amount = Math.max(1, Math.min(parseInt(add), 999));
+                            addDownloadBonus(email, amount);
+                            showToast(`已为该用户增加 ${amount} 次下载机会`, 'success');
+                            updateUserUI();
+                        }
+                    });
+                });
             }
 
             function openAuth(tab='login'){
@@ -1341,7 +1428,20 @@
                         updateUserUI();
                         document.getElementById('authModal').classList.remove('active');
                         showToast('登录成功', 'success');
-                        location.reload();
+                        // 登录后立即更新UI，不刷新页面
+                        renderCalendar();
+                        // 异步同步最新数据
+                        if(!isLocalFile){
+                            airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
+                                .then(data => {
+                                    if(data.records.length){
+                                        const rec = data.records[0];
+                                        currentUser.downloadCount = Number(rec.fields.DownloadCount || 0);
+                                        currentUser.role = rec.fields.Role || 'user';
+                                        updateUserUI();
+                                    }
+                                }).catch(()=>{});
+                        }
                     } catch(e){
                         showToast(e.message, 'error');
                         refreshCaptcha('loginCaptchaQuestion','loginCaptchaInput');
@@ -1489,7 +1589,7 @@
                         this.disabled = false;
                     }
                 });
-                // 购买套餐按钮事件（次数不足弹窗）
+                // 购买套餐按钮事件
                 document.querySelectorAll('.buy-package').forEach(btn => {
                     btn.addEventListener('click', function(){
                         const permanent = this.dataset.permanent === 'true';
