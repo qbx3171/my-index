@@ -157,7 +157,6 @@
         @media (max-width:640px) {
             .calendar-day { width:24px; height:24px; font-size:0.55rem; }
         }
-        /* 管理后台及次数不足弹窗额外样式 */
         .admin-user-card {
             background: var(--surface);
             border-radius: var(--radius-xl);
@@ -440,7 +439,7 @@
         emailjs.init('9VF7tzRthx9_nkchu');
 
         (function(){
-            // 粒子动画（保持不变）
+            // 粒子动画
             const c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');let w,h,m={x:-1e3,y:-1e3},p=[];function r(){w=innerWidth;h=innerHeight;c.width=w;c.height=h}window.addEventListener('resize',r);r();document.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY});document.addEventListener('mouseleave',()=>{m.x=-1e3;m.y=-1e3});class P{constructor(){this.reset();this.y=Math.random()*h}reset(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.rad=Math.random()*1.8+0.4;this.op=Math.random()*0.4+0.1}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;const dx=m.x-this.x,dy=m.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150&&m.x>0){const force=(1-dist/150)*0.03;this.x+=dx*force;this.y+=dy*force;this.rad=Math.min(this.rad+0.01,2.5);this.op=Math.min(this.op+0.01,0.8)}else{this.rad=Math.max(this.rad-0.003,0.4);this.op=Math.max(this.op-0.002,0.1)}}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.rad,0,Math.PI*2);ctx.fillStyle=`rgba(79,110,246,${this.op})`;ctx.fill()}}for(let i=0;i<60;i++)p.push(new P());function conn(){for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<90){ctx.beginPath();ctx.strokeStyle=`rgba(79,110,246,${0.06*(1-dist/90)})`;ctx.lineWidth=0.4;ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.stroke()}}}function anim(){ctx.clearRect(0,0,w,h);p.forEach(v=>{v.update();v.draw()});conn();requestAnimationFrame(anim)}anim();
 
             const CONFIG = {
@@ -461,9 +460,7 @@
             let articles = [], editingArticleId = null;
             let resetCode = '', resetCodeExpire = 0, resetEmail = '';
             const DEFAULT_MONTHLY_QUOTA = 2;
-
-            // 缓存用户列表，加速管理后台
-            let cachedUsers = null;
+            let cachedUsers = null; // 仅声明一次
 
             function showToast(m, t='success'){
                 const d = document.createElement('div');
@@ -692,7 +689,7 @@
             async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
             async function deleteArticle(id){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('DELETE',`Articles/${id}`); }
 
-            // 用户相关（本地优先，网络同步后台）
+            // 用户相关
             async function findUserByEmail(email){
                 if(isLocalFile){
                     const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -753,7 +750,6 @@
                 await airReq('POST', 'Users', { fields });
             }
             async function loginUser(email, password){
-                // 优先本地缓存验证
                 if(isLocalFile){
                     let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
                     let user = users.find(u => u.email === email);
@@ -773,11 +769,10 @@
                         downloadCount: user.downloadCount || 0
                     };
                 }
-                // 在线时先从缓存快速响应，然后异步验证更新
-                const cachedUsers = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
-                const cachedUser = cachedUsers.find(u => u.email === email);
+                // 在线快速登录：优先使用缓存
+                const cachedUsersData = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
+                const cachedUser = cachedUsersData.find(u => u.email === email);
                 if(cachedUser && CryptoJS.SHA256(password).toString() === cachedUser.password){
-                    // 立即返回缓存用户，不阻塞UI
                     setTimeout(()=>{
                         airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
                             .then(data => {
@@ -791,12 +786,10 @@
                                         inviteCode: rec.fields.InviteCode || '',
                                         downloadCount: Number(rec.fields.DownloadCount || 0)
                                     };
-                                    // 更新缓存
-                                    const idx = cachedUsers.findIndex(u => u.email === email);
-                                    if(idx >= 0) cachedUsers[idx] = {...cachedUsers[idx], ...syncedUser, password: cachedUsers[idx].password};
-                                    else cachedUsers.push({...syncedUser, password: cachedUser.password});
-                                    localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsers));
-                                    // 如果当前用户仍是该用户，更新currentUser
+                                    const idx = cachedUsersData.findIndex(u => u.email === email);
+                                    if(idx >= 0) cachedUsersData[idx] = {...cachedUsersData[idx], ...syncedUser, password: cachedUsersData[idx].password};
+                                    else cachedUsersData.push({...syncedUser, password: cachedUser.password});
+                                    localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsersData));
                                     if(currentUser && currentUser.email === email){
                                         currentUser = syncedUser;
                                         updateUserUI();
@@ -813,7 +806,7 @@
                         downloadCount: cachedUser.downloadCount || 0
                     };
                 }
-                // 缓存未命中或密码不匹配，走网络
+                // 缓存未命中，网络验证
                 const rec = await findUserByEmail(email);
                 if(!rec) throw new Error('邮箱未注册');
                 const hash = CryptoJS.SHA256(password).toString();
@@ -821,9 +814,7 @@
                 let inviteCode = rec.fields.InviteCode || '';
                 if(!inviteCode){
                     inviteCode = Math.random().toString(36).substring(2,10).toUpperCase();
-                    try {
-                        await airReq('PATCH', `Users/${rec.id}`, { fields: { InviteCode: inviteCode } });
-                    } catch(e) { console.warn('更新邀请码失败', e); }
+                    try { await airReq('PATCH', `Users/${rec.id}`, { fields: { InviteCode: inviteCode } }); } catch(e) {}
                 }
                 const userData = {
                     id: rec.id,
@@ -833,12 +824,10 @@
                     inviteCode: inviteCode,
                     downloadCount: Number(rec.fields.DownloadCount || 0)
                 };
-                // 更新缓存
-                const cachedUsers = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
-                const existing = cachedUsers.findIndex(u => u.email === email);
-                if(existing >= 0) cachedUsers[existing] = {...userData, password: rec.fields.Password};
-                else cachedUsers.push({...userData, password: rec.fields.Password});
-                localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsers));
+                const existing = cachedUsersData.findIndex(u => u.email === email);
+                if(existing >= 0) cachedUsersData[existing] = {...userData, password: rec.fields.Password};
+                else cachedUsersData.push({...userData, password: rec.fields.Password});
+                localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsersData));
                 return userData;
             }
             async function updatePassword(email, newPass){
@@ -869,10 +858,8 @@
                     return JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(u => ({ id: u.email, fields: { Email: u.email, Username: u.username, Role: u.role, DownloadCount: u.downloadCount || 0 } }));
                 }
                 const data = await airReq('GET', 'Users?maxRecords=100');
-                const users = data.records.map(r=>({ id: r.id, fields: r.fields }));
-                // 缓存用户列表
-                cachedUsers = users;
-                return users;
+                cachedUsers = data.records.map(r=>({ id: r.id, fields: r.fields }));
+                return cachedUsers;
             }
 
             async function sendResetCode(email){
@@ -883,7 +870,6 @@
                 return code;
             }
 
-            // 下载次数管理（同步到Airtable的DownloadCount字段）
             function getCurrentMonthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
             function getUserDownloadData(email){
                 const key = `download_${email}`;
@@ -897,7 +883,6 @@
             }
             function saveUserDownloadData(email, count){
                 localStorage.setItem(`download_${email}`, JSON.stringify({ month: getCurrentMonthKey(), count: count }));
-                // 同步到Airtable（异步）
                 if(!isLocalFile){
                     airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
                         .then(data => {
@@ -928,7 +913,7 @@
                 return Math.max(0, DEFAULT_MONTHLY_QUOTA - getUserDownloadData(user.email).count);
             }
 
-            // 图标渲染（保持不变）
+            // 图标渲染
             function getStdAbbr(n){
                 if(!n) return 'SW';
                 const l = n.toLowerCase();
@@ -1230,7 +1215,6 @@
 
             async function openAdminModal(){
                 const container = document.getElementById('adminUserList');
-                // 如果有缓存，先显示缓存数据
                 if(cachedUsers && cachedUsers.length){
                     renderAdminUserList(cachedUsers);
                 } else {
@@ -1279,7 +1263,6 @@
                     `;
                 }
                 container.innerHTML = html;
-                // 升级/降级VIP
                 container.querySelectorAll('.upgrade-vip-btn').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         e.stopPropagation();
@@ -1294,12 +1277,10 @@
                         btn.disabled = true;
                         try {
                             await updateUserRole(userId, newRole);
-                            // 更新缓存
                             if(cachedUsers) {
                                 const user = cachedUsers.find(u => u.id === userId);
                                 if(user) user.fields.Role = newRole;
                             }
-                            // 刷新列表
                             renderAdminUserList(cachedUsers || []);
                             showToast(`用户已${newRole === 'vip' ? '升级为VIP' : '降级为普通会员'}`, 'success');
                         } catch(err) {
@@ -1309,7 +1290,6 @@
                         }
                     });
                 });
-                // 重置下载次数
                 container.querySelectorAll('.reset-download-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -1319,7 +1299,6 @@
                         updateUserUI();
                     });
                 });
-                // 设置下载次数
                 container.querySelectorAll('.set-download-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -1334,7 +1313,6 @@
                         }
                     });
                 });
-                // 增加下载次数（1-999）
                 container.querySelectorAll('.add-download-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -1375,27 +1353,11 @@
                     const inviteCode = document.getElementById('regInviteCode').value.trim();
                     const cap = document.getElementById('regCaptchaInput').value.trim();
                     
-                    if(!username){
-                        showToast('用户名不能为空', 'error');
-                        return;
-                    }
-                    if(!email){
-                        showToast('邮箱不能为空', 'error');
-                        return;
-                    }
-                    if(pwd.length < 6){
-                        showToast('密码长度至少6位', 'error');
-                        return;
-                    }
-                    if(pwd !== confirm){
-                        showToast('两次输入的密码不一致', 'error');
-                        return;
-                    }
-                    if(!cap || parseInt(cap)!==currentCaptcha.answer){
-                        showToast('验证码错误', 'error');
-                        refreshCaptcha('regCaptchaQuestion','regCaptchaInput');
-                        return;
-                    }
+                    if(!username) return showToast('用户名不能为空', 'error');
+                    if(!email) return showToast('邮箱不能为空', 'error');
+                    if(pwd.length < 6) return showToast('密码长度至少6位', 'error');
+                    if(pwd !== confirm) return showToast('两次输入的密码不一致', 'error');
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误', 'error');
                     try{
                         if(await findUserByEmail(email)) return showToast('邮箱已注册', 'error');
                         await registerUser(email, pwd, username, inviteCode);
@@ -1409,7 +1371,7 @@
                         openAuth('login');
                         document.getElementById('loginEmail').value = email;
                     } catch(e){
-                        showToast(e.message || '注册失败，请稍后重试', 'error');
+                        showToast(e.message || '注册失败', 'error');
                     }
                 });
                 
@@ -1417,20 +1379,14 @@
                     const email = document.getElementById('loginEmail').value.trim();
                     const pwd = document.getElementById('loginPassword').value;
                     const cap = document.getElementById('loginCaptchaInput').value.trim();
-                    if(!cap || parseInt(cap)!==currentCaptcha.answer){
-                        showToast('验证码错误', 'error');
-                        refreshCaptcha('loginCaptchaQuestion','loginCaptchaInput');
-                        return;
-                    }
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误', 'error');
                     try{
                         currentUser = await loginUser(email, pwd);
                         localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
                         updateUserUI();
                         document.getElementById('authModal').classList.remove('active');
                         showToast('登录成功', 'success');
-                        // 登录后立即更新UI，不刷新页面
                         renderCalendar();
-                        // 异步同步最新数据
                         if(!isLocalFile){
                             airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
                                 .then(data => {
@@ -1444,23 +1400,15 @@
                         }
                     } catch(e){
                         showToast(e.message, 'error');
-                        refreshCaptcha('loginCaptchaQuestion','loginCaptchaInput');
                     }
                 });
                 
                 let countdown = 0;
                 const sendBtn = document.getElementById('sendResetCodeBtn');
-                const resetCodeInput = document.getElementById('resetCodeInput');
                 sendBtn.addEventListener('click', async () => {
-                    if(countdown > 0){
-                        showToast(`请等待 ${countdown} 秒后再试`, 'warning');
-                        return;
-                    }
+                    if(countdown > 0) return showToast(`请等待 ${countdown} 秒后再试`, 'warning');
                     const email = document.getElementById('forgotEmail').value.trim();
-                    if(!email){
-                        showToast('请输入邮箱', 'error');
-                        return;
-                    }
+                    if(!email) return showToast('请输入邮箱', 'error');
                     try{
                         sendBtn.disabled = true;
                         sendBtn.textContent = '发送中...';
@@ -1489,34 +1437,19 @@
                 
                 document.getElementById('resetPasswordBtn').addEventListener('click', async ()=>{
                     const email = document.getElementById('forgotEmail').value.trim();
-                    const code = resetCodeInput.value.trim();
+                    const code = document.getElementById('resetCodeInput').value.trim();
                     const newPwd = document.getElementById('newPassword').value;
                     const confirm = document.getElementById('confirmNewPassword').value;
                     const cap = document.getElementById('forgotCaptchaInput').value.trim();
-                    if(!email || newPwd !== confirm || newPwd.length<6){
-                        showToast('请正确填写信息（邮箱、新密码至少6位且一致）', 'error');
-                        return;
-                    }
-                    if(!cap || parseInt(cap)!==currentCaptcha.answer){
-                        showToast('验证码错误', 'error');
-                        refreshCaptcha('forgotCaptchaQuestion','forgotCaptchaInput');
-                        return;
-                    }
-                    if(email !== resetEmail){
-                        showToast('邮箱与发送验证码的邮箱不一致', 'error');
-                        return;
-                    }
-                    if(!code || code !== resetCode || Date.now() > resetCodeExpire){
-                        showToast('验证码错误或已过期', 'error');
-                        return;
-                    }
+                    if(!email || newPwd !== confirm || newPwd.length<6) return showToast('信息错误', 'error');
+                    if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误', 'error');
+                    if(email !== resetEmail || !code || code !== resetCode || Date.now() > resetCodeExpire) return showToast('验证码错误或已过期', 'error');
                     try{
                         await updatePassword(email, newPwd);
-                        showToast('密码重置成功，请登录', 'success');
+                        showToast('密码重置成功', 'success');
                         openAuth('login');
                         resetCode = '';
                         resetEmail = '';
-                        resetCodeInput.value = '';
                     } catch(e){
                         showToast(e.message, 'error');
                     }
@@ -1543,72 +1476,50 @@
                 document.getElementById('saveProfileBtn').addEventListener('click', async function(){
                     const newPwd = document.getElementById('profileNewPwd').value;
                     const confirm = document.getElementById('profileConfirmPwd').value;
-                    if(newPwd && newPwd !== confirm){
-                        showToast('两次密码不一致', 'error');
-                        return;
-                    }
-                    if(newPwd && newPwd.length<6){
-                        showToast('密码至少6位', 'error');
-                        return;
-                    }
+                    if(newPwd && newPwd !== confirm) return showToast('两次密码不一致', 'error');
+                    if(newPwd && newPwd.length<6) return showToast('密码至少6位', 'error');
                     try{
                         if(newPwd) await updatePassword(currentUser.email, newPwd);
                         showToast('资料更新成功', 'success');
                         document.getElementById('profileModal').classList.remove('active');
-                    } catch(e){
-                        showToast('更新失败', 'error');
-                    }
+                    } catch(e){ showToast('更新失败', 'error'); }
                 });
                 document.getElementById('closeAdminModal').addEventListener('click',()=>document.getElementById('adminModal').classList.remove('active'));
                 document.getElementById('closeInsufficientModal').addEventListener('click',()=>document.getElementById('insufficientModal').classList.remove('active'));
                 document.getElementById('submitFeedbackBtn').addEventListener('click', async function(){
                     const msg = document.getElementById('feedbackMessage').value.trim();
-                    if(!msg){
-                        showToast('请填写内容', 'error');
-                        return;
-                    }
+                    if(!msg) return showToast('请填写内容', 'error');
                     this.disabled = true;
                     try{
                         if(isLocalFile){
                             let list = JSON.parse(localStorage.getItem('feedback_list')||'[]');
-                            list.unshift({ name: document.getElementById('feedbackName').value||'网友', message: msg, time: new Date().toLocaleString() });
+                            list.unshift({ name: document.getElementById('feedbackName').value||'网友', message: msg });
                             if(list.length>20) list.pop();
                             localStorage.setItem('feedback_list', JSON.stringify(list));
-                            showToast('留言成功');
-                            document.getElementById('feedbackMessage').value = '';
-                            renderFeedback();
                         } else {
                             await airReq('POST', 'Messages', { fields: { Name: document.getElementById('feedbackName').value||'网友', Message: msg } });
-                            showToast('留言成功');
-                            document.getElementById('feedbackMessage').value = '';
-                            renderFeedback();
                         }
-                    } catch(e){
-                        showToast('提交失败', 'error');
-                    } finally {
-                        this.disabled = false;
-                    }
+                        showToast('留言成功');
+                        document.getElementById('feedbackMessage').value = '';
+                        renderFeedback();
+                    } catch(e){ showToast('提交失败', 'error'); }
+                    this.disabled = false;
                 });
-                // 购买套餐按钮事件
                 document.querySelectorAll('.buy-package').forEach(btn => {
                     btn.addEventListener('click', function(){
                         const permanent = this.dataset.permanent === 'true';
                         const amount = this.dataset.amount;
                         const price = this.dataset.price;
-                        if(permanent){
-                            showToast(`购买永久VIP（${price}元）请联系客服微信 Win_Mac_123 付款，付款后管理员将为您升级。`, 'warning');
-                        } else {
-                            showToast(`购买 ${amount} 次下载（${price}元）请联系客服微信 Win_Mac_123 付款，付款后管理员将为您增加次数。`, 'warning');
-                        }
+                        showToast(`购买${permanent?'永久VIP':amount+'次下载'}（${price}元）请联系客服微信 Win_Mac_123 付款。`, 'warning');
                         document.getElementById('insufficientModal').classList.remove('active');
                     });
                 });
                 document.getElementById('copyInviteCodeInsufficient').addEventListener('click', ()=>{
                     if(currentUser && currentUser.inviteCode){
                         navigator.clipboard.writeText(currentUser.inviteCode);
-                        showToast('已复制邀请码，发送给好友注册后双方各得5次下载', 'success');
+                        showToast('已复制邀请码', 'success');
                     } else {
-                        showToast('请先登录获取邀请码', 'error');
+                        showToast('请先登录', 'error');
                     }
                 });
             }
