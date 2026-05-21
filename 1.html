@@ -232,7 +232,7 @@
         </div>
     </div>
 
-    <!-- 登录/注册模态框 -->
+    <!-- 模态框 -->
     <div id="authModal" class="modal-overlay">
         <div class="modal-card" style="max-width:440px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
@@ -272,7 +272,6 @@
         </div>
     </div>
 
-    <!-- 个人中心 -->
     <div id="profileModal" class="modal-overlay">
         <div class="modal-card" style="max-width:440px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span style="font-weight:700;">个人中心</span><button id="closeProfileModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
@@ -287,7 +286,6 @@
         </div>
     </div>
 
-    <!-- 管理后台 -->
     <div id="adminModal" class="modal-overlay">
         <div class="modal-card" style="max-width:800px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:20px;align-items:center;">
@@ -336,7 +334,7 @@
         </div>
     </div>
 
-    <!-- 其他模态框（简洁占位，功能完整） -->
+    <!-- 其他模态框 -->
     <div id="articleManageModal" class="modal-overlay">
         <div class="modal-card" style="max-width:700px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-weight:700;">文章管理</h3><button id="closeArticleModal" style="background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
@@ -354,27 +352,44 @@
     <script>
         emailjs.init('9VF7tzRthx9_nkchu');
 
+        // 全局复制函数（支持 HTTP/HTTPS）
         window.copyText = function(text) {
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => showToast('复制成功！', 'success')).catch(() => fallbackCopy(text));
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('复制成功！', 'success');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
             } else {
                 fallbackCopy(text);
             }
         };
         function fallbackCopy(text) {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed'; ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            try { document.execCommand('copy'); showToast('复制成功！', 'success'); } catch(e) { showToast('复制失败，请手动复制', 'error'); }
-            document.body.removeChild(ta);
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('复制成功！', 'success');
+            } catch (e) {
+                showToast('复制失败，请手动复制', 'error');
+            }
+            document.body.removeChild(textarea);
         }
 
         (function(){
+            // 粒子动画
             const c=document.getElementById('particles-canvas'),ctx=c.getContext('2d');let w,h,m={x:-1e3,y:-1e3},p=[];function r(){w=innerWidth;h=innerHeight;c.width=w;c.height=h}window.addEventListener('resize',r);r();document.addEventListener('mousemove',e=>{m.x=e.clientX;m.y=e.clientY});document.addEventListener('mouseleave',()=>{m.x=-1e3;m.y=-1e3});class P{constructor(){this.reset();this.y=Math.random()*h}reset(){this.x=Math.random()*w;this.y=Math.random()*h;this.vx=(Math.random()-0.5)*0.4;this.vy=(Math.random()-0.5)*0.4;this.rad=Math.random()*1.8+0.4;this.op=Math.random()*0.4+0.1}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>w)this.vx*=-1;if(this.y<0||this.y>h)this.vy*=-1;const dx=m.x-this.x,dy=m.y-this.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<150&&m.x>0){const force=(1-dist/150)*0.03;this.x+=dx*force;this.y+=dy*force;this.rad=Math.min(this.rad+0.01,2.5);this.op=Math.min(this.op+0.01,0.8)}else{this.rad=Math.max(this.rad-0.003,0.4);this.op=Math.max(this.op-0.002,0.1)}}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.rad,0,Math.PI*2);ctx.fillStyle=`rgba(79,110,246,${this.op})`;ctx.fill()}}for(let i=0;i<60;i++)p.push(new P());function conn(){for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<90){ctx.beginPath();ctx.strokeStyle=`rgba(79,110,246,${0.06*(1-dist/90)})`;ctx.lineWidth=0.4;ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.stroke()}}}function anim(){ctx.clearRect(0,0,w,h);p.forEach(v=>{v.update();v.draw()});conn();requestAnimationFrame(anim)}anim();
 
-            const CONFIG = { AIRTABLE_TOKEN: 'pat9BdIPuJKKqjBps.608e5055b9a5171435f172928c955a1bf67c8f10e6b42c34cc623f49cf1d5e43', AIRTABLE_BASE_ID: 'appM4Ty76lOlslpU9', EMAILJS_SERVICE_ID: 'service_0jwzfc8', EMAILJS_TEMPLATE_RESET: 'template_xcv0pdc' };
+            const CONFIG = {
+                AIRTABLE_TOKEN: 'pat9BdIPuJKKqjBps.608e5055b9a5171435f172928c955a1bf67c8f10e6b42c34cc623f49cf1d5e43',
+                AIRTABLE_BASE_ID: 'appM4Ty76lOlslpU9',
+                EMAILJS_SERVICE_ID: 'service_0jwzfc8',
+                EMAILJS_TEMPLATE_RESET: 'template_xcv0pdc'
+            };
             const isLocalFile = window.location.protocol === 'file:';
             let softwares = [], bannerAds = [], sidebarAds = [];
             let currentCategory = "all", searchKeyword = "", showAll = false;
@@ -781,19 +796,20 @@
                 return code;
             }
 
+            // 下载次数管理（配额模式）
             function getCurrentMonthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
             function getUserDownloadData(email){
                 const key = `download_${email}`;
                 const data = localStorage.getItem(key);
-                if(!data) return { month: getCurrentMonthKey(), count: 0 };
+                if(!data) return { month: getCurrentMonthKey(), count: 0, extra: 0 };
                 try{
                     const parsed = JSON.parse(data);
-                    if(parsed.month !== getCurrentMonthKey()) return { month: getCurrentMonthKey(), count: 0 };
-                    return parsed;
-                }catch(e){ return { month: getCurrentMonthKey(), count: 0 }; }
+                    if(parsed.month !== getCurrentMonthKey()) return { month: getCurrentMonthKey(), count: 0, extra: 0 };
+                    return { month: parsed.month, count: parsed.count || 0, extra: parsed.extra || 0 };
+                }catch(e){ return { month: getCurrentMonthKey(), count: 0, extra: 0 }; }
             }
-            function saveUserDownloadData(email, count){
-                localStorage.setItem(`download_${email}`, JSON.stringify({ month: getCurrentMonthKey(), count: count }));
+            function saveUserDownloadData(email, count, extra = 0){
+                localStorage.setItem(`download_${email}`, JSON.stringify({ month: getCurrentMonthKey(), count: count, extra: extra }));
                 if(!isLocalFile){
                     airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
                         .then(data => {
@@ -805,25 +821,38 @@
             }
             function addDownloadBonus(email, bonus){
                 const data = getUserDownloadData(email);
-                saveUserDownloadData(email, Math.max(0, data.count - bonus));
-            }
-            function canDownload(user){
-                if(!user) return false;
-                if(user.role === 'vip' || user.role === 'admin') return true;
-                return getUserDownloadData(user.email).count < DEFAULT_MONTHLY_QUOTA;
-            }
-            function recordDownload(user){
-                if(!user || user.role === 'vip' || user.role === 'admin') return true;
-                const data = getUserDownloadData(user.email);
-                saveUserDownloadData(user.email, data.count + 1);
-                return data.count + 1 <= DEFAULT_MONTHLY_QUOTA;
+                const newExtra = Math.max(0, (data.extra || 0) + bonus);
+                saveUserDownloadData(email, data.count, newExtra);
             }
             function getRemainingCount(user){
                 if(!user) return 0;
                 if(user.role === 'vip' || user.role === 'admin') return Infinity;
-                return Math.max(0, DEFAULT_MONTHLY_QUOTA - getUserDownloadData(user.email).count);
+                const data = getUserDownloadData(user.email);
+                const total = DEFAULT_MONTHLY_QUOTA + (data.extra || 0);
+                return Math.max(0, total - data.count);
+            }
+            function canDownload(user){
+                if(!user) return false;
+                if(user.role === 'vip' || user.role === 'admin') return true;
+                const data = getUserDownloadData(user.email);
+                const total = DEFAULT_MONTHLY_QUOTA + (data.extra || 0);
+                return data.count < total;
+            }
+            function recordDownload(user){
+                if(!user || user.role === 'vip' || user.role === 'admin') return true;
+                const data = getUserDownloadData(user.email);
+                saveUserDownloadData(user.email, data.count + 1, data.extra);
+                return (data.count + 1) <= (DEFAULT_MONTHLY_QUOTA + data.extra);
+            }
+            function resetUserQuota(email){
+                saveUserDownloadData(email, 0, 0);
+            }
+            function setUserUsedCount(email, count){
+                const data = getUserDownloadData(email);
+                saveUserDownloadData(email, Math.max(0, Math.min(count, 999)), data.extra);
             }
 
+            // 图标渲染
             function getStdAbbr(n){
                 if(!n) return 'SW';
                 const l = n.toLowerCase();
@@ -1195,8 +1224,8 @@
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         const email = btn.dataset.email;
-                        saveUserDownloadData(email, 0);
-                        showToast('已重置该用户本月下载次数', 'success');
+                        resetUserQuota(email);
+                        showToast('已重置该用户本月下载次数（配额恢复默认）', 'success');
                         updateUserUI();
                     });
                 });
@@ -1204,12 +1233,13 @@
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         const email = btn.dataset.email;
-                        const currentData = getUserDownloadData(email);
-                        const newCount = prompt(`当前已用次数：${currentData.count}，剩余：${DEFAULT_MONTHLY_QUOTA - currentData.count}\n输入新的已用次数（0~999）`, currentData.count);
+                        const data = getUserDownloadData(email);
+                        const total = DEFAULT_MONTHLY_QUOTA + data.extra;
+                        const promptText = `当前总配额：${total} 次\n已用：${data.count} 次，剩余：${total - data.count} 次\n输入新的已用次数（0~999）`;
+                        const newCount = prompt(promptText, data.count);
                         if(newCount !== null && !isNaN(parseInt(newCount))) {
-                            const count = Math.max(0, Math.min(parseInt(newCount), 999));
-                            saveUserDownloadData(email, count);
-                            showToast(`已设置该用户本月已用次数为 ${count}，剩余 ${DEFAULT_MONTHLY_QUOTA - count} 次`, 'success');
+                            setUserUsedCount(email, parseInt(newCount));
+                            showToast(`已更新，剩余 ${getRemainingCount(currentUser)} 次`, 'success');
                             updateUserUI();
                         }
                     });
@@ -1218,11 +1248,11 @@
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         const email = btn.dataset.email;
-                        const add = prompt('请输入要增加的下载次数（1~999）', '1');
+                        const add = prompt('请输入要增加的下载次数（1~999）', '5');
                         if(add !== null && !isNaN(parseInt(add))) {
                             const amount = Math.max(1, Math.min(parseInt(add), 999));
                             addDownloadBonus(email, amount);
-                            showToast(`已为该用户增加 ${amount} 次下载机会`, 'success');
+                            showToast(`已为该用户总配额增加 ${amount} 次`, 'success');
                             updateUserUI();
                         }
                     });
@@ -1433,11 +1463,12 @@
                         document.getElementById('insufficientModal').classList.remove('active');
                     });
                 });
+                // 绑定邀请码复制按钮
                 document.getElementById('copyInviteCodeInsufficient').addEventListener('click', ()=>{
                     if(currentUser && currentUser.inviteCode){
                         window.copyText(currentUser.inviteCode);
                     } else {
-                        showToast('请先登录', 'error');
+                        showToast('请先登录获取邀请码', 'error');
                     }
                 });
             }
