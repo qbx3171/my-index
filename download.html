@@ -64,7 +64,12 @@
         .content-wrapper { display:flex; gap:22px; margin-top:2px; }
         .main-content { flex:1; min-width:0; }
         .sidebar { width:290px; flex-shrink:0; }
-        @media (max-width:900px) { .content-wrapper { flex-direction:column; } .sidebar { width:100%; } }
+        @media (max-width:900px) {
+            .content-wrapper { flex-direction:column; }
+            .sidebar { width:100%; }
+            /* 移动端隐藏侧边栏广告 */
+            #adContainer { display: none !important; }
+        }
         .carousel-container { position:relative; width:100%; aspect-ratio:21/9; background:#e8ecf3; border-radius:var(--radius-xl); overflow:hidden; border:1px solid var(--border-light); margin-bottom:18px; }
         .carousel-slides { display:flex; height:100%; transition:transform 0.5s ease; }
         .carousel-slide { flex:0 0 100%; height:100%; background:#e8ecf3; }
@@ -182,7 +187,6 @@
 <body>
     <canvas id="particles-canvas"></canvas>
     <div class="app-wrapper">
-        <!-- 导航栏 -->
         <div class="top-nav" id="topNav">
             <div class="nav-inner">
                 <div class="logo-area"><span class="logo">乐哲软件</span></div>
@@ -345,7 +349,7 @@
         </div>
     </div>
 
-    <!-- 其他模态框 -->
+    <!-- 其他模态框（文章管理、插件等） -->
     <div id="articleManageModal" class="modal-overlay">
         <div class="modal-card" style="max-width:700px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-weight:700;">文章管理</h3><button id="closeArticleModal" style="background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
@@ -362,9 +366,7 @@
             </div>
         </div>
     </div>
-    <div id="articleDetailModal" class="modal-overlay">
-        <div class="modal-card" style="max-width:600px;"><button id="closeDetailModal" style="float:right; background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h3 id="articleDetailTitle"></h3><img id="articleDetailCover" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin:10px 0;"><div id="articleDetailContent" style="line-height:1.7;"></div><div id="articleDetailMeta" style="margin-top:12px; font-size:0.7rem; color:var(--text-muted);"></div></div>
-    </div>
+    <div id="articleDetailModal" class="modal-overlay"><div class="modal-card" style="max-width:600px;"><button id="closeDetailModal" style="float:right; background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h3 id="articleDetailTitle"></h3><img id="articleDetailCover" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin:10px 0;"><div id="articleDetailContent" style="line-height:1.7;"></div><div id="articleDetailMeta" style="margin-top:12px; font-size:0.7rem; color:var(--text-muted);"></div></div></div>
     <div id="pluginModal" class="modal-overlay"><div class="modal-card" style="max-width:500px;"><button id="closePluginModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>插件商店</h2><div id="pluginListContainer"></div></div></div>
     <div id="payModal" class="modal-overlay"><div class="modal-card" style="max-width:400px;text-align:center;"><button id="closePayModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>购买插件</h2><p id="payPluginName"></p><div style="display:flex;gap:8px;justify-content:center;margin:14px 0;"><button class="pay-tab active" data-method="wechat" style="padding:8px 18px;border-radius:20px;background:var(--primary);color:#fff;border:none;">微信</button><button class="pay-tab" data-method="alipay" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);color:var(--text);">支付宝</button></div><img id="payQrImage" style="width:180px;height:180px;margin:10px auto;display:block;border-radius:12px;"><p style="font-weight:bold;">¥30.00</p><p>客服微信：Win_Mac_123</p></div></div>
 
@@ -401,10 +403,7 @@
             EMAILJS_SERVICE_ID: 'service_0jwzfc8',
             EMAILJS_TEMPLATE_RESET: 'template_xcv0pdc'
         };
-
         const isLocalFile = window.location.protocol === 'file:';
-        if(isLocalFile) console.log('本地模式：跳过网络请求');
-
         let softwares = [], bannerAds = [], sidebarAds = [];
         let currentCategory = "all", searchKeyword = "", showAll = false;
         const DEFAULT_LIMIT = 12;
@@ -427,14 +426,12 @@
         function genCap(){ let a=Math.floor(Math.random()*10)+1,b=Math.floor(Math.random()*10)+1,op=Math.random()>0.5?'+':'-',ans=op==='+'?a+b:a-b; if(ans<0) return genCap(); return { question: `${a} ${op} ${b} = ?`, answer: ans }; }
         function refCap(q,i){ let c=genCap(); currentCaptcha=c; document.getElementById(q).innerText=c.question; document.getElementById(i).value=''; }
 
-        // 汉堡菜单
         const hamburger = document.getElementById('hamburgerBtn'), navLinks = document.getElementById('navLinks');
-        if(hamburger && navLinks){
+        if(hamburger&&navLinks){
             hamburger.addEventListener('click', ()=>{ hamburger.classList.toggle('active'); navLinks.classList.toggle('show'); });
             navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{ hamburger.classList.remove('active'); navLinks.classList.remove('show'); }));
         }
 
-        // 日历与签到（修复跨浏览器漏洞）
         let currentDate = new Date();
         function renderCalendar(){
             const y = currentDate.getFullYear(), m = currentDate.getMonth();
@@ -485,7 +482,6 @@
             updateUserUI();
             renderCalendar();
 
-            // 同步到Airtable
             if(!isLocalFile){
                 const signData = JSON.stringify(signed);
                 airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(currentUser.email)}"`)
@@ -498,14 +494,12 @@
             }
         }
 
-        // 登录时同步签到数据
         function syncSignInData(email){
             if(isLocalFile) return;
             airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
                 .then(data => {
                     if(data.records.length){
                         const fields = data.records[0].fields;
-                        // 不区分大小写获取 SignInData 字段
                         let signDataStr = null;
                         for(let key in fields){
                             if(key.toLowerCase() === 'signindata'){
@@ -533,7 +527,6 @@
         document.getElementById('dailyCheckinBtn').addEventListener('click', performCheckin);
         renderCalendar();
 
-        // 网络请求
         async function fetchWithTimeout(url, opts, to=5000){
             if(isLocalFile) throw new Error('本地跳过');
             const controller = new AbortController();
@@ -579,7 +572,6 @@
             return defaultValue;
         }
 
-        // 获取软件数据
         async function fetchSoftwares(forceRefresh = false){
             if(!forceRefresh){
                 const cached = localStorage.getItem('cachedSoft');
@@ -626,7 +618,6 @@
             }
         }
 
-        // 获取广告
         async function fetchAds(forceRefresh = false){
             if(!forceRefresh){
                 const cached = localStorage.getItem('cachedAds');
@@ -662,7 +653,6 @@
             }
         }
 
-        // 文章
         async function fetchArticles(){
             if(isLocalFile) return [];
             try{
@@ -682,7 +672,6 @@
         async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
         async function deleteArticle(id){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('DELETE',`Articles/${id}`); }
 
-        // 用户管理
         async function findUserByEmail(email){
             if(isLocalFile){
                 const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -765,7 +754,8 @@
             }
             const cachedUsersData = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
             const cachedUser = cachedUsersData.find(u => u.email === email);
-            if(cachedUser && CryptoJS.SHA256(password).toString() === cachedUser.password){
+            const passwordHash = CryptoJS.SHA256(password).toString();
+            if(cachedUser && passwordHash === cachedUser.password){
                 syncSignInData(email);
                 setTimeout(()=>{
                     airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`)
@@ -802,8 +792,7 @@
             }
             const rec = await findUserByEmail(email);
             if(!rec) throw new Error('邮箱未注册');
-            const hash = CryptoJS.SHA256(password).toString();
-            if(rec.fields.Password !== hash) throw new Error('密码错误');
+            if(rec.fields.Password !== passwordHash) throw new Error('密码错误');
             let inviteCode = rec.fields.InviteCode || '';
             if(!inviteCode){
                 inviteCode = Math.random().toString(36).substring(2,10).toUpperCase();
@@ -866,7 +855,6 @@
             return code;
         }
 
-        // 下载配额管理
         function getCurrentMonthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
         function getUserDownloadData(email){
             const key = `download_${email}`;
@@ -914,15 +902,12 @@
             saveUserDownloadData(user.email, data.count + 1, data.extra);
             return (data.count + 1) <= (DEFAULT_MONTHLY_QUOTA + data.extra);
         }
-        function resetUserQuota(email){
-            saveUserDownloadData(email, 0, 0);
-        }
+        function resetUserQuota(email){ saveUserDownloadData(email, 0, 0); }
         function setUserUsedCount(email, count){
             const data = getUserDownloadData(email);
             saveUserDownloadData(email, Math.max(0, Math.min(count, 999)), data.extra);
         }
 
-        // 图标渲染
         function getStdAbbr(n){
             if(!n) return 'SW';
             const l = n.toLowerCase();
@@ -953,7 +938,6 @@
             return `<div class="icon-fallback" style="background:${getColor(name)};">${esc(parsed.value || getStdAbbr(name))}</div>`;
         }
 
-        // UI渲染
         const CAT_MAP = { 'adobe':'Adobe系列','autodesk':'Autodesk系列','c4d':'Cinema 4D','sketchup':'草图大师','rhino':'犀牛软件','plugin':'插件工具','other':'其他' };
         function renderCats(){
             const el = document.getElementById('categoryTabs');
