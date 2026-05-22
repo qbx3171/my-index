@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>乐哲软件 | 原版软件下载推荐 · 创意工具库</title>
     <meta name="description" content="乐哲软件博客提供 Adobe、Autodesk、C4D、草图大师、犀牛等主流软件的原版安装包推荐与下载指引，资源安全无捆绑，仅供个人学习使用。">
+    <meta name="keywords" content="乐哲软件,软件下载,Adobe下载,Autodesk,正版软件推荐,Mac软件,Windows软件,C4D,草图大师,犀牛,插件">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
@@ -91,6 +92,48 @@
         .grid { display:grid; grid-template-columns:1fr; gap:14px; max-width:1400px; margin:0 auto; }
         @media (min-width:560px) { .grid { grid-template-columns:repeat(2,1fr); } }
         @media (min-width:901px) { .grid { grid-template-columns:repeat(auto-fill,minmax(235px,1fr)); } }
+        /* 骨架屏样式 - 无文字，只有灰色脉冲块 */
+        .skeleton-card {
+            background: var(--surface);
+            border-radius: var(--radius-xl);
+            padding: 18px 16px;
+            border: 1px solid var(--border-light);
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        .skeleton-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--border-light);
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+        .skeleton-title {
+            height: 18px;
+            background: var(--border-light);
+            border-radius: 8px;
+            width: 60%;
+            margin-bottom: 8px;
+        }
+        .skeleton-text {
+            height: 12px;
+            background: var(--border-light);
+            border-radius: 6px;
+            width: 90%;
+            margin: 8px 0;
+        }
+        .skeleton-tag {
+            display: inline-block;
+            height: 20px;
+            width: 60px;
+            background: var(--border-light);
+            border-radius: 20px;
+            margin-right: 8px;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
         .software-card { border-radius:var(--radius-xl); padding:18px 16px; cursor:pointer; background:var(--surface); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); transition:transform 0.2s, box-shadow 0.2s; will-change:transform; position:relative; overflow:hidden; }
         .software-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
         .card-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--primary); overflow:hidden; flex-shrink:0; background:var(--primary-light); border:none; outline:none; }
@@ -320,6 +363,8 @@
             <footer style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.7rem; line-height:1.8;">版权所有 © 乐哲软件<br>乐哲软件博客 · 原版安装包推荐，安全无捆绑<br>www.lezhesoft.cn | 个人技术分享</footer>
         </div>
     </div>
+
+    <!-- 模态框部分（登录/注册、个人中心、管理后台等） -->
     <!-- 登录/注册模态框 -->
     <div id="authModal" class="modal-overlay">
         <div class="modal-card" style="max-width:440px;">
@@ -390,7 +435,7 @@
         </div>
     </div>
 
-    <!-- 次数不足液态玻璃弹窗 -->
+    <!-- 次数不足模态框 -->
     <div id="insufficientModal" class="modal-overlay">
         <div class="modal-card glass-modal" style="max-width:420px; text-align:center;">
             <div style="display:flex;justify-content:flex-end;">
@@ -474,9 +519,9 @@
     <div id="payModal" class="modal-overlay"><div class="modal-card" style="max-width:400px;text-align:center;"><button id="closePayModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>购买插件</h2><p id="payPluginName"></p><div style="display:flex;gap:8px;justify-content:center;margin:14px 0;"><button class="pay-tab active" data-method="wechat" style="padding:8px 18px;border-radius:20px;background:var(--primary);color:#fff;border:none;">微信</button><button class="pay-tab" data-method="alipay" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);color:var(--text);">支付宝</button></div><img id="payQrImage" style="width:180px;height:180px;margin:10px auto;display:block;border-radius:12px;"><p style="font-weight:bold;">¥30.00</p><p>客服微信：Win_Mac_123</p></div></div>
 
     <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
-
     <script>
         // ==================== 配置 ====================
+        // 请将 WORKER_URL 替换为您的 Cloudflare Worker 域名，或者绑定的自定义域名
         const WORKER_URL = 'https://bold-butterfly-7e05.qiubingxun063.workers.dev';
         
         // ==================== 全局变量 ====================
@@ -524,7 +569,7 @@
         }
         
         // 带超时的 fetch 封装
-        async function fetchWithTimeout(url, options, timeout = 10000) {
+        async function fetchWithTimeout(url, options, timeout = 15000) {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
             try {
@@ -547,7 +592,7 @@
             if (body) options.body = JSON.stringify(body);
             
             try {
-                const response = await fetchWithTimeout(`${WORKER_URL}${endpoint}`, options, 10000);
+                const response = await fetchWithTimeout(`${WORKER_URL}${endpoint}`, options, 15000);
                 const data = await response.json();
                 if (!response.ok) {
                     throw new Error(data.error || `请求失败 (${response.status})`);
@@ -568,7 +613,7 @@
             return apiCall('GET', endpoint, null, false);
         }
         
-        // ==================== 数据获取 ====================
+        // ==================== 数据获取（公开） ====================
         async function fetchSoftwares() {
             try {
                 const data = await publicGet('/api/airtable?path=softwares?maxRecords=100');
@@ -659,6 +704,7 @@
                     localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
                     updateUserUI();
                     showToast('登录成功', 'success');
+                    // 登录成功后静默刷新用户信息（剩余次数等）
                     fetchUserProfile().catch(() => {});
                     return true;
                 }
@@ -689,6 +735,7 @@
                 return data;
             } catch(e) {
                 if (e.message.includes('未授权') || e.message.includes('无效的会话')) {
+                    // token 失效，清除登录状态但保留软件缓存
                     currentUser = null;
                     localStorage.removeItem('lezhe_user');
                     updateUserUI();
@@ -729,7 +776,60 @@
             return currentUser.remaining !== undefined ? currentUser.remaining : 0;
         }
         
-        // ==================== 软件渲染 ====================
+        // ==================== 缓存管理（解决退出登录后软件消失） ====================
+        function saveToCache() {
+            const cacheData = {
+                softwares,
+                bannerAds,
+                sidebarAds,
+                articles,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('lezhe_public_cache', JSON.stringify(cacheData));
+        }
+        
+        function loadFromCache() {
+            const cached = localStorage.getItem('lezhe_public_cache');
+            if (cached) {
+                try {
+                    const data = JSON.parse(cached);
+                    if (data.softwares && data.softwares.length) {
+                        softwares = data.softwares;
+                        bannerAds = data.bannerAds || [];
+                        sidebarAds = data.sidebarAds || [];
+                        articles = data.articles || [];
+                        return true;
+                    }
+                } catch(e) {}
+            }
+            return false;
+        }
+        
+        // 显示骨架屏（初始占位，无文字）
+        function showSkeleton() {
+            const container = document.getElementById('softwareGridContainer');
+            if (!container) return;
+            let skeletonHtml = '';
+            for (let i = 0; i < 6; i++) {
+                skeletonHtml += `
+                    <div class="skeleton-card">
+                        <div style="display:flex; align-items:center; margin-bottom:12px;">
+                            <div class="skeleton-icon"></div>
+                            <div class="skeleton-title"></div>
+                        </div>
+                        <div class="skeleton-text"></div>
+                        <div class="skeleton-text" style="width: 70%;"></div>
+                        <div style="margin-top: 12px;">
+                            <span class="skeleton-tag"></span>
+                            <span class="skeleton-tag"></span>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = skeletonHtml;
+        }
+        
+        // ==================== 软件渲染核心函数 ====================
         function getStdAbbr(name) {
             if (!name) return 'SW';
             const l = name.toLowerCase();
@@ -1219,7 +1319,7 @@
             await submitMessage(name, msg);
         });
         
-        // ==================== 用户管理后台 ====================
+        // ==================== 用户管理后台（含设置下载次数） ====================
         async function fetchAllUsers() {
             const data = await apiCall('GET', '/api/admin/users', null, true);
             return data.map(rec => ({
@@ -1231,6 +1331,10 @@
         
         async function updateUserRole(userId, newRole) {
             await apiCall('POST', '/api/admin/update-role', { userId, newRole }, true);
+        }
+        
+        async function setUserQuota(userId, monthlyUsed, extraQuota) {
+            await apiCall('POST', '/api/admin/set-quota', { userId, monthlyUsed, extraQuota }, true);
         }
         
         async function renderAdminUserList() {
@@ -1255,6 +1359,8 @@
                 const isAdmin = role === 'admin';
                 const avatarIcon = isAdmin ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
                 const registerDate = u.createdTime ? new Date(u.createdTime).toLocaleString() : '未知';
+                const used = u.fields.MonthlyUsed || 0;
+                const extra = u.fields.ExtraQuota || 0;
                 html += `
                     <div class="admin-user-card" data-id="${u.id}">
                         <div class="admin-user-info">
@@ -1263,6 +1369,7 @@
                                 <div class="admin-user-email">${esc(u.fields.Email)}</div>
                                 <div class="admin-user-name">${esc(u.fields.Username || '未设置')}</div>
                                 <div class="admin-register-time">🕒 ${registerDate}</div>
+                                <div class="admin-quota-info" style="font-size:0.7rem; margin-top:4px;">已用: ${used} / 额外: ${extra}</div>
                             </div>
                             <div class="admin-user-role ${isVip ? 'vip' : (isAdmin ? 'admin' : '')}">${isVip ? 'VIP会员' : (isAdmin ? '管理员' : '普通会员')}</div>
                         </div>
@@ -1270,12 +1377,14 @@
                             <button class="admin-action-btn upgrade-vip-btn" data-id="${u.id}" data-role="${role}">
                                 ${isVip ? '<i class="fas fa-arrow-down"></i> 降级' : (isAdmin ? '<i class="fas fa-lock"></i> 不可降级' : '<i class="fas fa-crown"></i> 升级VIP')}
                             </button>
-                            <button class="admin-action-btn reset-download-btn" data-email="${u.fields.Email}" style="background:#10b981;">重置次数</button>
+                            <button class="admin-action-btn set-quota-btn" data-id="${u.id}" data-used="${used}" data-extra="${extra}" style="background:#3b82f6;">设置次数</button>
                         </div>
                     </div>
                 `;
             }
             container.innerHTML = html;
+            
+            // 升级/降级按钮
             container.querySelectorAll('.upgrade-vip-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -1292,10 +1401,31 @@
                     }
                 });
             });
-            container.querySelectorAll('.reset-download-btn').forEach(btn => {
+            
+            // 设置次数按钮
+            container.querySelectorAll('.set-quota-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
-                    showToast('重置次数功能开发中', 'warning');
+                    const userId = btn.dataset.id;
+                    const currentUsed = parseInt(btn.dataset.used);
+                    const currentExtra = parseInt(btn.dataset.extra);
+                    const newUsed = prompt(`请输入新的“本月已用次数”（当前 ${currentUsed} 次，范围 0-999）：`, currentUsed);
+                    if (newUsed === null) return;
+                    const newExtra = prompt(`请输入新的“额外奖励次数”（当前 ${currentExtra} 次，范围 0-999）：`, currentExtra);
+                    if (newExtra === null) return;
+                    const usedVal = Math.max(0, Math.min(parseInt(newUsed) || 0, 999));
+                    const extraVal = Math.max(0, Math.min(parseInt(newExtra) || 0, 999));
+                    try {
+                        await setUserQuota(userId, usedVal, extraVal);
+                        showToast('下载次数设置成功', 'success');
+                        await refreshAdminUsers();
+                        // 如果修改的是当前登录用户，同步更新界面
+                        if (currentUser && currentUser.id === userId) {
+                            await fetchUserProfile();
+                        }
+                    } catch(err) {
+                        showToast('设置失败', 'error');
+                    }
                 });
             });
         }
@@ -1336,7 +1466,20 @@
                     localStorage.removeItem('lezhe_user');
                     updateUserUI();
                     showToast('已退出登录');
-                    location.reload();
+                    // 退出登录后软件列表仍然显示（不清除缓存），无需刷新页面
+                    // 但为了安全，重新从缓存渲染一次（确保显示）
+                    if (loadFromCache()) {
+                        renderCategories();
+                        renderSoftwareGrid();
+                        renderHot();
+                        renderRanking();
+                        renderHistory();
+                        renderArticlesList();
+                        renderCalendar();
+                    } else {
+                        // 如果没有缓存，重新从网络获取（但保留原有数据）
+                        fetchAndUpdateSilently();
+                    }
                 });
                 document.getElementById('profileBtn')?.addEventListener('click', openProfileModal);
                 if (currentUser.role === 'admin') {
@@ -1476,102 +1619,81 @@
             });
         }
         
-        // ==================== 初始化 ====================
-        async function init() {
-            // 先显示加载提示
-            const gridContainer = document.getElementById('softwareGridContainer');
-            if (gridContainer) gridContainer.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-pulse"></i> 加载软件列表中...</div>';
-            
-            softwares = await fetchSoftwares();
-            bannerAds = (await fetchAds()).filter(a => a.position === 'banner');
-            sidebarAds = (await fetchAds()).filter(a => a.position === 'sidebar');
-            articles = await fetchArticles();
-            
-            renderCategories();
-            renderSoftwareGrid();
-            renderHot();
-            renderRanking();
-            renderHistory();
-            renderArticlesList();
-            renderCalendar();
-            await loadMessages();
-            
-            if (bannerAds.length) {
-                const slides = document.getElementById('categoryBannerSlides');
-                const dots = document.getElementById('categoryBannerDots');
-                renderCarousel(slides, dots, bannerAds, true);
-                startCarousel(true);
-            }
-            if (sidebarAds.length) {
-                const slides = document.getElementById('sidebarCarouselSlides');
-                const dots = document.getElementById('sidebarCarouselDots');
-                renderCarousel(slides, dots, sidebarAds, false);
-                startCarousel(false);
-            }
-            
-            const searchInput = document.getElementById('searchInput');
-            const searchSuggestions = document.getElementById('searchSuggestions');
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    searchKeyword = e.target.value;
-                    renderSoftwareGrid();
-                    const val = searchKeyword.toLowerCase().trim();
-                    if (!val) { searchSuggestions.classList.remove('active'); return; }
-                    const matches = softwares.filter(s => s.name.toLowerCase().includes(val)).slice(0,5);
-                    if (!matches.length) { searchSuggestions.classList.remove('active'); return; }
-                    searchSuggestions.innerHTML = matches.map(s => `<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join('');
-                    searchSuggestions.classList.add('active');
-                });
-                document.addEventListener('click', (e) => {
-                    if (!searchSuggestions.contains(e.target) && e.target !== searchInput) searchSuggestions.classList.remove('active');
-                });
-                searchSuggestions?.addEventListener('click', (e) => {
-                    const item = e.target.closest('.suggestion-item');
-                    if (item) {
-                        searchInput.value = item.dataset.name;
-                        searchKeyword = item.dataset.name;
-                        searchSuggestions.classList.remove('active');
-                        renderSoftwareGrid();
-                    }
-                });
-            }
-            document.getElementById('searchBtn')?.addEventListener('click', () => {
-                searchKeyword = document.getElementById('searchInput')?.value || '';
+        // 后台静默更新数据（不显示骨架屏）
+        async function fetchAndUpdateSilently() {
+            try {
+                const newSoftwares = await fetchSoftwares();
+                const newBannerAds = (await fetchAds()).filter(a => a.position === 'banner');
+                const newSidebarAds = (await fetchAds()).filter(a => a.position === 'sidebar');
+                const newArticles = await fetchArticles();
+                
+                softwares = newSoftwares;
+                bannerAds = newBannerAds;
+                sidebarAds = newSidebarAds;
+                articles = newArticles;
+                saveToCache();
+                
+                renderCategories();
                 renderSoftwareGrid();
-            });
+                renderHot();
+                renderRanking();
+                renderHistory();
+                renderArticlesList();
+                renderCalendar();
+                
+                if (bannerAds.length) {
+                    const slides = document.getElementById('categoryBannerSlides');
+                    const dots = document.getElementById('categoryBannerDots');
+                    renderCarousel(slides, dots, bannerAds, true);
+                    startCarousel(true);
+                }
+                if (sidebarAds.length) {
+                    const slides = document.getElementById('sidebarCarouselSlides');
+                    const dots = document.getElementById('sidebarCarouselDots');
+                    renderCarousel(slides, dots, sidebarAds, false);
+                    startCarousel(false);
+                }
+            } catch(e) {
+                console.warn('后台更新失败', e);
+            }
+        }
+        
+        // 初始化：先显示骨架屏，然后尝试加载缓存，最后静默更新网络数据
+        async function init() {
+            // 1. 显示骨架屏（保证用户看到内容，没有空白）
+            showSkeleton();
             
-            const hamburger = document.getElementById('hamburgerBtn');
-            const navLinks = document.getElementById('navLinks');
-            if (hamburger && navLinks) {
-                hamburger.addEventListener('click', () => {
-                    hamburger.classList.toggle('active');
-                    navLinks.classList.toggle('show');
-                });
-                document.addEventListener('click', (e) => {
-                    if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
-                        navLinks.classList.remove('show');
-                        hamburger.classList.remove('active');
-                    }
-                });
+            // 2. 尝试加载缓存（立即显示真实内容，替换骨架屏）
+            const hasCache = loadFromCache();
+            if (hasCache) {
+                // 用缓存数据渲染
+                renderCategories();
+                renderSoftwareGrid();
+                renderHot();
+                renderRanking();
+                renderHistory();
+                renderArticlesList();
+                renderCalendar();
+                // 轮播图需要从缓存中的 bannerAds 和 sidebarAds 渲染
+                if (bannerAds.length) {
+                    const slides = document.getElementById('categoryBannerSlides');
+                    const dots = document.getElementById('categoryBannerDots');
+                    renderCarousel(slides, dots, bannerAds, true);
+                    startCarousel(true);
+                }
+                if (sidebarAds.length) {
+                    const slides = document.getElementById('sidebarCarouselSlides');
+                    const dots = document.getElementById('sidebarCarouselDots');
+                    renderCarousel(slides, dots, sidebarAds, false);
+                    startCarousel(false);
+                }
             }
             
-            let lastScroll = 0;
-            let scrollTimer = null;
-            window.addEventListener('scroll', () => {
-                if (scrollTimer) clearTimeout(scrollTimer);
-                scrollTimer = setTimeout(() => {
-                    const currentScroll = window.pageYOffset;
-                    const nav = document.getElementById('topNav');
-                    if (currentScroll > lastScroll && currentScroll > 100) {
-                        nav.classList.add('hide');
-                    } else if (currentScroll < lastScroll) {
-                        nav.classList.remove('hide');
-                    }
-                    lastScroll = currentScroll;
-                    document.getElementById('backToTop').classList.toggle('show', currentScroll > 300);
-                }, 50);
-            });
-            document.getElementById('backToTop')?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+            // 3. 无论有无缓存，都在后台静默更新最新数据（不阻塞界面）
+            await fetchAndUpdateSilently();
+            
+            // 4. 加载留言（不影响主要显示）
+            await loadMessages();
         }
         
         const savedUser = localStorage.getItem('lezhe_user');
@@ -1589,6 +1711,13 @@
         bindAuthEvents();
         refreshCaptcha('loginCaptchaQuestion', 'loginCaptchaInput');
         init();
+        
+        // 额外：防止点击模态框背景关闭（可选）
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('active');
+            });
+        });
     </script>
 </body>
 </html>
