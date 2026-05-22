@@ -32,7 +32,8 @@
         body { font-family:'Inter',system-ui,-apple-system,sans-serif; min-height:100vh; color:var(--text); background:var(--bg); overflow-x:hidden; position:relative; }
         #particles-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
         .app-wrapper { position:relative; z-index:1; }
-        .top-nav { position:sticky; top:0; z-index:1000; padding:0 20px; background:rgba(255,255,255,0.72); backdrop-filter:blur(20px); border-bottom:1px solid var(--border-light); }
+        .top-nav { position:sticky; top:0; z-index:1000; padding:0 20px; background:rgba(255,255,255,0.72); backdrop-filter:blur(20px); border-bottom:1px solid var(--border-light); transition:transform 0.3s ease; }
+        .top-nav.hide { transform:translateY(-100%); }
         .nav-inner { max-width:1300px; margin:0 auto; padding:10px 0; display:flex; align-items:center; justify-content:space-between; gap:12px; }
         .logo { font-size:1.35rem; font-weight:800; background:linear-gradient(135deg,#1a1d2e,var(--primary)); -webkit-background-clip:text; background-clip:text; color:transparent; }
         .nav-links { display:flex; gap:4px; align-items:center; }
@@ -76,7 +77,7 @@
         .carousel-dots { position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:7px; }
         .carousel-dot { width:7px; height:7px; border-radius:10px; background:rgba(255,255,255,0.7); cursor:pointer; }
         .carousel-dot.active { width:22px; background:#fff; }
-        .hot-section { margin-bottom:18px; }
+        .hot-section { margin-bottom:18px; position:relative; }
         .hot-header h3 { font-size:1.05rem; font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:10px; }
         .hot-scroll { display:flex; gap:12px; overflow-x:auto; padding:4px 0 10px; scrollbar-width:none; scroll-behavior:smooth; }
         .hot-scroll::-webkit-scrollbar { display:none; }
@@ -114,7 +115,7 @@
         .sidebar-card { border-radius:var(--radius-xl); padding:18px 16px; margin-bottom:14px; background:var(--surface); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); }
         .sidebar-card h3 { font-size:var(--font-base); font-weight:650; margin-bottom:10px; display:flex; align-items:center; gap:7px; }
         .search-bar { background:var(--surface); border-radius:var(--radius-full); padding:3px 3px 3px 14px; display:flex; align-items:center; border:1px solid var(--border); }
-        .sidebar-search { margin-bottom: 22px; }
+        .sidebar-search { margin-bottom: 22px; position:relative; }
         .search-bar input { flex:1; border:none; background:transparent; padding:12px 8px; font-size:var(--font-sm); outline:none; color:var(--text); }
         .search-bar button { background:var(--primary); border:none; color:#fff; padding:10px 16px; border-radius:var(--radius-full); cursor:pointer; }
         .search-suggestions { position:absolute; background:var(--surface); border-radius:var(--radius-lg); max-height:240px; overflow-y:auto; z-index:50; display:none; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.1); margin-top:4px; width:calc(100% - 30px); }
@@ -129,7 +130,7 @@
         .calendar-day-name { font-size:0.5rem; color:var(--text-muted); font-weight:500; padding:3px 0; }
         .calendar-day { padding:6px 0; font-size:0.6rem; border-radius:50%; color:var(--text-secondary); width:28px; height:28px; display:flex; align-items:center; justify-content:center; margin:0 auto; cursor:default; }
         .calendar-day.today { background:var(--primary); color:#fff; font-weight:600; cursor:pointer; }
-        .calendar-day.signed { background:var(--success); color:#ff0000; font-weight:700; }
+        .calendar-day.signed { background:var(--success); color:#fff; font-weight:700; }
         .rank-item,.history-item { display:flex; align-items:center; gap:10px; padding:9px 6px; border-bottom:1px solid var(--border-light); cursor:pointer; font-size:var(--font-sm); }
         .rank-index { width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.6rem; background:var(--bg); color:var(--text-muted); flex-shrink:0; }
         .rank-index.top1 { background:#fef3c7; color:#b45309; } .rank-index.top2 { background:#e2e8f0; color:#475569; } .rank-index.top3 { background:#fde8d0; color:#9a3412; }
@@ -174,8 +175,9 @@
         .send-code-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .plan-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 0.8rem; }
         .plan-item:last-child { border-bottom: none; }
-        .admin-search-bar { margin-bottom: 16px; }
-        .admin-search-bar input { width: 100%; padding: 10px 16px; border: 1px solid var(--border); border-radius: 30px; font-size: 0.85rem; background: var(--bg); }
+        .admin-search-bar { margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .admin-search-bar input { flex: 1; padding: 10px 16px; border: 1px solid var(--border); border-radius: 30px; font-size: 0.85rem; background: var(--bg); }
+        .admin-search-bar button { background: var(--primary); color: white; border: none; border-radius: 30px; padding: 0 16px; cursor: pointer; font-weight: 500; }
         .admin-register-time { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
 
         /* 高级文章卡片样式 */
@@ -280,7 +282,7 @@
             <div class="content-wrapper">
                 <div class="main-content">
                     <div class="carousel-container" id="categoryBannerContainer"><div class="carousel-slides" id="categoryBannerSlides"></div><div class="carousel-dots" id="categoryBannerDots"></div></div>
-                    <div class="hot-section"><div class="hot-header"><h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3></div><div class="hot-wrapper"><div class="hot-arrow left" id="hotArrowLeft"><i class="fas fa-chevron-left"></i></div><div class="hot-scroll" id="hotScroll"></div><div class="hot-arrow right" id="hotArrowRight"><i class="fas fa-chevron-right"></i></div></div></div>
+                    <div class="hot-section"><div class="hot-header"><h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3></div><div class="hot-wrapper" style="position:relative;"><div class="hot-arrow left" id="hotArrowLeft"><i class="fas fa-chevron-left"></i></div><div class="hot-scroll" id="hotScroll"></div><div class="hot-arrow right" id="hotArrowRight"><i class="fas fa-chevron-right"></i></div></div></div>
                     <div class="category-row" id="categoryTabs"></div>
                     <div id="softwareGridContainer" class="grid"></div>
                     <div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;" onclick="window._loadMore()">加载更多</button></div>
@@ -385,6 +387,7 @@
             </div>
             <div class="admin-search-bar">
                 <input type="text" id="adminSearchInput" placeholder="🔍 搜索用户邮箱或名称...">
+                <button id="refreshUserListBtn"><i class="fas fa-sync-alt"></i> 刷新</button>
             </div>
             <div id="adminUserList" style="max-height:65vh;overflow-y:auto;padding-right:4px;"></div>
         </div>
@@ -756,11 +759,10 @@
             }
         }
 
-        // ==================== 文章管理核心修复函数 ====================
+        // ==================== 文章管理核心函数 ====================
         async function fetchArticles(){
             if(isLocalFile) return [];
             try{
-                // 按创建时间倒序获取最新文章
                 const data = await airReq('GET', 'Articles?maxRecords=100&sort[0][field]=CreatedAt&sort[0][direction]=desc');
                 return data.records.map(rec=>({
                     id: rec.id,
@@ -786,7 +788,6 @@
             return await airReq('DELETE',`Articles/${id}`); 
         }
 
-        // 高级卡片式渲染文章管理列表
         function renderAdmin(){
             const container = document.getElementById('articleAdminList');
             if(!articles.length){
@@ -817,7 +818,6 @@
                 `;
             });
             container.innerHTML = html;
-            // 绑定编辑删除事件
             container.querySelectorAll('.edit-article-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -853,11 +853,10 @@
         }
 
         async function refreshArticleList(){
-            // 显示加载中
             document.getElementById('articleAdminList').innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-pulse"></i> 加载中...</div>';
             articles = await fetchArticles();
-            renderAdmin();          // 刷新管理面板列表
-            renderArtsList();       // 刷新侧边栏最新文章列表
+            renderAdmin();
+            renderArtsList();
         }
 
         async function saveArt(){
@@ -881,7 +880,6 @@
                     await createArticle(articleData);
                     showToast('文章创建成功', 'success');
                 }
-                // 关闭表单并刷新列表
                 document.getElementById('articleFormContainer').style.display = 'none';
                 editingArticleId = null;
                 await refreshArticleList();
@@ -897,7 +895,6 @@
                 el.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>'; 
                 return; 
             }
-            // 只显示最近5篇
             const latest = articles.slice(0,5);
             el.innerHTML = latest.map(a=>`
                 <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}">
@@ -920,8 +917,8 @@
                 }
             }));
         }
-        // ==================== 文章管理函数结束 ====================
 
+        // ==================== 用户相关函数 ====================
         async function findUserByEmail(email){
             if(isLocalFile){
                 const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -948,7 +945,7 @@
                 if(inviteCode){
                     const inviter = users.find(u => u.inviteCode === inviteCode);
                     if(inviter){
-                        inviter.downloadCount = Math.max(0, (inviter.downloadCount||0) - 5);
+                        // 修复：只增加邀请者额外下载次数，不扣减已用次数
                         addDownloadBonus(inviter.email, 5);
                         showToast(`邀请成功！您获得了5次额外下载`, 'success');
                     } else {
@@ -966,15 +963,9 @@
             if(inviteCode){
                 const inviter = await findUserByInviteCode(inviteCode);
                 if(inviter){
-                    let currentCount = Number(inviter.fields.DownloadCount || 0);
-                    let newCount = Math.max(0, currentCount - 5);
-                    try {
-                        await airReq('PATCH', `Users/${inviter.id}`, { fields: { DownloadCount: newCount } });
-                        addDownloadBonus(inviter.fields.Email, 5);
-                        showToast(`邀请成功！您获得了5次额外下载`, 'success');
-                    } catch(e) {
-                        console.warn('更新邀请人下载次数失败', e);
-                    }
+                    // 修复：只增加邀请者额外下载次数，不扣减已用次数
+                    addDownloadBonus(inviter.fields.Email, 5);
+                    showToast(`邀请成功！您获得了5次额外下载`, 'success');
                 } else {
                     showToast('邀请码无效', 'warning');
                 }
@@ -1158,6 +1149,7 @@
             saveUserDownloadData(email, Math.max(0, Math.min(count, 999)), data.extra);
         }
 
+        // ==================== 软件相关函数 ====================
         function getStdAbbr(n){
             if(!n) return 'SW';
             const l = n.toLowerCase();
@@ -1328,8 +1320,20 @@
             }
         }
 
+        // ==================== 用户管理后台 ====================
+        async function refreshUserListAndRender(){
+            const container = document.getElementById('adminUserList');
+            container.innerHTML = '<div class="admin-loading"><div class="loading-spinner" style="width:30px;height:30px;"></div> 加载中...</div>';
+            try {
+                const users = await getAllUsers();
+                allAdminUsers = users;
+                renderAdminUserList(users);
+            } catch(err) {
+                container.innerHTML = '<div class="admin-loading">加载失败，请重试</div>';
+            }
+        }
+
         function renderAdminUserList(users){
-            allAdminUsers = users;
             const container = document.getElementById('adminUserList');
             const term = document.getElementById('adminSearchInput').value.toLowerCase().trim();
             const filtered = term ? users.filter(u => {
@@ -1374,6 +1378,7 @@
             container.innerHTML = html;
             bindAdminCardEvents();
         }
+
         function bindAdminCardEvents(){
             const container = document.getElementById('adminUserList');
             container.querySelectorAll('.upgrade-vip-btn').forEach(btn => {
@@ -1386,8 +1391,14 @@
                     btn.disabled = true;
                     try {
                         await updateUserRole(userId, newRole);
-                        if(cachedUsers){ const u = cachedUsers.find(u => u.id === userId); if(u) u.fields.Role = newRole; }
-                        renderAdminUserList(allAdminUsers);
+                        // 刷新用户列表以确保数据最新
+                        await refreshUserListAndRender();
+                        // 如果更新的是当前登录用户，同步 currentUser
+                        if(currentUser && currentUser.id === userId){
+                            currentUser.role = newRole;
+                            localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
+                            updateUserUI();
+                        }
                         showToast(`用户已${newRole === 'vip' ? '升级为VIP' : '降级为普通会员'}`, 'success');
                     } catch(err) {
                         showToast('操作失败，请重试', 'error');
@@ -1402,7 +1413,7 @@
                     const email = btn.dataset.email;
                     resetUserQuota(email);
                     showToast('已重置该用户本月下载次数（配额恢复默认）', 'success');
-                    updateUserUI();
+                    if(currentUser && currentUser.email === email) updateUserUI();
                 });
             });
             container.querySelectorAll('.set-download-btn').forEach(btn => {
@@ -1416,7 +1427,7 @@
                     if(newCount !== null && !isNaN(parseInt(newCount))) {
                         setUserUsedCount(email, parseInt(newCount));
                         showToast(`已更新，剩余 ${getRemainingCount(currentUser)} 次`, 'success');
-                        updateUserUI();
+                        if(currentUser && currentUser.email === email) updateUserUI();
                     }
                 });
             });
@@ -1429,30 +1440,18 @@
                         const amount = Math.max(1, Math.min(parseInt(add), 999));
                         addDownloadBonus(email, amount);
                         showToast(`已为该用户总配额增加 ${amount} 次`, 'success');
-                        updateUserUI();
+                        if(currentUser && currentUser.email === email) updateUserUI();
                     }
                 });
             });
         }
+
         async function openAdminModal(){
-            const container = document.getElementById('adminUserList');
-            if(cachedUsers && cachedUsers.length){
-                renderAdminUserList(cachedUsers);
-            } else {
-                container.innerHTML = '<div class="admin-loading"><div class="loading-spinner" style="width:30px;height:30px;"></div> 加载中...</div>';
-            }
-            try {
-                const users = await getAllUsers();
-                renderAdminUserList(users);
-            } catch(err){
-                if(!cachedUsers) container.innerHTML = '<div class="admin-loading">加载失败，请重试</div>';
-            }
+            await refreshUserListAndRender();
             document.getElementById('adminModal').classList.add('active');
         }
-        document.getElementById('adminSearchInput').addEventListener('input', () => {
-            if(allAdminUsers.length) renderAdminUserList(allAdminUsers);
-        });
 
+        // ==================== 通用函数 ====================
         function openAuth(tab='login'){
             const m = document.getElementById('authModal');
             document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
@@ -1586,7 +1585,7 @@
             document.querySelectorAll('.auth-tab').forEach(t=>t.addEventListener('click',()=>openAuth(t.dataset.tab)));
 
             document.getElementById('manageArticlesBtn').addEventListener('click', async ()=>{
-                await refreshArticleList();  // 确保最新数据
+                await refreshArticleList();
                 document.getElementById('articleManageModal').classList.add('active');
             });
             document.getElementById('closeArticleModal').addEventListener('click',()=>{
@@ -1611,6 +1610,10 @@
                 } catch(e){ showToast('更新失败', 'error'); }
             });
             document.getElementById('closeAdminModal').addEventListener('click',()=>document.getElementById('adminModal').classList.remove('active'));
+            document.getElementById('refreshUserListBtn').addEventListener('click', async ()=>{
+                await refreshUserListAndRender();
+                showToast('用户列表已刷新', 'success');
+            });
             document.getElementById('closeInsufficientModal').addEventListener('click',()=>document.getElementById('insufficientModal').classList.remove('active'));
             document.getElementById('submitFeedbackBtn').addEventListener('click', async function(){
                 const msg = document.getElementById('feedbackMessage').value.trim();
@@ -1647,7 +1650,6 @@
                     showToast('请先登录获取邀请码', 'error');
                 }
             });
-            // 刷新按钮事件
             document.getElementById('refreshArticleListBtn').addEventListener('click', async ()=>{
                 await refreshArticleList();
                 showToast('文章列表已刷新', 'success');
@@ -1809,6 +1811,7 @@
         }
 
         async function openProfileModal(){
+            if(!currentUser) return;
             document.getElementById('profileUsername').innerText = currentUser.username;
             document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`;
             document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser);
