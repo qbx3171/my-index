@@ -67,7 +67,6 @@
         @media (max-width:900px) {
             .content-wrapper { flex-direction:column; }
             .sidebar { width:100%; }
-            /* 移动端隐藏侧边栏广告 */
             #adContainer { display: none !important; }
         }
         .carousel-container { position:relative; width:100%; aspect-ratio:21/9; background:#e8ecf3; border-radius:var(--radius-xl); overflow:hidden; border:1px solid var(--border-light); margin-bottom:18px; }
@@ -138,11 +137,7 @@
         .feedback-input,.feedback-textarea { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:12px; background:var(--bg); margin-bottom:8px; outline:none; color:var(--text); font-size:var(--font-xs); }
         .feedback-submit-btn { background:var(--primary); color:#fff; padding:10px 18px; border-radius:20px; border:none; font-weight:600; cursor:pointer; font-size:var(--font-xs); }
         .clear-history { margin-top: 12px; text-align: right; }
-        .clear-history button {
-            background: none; border: 1px solid var(--border); color: var(--text-muted);
-            padding: 6px 14px; border-radius: 20px; font-size: 0.65rem; cursor: pointer;
-            transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
-        }
+        .clear-history button { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 0.65rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
         .clear-history button:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
         .friend-links-wrapper { text-align:center; margin:30px 0; padding:20px 16px; }
         .friend-links-title { font-size:0.65rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px; }
@@ -182,6 +177,87 @@
         .admin-search-bar { margin-bottom: 16px; }
         .admin-search-bar input { width: 100%; padding: 10px 16px; border: 1px solid var(--border); border-radius: 30px; font-size: 0.85rem; background: var(--bg); }
         .admin-register-time { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
+
+        /* 高级文章卡片样式 */
+        .article-admin-card {
+            background: var(--surface);
+            border-radius: 20px;
+            margin-bottom: 16px;
+            padding: 16px;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-light);
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .article-admin-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
+        }
+        .article-admin-cover {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            object-fit: cover;
+            background: var(--bg);
+            flex-shrink: 0;
+        }
+        .article-admin-info {
+            flex: 1;
+        }
+        .article-admin-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        .article-admin-excerpt {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .article-admin-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        .article-admin-tags {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .article-admin-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .article-admin-actions button {
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+        }
+        .edit-article-btn { background: #fef3c7; color: #b45309; }
+        .edit-article-btn:hover { background: #fde68a; transform: translateY(-1px); }
+        .delete-article-btn { background: #fee2e2; color: #b91c1c; }
+        .delete-article-btn:hover { background: #fecaca; transform: translateY(-1px); }
+        @media (max-width: 640px) {
+            .article-admin-card { flex-direction: column; }
+            .article-admin-cover { width: 100%; height: 140px; }
+        }
     </style>
 </head>
 <body>
@@ -349,23 +425,50 @@
         </div>
     </div>
 
-    <!-- 其他模态框（文章管理、插件等） -->
+    <!-- 文章管理模态框 - 高级卡片版 -->
     <div id="articleManageModal" class="modal-overlay">
-        <div class="modal-card" style="max-width:700px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 style="font-weight:700;">文章管理</h3><button id="closeArticleModal" style="background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
-            <button id="addNewArticleBtn" class="admin-btn admin-btn-add" style="margin-bottom:16px; background:var(--success); color:#fff; padding:8px 18px; border-radius:20px; border:none; cursor:pointer; font-weight:600;">+ 新增文章</button>
-            <div id="articleAdminList"></div>
-            <div id="articleFormContainer" style="display:none; margin-top:16px; background:var(--bg); border-radius:16px; padding:20px;">
-                <h4 style="margin-bottom:14px;">编辑/新增文章</h4>
-                <div class="article-form-group"><label>标题</label><input type="text" id="articleTitle" placeholder="文章标题" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div>
-                <div class="article-form-group"><label>封面图片URL</label><input type="text" id="articleCover" placeholder="图片链接" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div>
-                <div class="article-form-group"><label>摘要</label><textarea id="articleExcerpt" rows="2" placeholder="简短摘要" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div>
-                <div class="article-form-group"><label>正文内容</label><textarea id="articleContent" rows="5" placeholder="详细内容..." style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></textarea></div>
-                <div class="article-form-group"><label>标签 (逗号分隔)</label><input type="text" id="articleTags" placeholder="教程, 技巧" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--bg);"></div>
-                <div style="display:flex; gap:8px; margin-top:16px;"><button id="saveArticleBtn" style="background:var(--success); color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">保存</button><button id="cancelArticleBtn" style="background:#94a3b8; color:#fff; border:none; padding:10px 20px; border-radius:20px; cursor:pointer;">取消</button></div>
+        <div class="modal-card" style="max-width: 900px; width: 92%; padding: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                <h3 style="font-weight: 700; display: flex; align-items: center; gap: 8px;"><i class="fas fa-newspaper" style="color: var(--primary);"></i> 文章管理</h3>
+                <div style="display: flex; gap: 8px;">
+                    <button id="refreshArticleListBtn" style="background: var(--bg); border: 1px solid var(--border); border-radius: 30px; padding: 8px 16px; cursor: pointer; font-weight: 500; transition: 0.2s;"><i class="fas fa-sync-alt"></i> 刷新</button>
+                    <button id="addNewArticleBtn" style="background: var(--success); color: #fff; border: none; border-radius: 30px; padding: 8px 18px; cursor: pointer; font-weight: 600; transition: 0.2s;"><i class="fas fa-plus"></i> 新增文章</button>
+                    <button id="closeArticleModal" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%;"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div id="articleAdminList" style="max-height: 55vh; overflow-y: auto; padding-right: 6px; min-height: 200px;">
+                <div style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fas fa-spinner fa-pulse"></i> 加载中...</div>
+            </div>
+            <div id="articleFormContainer" style="display: none; margin-top: 24px; background: var(--bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border-light);">
+                <h4 style="margin-bottom: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px;"><i class="fas fa-edit"></i> 编辑/新增文章</h4>
+                <div class="article-form-group" style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">标题 *</label>
+                    <input type="text" id="articleTitle" placeholder="请输入文章标题" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface); font-size: 0.9rem;">
+                </div>
+                <div class="article-form-group" style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">封面图片URL</label>
+                    <input type="text" id="articleCover" placeholder="https://..." style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface);">
+                </div>
+                <div class="article-form-group" style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">摘要</label>
+                    <textarea id="articleExcerpt" rows="2" placeholder="简短摘要" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface); resize: vertical;"></textarea>
+                </div>
+                <div class="article-form-group" style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">正文内容</label>
+                    <textarea id="articleContent" rows="5" placeholder="详细内容..." style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface); resize: vertical;"></textarea>
+                </div>
+                <div class="article-form-group" style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">标签 (逗号分隔)</label>
+                    <input type="text" id="articleTags" placeholder="教程, 技巧" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface);">
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button id="saveArticleBtn" style="background: var(--success); color: #fff; border: none; padding: 10px 24px; border-radius: 40px; cursor: pointer; font-weight: 600;">保存文章</button>
+                    <button id="cancelArticleBtn" style="background: #94a3b8; color: #fff; border: none; padding: 10px 24px; border-radius: 40px; cursor: pointer; font-weight: 600;">取消</button>
+                </div>
             </div>
         </div>
     </div>
+
     <div id="articleDetailModal" class="modal-overlay"><div class="modal-card" style="max-width:600px;"><button id="closeDetailModal" style="float:right; background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h3 id="articleDetailTitle"></h3><img id="articleDetailCover" style="width:100%; max-height:250px; object-fit:cover; border-radius:12px; margin:10px 0;"><div id="articleDetailContent" style="line-height:1.7;"></div><div id="articleDetailMeta" style="margin-top:12px; font-size:0.7rem; color:var(--text-muted);"></div></div></div>
     <div id="pluginModal" class="modal-overlay"><div class="modal-card" style="max-width:500px;"><button id="closePluginModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>插件商店</h2><div id="pluginListContainer"></div></div></div>
     <div id="payModal" class="modal-overlay"><div class="modal-card" style="max-width:400px;text-align:center;"><button id="closePayModal" style="position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;color:var(--text-muted);"><i class="fas fa-times"></i></button><h2>购买插件</h2><p id="payPluginName"></p><div style="display:flex;gap:8px;justify-content:center;margin:14px 0;"><button class="pay-tab active" data-method="wechat" style="padding:8px 18px;border-radius:20px;background:var(--primary);color:#fff;border:none;">微信</button><button class="pay-tab" data-method="alipay" style="padding:8px 18px;border-radius:20px;border:1px solid var(--border);color:var(--text);">支付宝</button></div><img id="payQrImage" style="width:180px;height:180px;margin:10px auto;display:block;border-radius:12px;"><p style="font-weight:bold;">¥30.00</p><p>客服微信：Win_Mac_123</p></div></div>
@@ -653,10 +756,12 @@
             }
         }
 
+        // ==================== 文章管理核心修复函数 ====================
         async function fetchArticles(){
             if(isLocalFile) return [];
             try{
-                const data = await airReq('GET', 'Articles?maxRecords=50&sort[0][field]=CreatedAt&sort[0][direction]=desc');
+                // 按创建时间倒序获取最新文章
+                const data = await airReq('GET', 'Articles?maxRecords=100&sort[0][field]=CreatedAt&sort[0][direction]=desc');
                 return data.records.map(rec=>({
                     id: rec.id,
                     title: rec.fields.Title || '无标题',
@@ -668,9 +773,154 @@
                 }));
             }catch(e){ return []; }
         }
-        async function createArticle(art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('POST','Articles',{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
-        async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
-        async function deleteArticle(id){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('DELETE',`Articles/${id}`); }
+        async function createArticle(art){ 
+            if(isLocalFile) throw new Error('本地不支持'); 
+            return await airReq('POST','Articles',{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); 
+        }
+        async function updateArticle(id,art){ 
+            if(isLocalFile) throw new Error('本地不支持'); 
+            return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); 
+        }
+        async function deleteArticle(id){ 
+            if(isLocalFile) throw new Error('本地不支持'); 
+            return await airReq('DELETE',`Articles/${id}`); 
+        }
+
+        // 高级卡片式渲染文章管理列表
+        function renderAdmin(){
+            const container = document.getElementById('articleAdminList');
+            if(!articles.length){
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-inbox"></i> 暂无文章，点击“新增文章”创建</div>';
+                return;
+            }
+            let html = '';
+            articles.forEach(article => {
+                const coverHtml = article.cover ? `<img class="article-admin-cover" src="${esc(article.cover)}" loading="lazy" onerror="this.style.display='none';">` : `<div class="article-admin-cover" style="background: var(--bg); display: flex; align-items: center; justify-content: center;"><i class="fas fa-file-alt" style="font-size: 24px; color: var(--text-muted);"></i></div>`;
+                const tagsHtml = article.tags ? `<span class="article-admin-tags"><i class="fas fa-tag"></i> ${esc(article.tags)}</span>` : '';
+                const dateStr = article.createdAt ? new Date(article.createdAt).toLocaleDateString() : '未知日期';
+                html += `
+                    <div class="article-admin-card" data-id="${article.id}">
+                        ${coverHtml}
+                        <div class="article-admin-info">
+                            <div class="article-admin-title">${esc(article.title)}</div>
+                            <div class="article-admin-excerpt">${esc(article.excerpt || '暂无摘要')}</div>
+                            <div class="article-admin-meta">
+                                <span><i class="far fa-calendar-alt"></i> ${dateStr}</span>
+                                ${tagsHtml}
+                            </div>
+                            <div class="article-admin-actions">
+                                <button class="edit-article-btn" data-id="${article.id}"><i class="fas fa-edit"></i> 编辑</button>
+                                <button class="delete-article-btn" data-id="${article.id}"><i class="fas fa-trash-alt"></i> 删除</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            // 绑定编辑删除事件
+            container.querySelectorAll('.edit-article-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    const article = articles.find(a => a.id === id);
+                    if(article) showArtForm(article);
+                });
+            });
+            container.querySelectorAll('.delete-article-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if(confirm(`确定要删除文章“${articles.find(a=>a.id===btn.dataset.id)?.title}”吗？`)){
+                        try {
+                            await deleteArticle(btn.dataset.id);
+                            showToast('删除成功', 'success');
+                            await refreshArticleList();
+                        } catch(err) {
+                            showToast('删除失败', 'error');
+                        }
+                    }
+                });
+            });
+        }
+
+        function showArtForm(art=null){
+            editingArticleId = art ? art.id : null;
+            document.getElementById('articleTitle').value = art?.title || '';
+            document.getElementById('articleCover').value = art?.cover || '';
+            document.getElementById('articleExcerpt').value = art?.excerpt || '';
+            document.getElementById('articleContent').value = art?.content || '';
+            document.getElementById('articleTags').value = art?.tags || '';
+            document.getElementById('articleFormContainer').style.display = 'block';
+        }
+
+        async function refreshArticleList(){
+            // 显示加载中
+            document.getElementById('articleAdminList').innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-pulse"></i> 加载中...</div>';
+            articles = await fetchArticles();
+            renderAdmin();          // 刷新管理面板列表
+            renderArtsList();       // 刷新侧边栏最新文章列表
+        }
+
+        async function saveArt(){
+            const title = document.getElementById('articleTitle').value.trim();
+            if(!title){
+                showToast('标题不能为空', 'error');
+                return;
+            }
+            const articleData = {
+                title: title,
+                cover: document.getElementById('articleCover').value.trim(),
+                excerpt: document.getElementById('articleExcerpt').value.trim(),
+                content: document.getElementById('articleContent').value.trim(),
+                tags: document.getElementById('articleTags').value.trim()
+            };
+            try {
+                if(editingArticleId){
+                    await updateArticle(editingArticleId, articleData);
+                    showToast('文章更新成功', 'success');
+                } else {
+                    await createArticle(articleData);
+                    showToast('文章创建成功', 'success');
+                }
+                // 关闭表单并刷新列表
+                document.getElementById('articleFormContainer').style.display = 'none';
+                editingArticleId = null;
+                await refreshArticleList();
+            } catch(e){
+                console.error(e);
+                showToast('保存失败，请检查网络或重试', 'error');
+            }
+        }
+
+        function renderArtsList(){
+            const el = document.getElementById('articlesList');
+            if(!articles.length){ 
+                el.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>'; 
+                return; 
+            }
+            // 只显示最近5篇
+            const latest = articles.slice(0,5);
+            el.innerHTML = latest.map(a=>`
+                <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}">
+                    <div class="article-cover-sm" style="overflow:hidden;">
+                        ${a.cover?`<img src="${esc(a.cover)}" style="width:100%;height:100%;object-fit:cover;border:none;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div style="display:none;width:100%;height:100%;background:#e8ecf3;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-image"></i></div>`:`<div style="width:100%;height:100%;background:#e8ecf3;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-file"></i></div>`}
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:550;font-size:0.85rem;">${esc(a.title)}</div>
+                        <div style="font-size:0.6rem;color:var(--text-muted);">${new Date(a.createdAt).toLocaleDateString()}</div>
+                    </div>
+                </div>
+            `).join('');
+            el.querySelectorAll('[data-id]').forEach(item=>item.addEventListener('click',()=>{
+                const art = articles.find(a=>a.id===item.dataset.id);
+                if(art){
+                    document.getElementById('articleDetailTitle').innerText = art.title;
+                    document.getElementById('articleDetailCover').src = art.cover || '';
+                    document.getElementById('articleDetailContent').innerHTML = art.content?.replace(/\n/g,'<br>') || '暂无正文';
+                    document.getElementById('articleDetailModal').classList.add('active');
+                }
+            }));
+        }
+        // ==================== 文章管理函数结束 ====================
 
         async function findUserByEmail(email){
             if(isLocalFile){
@@ -1078,135 +1328,6 @@
             }
         }
 
-        function renderAdmin(){
-            const el = document.getElementById('articleAdminList');
-            if(!articles.length){ el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章</div>'; return; }
-            el.innerHTML = `<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></tr></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody></table>`;
-            el.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{ const art = articles.find(a=>a.id===b.dataset.id); if(art) showArtForm(art); }));
-            el.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',async()=>{ if(confirm('确定删除？')){ await deleteArticle(b.dataset.id); articles = await fetchArticles(); renderAdmin(); renderArtsList(); } }));
-        }
-        function showArtForm(art=null){
-            editingArticleId = art ? art.id : null;
-            document.getElementById('articleTitle').value = art?.title || '';
-            document.getElementById('articleCover').value = art?.cover || '';
-            document.getElementById('articleExcerpt').value = art?.excerpt || '';
-            document.getElementById('articleContent').value = art?.content || '';
-            document.getElementById('articleTags').value = art?.tags || '';
-            document.getElementById('articleFormContainer').style.display = 'block';
-        }
-        async function saveArt(){
-            const title = document.getElementById('articleTitle').value.trim();
-            if(!title) return showToast('标题不能为空','error');
-            const fields = {
-                Title: title,
-                Cover: document.getElementById('articleCover').value,
-                Excerpt: document.getElementById('articleExcerpt').value,
-                Content: document.getElementById('articleContent').value,
-                Tags: document.getElementById('articleTags').value
-            };
-            try{
-                if(editingArticleId) await updateArticle(editingArticleId, fields);
-                else await createArticle(fields);
-                articles = await fetchArticles();
-                renderAdmin();
-                renderArtsList();
-                document.getElementById('articleFormContainer').style.display = 'none';
-                showToast('保存成功');
-            }catch(e){ showToast('保存失败','error'); }
-        }
-        function renderArtsList(){
-            const el = document.getElementById('articlesList');
-            if(!articles.length){ el.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>'; return; }
-            el.innerHTML = articles.map(a=>`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}"><div class="article-cover-sm" style="overflow:hidden;">${a.cover?`<img src="${esc(a.cover)}" style="width:100%;height:100%;object-fit:cover;border:none;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div style="display:none;width:100%;height:100%;background:#e8ecf3;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-image"></i></div>`:`<div style="width:100%;height:100%;background:#e8ecf3;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-file"></i></div>`}</div><div style="flex:1;min-width:0;"><div style="font-weight:550;font-size:0.85rem;">${esc(a.title)}</div><div style="font-size:0.6rem;color:var(--text-muted);">${new Date(a.createdAt).toLocaleDateString()}</div></div></div>`).join('');
-            el.querySelectorAll('[data-id]').forEach(item=>item.addEventListener('click',()=>{
-                const art = articles.find(a=>a.id===item.dataset.id);
-                if(art){
-                    document.getElementById('articleDetailTitle').innerText = art.title;
-                    document.getElementById('articleDetailCover').src = art.cover || '';
-                    document.getElementById('articleDetailContent').innerHTML = art.content?.replace(/\n/g,'<br>') || '暂无正文';
-                    document.getElementById('articleDetailModal').classList.add('active');
-                }
-            }));
-        }
-
-        const plugins = [
-            { name: 'AE 特效套装', software: 'After Effects' },
-            { name: 'PS 磨皮润色', software: 'Photoshop' },
-            { name: 'AI 矢量增强', software: 'Illustrator' },
-            { name: 'PR 转场大师', software: 'Premiere Pro' },
-            { name: 'LR 批量调色', software: 'Lightroom' },
-            { name: '达芬奇 LUTs', software: 'DaVinci Resolve' }
-        ];
-        const PAY_CODES = { wechat: 'https://img.cdn1.vip/i/69ec0bb88e003_1777077176.webp', alipay: 'https://img.cdn1.vip/i/69ec0bdf4d571_1777077215.webp' };
-        let payMethod = 'wechat';
-        document.getElementById('pluginListContainer').innerHTML = plugins.map(p=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light);"><div><strong>${p.name}</strong><div style="font-size:0.7rem;color:var(--text-muted);">适用：${p.software}</div></div><div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--success);font-weight:700;">¥30</span><button onclick="window._openPay('${p.name}')" style="background:var(--primary);color:#fff;border:none;border-radius:15px;padding:5px 14px;cursor:pointer;">购买</button></div></div>`).join('');
-        window._openPay = function(name){
-            document.getElementById('payPluginName').innerText = name;
-            document.getElementById('payQrImage').src = PAY_CODES[payMethod];
-            document.getElementById('payModal').classList.add('active');
-        };
-        document.getElementById('closePluginModal').addEventListener('click',()=>document.getElementById('pluginModal').classList.remove('active'));
-        document.getElementById('closePayModal').addEventListener('click',()=>document.getElementById('payModal').classList.remove('active'));
-        document.querySelectorAll('.pay-tab').forEach(t=>t.addEventListener('click',function(){
-            document.querySelectorAll('.pay-tab').forEach(x=>x.style.background='transparent');
-            this.style.background = 'var(--primary)';
-            this.style.color = '#fff';
-            payMethod = this.dataset.method;
-            document.getElementById('payQrImage').src = PAY_CODES[payMethod];
-        }));
-
-        let bannerInt = null, sidebarInt = null, curB = 0, curS = 0;
-        function renderCarousel(slides, dots, ads, isB){
-            slides.innerHTML = ads.map((a,i)=>`<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="lazy" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join('');
-            if(ads.length<=1){ dots.style.display='none'; return; }
-            dots.style.display='flex';
-            dots.innerHTML = ads.map((_,i)=>`<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join('');
-            const update = (idx)=>{ if(isB) curB=idx; else curS=idx; slides.style.transform=`translateX(-${idx*100}%)`; dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===idx)); };
-            dots.querySelectorAll('.carousel-dot').forEach(d=>d.addEventListener('click',e=>{ update(parseInt(e.target.dataset.index)); resetCar(isB); }));
-            return update;
-        }
-        function startCar(isB){
-            clearInterval(isB ? bannerInt : sidebarInt);
-            const ads = isB ? bannerAds : sidebarAds;
-            if(ads.length<=1) return;
-            const int = setInterval(()=>{
-                const nxt = ((isB?curB:curS)+1) % ads.length;
-                if(isB) curB = nxt; else curS = nxt;
-                const slides = isB ? document.getElementById('categoryBannerSlides') : document.getElementById('sidebarCarouselSlides');
-                const dots = isB ? document.getElementById('categoryBannerDots') : document.getElementById('sidebarCarouselDots');
-                slides.style.transform = `translateX(-${nxt*100}%)`;
-                dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active', i===nxt));
-            }, 4000);
-            if(isB) bannerInt = int; else sidebarInt = int;
-        }
-        function resetCar(isB){ clearInterval(isB ? bannerInt : sidebarInt); startCar(isB); }
-
-        function updateUserUI(){
-            const area = document.getElementById('userArea');
-            if(currentUser){
-                const remaining = getRemainingCount(currentUser);
-                const remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining;
-                area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;
-                document.getElementById('userMenuBtn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
-                document.getElementById('logoutBtn').addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出'); location.reload(); });
-                document.getElementById('profileBtn').addEventListener('click', openProfileModal);
-                if(currentUser.role === 'admin') document.getElementById('adminBtn').addEventListener('click', openAdminModal);
-                if(currentUser.role === 'admin') document.getElementById('manageArticlesBtn').style.display = 'block';
-            } else {
-                area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>';
-                document.getElementById('showAuthBtn').addEventListener('click', ()=>openAuth('login'));
-                document.getElementById('manageArticlesBtn').style.display = 'none';
-            }
-        }
-
-        async function openProfileModal(){
-            document.getElementById('profileUsername').innerText = currentUser.username;
-            document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`;
-            document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser);
-            document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无（请重新登录）';
-            document.getElementById('profileModal').classList.add('active');
-        }
-
         function renderAdminUserList(users){
             allAdminUsers = users;
             const container = document.getElementById('adminUserList');
@@ -1464,17 +1585,18 @@
             document.getElementById('closeAuthModal').addEventListener('click',()=>document.getElementById('authModal').classList.remove('active'));
             document.querySelectorAll('.auth-tab').forEach(t=>t.addEventListener('click',()=>openAuth(t.dataset.tab)));
 
-            document.getElementById('manageArticlesBtn').addEventListener('click',()=>{
+            document.getElementById('manageArticlesBtn').addEventListener('click', async ()=>{
+                await refreshArticleList();  // 确保最新数据
                 document.getElementById('articleManageModal').classList.add('active');
-                renderAdmin();
             });
             document.getElementById('closeArticleModal').addEventListener('click',()=>{
                 document.getElementById('articleManageModal').classList.remove('active');
                 document.getElementById('articleFormContainer').style.display='none';
+                editingArticleId = null;
             });
             document.getElementById('addNewArticleBtn').addEventListener('click',()=>showArtForm(null));
             document.getElementById('saveArticleBtn').addEventListener('click',saveArt);
-            document.getElementById('cancelArticleBtn').addEventListener('click',()=>{ document.getElementById('articleFormContainer').style.display='none'; });
+            document.getElementById('cancelArticleBtn').addEventListener('click',()=>{ document.getElementById('articleFormContainer').style.display='none'; editingArticleId = null; });
             document.getElementById('closeDetailModal').addEventListener('click',()=>document.getElementById('articleDetailModal').classList.remove('active'));
             document.getElementById('closeProfileModal').addEventListener('click',()=>document.getElementById('profileModal').classList.remove('active'));
             document.getElementById('saveProfileBtn').addEventListener('click', async function(){
@@ -1524,6 +1646,11 @@
                 } else {
                     showToast('请先登录获取邀请码', 'error');
                 }
+            });
+            // 刷新按钮事件
+            document.getElementById('refreshArticleListBtn').addEventListener('click', async ()=>{
+                await refreshArticleList();
+                showToast('文章列表已刷新', 'success');
             });
         }
 
@@ -1635,6 +1762,58 @@
             articles = await fetchArticles();
             renderArtsList();
             await renderFeedback();
+        }
+
+        let bannerInt = null, sidebarInt = null, curB = 0, curS = 0;
+        function renderCarousel(slides, dots, ads, isB){
+            slides.innerHTML = ads.map((a,i)=>`<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="lazy" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join('');
+            if(ads.length<=1){ dots.style.display='none'; return; }
+            dots.style.display='flex';
+            dots.innerHTML = ads.map((_,i)=>`<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join('');
+            const update = (idx)=>{ if(isB) curB=idx; else curS=idx; slides.style.transform=`translateX(-${idx*100}%)`; dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===idx)); };
+            dots.querySelectorAll('.carousel-dot').forEach(d=>d.addEventListener('click',e=>{ update(parseInt(e.target.dataset.index)); resetCar(isB); }));
+            return update;
+        }
+        function startCar(isB){
+            clearInterval(isB ? bannerInt : sidebarInt);
+            const ads = isB ? bannerAds : sidebarAds;
+            if(ads.length<=1) return;
+            const int = setInterval(()=>{
+                const nxt = ((isB?curB:curS)+1) % ads.length;
+                if(isB) curB = nxt; else curS = nxt;
+                const slides = isB ? document.getElementById('categoryBannerSlides') : document.getElementById('sidebarCarouselSlides');
+                const dots = isB ? document.getElementById('categoryBannerDots') : document.getElementById('sidebarCarouselDots');
+                slides.style.transform = `translateX(-${nxt*100}%)`;
+                dots.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active', i===nxt));
+            }, 4000);
+            if(isB) bannerInt = int; else sidebarInt = int;
+        }
+        function resetCar(isB){ clearInterval(isB ? bannerInt : sidebarInt); startCar(isB); }
+
+        function updateUserUI(){
+            const area = document.getElementById('userArea');
+            if(currentUser){
+                const remaining = getRemainingCount(currentUser);
+                const remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining;
+                area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;
+                document.getElementById('userMenuBtn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
+                document.getElementById('logoutBtn').addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出'); location.reload(); });
+                document.getElementById('profileBtn').addEventListener('click', openProfileModal);
+                if(currentUser.role === 'admin') document.getElementById('adminBtn').addEventListener('click', openAdminModal);
+                if(currentUser.role === 'admin') document.getElementById('manageArticlesBtn').style.display = 'block';
+            } else {
+                area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>';
+                document.getElementById('showAuthBtn').addEventListener('click', ()=>openAuth('login'));
+                document.getElementById('manageArticlesBtn').style.display = 'none';
+            }
+        }
+
+        async function openProfileModal(){
+            document.getElementById('profileUsername').innerText = currentUser.username;
+            document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`;
+            document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser);
+            document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无（请重新登录）';
+            document.getElementById('profileModal').classList.add('active');
         }
 
         if(localStorage.getItem('lezhe_user')){
