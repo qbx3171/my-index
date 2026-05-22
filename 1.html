@@ -67,7 +67,6 @@
         @media (max-width:900px) {
             .content-wrapper { flex-direction:column; }
             .sidebar { width:100%; }
-            /* 移动端隐藏侧边栏广告 */
             #adContainer { display: none !important; }
         }
         .carousel-container { position:relative; width:100%; aspect-ratio:21/9; background:#e8ecf3; border-radius:var(--radius-xl); overflow:hidden; border:1px solid var(--border-light); margin-bottom:18px; }
@@ -182,6 +181,20 @@
         .admin-search-bar { margin-bottom: 16px; }
         .admin-search-bar input { width: 100%; padding: 10px 16px; border: 1px solid var(--border); border-radius: 30px; font-size: 0.85rem; background: var(--bg); }
         .admin-register-time { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
+        /* 文章管理卡片样式 */
+        .article-admin-card { background: var(--surface); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; transition: 0.2s; border: 1px solid var(--border-light); cursor: default; }
+        .article-admin-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .article-admin-cover { width: 60px; height: 60px; border-radius: 12px; background: #e8ecf3; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .article-admin-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .article-admin-info { flex: 1; }
+        .article-admin-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+        .article-admin-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; gap: 12px; }
+        .article-admin-actions { display: flex; gap: 8px; }
+        .article-admin-actions button { padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 500; cursor: pointer; border: none; transition: 0.2s; }
+        .article-admin-actions .edit-btn { background: #fef3c7; color: #92400e; }
+        .article-admin-actions .edit-btn:hover { background: #fde68a; }
+        .article-admin-actions .del-btn { background: #fee2e2; color: #b91c1c; }
+        .article-admin-actions .del-btn:hover { background: #fecaca; }
     </style>
 </head>
 <body>
@@ -656,18 +669,26 @@
         async function fetchArticles(){
             if(isLocalFile) return [];
             try{
-                const data = await airReq('GET', 'Articles?maxRecords=50&sort[0][field]=CreatedAt&sort[0][direction]=desc');
-                return data.records.map(rec=>({
+                // 移除排序参数，避免字段名大小写问题，改用客户端排序
+                const data = await airReq('GET', 'Articles?maxRecords=50');
+                const articlesData = data.records.map(rec => ({
                     id: rec.id,
-                    title: rec.fields.Title || '无标题',
-                    cover: rec.fields.Cover || '',
-                    excerpt: rec.fields.Excerpt || '',
-                    content: rec.fields.Content || '',
-                    tags: rec.fields.Tags || '',
-                    createdAt: rec.fields.CreatedAt || new Date().toISOString()
+                    title: getFieldValue(rec.fields, ['Title', 'title'], '无标题'),
+                    cover: getFieldValue(rec.fields, ['Cover', 'cover'], ''),
+                    excerpt: getFieldValue(rec.fields, ['Excerpt', 'excerpt', 'Exxerpt'], ''),
+                    content: getFieldValue(rec.fields, ['Content', 'content'], ''),
+                    tags: getFieldValue(rec.fields, ['Tags', 'tags'], ''),
+                    createdAt: rec.createdTime || getFieldValue(rec.fields, ['CreatedAt', 'createdAt'], new Date().toISOString())
                 }));
-            }catch(e){ return []; }
+                // 按创建时间倒序排列
+                articlesData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                return articlesData;
+            }catch(e){
+                console.error('获取文章失败:', e);
+                return [];
+            }
         }
+
         async function createArticle(art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('POST','Articles',{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
         async function updateArticle(id,art){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('PATCH',`Articles/${id}`,{ fields:{ Title:art.title, Cover:art.cover, Excerpt:art.excerpt, Content:art.content, Tags:art.tags } }); }
         async function deleteArticle(id){ if(isLocalFile) throw new Error('本地不支持'); return await airReq('DELETE',`Articles/${id}`); }
@@ -1080,11 +1101,62 @@
 
         function renderAdmin(){
             const el = document.getElementById('articleAdminList');
-            if(!articles.length){ el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章</div>'; return; }
-            el.innerHTML = `<table style="width:100%;border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:10px;">标题</th><th style="text-align:left;padding:10px;">日期</th><th style="text-align:right;padding:10px;">操作</th></tr></thead><tbody>${articles.map(a=>`<tr><td style="padding:10px;border-top:1px solid var(--border-light);">${esc(a.title)}</td><td style="padding:10px;border-top:1px solid var(--border-light);font-size:0.7rem;">${new Date(a.createdAt).toLocaleDateString()}</td><td style="text-align:right;padding:10px;border-top:1px solid var(--border-light);"><button class="edit-btn" data-id="${a.id}" style="background:#fef3c7;border:none;border-radius:12px;padding:5px 10px;margin-right:6px;">编辑</button><button class="del-btn" data-id="${a.id}" style="background:#fee2e2;border:none;border-radius:12px;padding:5px 10px;color:#b91c1c;">删除</button></td></tr>`).join('')}</tbody></table>`;
-            el.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{ const art = articles.find(a=>a.id===b.dataset.id); if(art) showArtForm(art); }));
-            el.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click',async()=>{ if(confirm('确定删除？')){ await deleteArticle(b.dataset.id); articles = await fetchArticles(); renderAdmin(); renderArtsList(); } }));
+            if(!articles.length){
+                el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无文章，点击上方按钮创建第一篇</div>';
+                return;
+            }
+            let html = '';
+            articles.forEach(a => {
+                const dateStr = new Date(a.createdAt).toLocaleDateString();
+                const coverHtml = a.cover
+                    ? `<img src="${esc(a.cover)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" loading="lazy"><div style="display:none;width:100%;height:100%;background:#e8ecf3;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-image"></i></div>`
+                    : `<div style="width:100%;height:100%;background:#e8ecf3;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-file-alt"></i></div>`;
+                html += `
+                    <div class="article-admin-card" data-id="${a.id}">
+                        <div class="article-admin-cover">${coverHtml}</div>
+                        <div class="article-admin-info">
+                            <div class="article-admin-title">${esc(a.title)}</div>
+                            <div class="article-admin-meta">
+                                <span><i class="far fa-calendar-alt"></i> ${dateStr}</span>
+                                ${a.tags ? `<span><i class="fas fa-tag"></i> ${esc(a.tags)}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="article-admin-actions">
+                            <button class="edit-btn" data-id="${a.id}"><i class="fas fa-edit"></i> 编辑</button>
+                            <button class="del-btn" data-id="${a.id}"><i class="fas fa-trash-alt"></i> 删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+            el.innerHTML = html;
+            // 事件委托
+            el.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const art = articles.find(a => a.id === btn.dataset.id);
+                    if(art) showArtForm(art);
+                });
+            });
+            el.querySelectorAll('.del-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if(confirm('确定删除这篇文章吗？')){
+                        btn.disabled = true;
+                        btn.innerHTML = '<span class="loading-spinner"></span>';
+                        try {
+                            await deleteArticle(btn.dataset.id);
+                            articles = await fetchArticles();
+                            renderAdmin();
+                            renderArtsList();
+                            showToast('删除成功');
+                        } catch(e) {
+                            showToast('删除失败', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = '<i class="fas fa-trash-alt"></i> 删除';
+                        }
+                    }
+                });
+            });
         }
+
         function showArtForm(art=null){
             editingArticleId = art ? art.id : null;
             document.getElementById('articleTitle').value = art?.title || '';
@@ -1093,7 +1165,9 @@
             document.getElementById('articleContent').value = art?.content || '';
             document.getElementById('articleTags').value = art?.tags || '';
             document.getElementById('articleFormContainer').style.display = 'block';
+            document.getElementById('articleFormContainer').scrollIntoView({ behavior: 'smooth' });
         }
+
         async function saveArt(){
             const title = document.getElementById('articleTitle').value.trim();
             if(!title) return showToast('标题不能为空','error');
@@ -1104,16 +1178,30 @@
                 Content: document.getElementById('articleContent').value,
                 Tags: document.getElementById('articleTags').value
             };
+            const saveBtn = document.getElementById('saveArticleBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="loading-spinner"></span> 保存中...';
             try{
-                if(editingArticleId) await updateArticle(editingArticleId, fields);
-                else await createArticle(fields);
+                if(editingArticleId) {
+                    await updateArticle(editingArticleId, fields);
+                } else {
+                    await createArticle(fields);
+                }
+                // 重新获取最新文章列表
                 articles = await fetchArticles();
                 renderAdmin();
                 renderArtsList();
                 document.getElementById('articleFormContainer').style.display = 'none';
                 showToast('保存成功');
-            }catch(e){ showToast('保存失败','error'); }
+            }catch(e){
+                console.error(e);
+                showToast('保存失败，请重试', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '保存';
+            }
         }
+
         function renderArtsList(){
             const el = document.getElementById('articlesList');
             if(!articles.length){ el.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>'; return; }
