@@ -730,7 +730,7 @@
             return currentUser.remaining !== undefined ? currentUser.remaining : 0;
         }
         
-        // ==================== 软件渲染（核心） ====================
+        // ==================== 软件渲染 ====================
         function getStdAbbr(name) {
             if (!name) return 'SW';
             const l = name.toLowerCase();
@@ -1355,18 +1355,13 @@
         
         async function openProfileModal() {
             if (!currentUser) return;
+            await fetchUserProfile();
             document.getElementById('profileUsername').innerText = currentUser.username;
             document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（2次/月）`;
             const remaining = getRemainingCount();
             document.getElementById('profileRemaining').innerText = remaining === Infinity ? '∞' : remaining;
             document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无';
             document.getElementById('profileModal').classList.add('active');
-            // 后台静默刷新
-            fetchUserProfile().then(() => {
-                const newRemaining = getRemainingCount();
-                document.getElementById('profileRemaining').innerText = newRemaining === Infinity ? '∞' : newRemaining;
-                if (currentUser.inviteCode) document.getElementById('myInviteCode').innerText = currentUser.inviteCode;
-            }).catch(() => {});
         }
         
         async function openAdminModal() {
@@ -1484,6 +1479,10 @@
         
         // ==================== 初始化 ====================
         async function init() {
+            // 显示加载提示（可选）
+            const gridContainer = document.getElementById('softwareGridContainer');
+            if (gridContainer) gridContainer.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-pulse"></i> 加载软件列表中...</div>';
+            
             softwares = await fetchSoftwares();
             bannerAds = (await fetchAds()).filter(a => a.position === 'banner');
             sidebarAds = (await fetchAds()).filter(a => a.position === 'sidebar');
@@ -1513,30 +1512,32 @@
             
             const searchInput = document.getElementById('searchInput');
             const searchSuggestions = document.getElementById('searchSuggestions');
-            searchInput?.addEventListener('input', (e) => {
-                searchKeyword = e.target.value;
-                renderSoftwareGrid();
-                const val = searchKeyword.toLowerCase().trim();
-                if (!val) { searchSuggestions.classList.remove('active'); return; }
-                const matches = softwares.filter(s => s.name.toLowerCase().includes(val)).slice(0,5);
-                if (!matches.length) { searchSuggestions.classList.remove('active'); return; }
-                searchSuggestions.innerHTML = matches.map(s => `<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join('');
-                searchSuggestions.classList.add('active');
-            });
-            document.addEventListener('click', (e) => {
-                if (!searchSuggestions.contains(e.target) && e.target !== searchInput) searchSuggestions.classList.remove('active');
-            });
-            searchSuggestions?.addEventListener('click', (e) => {
-                const item = e.target.closest('.suggestion-item');
-                if (item) {
-                    searchInput.value = item.dataset.name;
-                    searchKeyword = item.dataset.name;
-                    searchSuggestions.classList.remove('active');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchKeyword = e.target.value;
                     renderSoftwareGrid();
-                }
-            });
+                    const val = searchKeyword.toLowerCase().trim();
+                    if (!val) { searchSuggestions.classList.remove('active'); return; }
+                    const matches = softwares.filter(s => s.name.toLowerCase().includes(val)).slice(0,5);
+                    if (!matches.length) { searchSuggestions.classList.remove('active'); return; }
+                    searchSuggestions.innerHTML = matches.map(s => `<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join('');
+                    searchSuggestions.classList.add('active');
+                });
+                document.addEventListener('click', (e) => {
+                    if (!searchSuggestions.contains(e.target) && e.target !== searchInput) searchSuggestions.classList.remove('active');
+                });
+                searchSuggestions?.addEventListener('click', (e) => {
+                    const item = e.target.closest('.suggestion-item');
+                    if (item) {
+                        searchInput.value = item.dataset.name;
+                        searchKeyword = item.dataset.name;
+                        searchSuggestions.classList.remove('active');
+                        renderSoftwareGrid();
+                    }
+                });
+            }
             document.getElementById('searchBtn')?.addEventListener('click', () => {
-                searchKeyword = searchInput.value;
+                searchKeyword = document.getElementById('searchInput')?.value || '';
                 renderSoftwareGrid();
             });
             
