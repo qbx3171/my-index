@@ -479,7 +479,6 @@
 
     <script>
         // ==================== 配置 ====================
-        // 已更新为自定义域名
         const WORKER_URL = 'https://api.lezhesoft.cn';
         
         // ==================== 全局变量 ====================
@@ -526,7 +525,21 @@
             document.getElementById(inputId).value = '';
         }
         
-        // ==================== API 封装（公开读取无需认证） ====================
+        // 带超时的 fetch 封装
+        async function fetchWithTimeout(url, options, timeout = 10000) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), timeout);
+            try {
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(id);
+                return response;
+            } catch (error) {
+                clearTimeout(id);
+                throw error;
+            }
+        }
+        
+        // ==================== API 封装 ====================
         async function apiCall(method, endpoint, body = null, needAuth = false) {
             const headers = { 'Content-Type': 'application/json' };
             if (needAuth && currentUser && currentUser.token) {
@@ -536,7 +549,7 @@
             if (body) options.body = JSON.stringify(body);
             
             try {
-                const response = await fetch(`${WORKER_URL}${endpoint}`, options);
+                const response = await fetchWithTimeout(`${WORKER_URL}${endpoint}`, options, 10000);
                 const data = await response.json();
                 if (!response.ok) {
                     throw new Error(data.error || `请求失败 (${response.status})`);
@@ -544,7 +557,11 @@
                 return data;
             } catch (err) {
                 console.error(`API Error [${endpoint}]:`, err);
-                showToast(err.message, 'error');
+                if (err.name === 'AbortError') {
+                    showToast('请求超时，请检查网络后重试', 'error');
+                } else {
+                    showToast(err.message, 'error');
+                }
                 throw err;
             }
         }
@@ -553,7 +570,7 @@
             return apiCall('GET', endpoint, null, false);
         }
         
-        // ==================== 数据获取（公开） ====================
+        // ==================== 数据获取 ====================
         async function fetchSoftwares() {
             try {
                 const data = await publicGet('/api/airtable?path=softwares?maxRecords=100');
@@ -635,18 +652,24 @@
             }
         }
         
-        // ==================== 用户认证（需要认证的 API） ====================
+        // ==================== 用户认证 ====================
         async function login(email, password) {
-            const data = await apiCall('POST', '/api/auth/login', { email, password }, false);
-            if (data.token) {
-                currentUser = { ...data.user, token: data.token };
-                localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                updateUserUI();
-                showToast('登录成功', 'success');
-                await fetchUserProfile();
-                return true;
+            try {
+                const data = await apiCall('POST', '/api/auth/login', { email, password }, false);
+                if (data.token) {
+                    currentUser = { ...data.user, token: data.token };
+                    localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
+                    updateUserUI();
+                    showToast('登录成功', 'success');
+                    // 登录后静默刷新个人资料
+                    fetchUserProfile().catch(() => {});
+                    return true;
+                }
+                return false;
+            } catch (e) {
+                showToast(e.message, 'error');
+                return false;
             }
-            return false;
         }
         
         async function register(email, password, username, inviteCode) {
@@ -668,9 +691,11 @@
                 updateUserUI();
                 return data;
             } catch(e) {
-                currentUser = null;
-                localStorage.removeItem('lezhe_user');
-                updateUserUI();
+                if (e.message.includes('未授权') || e.message.includes('无效的会话')) {
+                    currentUser = null;
+                    localStorage.removeItem('lezhe_user');
+                    updateUserUI();
+                }
                 return null;
             }
         }
@@ -707,7 +732,7 @@
             return currentUser.remaining !== undefined ? currentUser.remaining : 0;
         }
         
-        // ==================== 软件渲染 ====================
+        // ==================== 软件渲染（核心） ====================
         function getStdAbbr(name) {
             if (!name) return 'SW';
             const l = name.toLowerCase();
@@ -1332,13 +1357,20 @@
         
         async function openProfileModal() {
             if (!currentUser) return;
-            await fetchUserProfile();
+            // 立即显示当前缓存的信息
             document.getElementById('profileUsername').innerText = currentUser.username;
             document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（2次/月）`;
             const remaining = getRemainingCount();
             document.getElementById('profileRemaining').innerText = remaining === Infinity ? '∞' : remaining;
             document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无';
             document.getElementById('profileModal').classList.add('active');
+            // 后台静默刷新数据
+            fetchUserProfile().then(() => {
+                const newRemaining = getRemainingCount();
+                document.getElementById('profileRemaining').innerText = newRemaining === Infinity ? '∞' : newRemaining;
+                document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（2次/月）`;
+                if (currentUser.inviteCode) document.getElementById('myInviteCode').innerText = currentUser.inviteCode;
+            }).catch(() => {});
         }
         
         async function openAdminModal() {
