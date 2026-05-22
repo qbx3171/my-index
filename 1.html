@@ -34,23 +34,29 @@
         .app-wrapper { position:relative; z-index:1; }
         .top-nav { position:sticky; top:0; z-index:1000; padding:0 20px; background:rgba(255,255,255,0.72); backdrop-filter:blur(20px); border-bottom:1px solid var(--border-light); transition:transform 0.3s ease; }
         .top-nav.hide { transform:translateY(-100%); }
-        .nav-inner { max-width:1300px; margin:0 auto; padding:10px 0; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+        .nav-inner { max-width:1300px; margin:0 auto; padding:10px 0; display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative; flex-wrap:wrap; }
         .logo { font-size:1.35rem; font-weight:800; background:linear-gradient(135deg,#1a1d2e,var(--primary)); -webkit-background-clip:text; background-clip:text; color:transparent; }
         .nav-links { display:flex; gap:4px; align-items:center; }
         .nav-links a { text-decoration:none; color:var(--text-secondary); font-weight:500; font-size:var(--font-sm); padding:9px 18px; border-radius:var(--radius-full); transition:var(--transition-fast); }
         .nav-links a.active,.nav-links a:hover { color:var(--primary); background:var(--primary-light); }
-        .hamburger { display:none; }
+        .hamburger { display:none; z-index:1001; background:transparent; border:none; cursor:pointer; flex-direction:column; justify-content:center; gap:4px; width:28px; height:28px; }
+        .hamburger span { width:26px; height:2.5px; background:var(--primary); border-radius:3px; transition:0.3s; }
+        .hamburger.active span:nth-child(1){ transform:rotate(45deg)translate(5px,5px); }
+        .hamburger.active span:nth-child(2){ opacity:0; }
+        .hamburger.active span:nth-child(3){ transform:rotate(-45deg)translate(5px,-5px); }
         @media (max-width:768px) {
-            .nav-inner { flex-wrap:wrap; }
-            .hamburger { display:flex; flex-direction:column; width:28px; height:20px; background:transparent; border:none; cursor:pointer; gap:4px; }
-            .hamburger span { width:26px; height:2.5px; background:var(--primary); border-radius:3px; transition:0.3s; }
-            .hamburger.active span:nth-child(1){ transform:rotate(45deg)translate(5px,5px); }
-            .hamburger.active span:nth-child(2){ opacity:0; }
-            .hamburger.active span:nth-child(3){ transform:rotate(-45deg)translate(5px,-5px); }
-            .nav-links { display:none; width:100%; flex-direction:column; gap:2px; padding:6px 0; order:4; }
+            .nav-inner { justify-content:space-between; }
+            .hamburger { display:flex; }
+            .nav-links { 
+                display:none; width:100%; flex-direction:column; gap:2px; padding:12px 0; 
+                background:var(--surface); border-radius:var(--radius-lg); margin-top:10px;
+                box-shadow:var(--shadow-md); border:1px solid var(--border-light);
+                position:absolute; top:100%; left:0; z-index:1000;
+            }
             .nav-links.show { display:flex; }
+            .user-area { margin-left:0; }
         }
-        .user-area { flex-shrink:0; margin-left:auto; }
+        .user-area { flex-shrink:0; }
         .auth-btn { background:linear-gradient(135deg, #4f6ef6, #3b54d4); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-full); font-weight:600; font-size:var(--font-sm); cursor:pointer; display:flex; align-items:center; gap:7px; box-shadow:0 2px 10px rgba(79,110,246,0.15); transition:0.2s; }
         .auth-btn:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(79,110,246,0.3); }
         .user-name-btn { background:var(--surface); padding:9px 18px; border-radius:var(--radius-full); display:flex; align-items:center; gap:7px; cursor:pointer; border:1px solid var(--border); font-weight:500; font-size:var(--font-sm); }
@@ -75,11 +81,11 @@
         .carousel-slide { flex:0 0 100%; height:100%; background:#e8ecf3; }
         .carousel-slide img { width:100%; height:100%; object-fit:cover; border:none; outline:none; }
         .carousel-dots { position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:7px; }
-        .carousel-dot { width:7px; height:7px; border-radius:10px; background:rgba(255,255,255,0.7); cursor:pointer; }
+        .carousel-dot { width:10px; height:10px; border-radius:10px; background:rgba(255,255,255,0.7); cursor:pointer; transition:0.2s; }
         .carousel-dot.active { width:22px; background:#fff; }
         .hot-section { margin-bottom:18px; position:relative; }
         .hot-header h3 { font-size:1.05rem; font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-        .hot-scroll { display:flex; gap:12px; overflow-x:auto; padding:4px 0 10px; scrollbar-width:none; scroll-behavior:smooth; }
+        .hot-scroll { display:flex; gap:12px; overflow-x:auto; padding:4px 16px 10px; scrollbar-width:none; scroll-behavior:smooth; }
         .hot-scroll::-webkit-scrollbar { display:none; }
         .hot-card { flex:0 0 170px; border-radius:var(--radius-lg); padding:14px 12px; cursor:pointer; background:var(--surface); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); transition:0.25s; display:flex; flex-direction:column; gap:6px; }
         .hot-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
@@ -90,10 +96,10 @@
         .category-row { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
         .cat-chip { padding:8px 18px; border-radius:var(--radius-full); font-size:var(--font-sm); font-weight:500; cursor:pointer; background:var(--surface); border:1px solid var(--border); color:var(--text-secondary); transition:var(--transition-fast); }
         .cat-chip.active { background:var(--primary)!important; color:#fff!important; border-color:var(--primary); }
-        .grid { display:grid; grid-template-columns:1fr; gap:14px; }
+        .grid { display:grid; grid-template-columns:1fr; gap:14px; max-width:1400px; margin:0 auto; }
         @media (min-width:560px) { .grid { grid-template-columns:repeat(2,1fr); } }
         @media (min-width:901px) { .grid { grid-template-columns:repeat(auto-fill,minmax(235px,1fr)); } }
-        .software-card { border-radius:var(--radius-xl); padding:18px 16px; cursor:pointer; background:var(--surface); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); transition:0.25s; position:relative; overflow:hidden; }
+        .software-card { border-radius:var(--radius-xl); padding:18px 16px; cursor:pointer; background:var(--surface); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); transition:transform 0.2s, box-shadow 0.2s; will-change:transform; position:relative; overflow:hidden; }
         .software-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
         .card-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--primary); overflow:hidden; flex-shrink:0; background:var(--primary-light); border:none; outline:none; }
         .card-icon img { width:100%; height:100%; object-fit:cover; border:none; outline:none; display:block; }
@@ -113,11 +119,14 @@
         .sidebar-card h3 { font-size:var(--font-base); font-weight:650; margin-bottom:10px; display:flex; align-items:center; gap:7px; }
         .search-bar { background:var(--surface); border-radius:var(--radius-full); padding:3px 3px 3px 14px; display:flex; align-items:center; border:1px solid var(--border); }
         .sidebar-search { margin-bottom: 22px; position:relative; }
-        .search-bar input { flex:1; border:none; background:transparent; padding:12px 8px; font-size:var(--font-sm); outline:none; color:var(--text); }
-        .search-bar button { background:var(--primary); border:none; color:#fff; padding:10px 16px; border-radius:var(--radius-full); cursor:pointer; }
-        .search-suggestions { position:absolute; background:var(--surface); border-radius:var(--radius-lg); max-height:240px; overflow-y:auto; z-index:50; display:none; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.1); margin-top:4px; width:calc(100% - 30px); }
+        .search-bar input { flex:1; border:none; background:transparent; padding:12px 8px; font-size:var(--font-sm); outline:none; color:var(--text); min-height:44px; }
+        .search-bar button { background:var(--primary); border:none; color:#fff; padding:10px 16px; border-radius:var(--radius-full); cursor:pointer; min-height:44px; }
+        .search-suggestions { position:absolute; background:var(--surface); border-radius:var(--radius-lg); max-height:240px; overflow-y:auto; z-index:50; display:none; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.1); width:100%; }
+        @media (max-width:768px) {
+            .search-suggestions { bottom:100%; top:auto; margin-bottom:4px; }
+        }
         .search-suggestions.active { display:block; }
-        .suggestion-item { padding:10px 14px; cursor:pointer; font-size:var(--font-sm); color:var(--text); }
+        .suggestion-item { padding:12px 14px; cursor:pointer; font-size:var(--font-sm); color:var(--text); }
         .suggestion-item:hover { background:var(--bg); color:var(--primary); }
         .calendar-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
         .calendar-nav { display:flex; gap:4px; }
@@ -132,10 +141,10 @@
         .rank-index { width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.6rem; background:var(--bg); color:var(--text-muted); flex-shrink:0; }
         .rank-index.top1 { background:#fef3c7; color:#b45309; } .rank-index.top2 { background:#e2e8f0; color:#475569; } .rank-index.top3 { background:#fde8d0; color:#9a3412; }
         .feedback-section { border-radius:var(--radius-xl); padding:18px 16px; background:var(--surface); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); margin-bottom:14px; }
-        .feedback-input,.feedback-textarea { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:12px; background:var(--bg); margin-bottom:8px; outline:none; color:var(--text); font-size:var(--font-xs); }
-        .feedback-submit-btn { background:var(--primary); color:#fff; padding:10px 18px; border-radius:20px; border:none; font-weight:600; cursor:pointer; font-size:var(--font-xs); }
+        .feedback-input,.feedback-textarea { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:12px; background:var(--bg); margin-bottom:8px; outline:none; color:var(--text); font-size:var(--font-xs); min-height:44px; }
+        .feedback-submit-btn { background:var(--primary); color:#fff; padding:10px 18px; border-radius:20px; border:none; font-weight:600; cursor:pointer; font-size:var(--font-xs); min-height:44px; }
         .clear-history { margin-top: 12px; text-align: right; }
-        .clear-history button { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 0.65rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+        .clear-history button { background: none; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 0.65rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px; min-height: 36px; }
         .clear-history button:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
         .friend-links-wrapper { text-align:center; margin:30px 0; padding:20px 16px; }
         .friend-links-title { font-size:0.65rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px; }
@@ -145,7 +154,7 @@
         .toast-message { position:fixed; top:16px; left:50%; transform:translateX(-50%); padding:11px 22px; border-radius:30px; z-index:9999; color:#fff; font-weight:600; text-shadow:0 1px 2px rgba(0,0,0,0.2); box-shadow:0 8px 24px rgba(0,0,0,0.2); animation:toastIn 3s ease forwards; }
         .toast-message.success { background:#10b981; } .toast-message.error { background:#ef4444; } .toast-message.warning { background:#f59e0b; }
         @keyframes toastIn { 0%{opacity:0;transform:translate(-50%,-10px)} 10%{opacity:1;transform:translate(-50%,0)} 90%{opacity:1} 100%{opacity:0;transform:translate(-50%,-10px)} }
-        .back-to-top { position:fixed; bottom:24px; right:24px; width:42px; height:42px; background:var(--surface); color:var(--primary); border-radius:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; visibility:hidden; z-index:150; border:1px solid var(--border); box-shadow:var(--shadow-md); transition:0.3s; }
+        .back-to-top { position:fixed; bottom:24px; right:24px; width:44px; height:44px; background:var(--surface); color:var(--primary); border-radius:28px; display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:0; visibility:hidden; z-index:150; border:1px solid var(--border); box-shadow:var(--shadow-md); transition:0.3s; }
         .back-to-top.show { opacity:1; visibility:visible; }
         .modal-overlay { display:none; position:fixed; inset:0; background:rgba(12,14,24,0.5); backdrop-filter:blur(12px); z-index:2000; align-items:center; justify-content:center; }
         .modal-overlay.active { display:flex; }
@@ -163,7 +172,7 @@
         .admin-user-role { background: var(--bg); padding: 4px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 600; color: var(--text-secondary); }
         .admin-user-role.vip { background: #fef3c7; color: #b45309; }
         .admin-user-role.admin { background: #eef2ff; color: #4f6ef6; }
-        .admin-action-btn { background: var(--primary); color: white; border: none; border-radius: 40px; padding: 8px 18px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .admin-action-btn { background: var(--primary); color: white; border: none; border-radius: 40px; padding: 8px 18px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; }
         .admin-action-btn:hover { transform: translateY(-2px); background: var(--primary-hover); box-shadow: 0 4px 10px rgba(79,110,246,0.3); }
         .admin-action-btn:active { transform: translateY(1px); }
         .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
@@ -173,8 +182,8 @@
         .plan-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 0.8rem; }
         .plan-item:last-child { border-bottom: none; }
         .admin-search-bar { margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .admin-search-bar input { flex: 1; padding: 10px 16px; border: 1px solid var(--border); border-radius: 30px; font-size: 0.85rem; background: var(--bg); }
-        .admin-search-bar button { background: var(--primary); color: white; border: none; border-radius: 30px; padding: 0 16px; cursor: pointer; font-weight: 500; }
+        .admin-search-bar input { flex: 1; padding: 10px 16px; border: 1px solid var(--border); border-radius: 30px; font-size: 0.85rem; background: var(--bg); min-height:44px; }
+        .admin-search-bar button { background: var(--primary); color: white; border: none; border-radius: 30px; padding: 0 16px; cursor: pointer; font-weight: 500; min-height:44px; }
         .admin-register-time { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
 
         /* 高级文章卡片样式 */
@@ -248,6 +257,7 @@
             cursor: pointer;
             transition: 0.2s;
             border: none;
+            min-height: 36px;
         }
         .edit-article-btn { background: #fef3c7; color: #b45309; }
         .edit-article-btn:hover { background: #fde68a; transform: translateY(-1px); }
@@ -285,7 +295,7 @@
                     </div>
                     <div class="category-row" id="categoryTabs"></div>
                     <div id="softwareGridContainer" class="grid"></div>
-                    <div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;" onclick="window._loadMore()">加载更多</button></div>
+                    <div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600; min-height:44px;" onclick="window._loadMore()">加载更多</button></div>
                 </div>
                 <div class="sidebar">
                     <div class="sidebar-search"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="搜软件..." autocomplete="off"><button id="searchBtn"><i class="fas fa-arrow-right"></i></button></div><div class="search-suggestions" id="searchSuggestions"></div></div>
@@ -294,7 +304,7 @@
                         <div class="calendar-header"><span id="calendarMonthYear"></span><div class="calendar-nav"><button id="prevMonth"><i class="fas fa-chevron-left"></i></button><button id="nextMonth"><i class="fas fa-chevron-right"></i></button></div></div>
                         <div class="calendar-grid" id="calendarDays"></div>
                         <div style="text-align:center; margin-top:10px;">
-                            <button id="dailyCheckinBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:6px 16px; font-size:0.7rem; cursor:pointer;">📅 每日签到 (+1次)</button>
+                            <button id="dailyCheckinBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:8px 16px; font-size:0.75rem; cursor:pointer; min-height:44px;">📅 每日签到 (+1次)</button>
                         </div>
                     </div>
                     <div class="feedback-section" id="sidebarFeedback">
@@ -304,7 +314,7 @@
                         <button id="submitFeedbackBtn" class="feedback-submit-btn"><i class="fas fa-paper-plane"></i> 提交</button>
                         <div id="feedbackListContainer" style="margin-top:12px;font-size:var(--font-xs);"></div>
                     </div>
-                    <div class="sidebar-card"><h3><i class="fas fa-newspaper"></i> 最新文章 <button id="manageArticlesBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:5px 12px; font-size:0.65rem; cursor:pointer; display:none; font-weight:550;">管理</button></h3><div id="articlesList"></div></div>
+                    <div class="sidebar-card"><h3><i class="fas fa-newspaper"></i> 最新文章 <button id="manageArticlesBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:5px 12px; font-size:0.65rem; cursor:pointer; display:none; font-weight:550; min-height:32px;">管理</button></h3><div id="articlesList"></div></div>
                     <div class="sidebar-card"><h3><i class="fas fa-chart-line"></i> 下载排行榜</h3><div id="rankList"></div></div>
                     <div class="sidebar-card"><h3><i class="fas fa-history"></i> 最近浏览</h3><div id="historyList"></div><div class="clear-history"><button id="clearHistoryBtn"><i class="fas fa-trash-alt"></i> 清空历史</button></div></div>
                 </div>
@@ -329,35 +339,35 @@
             <div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div>
             <div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div>
             <div id="loginForm">
-                <input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div>
+                <input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
+                <input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
+                <div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"></div>
                 <button id="showForgotBtn" style="background:none;border:none;color:var(--primary);margin-bottom:12px;">忘记密码？</button>
-                <button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">登录</button>
+                <button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;min-height:44px;">登录</button>
             </div>
             <div id="registerForm" style="display:none;">
-                <input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="text" id="regInviteCode" placeholder="邀请码（选填）" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div>
-                <button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">注册</button>
+                <input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
+                <input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
+                <input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
+                <input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
+                <input type="text" id="regInviteCode" placeholder="邀请码（选填）" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
+                <div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"></div>
+                <button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;min-height:44px;">注册</button>
             </div>
             <div id="forgotForm" style="display:none;">
-                <input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
+                <input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
                 <div style="display:flex; gap:10px; margin-bottom:12px;">
-                    <button id="sendResetCodeBtn" class="send-code-btn" style="flex:1; background:var(--primary); color:#fff; border:none; border-radius:40px; padding:10px; cursor:pointer;">发送验证码</button>
-                    <input type="text" id="resetCodeInput" placeholder="验证码" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:12px;">
+                    <button id="sendResetCodeBtn" class="send-code-btn" style="flex:1; background:var(--primary); color:#fff; border:none; border-radius:40px; padding:10px; cursor:pointer; min-height:44px;">发送验证码</button>
+                    <input type="text" id="resetCodeInput" placeholder="验证码" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:12px;min-height:44px;">
                 </div>
-                <input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
-                <input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
+                <input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
+                <input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
                 <div style="display:flex;gap:8px;align-items:center;margin:10px 0;">
                     <span id="forgotCaptchaQuestion"></span>
                     <button id="refreshForgotCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button>
-                    <input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);">
+                    <input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;">
                 </div>
-                <button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">重置密码</button>
+                <button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;min-height:44px;">重置密码</button>
                 <button id="backToLoginFromForgot" style="background:none;border:none;color:var(--primary);margin-top:10px;">返回登录</button>
             </div>
         </div>
@@ -372,9 +382,9 @@
             <div><strong>本月剩余下载：</strong> <span id="profileRemaining"></span> 次</div>
             <div><strong>我的邀请码：</strong><div class="invite-code-box" style="background:#f0f4fe;border:1px solid var(--primary);border-radius:12px;padding:12px;text-align:center;font-weight:600;margin:8px 0;" id="myInviteCode"></div><div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">邀请好友注册，双方各得5次下载机会</div></div>
             <div style="margin-top:16px;"><strong>修改密码（选填）</strong></div>
-            <input type="password" id="profileNewPwd" placeholder="新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;">
-            <input type="password" id="profileConfirmPwd" placeholder="确认新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;">
-            <button id="saveProfileBtn" style="width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:30px;">保存修改</button>
+            <input type="password" id="profileNewPwd" placeholder="新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;min-height:44px;">
+            <input type="password" id="profileConfirmPwd" placeholder="确认新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;min-height:44px;">
+            <button id="saveProfileBtn" style="width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:30px;min-height:44px;">保存修改</button>
         </div>
     </div>
 
@@ -434,8 +444,8 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
                 <h3 style="font-weight: 700; display: flex; align-items: center; gap: 8px;"><i class="fas fa-newspaper" style="color: var(--primary);"></i> 文章管理</h3>
                 <div style="display: flex; gap: 8px;">
-                    <button id="refreshArticleListBtn" style="background: var(--bg); border: 1px solid var(--border); border-radius: 30px; padding: 8px 16px; cursor: pointer; font-weight: 500; transition: 0.2s;"><i class="fas fa-sync-alt"></i> 刷新</button>
-                    <button id="addNewArticleBtn" style="background: var(--success); color: #fff; border: none; border-radius: 30px; padding: 8px 18px; cursor: pointer; font-weight: 600; transition: 0.2s;"><i class="fas fa-plus"></i> 新增文章</button>
+                    <button id="refreshArticleListBtn" style="background: var(--bg); border: 1px solid var(--border); border-radius: 30px; padding: 8px 16px; cursor: pointer; font-weight: 500; transition: 0.2s; min-height:36px;"><i class="fas fa-sync-alt"></i> 刷新</button>
+                    <button id="addNewArticleBtn" style="background: var(--success); color: #fff; border: none; border-radius: 30px; padding: 8px 18px; cursor: pointer; font-weight: 600; transition: 0.2s; min-height:36px;"><i class="fas fa-plus"></i> 新增文章</button>
                     <button id="closeArticleModal" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%;"><i class="fas fa-times"></i></button>
                 </div>
             </div>
@@ -446,11 +456,11 @@
                 <h4 style="margin-bottom: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px;"><i class="fas fa-edit"></i> 编辑/新增文章</h4>
                 <div class="article-form-group" style="margin-bottom: 14px;">
                     <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">标题 *</label>
-                    <input type="text" id="articleTitle" placeholder="请输入文章标题" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface); font-size: 0.9rem;">
+                    <input type="text" id="articleTitle" placeholder="请输入文章标题" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface); font-size: 0.9rem;min-height:44px;">
                 </div>
                 <div class="article-form-group" style="margin-bottom: 14px;">
                     <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">封面图片URL</label>
-                    <input type="text" id="articleCover" placeholder="https://..." style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface);">
+                    <input type="text" id="articleCover" placeholder="https://..." style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface);min-height:44px;">
                 </div>
                 <div class="article-form-group" style="margin-bottom: 14px;">
                     <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">摘要</label>
@@ -462,11 +472,11 @@
                 </div>
                 <div class="article-form-group" style="margin-bottom: 14px;">
                     <label style="display: block; font-weight: 500; margin-bottom: 6px; font-size: 0.8rem;">标签 (逗号分隔)</label>
-                    <input type="text" id="articleTags" placeholder="教程, 技巧" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface);">
+                    <input type="text" id="articleTags" placeholder="教程, 技巧" style="width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 16px; background: var(--surface);min-height:44px;">
                 </div>
                 <div style="display: flex; gap: 12px; margin-top: 20px;">
-                    <button id="saveArticleBtn" style="background: var(--success); color: #fff; border: none; padding: 10px 24px; border-radius: 40px; cursor: pointer; font-weight: 600;">保存文章</button>
-                    <button id="cancelArticleBtn" style="background: #94a3b8; color: #fff; border: none; padding: 10px 24px; border-radius: 40px; cursor: pointer; font-weight: 600;">取消</button>
+                    <button id="saveArticleBtn" style="background: var(--success); color: #fff; border: none; padding: 10px 24px; border-radius: 40px; cursor: pointer; font-weight: 600;min-height:44px;">保存文章</button>
+                    <button id="cancelArticleBtn" style="background: #94a3b8; color: #fff; border: none; padding: 10px 24px; border-radius: 40px; cursor: pointer; font-weight: 600;min-height:44px;">取消</button>
                 </div>
             </div>
         </div>
@@ -479,6 +489,11 @@
     <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
 <script>
     emailjs.init('9VF7tzRthx9_nkchu');
+
+    // 安全警告（提醒 Token 暴露风险，生产环境应移至后端）
+    if (window.location.hostname !== 'localhost' && window.location.protocol !== 'file:') {
+        console.warn('⚠️ 安全提示：当前前端代码中暴露了 Airtable API Token，请在生产环境中将 API 调用移至后端代理。');
+    }
 
     if (typeof window.copyText !== 'function') {
         window.copyText = function(text) {
@@ -520,6 +535,8 @@
         const DEFAULT_MONTHLY_QUOTA = 2;
         let cachedUsers = null;
         let allAdminUsers = [];
+        let lastScrollY = 0;
+        let scrollTimer = null;
 
         function showToast(m, t='success'){
             const d = document.createElement('div');
@@ -529,12 +546,27 @@
             setTimeout(()=>d.remove(), 3000);
         }
         function esc(s){ return String(s).replace(/[&<>]/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        // 简单的富文本过滤（允许 <br> <strong> <em> <p> 等基本标签，防止XSS）
+        function sanitizeHtml(html) {
+            if (!html) return '';
+            // 移除 script 和 on* 事件
+            const temp = document.createElement('div');
+            temp.textContent = html; // 先转义所有HTML
+            let safe = temp.innerHTML;
+            // 允许特定标签：br, p, strong, em, b, i, ul, li, ol, a, img
+            safe = safe.replace(/&lt;(\/?(?:br|p|strong|em|b|i|ul|li|ol|a|img))&gt;/gi, '<$1>');
+            safe = safe.replace(/&lt;(\/?a)&gt;([^&]*)&lt;(\/a)&gt;/gi, '<$1>$2</$3>');
+            // 简单处理 a 标签 href
+            safe = safe.replace(/href\s*=\s*['"]([^'"]*)['"]/gi, (m, url) => `href="${url.replace(/javascript:/gi, '')}"`);
+            return safe;
+        }
         function genCap(){ let a=Math.floor(Math.random()*10)+1,b=Math.floor(Math.random()*10)+1,op=Math.random()>0.5?'+':'-',ans=op==='+'?a+b:a-b; if(ans<0) return genCap(); return { question: `${a} ${op} ${b} = ?`, answer: ans }; }
         function refCap(q,i){ let c=genCap(); currentCaptcha=c; document.getElementById(q).innerText=c.question; document.getElementById(i).value=''; }
 
         const hamburger = document.getElementById('hamburgerBtn'), navLinks = document.getElementById('navLinks');
         if(hamburger&&navLinks){
-            hamburger.addEventListener('click', ()=>{ hamburger.classList.toggle('active'); navLinks.classList.toggle('show'); });
+            hamburger.addEventListener('click', (e)=>{ e.stopPropagation(); hamburger.classList.toggle('active'); navLinks.classList.toggle('show'); });
+            document.addEventListener('click', (e)=>{ if(!navLinks.contains(e.target) && !hamburger.contains(e.target)){ navLinks.classList.remove('show'); hamburger.classList.remove('active'); } });
             navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{ hamburger.classList.remove('active'); navLinks.classList.remove('show'); }));
         }
 
@@ -594,6 +626,7 @@
                     .then(data => {
                         if(data.records.length){
                             const recId = data.records[0].id;
+                            // 统一字段名为 SignInData
                             airReq('PATCH', `Users/${recId}`, { fields: { SignInData: signData } }).catch(()=>{});
                         }
                     }).catch(()=>{});
@@ -608,7 +641,7 @@
                         const fields = data.records[0].fields;
                         let signDataStr = null;
                         for(let key in fields){
-                            if(key.toLowerCase() === 'signindata'){
+                            if(key === 'SignInData'){
                                 signDataStr = fields[key];
                                 break;
                             }
@@ -912,7 +945,7 @@
                 if(art){
                     document.getElementById('articleDetailTitle').innerText = art.title;
                     document.getElementById('articleDetailCover').src = art.cover || '';
-                    document.getElementById('articleDetailContent').innerHTML = art.content?.replace(/\n/g,'<br>') || '暂无正文';
+                    document.getElementById('articleDetailContent').innerHTML = sanitizeHtml(art.content) || '暂无正文';
                     document.getElementById('articleDetailModal').classList.add('active');
                 }
             }));
@@ -1228,6 +1261,11 @@
                 openAuth('login');
                 return;
             }
+            // 检查下载链接是否有效
+            if(!sw.url || sw.url === '#'){
+                showToast('该软件下载链接暂不可用，请联系管理员', 'warning');
+                return;
+            }
             if(!canDownload(currentUser)){
                 document.getElementById('insufficientModal').classList.add('active');
                 return;
@@ -1270,10 +1308,12 @@
         }
 
         const hotScroll = document.getElementById('hotScroll'); let hotInt = null;
+        let isHotTouching = false;
         function startHot(){
             if(!hotScroll) return;
             clearInterval(hotInt);
             hotInt = setInterval(()=>{
+                if(isHotTouching) return; // 触摸时暂停
                 if(hotScroll.scrollLeft >= hotScroll.scrollWidth - hotScroll.clientWidth - 10) hotScroll.scrollTo({ left:0, behavior:'smooth' });
                 else hotScroll.scrollBy({ left:200, behavior:'smooth' });
             }, 2000);
@@ -1287,6 +1327,9 @@
                 const sw = softwares.find(s=>s.name === c.dataset.name);
                 if(sw) downloadSoftware(sw);
             }));
+            // 触摸事件支持
+            hotScroll.addEventListener('touchstart', ()=>{ isHotTouching = true; stopHot(); });
+            hotScroll.addEventListener('touchend', ()=>{ isHotTouching = false; startHot(); });
             hotScroll.addEventListener('mouseenter', stopHot);
             hotScroll.addEventListener('mouseleave', startHot);
             startHot();
@@ -1562,6 +1605,11 @@
                 if(!email || newPwd !== confirm || newPwd.length<6) return showToast('信息错误', 'error');
                 if(!cap || parseInt(cap)!==currentCaptcha.answer) return showToast('验证码错误', 'error');
                 if(email !== resetEmail || !code || code !== resetCode || Date.now() > resetCodeExpire) return showToast('验证码错误或已过期', 'error');
+                // 检查新旧密码是否相同
+                const rec = await findUserByEmail(email);
+                if(rec && rec.fields && rec.fields.Password === CryptoJS.SHA256(newPwd).toString()){
+                    return showToast('新密码不能与旧密码相同', 'error');
+                }
                 try{
                     await updatePassword(email, newPwd);
                     showToast('密码重置成功', 'success');
@@ -1597,6 +1645,13 @@
                 const confirm = document.getElementById('profileConfirmPwd').value;
                 if(newPwd && newPwd !== confirm) return showToast('两次密码不一致', 'error');
                 if(newPwd && newPwd.length<6) return showToast('密码至少6位', 'error');
+                if(newPwd){
+                    // 检查是否与旧密码相同
+                    const user = await findUserByEmail(currentUser.email);
+                    if(user && user.fields && user.fields.Password === CryptoJS.SHA256(newPwd).toString()){
+                        return showToast('新密码不能与旧密码相同', 'error');
+                    }
+                }
                 try{
                     if(newPwd) await updatePassword(currentUser.email, newPwd);
                     showToast('资料更新成功', 'success');
@@ -1662,6 +1717,16 @@
             searchSug.innerHTML = matches.map(s=>`<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join('');
             searchSug.classList.add('active');
         });
+        // 移动端优化：点击输入框时，建议浮层移到上方
+        searchInput.addEventListener('focus', ()=>{
+            if(window.innerWidth <= 768){
+                searchSug.style.top = 'auto';
+                searchSug.style.bottom = '100%';
+            }else{
+                searchSug.style.top = '100%';
+                searchSug.style.bottom = 'auto';
+            }
+        });
         document.addEventListener('click', e=>{ if(!searchSug.contains(e.target) && e.target!==searchInput) searchSug.classList.remove('active'); });
         searchSug.addEventListener('click', e=>{
             const item = e.target.closest('.suggestion-item');
@@ -1674,15 +1739,18 @@
         });
         document.getElementById('searchBtn').addEventListener('click', ()=>{ searchKeyword = searchInput.value; renderGrid(); });
 
-        let lastScrollY = 0;
+        // 优化滚动隐藏导航栏（防抖）
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('topNav');
             if (!nav) return;
-            const currentScrollY = window.scrollY;
-            if (currentScrollY > lastScrollY && currentScrollY > 70) nav.classList.add('hide');
-            else nav.classList.remove('hide');
-            lastScrollY = currentScrollY;
-            document.getElementById('backToTop').classList.toggle('show', currentScrollY > 300);
+            if(scrollTimer) clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(()=>{
+                const currentScrollY = window.scrollY;
+                if (currentScrollY > lastScrollY && currentScrollY > 100) nav.classList.add('hide');
+                else if(currentScrollY < lastScrollY) nav.classList.remove('hide');
+                lastScrollY = currentScrollY;
+                document.getElementById('backToTop').classList.toggle('show', currentScrollY > 300);
+            }, 50);
         });
         document.getElementById('backToTop').addEventListener('click', ()=>window.scrollTo({ top:0, behavior:'smooth' }));
 
@@ -1793,7 +1861,14 @@
                 const remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining;
                 area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;
                 document.getElementById('userMenuBtn').addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
-                document.getElementById('logoutBtn').addEventListener('click',()=>{ currentUser=null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出'); location.reload(); });
+                document.getElementById('logoutBtn').addEventListener('click',()=>{
+                    currentUser = null;
+                    localStorage.removeItem('lezhe_user');
+                    updateUserUI();
+                    showToast('已退出登录', 'success');
+                    // 不刷新页面，只重置UI
+                    location.reload(); // 简单刷新以确保状态完全重置，也可以选择性刷新组件
+                });
                 document.getElementById('profileBtn').addEventListener('click', openProfileModal);
                 if(currentUser.role === 'admin') document.getElementById('adminBtn').addEventListener('click', openAdminModal);
                 if(currentUser.role === 'admin') document.getElementById('manageArticlesBtn').style.display = 'block';
