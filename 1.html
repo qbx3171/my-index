@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
     <title>乐哲软件 | 原版软件下载推荐 · 创意工具库</title>
     <meta name="description" content="乐哲软件博客提供 Adobe、Autodesk、C4D、草图大师、犀牛等主流软件的原版安装包推荐与下载指引，资源安全无捆绑，仅供个人学习使用。">
-    <meta name="keywords" content="乐哲软件,软件下载,Adobe下载,Autodesk,正版软件推荐,Mac软件,Windows软件,C4D,草图大师,犀牛,插件">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
@@ -478,7 +477,7 @@
 
     <script>
         // ==================== 配置 ====================
-        const WORKER_URL = 'https://api.lezhesoft.cn';
+        const WORKER_URL = 'https://bold-butterfly-7e05.qiubingxun063.workers.dev';
         
         // ==================== 全局变量 ====================
         let currentUser = null;
@@ -1479,7 +1478,7 @@
         
         // ==================== 初始化 ====================
         async function init() {
-            // 显示加载提示（可选）
+            // 先显示加载提示
             const gridContainer = document.getElementById('softwareGridContainer');
             if (gridContainer) gridContainer.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-pulse"></i> 加载软件列表中...</div>';
             
