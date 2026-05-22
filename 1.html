@@ -81,9 +81,6 @@
         .hot-header h3 { font-size:1.05rem; font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:10px; }
         .hot-scroll { display:flex; gap:12px; overflow-x:auto; padding:4px 0 10px; scrollbar-width:none; scroll-behavior:smooth; }
         .hot-scroll::-webkit-scrollbar { display:none; }
-        .hot-arrow { position:absolute; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:34px; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:5; color:var(--text-secondary); box-shadow:var(--shadow-md); }
-        .hot-arrow:hover { color:var(--primary); background:var(--primary-light); }
-        .hot-arrow.left { left:-16px; } .hot-arrow.right { right:-16px; }
         .hot-card { flex:0 0 170px; border-radius:var(--radius-lg); padding:14px 12px; cursor:pointer; background:var(--surface); border:1px solid var(--border-light); box-shadow:var(--shadow-sm); transition:0.25s; display:flex; flex-direction:column; gap:6px; }
         .hot-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
         .hot-card .hot-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:var(--primary-light); font-size:14px; color:var(--primary); overflow:hidden; }
@@ -282,7 +279,10 @@
             <div class="content-wrapper">
                 <div class="main-content">
                     <div class="carousel-container" id="categoryBannerContainer"><div class="carousel-slides" id="categoryBannerSlides"></div><div class="carousel-dots" id="categoryBannerDots"></div></div>
-                    <div class="hot-section"><div class="hot-header"><h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3></div><div class="hot-wrapper" style="position:relative;"><div class="hot-arrow left" id="hotArrowLeft"><i class="fas fa-chevron-left"></i></div><div class="hot-scroll" id="hotScroll"></div><div class="hot-arrow right" id="hotArrowRight"><i class="fas fa-chevron-right"></i></div></div></div>
+                    <div class="hot-section">
+                        <div class="hot-header"><h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3></div>
+                        <div class="hot-scroll" id="hotScroll"></div>
+                    </div>
                     <div class="category-row" id="categoryTabs"></div>
                     <div id="softwareGridContainer" class="grid"></div>
                     <div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;" onclick="window._loadMore()">加载更多</button></div>
@@ -945,7 +945,6 @@
                 if(inviteCode){
                     const inviter = users.find(u => u.inviteCode === inviteCode);
                     if(inviter){
-                        // 修复：只增加邀请者额外下载次数，不扣减已用次数
                         addDownloadBonus(inviter.email, 5);
                         showToast(`邀请成功！您获得了5次额外下载`, 'success');
                     } else {
@@ -963,7 +962,6 @@
             if(inviteCode){
                 const inviter = await findUserByInviteCode(inviteCode);
                 if(inviter){
-                    // 修复：只增加邀请者额外下载次数，不扣减已用次数
                     addDownloadBonus(inviter.fields.Email, 5);
                     showToast(`邀请成功！您获得了5次额外下载`, 'success');
                 } else {
@@ -1281,8 +1279,6 @@
             }, 2000);
         }
         function stopHot(){ clearInterval(hotInt); }
-        document.getElementById('hotArrowLeft').addEventListener('click',()=>{ hotScroll.scrollBy({ left:-200 }); stopHot(); startHot(); });
-        document.getElementById('hotArrowRight').addEventListener('click',()=>{ hotScroll.scrollBy({ left:200 }); stopHot(); startHot(); });
         function renderHot(){
             if(!softwares.length) return;
             const hotItems = [...softwares].sort((a,b)=>(b.downloads||0)-(a.downloads||0)).slice(0,6);
@@ -1391,9 +1387,7 @@
                     btn.disabled = true;
                     try {
                         await updateUserRole(userId, newRole);
-                        // 刷新用户列表以确保数据最新
                         await refreshUserListAndRender();
-                        // 如果更新的是当前登录用户，同步 currentUser
                         if(currentUser && currentUser.id === userId){
                             currentUser.role = newRole;
                             localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
