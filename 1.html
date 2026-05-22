@@ -6,7 +6,6 @@
     <title>乐哲软件 | 原版软件下载推荐 · 创意工具库</title>
     <meta name="description" content="乐哲软件博客提供 Adobe、Autodesk、C4D、草图大师、犀牛等主流软件的原版安装包推荐与下载指引，资源安全无捆绑，仅供个人学习使用。">
     <meta name="keywords" content="乐哲软件,软件下载,Adobe下载,Autodesk,正版软件推荐,Mac软件,Windows软件,C4D,草图大师,犀牛,插件">
-    <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
@@ -480,6 +479,7 @@
 
     <script>
         // ==================== 配置 ====================
+        // 请将下面的 WORKER_URL 替换为您的 Cloudflare Worker 域名
         const WORKER_URL = 'https://bold-butterfly-7e05.qiubingxun063.workers.dev';
         
         // ==================== 全局变量 ====================
@@ -494,7 +494,6 @@
         const DEFAULT_LIMIT = 12;
         let editingArticleId = null;
         let currentCaptcha = { question: '', answer: 0 };
-        let cachedUsers = null;
         let allAdminUsers = [];
         
         // ==================== 辅助函数 ====================
@@ -527,8 +526,8 @@
             document.getElementById(inputId).value = '';
         }
         
-        // ==================== API 封装 ====================
-        async function apiCall(method, endpoint, body = null, needAuth = true) {
+        // ==================== API 封装（公开读取无需认证） ====================
+        async function apiCall(method, endpoint, body = null, needAuth = false) {
             const headers = { 'Content-Type': 'application/json' };
             if (needAuth && currentUser && currentUser.token) {
                 headers['Authorization'] = `Bearer ${currentUser.token}`;
@@ -554,7 +553,7 @@
             return apiCall('GET', endpoint, null, false);
         }
         
-        // ==================== 数据获取 ====================
+        // ==================== 数据获取（公开） ====================
         async function fetchSoftwares() {
             try {
                 const data = await publicGet('/api/airtable?path=softwares?maxRecords=100');
@@ -636,7 +635,7 @@
             }
         }
         
-        // ==================== 用户认证 ====================
+        // ==================== 用户认证（需要认证的 API） ====================
         async function login(email, password) {
             const data = await apiCall('POST', '/api/auth/login', { email, password }, false);
             if (data.token) {
@@ -658,7 +657,7 @@
         async function fetchUserProfile() {
             if (!currentUser) return null;
             try {
-                const data = await apiCall('GET', '/api/user/profile');
+                const data = await apiCall('GET', '/api/user/profile', null, true);
                 currentUser.remaining = data.remaining;
                 currentUser.role = data.role;
                 currentUser.username = data.username;
@@ -679,7 +678,7 @@
         async function checkin() {
             if (!currentUser) { showToast('请先登录', 'error'); return false; }
             try {
-                await apiCall('POST', '/api/user/checkin');
+                await apiCall('POST', '/api/user/checkin', null, true);
                 showToast('签到成功，获得1次下载机会', 'success');
                 await fetchUserProfile();
                 renderCalendar();
@@ -694,7 +693,7 @@
         async function recordDownload() {
             if (!currentUser) return false;
             try {
-                await apiCall('POST', '/api/user/record-download');
+                await apiCall('POST', '/api/user/record-download', null, true);
                 await fetchUserProfile();
                 return true;
             } catch(e) {
@@ -1200,7 +1199,7 @@
         
         // ==================== 用户管理后台 ====================
         async function fetchAllUsers() {
-            const data = await apiCall('GET', '/api/admin/users');
+            const data = await apiCall('GET', '/api/admin/users', null, true);
             return data.map(rec => ({
                 id: rec.id,
                 fields: rec.fields,
