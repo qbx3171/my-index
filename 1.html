@@ -321,7 +321,6 @@
             <footer style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.7rem; line-height:1.8;">版权所有 © 乐哲软件<br>乐哲软件博客 · 原版安装包推荐，安全无捆绑<br>www.lezhesoft.cn | 个人技术分享</footer>
         </div>
     </div>
-
     <!-- 登录/注册模态框 -->
     <div id="authModal" class="modal-overlay">
         <div class="modal-card" style="max-width:440px;">
@@ -427,7 +426,7 @@
         </div>
     </div>
 
-    <!-- 文章管理模态框 - 高级卡片版 -->
+    <!-- 文章管理模态框 -->
     <div id="articleManageModal" class="modal-overlay">
         <div class="modal-card" style="max-width: 900px; width: 92%; padding: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
@@ -661,7 +660,6 @@
                     localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
                     updateUserUI();
                     showToast('登录成功', 'success');
-                    // 登录后静默刷新个人资料
                     fetchUserProfile().catch(() => {});
                     return true;
                 }
@@ -1357,18 +1355,16 @@
         
         async function openProfileModal() {
             if (!currentUser) return;
-            // 立即显示当前缓存的信息
             document.getElementById('profileUsername').innerText = currentUser.username;
             document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（2次/月）`;
             const remaining = getRemainingCount();
             document.getElementById('profileRemaining').innerText = remaining === Infinity ? '∞' : remaining;
             document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无';
             document.getElementById('profileModal').classList.add('active');
-            // 后台静默刷新数据
+            // 后台静默刷新
             fetchUserProfile().then(() => {
                 const newRemaining = getRemainingCount();
                 document.getElementById('profileRemaining').innerText = newRemaining === Infinity ? '∞' : newRemaining;
-                document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（2次/月）`;
                 if (currentUser.inviteCode) document.getElementById('myInviteCode').innerText = currentUser.inviteCode;
             }).catch(() => {});
         }
