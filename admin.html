@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>乐哲软件 · 管理后台</title>
+    <title>乐哲软件 · 管理后台（支持安卓/iOS）</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
@@ -38,7 +38,7 @@
         .form-group label { font-weight: 600; font-size: 13px; color: #475569; }
         .form-group input, .form-group select, .form-group textarea { padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 16px; font-size: 14px; transition: 0.2s; background: white; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1e6bdf; outline: none; box-shadow: 0 0 0 3px rgba(30,107,223,0.1); }
-        .checkbox-group { display: flex; gap: 24px; align-items: center; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
         .checkbox-group label { display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; }
         .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #1e6bdf; }
         .icon-selector-wrapper { position: relative; }
@@ -155,9 +155,17 @@
             <div class="form-group"><label>软件名称 <span style="color:red;">*</span></label><input type="text" id="swName" placeholder="例如: Photoshop" oninput="suggestIcon(); refreshIconPreview();"></div>
             <div class="form-group"><label>分类 <span style="color:red;">*</span></label><select id="swCategory"></select></div>
             <div class="form-group"><label>版本</label><input type="text" id="swVersion" placeholder="例如: 2024"></div>
-            <div class="form-group"><label>支持系统 <span style="color:red;">*</span></label><div class="checkbox-group"><label><input type="checkbox" id="osWindows" checked> Windows</label><label><input type="checkbox" id="osMac" checked> Mac</label></div></div>
+            <div class="form-group">
+                <label>支持系统 <span style="color:red;">*</span></label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="osWindows" checked> <i class="fab fa-windows"></i> Windows</label>
+                    <label><input type="checkbox" id="osMac" checked> <i class="fab fa-apple"></i> Mac</label>
+                    <label><input type="checkbox" id="osAndroid"> <i class="fab fa-android"></i> 安卓</label>
+                    <label><input type="checkbox" id="osiOS"> <i class="fab fa-apple"></i> 苹果</label>
+                </div>
+            </div>
             <div class="form-group"><label>下载链接 <span style="color:red;">*</span></label><input type="url" id="swURL" placeholder="https://..."></div>
-            <div class="form-group"><label>添加日期</label><input type="date" id="swAddedDate"></div>
+            <div class="form-group"><label>添加日期</label><input type="date" id="swAddedDate" readonly></div>
             <div class="form-group" style="grid-column: span 2;"><label>描述</label><textarea id="swDescription" rows="2" placeholder="简要描述软件功能..."></textarea></div>
             <div class="form-group" style="grid-column: span 2;">
                 <label>图标</label>
@@ -173,7 +181,7 @@
         <input type="hidden" id="editingId" value="">
         </div>
         <h3 style="margin: 32px 0 16px;">📋 现有软件列表</h3>
-        <table class="table" id="softwaresTable"><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>系统</th><th>图标</th><th>操作</th></tr></thead><tbody id="softwaresTbody"><tr class="empty-row"><td colspan="6">加载中...</tr></tbody></table>
+        <table class="table" id="softwaresTable"><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>系统</th><th>图标</th><th>操作</th></tr></thead><tbody id="softwaresTbody"><tr class="empty-row"><td colspan="6">加载中...</tbody></table>
     </div>
 
     <!-- 广告管理面板 -->
@@ -191,7 +199,7 @@
         <div style="display: flex; gap: 16px;"><button class="btn-primary" id="saveAdBtn"><i class="fas fa-save"></i> 保存广告</button><button class="btn-secondary" id="cancelAdBtn">取消编辑</button></div>
         <input type="hidden" id="editingAdId" value="">
         <h3 style="margin: 32px 0 16px;">📋 现有广告列表</h3>
-        <table class="table" id="adsTable"><thead><tr><th>预览</th><th>标题</th><th>位置</th><th>链接</th><th>状态</th><th>操作</th></tr></thead><tbody id="adsTbody"><tr class="empty-row"><td colspan="6">加载中...</td></tr></tbody></table>
+        <table class="table" id="adsTable"><thead><tr><th>预览</th><th>标题</th><th>位置</th><th>链接</th><th>状态</th><th>操作</th></tr></thead><tbody id="adsTbody"><tr class="empty-row"><td colspan="6">加载中...</tbody></table>
     </div>
 
     <!-- 用户管理面板 -->
@@ -204,13 +212,13 @@
             <div class="form-group"><label>角色</label><select id="newUserRole"><option value="user">普通用户</option><option value="admin">管理员</option></select></div>
         </div>
         <button class="btn-primary" id="addUserBtn"><i class="fas fa-plus"></i> 添加用户</button>
-        <table class="table" style="margin-top:30px;"><thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>操作</th></tr></thead><tbody id="usersTbody"><tr class="empty-row"><td colspan="4">加载中...</tr></tbody></table>
+        <table class="table" style="margin-top:30px;"><thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>操作</th></tr></thead><tbody id="usersTbody"><tr class="empty-row"><td colspan="4">加载中...</tbody></table>
     </div>
 
     <!-- 留言管理面板 -->
     <div id="messagesPanel" class="panel" style="display:none;">
         <h2><i class="fas fa-comments"></i> 留言管理</h2>
-        <table class="table"><thead><tr><th>昵称</th><th>留言内容</th><th>时间</th><th>操作</th></tr></thead><tbody id="messagesTbody"><tr class="empty-row"><td colspan="4">加载中...</tr></tbody></table>
+        <table class="table"><thead><tr><th>昵称</th><th>留言内容</th><th>时间</th><th>操作</th><tr></thead><tbody id="messagesTbody"><tr class="empty-row"><td colspan="4">加载中...</tbody></table>
     </div>
 </div>
 </div>
@@ -247,6 +255,15 @@
     // 分类缓存（使用 Name 作为唯一标识）
     let cachedCategoriesList = [];
     let categoriesLoading = false;
+    
+    // 自动设置当天日期的函数
+    function setDefaultAddedDate() {
+        const dateInput = document.getElementById('swAddedDate');
+        if (dateInput && !dateInput.value) {
+            const today = new Date().toISOString().slice(0,10);
+            dateInput.value = today;
+        }
+    }
     
     function showToast(msg, isError = false) { const t = document.createElement('div'); t.className = 'toast'; t.style.background = isError ? '#ef4444' : '#1e293b'; t.innerHTML = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
     async function airtableRequest(method, path, body = null) { const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`; const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' }; const opts = { method, headers }; if (body) opts.body = JSON.stringify(body); const resp = await fetch(url, opts); if (!resp.ok) { const err = await resp.json().catch(()=>({error:{message:'请求失败'}})); throw new Error(err.error?.message || `HTTP ${resp.status}`); } return resp.json(); }
@@ -326,6 +343,8 @@
         select.innerHTML = cats.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
         if(currentVal && cats.some(c => c.name === currentVal)) select.value = currentVal;
         else if(cats.length) select.value = cats[0].name;
+        // 自动填充日期（新建状态下）
+        setDefaultAddedDate();
     }
     
     async function renderCategoryModal() {
@@ -380,11 +399,13 @@
             if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无软件数据</td></tr>'; return; }
             tbody.innerHTML = data.records.map(r => {
                 const f = r.fields;
+                let osList = f.os || [];
+                let osDisplay = osList.join(', ');
                 return `<tr>
                     <td>${f.name||''}</td>
                     <td>${f.category||''}</td>
                     <td>${f.version||''}</td>
-                    <td>${(f.os||[]).join(', ')}</td>
+                    <td>${osDisplay}</td>
                     <td>${renderIconForTable(f)}</td>
                     <td class="action-btns"><button onclick="editSoftware('${r.id}')"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteSoftware('${r.id}')"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
@@ -454,12 +475,15 @@
             document.getElementById('swName').value=fields.name||'';
             document.getElementById('swCategory').value=fields.category||'';
             document.getElementById('swVersion').value=fields.version||'';
-            const os=fields.os||['Windows','Mac'];
+            const os=fields.os||[];
             document.getElementById('osWindows').checked=os.includes('Windows');
             document.getElementById('osMac').checked=os.includes('Mac');
+            document.getElementById('osAndroid').checked=os.includes('安卓');
+            document.getElementById('osiOS').checked=os.includes('苹果');
             document.getElementById('swURL').value=fields.url||'';
             document.getElementById('swDescription').value=fields.description||'';
-            document.getElementById('swAddedDate').value=fields.addedDate||'';
+            if(fields.addedDate) document.getElementById('swAddedDate').value=fields.addedDate;
+            else setDefaultAddedDate();
             document.getElementById('swNoVerify').checked=!!fields.noVerify;
             document.getElementById('editingId').value=id;
             const icon=fields.icon;
@@ -493,7 +517,7 @@
     window.deleteUser = async (id) => { if(confirm('删除用户？')) { try{ await airtableRequest('DELETE',`Users/${id}`); loadUsers(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
     window.deleteMessage = async (id) => { if(confirm('删除留言？')) { try{ await airtableRequest('DELETE',`messages/${id}`); loadMessages(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
     
-    // 保存软件（关键修改：分类直接保存下拉框的中文值）
+    // 保存软件（分类直接保存下拉框的中文值，系统支持数组包含新选项）
     document.getElementById('saveSoftwareBtn')?.addEventListener('click', async () => {
         let finalIcon = document.getElementById('swIcon').value;
         const custom = document.getElementById('swIconCustom').value.trim();
@@ -501,7 +525,9 @@
         const os = [];
         if(document.getElementById('osWindows').checked) os.push('Windows');
         if(document.getElementById('osMac').checked) os.push('Mac');
-        if(!os.length) return showToast('请至少选择系统', true);
+        if(document.getElementById('osAndroid').checked) os.push('安卓');
+        if(document.getElementById('osiOS').checked) os.push('苹果');
+        if(!os.length) return showToast('请至少选择一个系统', true);
         const category = document.getElementById('swCategory').value.trim();
         if(!category) return showToast('请选择分类', true);
         const fields = {
@@ -534,9 +560,12 @@
         document.getElementById('swIconType').value='text';
         document.getElementById('osWindows').checked=true;
         document.getElementById('osMac').checked=true;
+        document.getElementById('osAndroid').checked=false;
+        document.getElementById('osiOS').checked=false;
         document.getElementById('editingId').value='';
         document.getElementById('swNoVerify').checked=false;
         document.getElementById('swAddedDate').value='';
+        setDefaultAddedDate();
         refreshIconPreview();
     });
     
@@ -586,8 +615,6 @@
             document.getElementById('newUserPassword').value='';
         } catch(e) { showToast('添加失败', true); }
     });
-    
-    // 留言提交（前台已实现，后台仅显示删除）
     
     // 登录逻辑
     const loginOverlay = document.getElementById('loginOverlay');
