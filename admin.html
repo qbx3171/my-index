@@ -69,6 +69,8 @@
         .btn-primary { background: #1e6bdf; color: white; border: none; padding: 14px 28px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-primary:hover { background: #1557b0; }
         .btn-secondary { background: #f1f5f9; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+        .btn-outline { background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 40px; font-weight: 500; cursor: pointer; }
+        .btn-outline:hover { background: #f1f5f9; }
         .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .table th { text-align: left; padding: 14px 8px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; }
         .table td { padding: 14px 8px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
@@ -93,6 +95,15 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .edit-loading { background: #f8fafc; text-align: center; padding: 20px; color: #1e6bdf; border-radius: 20px; }
         .empty-row td { text-align: center; padding: 40px; color: #94a3b8; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 20000; }
+        .modal.active { display: flex; }
+        .modal-card { background: white; border-radius: 32px; width: 90%; max-width: 600px; max-height: 80vh; overflow: auto; padding: 28px; }
+        .modal-card h3 { margin-bottom: 20px; }
+        .category-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 8px; border-bottom: 1px solid #eef2fc; }
+        .category-key { font-family: monospace; font-size: 12px; color: #64748b; margin-left: 8px; }
+        .delete-cat-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px; }
+        .delete-cat-btn:hover { opacity: 0.7; }
+        .delete-cat-btn.disabled { color: #cbd5e1; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -131,16 +142,19 @@
         <div class="recent-users"><h3><i class="fas fa-user-plus"></i> 最近注册用户</h3><table class="table"><thead><tr><th>邮箱</th><th>用户名</th><th>注册时间</th></tr></thead><tbody id="recentUsersTbody"></tbody></table></div>
     </div>
     <div id="softwaresPanel" class="panel" style="display:none;">
-        <h2 style="margin-bottom: 20px;"><i class="fas fa-cubes"></i> 添加 / 编辑软件</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin:0;"><i class="fas fa-cubes"></i> 添加 / 编辑软件</h2>
+            <button class="btn-outline" id="manageCategoriesBtn"><i class="fas fa-tags"></i> 管理分类</button>
+        </div>
         <div id="editSoftwareLoading" style="display:none;" class="edit-loading"><span class="loading-spinner"></span> 加载软件信息...</div>
         <div id="softwareFormContainer">
         <div class="form-grid">
             <div class="form-group"><label>软件名称 <span style="color:red;">*</span></label><input type="text" id="swName" placeholder="例如: Photoshop" oninput="suggestIcon(); refreshIconPreview();"></div>
-            <div class="form-group"><label>分类 <span style="color:red;">*</span></label><select id="swCategory"><option value="adobe">Adobe系列</option><option value="autodesk">Autodesk系列</option><option value="c4d">Cinema 4D</option><option value="sketchup">草图大师</option><option value="rhino">犀牛软件</option><option value="plugin">插件工具</option><option value="other">其他</option></select></div>
+            <div class="form-group"><label>分类 <span style="color:red;">*</span></label><select id="swCategory"></select></div>
             <div class="form-group"><label>版本</label><input type="text" id="swVersion" placeholder="例如: 2024"></div>
             <div class="form-group"><label>支持系统 <span style="color:red;">*</span></label><div class="checkbox-group"><label><input type="checkbox" id="osWindows" checked> Windows</label><label><input type="checkbox" id="osMac" checked> Mac</label></div></div>
             <div class="form-group"><label>下载链接 <span style="color:red;">*</span></label><input type="url" id="swURL" placeholder="https://..."></div>
-            <div class="form-group"><label>添加日期</label><input type="date" id="swAddedDate"></div>
+            <div class="form-group" style="display:none;"><label>添加日期</label><input type="date" id="swAddedDate" readonly></div> <!-- 隐藏自动日期 -->
             <div class="form-group" style="grid-column: span 2;"><label>描述</label><textarea id="swDescription" rows="2" placeholder="简要描述软件功能..."></textarea></div>
             <div class="form-group" style="grid-column: span 2;">
                 <label>图标</label>
@@ -156,7 +170,7 @@
         <input type="hidden" id="editingId" value="">
         </div>
         <h3 style="margin: 32px 0 16px;">📋 现有软件列表</h3>
-        <table class="table" id="softwaresTable"><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>系统</th><th>图标</th><th>操作</th></tr></thead><tbody id="softwaresTbody"><tr class="empty-row"><td colspan="6">加载中...</td></tr></tbody></table>
+        <table class="table" id="softwaresTable"><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>系统</th><th>图标</th><th>操作</th></tr></thead><tbody id="softwaresTbody"><tr class="empty-row"><td colspan="6">加载中...</tr></tbody></table>
     </div>
     <div id="adsPanel" class="panel" style="display:none;">
         <h2 style="margin-bottom: 20px;"><i class="fas fa-ad"></i> 添加 / 编辑广告</h2>
@@ -172,12 +186,33 @@
         <div style="display: flex; gap: 16px;"><button class="btn-primary" id="saveAdBtn"><i class="fas fa-save"></i> 保存广告</button><button class="btn-secondary" id="cancelAdBtn">取消编辑</button></div>
         <input type="hidden" id="editingAdId" value="">
         <h3 style="margin: 32px 0 16px;">📋 现有广告列表</h3>
-        <table class="table" id="adsTable"><thead><tr><th>预览</th><th>标题</th><th>位置</th><th>链接</th><th>状态</th><th>操作</th></tr></thead><tbody id="adsTbody"><tr class="empty-row"><td colspan="6">加载中...</td></tr></tbody></table>
+        <table class="table" id="adsTable"><thead><tr><th>预览</th><th>标题</th><th>位置</th><th>链接</th><th>状态</th><th>操作</th></tr></thead><tbody id="adsTbody"><tr class="empty-row"><td colspan="6">加载中...</tr></tbody></table>
     </div>
-    <div id="usersPanel" class="panel" style="display:none;"><h2><i class="fas fa-users"></i> 用户管理</h2><div class="form-grid" style="margin-top:20px;"><div class="form-group"><label>邮箱</label><input type="email" id="newUserEmail" placeholder="user@example.com"></div><div class="form-group"><label>用户名</label><input type="text" id="newUsername" placeholder="昵称"></div><div class="form-group"><label>密码</label><input type="password" id="newUserPassword" placeholder="至少6位"></div><div class="form-group"><label>角色</label><select id="newUserRole"><option value="user">普通用户</option><option value="admin">管理员</option></select></div></div><button class="btn-primary" id="addUserBtn"><i class="fas fa-plus"></i> 添加用户</button><table class="table" style="margin-top:30px;"><thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>操作</th></tr></thead><tbody id="usersTbody"><tr class="empty-row"><td colspan="4">加载中...</td></tr></tbody></table></div>
-    <div id="messagesPanel" class="panel" style="display:none;"><h2><i class="fas fa-comments"></i> 留言管理</h2><table class="table"><thead><tr><th>昵称</th><th>留言内容</th><th>时间</th><th>操作</th></tr></thead><tbody id="messagesTbody"><tr class="empty-row"><td colspan="4">加载中...</td></tr></tbody></table></div>
+    <div id="usersPanel" class="panel" style="display:none;"><h2><i class="fas fa-users"></i> 用户管理</h2><div class="form-grid" style="margin-top:20px;"><div class="form-group"><label>邮箱</label><input type="email" id="newUserEmail" placeholder="user@example.com"></div><div class="form-group"><label>用户名</label><input type="text" id="newUsername" placeholder="昵称"></div><div class="form-group"><label>密码</label><input type="password" id="newUserPassword" placeholder="至少6位"></div><div class="form-group"><label>角色</label><select id="newUserRole"><option value="user">普通用户</option><option value="admin">管理员</option></select></div></div><button class="btn-primary" id="addUserBtn"><i class="fas fa-plus"></i> 添加用户</button><table class="table" style="margin-top:30px;"><thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>操作</th></tr></thead><tbody id="usersTbody"><tr class="empty-row"><td colspan="4">加载中...</tr></tbody></table></div>
+    <div id="messagesPanel" class="panel" style="display:none;"><h2><i class="fas fa-comments"></i> 留言管理</h2><table class="table"><thead><tr><th>昵称</th><th>留言内容</th><th>时间</th><th>操作</th></tr></thead><tbody id="messagesTbody"><tr class="empty-row"><td colspan="4">加载中...</tr></tbody></table></div>
 </div>
 </div>
+
+<!-- 分类管理模态框 -->
+<div id="categoryModal" class="modal">
+    <div class="modal-card">
+        <h3><i class="fas fa-tags"></i> 软件分类管理</h3>
+        <div style="margin-bottom: 20px;">
+            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                <input type="text" id="newCatName" placeholder="新分类名称 (例如: 视频剪辑)" style="flex:1; padding: 10px 16px; border-radius: 40px; border:1px solid #cbd5e1;">
+                <button id="addCategoryBtn" class="btn-primary" style="padding: 10px 20px;">添加</button>
+            </div>
+            <div class="hint-text">分类key将自动生成，删除自定义分类前请确保没有软件使用该分类。</div>
+        </div>
+        <div id="categoriesList" style="max-height: 400px; overflow-y: auto;">
+            <div style="text-align:center; padding:20px;"><span class="loading-spinner"></span> 加载中...</div>
+        </div>
+        <div style="margin-top: 20px; text-align: right;">
+            <button class="btn-secondary" id="closeCategoryModal">关闭</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script>
     // ---------- 配置与全局 ----------
@@ -187,7 +222,10 @@
     let currentIconCat = '常用';
     const iconCategories = { '常用': ['fa-cube','fa-image','fa-paint-brush','fa-video','fa-film','fa-camera','fa-cloud-download-alt','fa-puzzle-piece','fa-drafting-compass','fa-shapes','fa-cubes','fa-file-pdf'], '品牌': ['fa-adobe','fa-apple','fa-windows','fa-linux'], '工具': ['fa-wrench','fa-tools'], '文件': ['fa-file','fa-folder','fa-save','fa-download'] };
     
-    // 辅助函数
+    // 分类缓存
+    let cachedCategoriesList = null;
+    let categoriesLoading = false;
+    
     function showToast(msg, isError = false) { const t = document.createElement('div'); t.className = 'toast'; t.style.background = isError ? '#ef4444' : '#1e293b'; t.innerHTML = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
     async function airtableRequest(method, path, body = null) { const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`; const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' }; const opts = { method, headers }; if (body) opts.body = JSON.stringify(body); const resp = await fetch(url, opts); if (!resp.ok) { const err = await resp.json().catch(()=>({error:{message:'请求失败'}})); throw new Error(err.error?.message || `HTTP ${resp.status}`); } return resp.json(); }
     function getSmartAbbreviation(name) { if (!name) return 'SW'; const lower = name.toLowerCase().trim(); const map = { 'photoshop':'PS','illustrator':'AI','premiere pro':'PR','after effects':'AE','lightroom':'LR','indesign':'ID','cinema 4d':'C4D','c4d':'C4D','autocad':'AC','cad':'CAD','3ds max':'3DS','maya':'MA','sketchup':'SU','rhino':'RH','blender':'BL' }; if(map[lower]) return map[lower]; for(let [k,v] of Object.entries(map)) if(lower.includes(k)) return v; if(/[\u4e00-\u9fa5]/.test(name)) return name.match(/[\u4e00-\u9fa5]/)[0]; const words = name.split(/[\s\-_]+/).filter(w=>w.length); if(words.length>=2) return words.map(w=>w.charAt(0).toUpperCase()).slice(0,3).join(''); return name.slice(0,2).toUpperCase(); }
@@ -206,16 +244,236 @@
     function renderIconGrid(cat, filter='') { let icons=iconCategories[cat]||[]; if(filter) icons=icons.filter(i=>i.includes(filter.toLowerCase())); const grid=document.getElementById('iconGrid'); if(grid) grid.innerHTML=icons.map(icon=>`<div class="icon-item" onclick="selectPresetIcon('${icon}')"><i class="fas ${icon}"></i><span>${icon.replace('fa-','')}</span></div>`).join(''); }
     window.selectPresetIcon = function(icon) { document.getElementById('swIconType').value='icon'; document.getElementById('swIcon').value=icon; document.getElementById('swIconCustom').value=''; refreshIconPreview(); document.getElementById('iconPanel')?.classList.remove('show'); };
     
-    // 加载各模块数据 (完善错误处理，确保表格显示)
-    async function loadSoftwares() { try { const data=await airtableRequest('GET','softwares?maxRecords=100'); const tbody=document.getElementById('softwaresTbody'); if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无软件数据</td></tr>'; return; } tbody.innerHTML=data.records.map(r=>{ const f=r.fields; return `<tr><td>${f.name||''}</td><td>${f.category||''}</td><td>${f.version||''}</td><td>${(f.os||[]).join(', ')}</td><td>${renderIconForTable(f)}</td><td class="action-btns"><button onclick="editSoftware('${r.id}')"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteSoftware('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }).join(''); } catch(e) { document.getElementById('softwaresTbody').innerHTML='<tr class="empty-row"><td colspan="6">加载失败，请检查网络或Airtable配置</td></tr>'; showToast('加载软件失败: '+e.message,true); } }
-    async function loadAds() { try { const data=await airtableRequest('GET','Ads?maxRecords=50'); const tbody=document.getElementById('adsTbody'); if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无广告数据</td></tr>'; return; } tbody.innerHTML=data.records.map(r=>{ const f=r.fields; const img=f.Image||f.image||''; return `<tr><td><img src="${img}" style="width:80px;height:40px;object-fit:cover;border-radius:8px;" loading="lazy" onerror="this.style.display='none'"></td><td>${f.Title||f.title||''}</td><td><span class="position-badge ${f.Position||'sidebar'}">${f.Position||'sidebar'}</span></td><td style="max-width:150px;overflow:hidden;">${f.Link||f.link||''}</td><td>${f.Enabled!==false?'✅ 启用':'⏸️ 禁用'}</td><td class="action-btns"><button onclick="editAd('${r.id}')"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteAd('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }).join(''); } catch(e) { document.getElementById('adsTbody').innerHTML='<tr class="empty-row"><td colspan="6">加载广告失败</td></tr>'; showToast('加载广告失败',true); } }
-    async function loadUsers() { try { const data=await airtableRequest('GET','Users?maxRecords=100'); const tbody=document.getElementById('usersTbody'); if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="4">暂无用户</td></tr>'; return; } tbody.innerHTML=data.records.map(r=>`<tr><td>${r.fields.Email||''}</td><td>${r.fields.Username||''}</td><td>${r.fields.Role||'user'}</td><td><button onclick="deleteUser('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); } catch(e) { document.getElementById('usersTbody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</td></tr>'; showToast('加载用户失败',true); } }
-    async function loadMessages() { try { const data=await airtableRequest('GET','messages?maxRecords=50'); const tbody=document.getElementById('messagesTbody'); if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="4">暂无留言</td></tr>'; return; } tbody.innerHTML=data.records.map(r=>`<tr><td>${r.fields.Name||'网友'}</td><td>${r.fields.Message||''}</td><td>${r.fields.CreatedAt||''}</td><td><button onclick="deleteMessage('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); } catch(e) { document.getElementById('messagesTbody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</td></tr>'; showToast('加载留言失败',true); } }
-    async function loadDashboard() { try { const [users, sw, msgs, visits] = await Promise.all([airtableRequest('GET','Users'), airtableRequest('GET','softwares'), airtableRequest('GET','messages'), airtableRequest('GET','Visits?maxRecords=1')]); document.getElementById('statUsers').innerText=users.records.length; document.getElementById('statSoftwares').innerText=sw.records.length; document.getElementById('statMessages').innerText=msgs.records.length; const visitCount=visits.records[0]?.fields?.Count||0; document.getElementById('statVisits').innerText=visitCount; const recent=await airtableRequest('GET','Users?maxRecords=5'); document.getElementById('recentUsersTbody').innerHTML=recent.records.map(r=>`<tr><td>${r.fields.Email||''}</td><td>${r.fields.Username||''}</td><td>${r.fields.CreatedAt?new Date(r.fields.CreatedAt).toLocaleString('zh-CN'):'未知'}</td></tr>`).join(''); } catch(e) { showToast('仪表盘加载失败',true); document.getElementById('statUsers').innerText='0'; document.getElementById('statSoftwares').innerText='0'; document.getElementById('statMessages').innerText='0'; document.getElementById('statVisits').innerText='0'; } }
+    // ========== 分类管理核心函数（带缓存） ==========
+    async function loadCategories(forceRefresh = false) {
+        if (!forceRefresh && cachedCategoriesList && cachedCategoriesList.length) return cachedCategoriesList;
+        // 如果正在加载，等待
+        if (categoriesLoading) {
+            return new Promise(resolve => {
+                const check = setInterval(() => {
+                    if (!categoriesLoading && cachedCategoriesList) {
+                        clearInterval(check);
+                        resolve(cachedCategoriesList);
+                    }
+                }, 100);
+            });
+        }
+        categoriesLoading = true;
+        try {
+            let records = [];
+            try {
+                const data = await airtableRequest('GET', 'Categories?maxRecords=100');
+                records = data.records || [];
+                cachedCategoriesList = records.map(r => ({
+                    key: r.fields.Key,
+                    name: r.fields.Name,
+                    isDefault: r.fields.IsDefault === true || r.fields.IsDefault === 'true',
+                    id: r.id,
+                    order: r.fields.Order || 0
+                })).sort((a,b) => (a.order||0) - (b.order||0));
+            } catch(err) {
+                if(err.message.includes('404')) {
+                    cachedCategoriesList = [
+                        { key: 'adobe', name: 'Adobe系列', isDefault: true },
+                        { key: 'autodesk', name: 'Autodesk系列', isDefault: true },
+                        { key: 'c4d', name: 'Cinema 4D', isDefault: true },
+                        { key: 'sketchup', name: '草图大师', isDefault: true },
+                        { key: 'rhino', name: '犀牛软件', isDefault: true },
+                        { key: 'plugin', name: '插件工具', isDefault: true },
+                        { key: 'other', name: '其他', isDefault: true }
+                    ];
+                } else throw err;
+            }
+            return cachedCategoriesList;
+        } catch(e) {
+            console.warn(e);
+            cachedCategoriesList = [
+                { key: 'adobe', name: 'Adobe系列', isDefault: true },
+                { key: 'autodesk', name: 'Autodesk系列', isDefault: true },
+                { key: 'c4d', name: 'Cinema 4D', isDefault: true },
+                { key: 'sketchup', name: '草图大师', isDefault: true },
+                { key: 'rhino', name: '犀牛软件', isDefault: true },
+                { key: 'plugin', name: '插件工具', isDefault: true },
+                { key: 'other', name: '其他', isDefault: true }
+            ];
+            return cachedCategoriesList;
+        } finally {
+            categoriesLoading = false;
+        }
+    }
+
+    async function refreshCategorySelect() {
+        const select = document.getElementById('swCategory');
+        if(!select) return;
+        const cats = await loadCategories();
+        const currentVal = select.value;
+        select.innerHTML = cats.map(cat => `<option value="${cat.key}">${cat.name}</option>`).join('');
+        if(currentVal && cats.some(c=>c.key===currentVal)) select.value = currentVal;
+        else if(cats.length) select.value = cats[0].key;
+    }
+
+    // 渲染分类管理模态框（优化：先显示加载提示，异步加载数据）
+    async function renderCategoryModal() {
+        const container = document.getElementById('categoriesList');
+        container.innerHTML = '<div style="text-align:center; padding:20px;"><span class="loading-spinner"></span> 加载分类...</div>';
+        const cats = await loadCategories(true); // 强制刷新
+        container.innerHTML = cats.map(cat => `
+            <div class="category-item">
+                <div><strong>${cat.name}</strong> <span class="category-key">(${cat.key})</span> ${cat.isDefault ? '<span style="background:#eef2ff; padding:2px 8px; border-radius:20px; font-size:11px;">预置</span>' : ''}</div>
+                ${!cat.isDefault ? `<button class="delete-cat-btn" data-key="${cat.key}"><i class="fas fa-trash"></i></button>` : '<span style="opacity:0.5;">不可删除</span>'}
+            </div>
+        `).join('');
+        // 绑定删除事件
+        document.querySelectorAll('.delete-cat-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const key = btn.dataset.key;
+                if(!key) return;
+                // 检查是否有软件使用了该分类
+                try {
+                    const softwares = await airtableRequest('GET', `softwares?filterByFormula={category}="${key}"`);
+                    if(softwares.records.length > 0) {
+                        showToast(`无法删除：有 ${softwares.records.length} 款软件正在使用此分类，请先修改软件分类`, true);
+                        return;
+                    }
+                    const catRecord = cachedCategoriesList.find(c => c.key === key);
+                    if(catRecord && catRecord.id) {
+                        await airtableRequest('DELETE', `Categories/${catRecord.id}`);
+                        showToast(`分类“${catRecord.name}”已删除`);
+                        cachedCategoriesList = null; // 清除缓存
+                        await renderCategoryModal();
+                        await refreshCategorySelect();
+                        if(document.getElementById('softwaresPanel').style.display !== 'none') loadSoftwares();
+                    } else {
+                        showToast('删除失败：找不到记录', true);
+                    }
+                } catch(err) {
+                    showToast('删除失败：'+err.message, true);
+                }
+            });
+        });
+    }
+
+    async function addCategory(name) {
+        if(!name.trim()) return showToast('请输入分类名称', true);
+        const key = name.trim().toLowerCase().replace(/[\s\(\)\-]+/g, '_').replace(/[^\w\u4e00-\u9fa5]/g, '');
+        if(!key) return showToast('无法生成分类标识符', true);
+        const cats = await loadCategories();
+        if(cats.some(c => c.key === key)) return showToast('分类标识已存在', true);
+        try {
+            const fields = { Key: key, Name: name.trim(), IsDefault: false };
+            await airtableRequest('POST', 'Categories', { fields });
+            showToast('分类添加成功');
+            cachedCategoriesList = null;
+            await refreshCategorySelect();
+            await renderCategoryModal();
+            if(document.getElementById('softwaresPanel').style.display !== 'none') loadSoftwares();
+        } catch(err) {
+            showToast('添加失败：'+err.message, true);
+        }
+    }
+
+    // 加载软件列表时，将分类key转换为显示名称
+    async function loadSoftwares() { 
+        try { 
+            const cats = await loadCategories(); // 使用缓存
+            const data=await airtableRequest('GET','softwares?maxRecords=100'); 
+            const tbody=document.getElementById('softwaresTbody'); 
+            if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无软件数据</tr>'; return; } 
+            tbody.innerHTML=data.records.map(r=>{ 
+                const f=r.fields; 
+                const catObj = cats.find(c => c.key === f.category);
+                const categoryDisplay = catObj ? catObj.name : (f.category || '未分类');
+                return `<tr>
+                    <td>${f.name||''}</td>
+                    <td>${categoryDisplay}</td>
+                    <td>${f.version||''}</td>
+                    <td>${(f.os||[]).join(', ')}</td>
+                    <td>${renderIconForTable(f)}</td>
+                    <td class="action-btns"><button onclick="editSoftware('${r.id}')"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteSoftware('${r.id}')"><i class="fas fa-trash"></i></button></td>
+                </tr>`; }).join(''); 
+        } catch(e) { document.getElementById('softwaresTbody').innerHTML='<tr class="empty-row"><td colspan="6">加载失败，请检查网络或Airtable配置</tr>'; showToast('加载软件失败: '+e.message,true); } 
+    }
     
-    // 编辑/删除函数
-    window.editSoftware = async function(id) { const loadingDiv=document.getElementById('editSoftwareLoading'); const formDiv=document.getElementById('softwareFormContainer'); if(loadingDiv) loadingDiv.style.display='block'; if(formDiv) formDiv.style.opacity='0.5'; try { const {fields}=await airtableRequest('GET',`softwares/${id}`); document.getElementById('swName').value=fields.name||''; document.getElementById('swCategory').value=fields.category||'adobe'; document.getElementById('swVersion').value=fields.version||''; const os=fields.os||['Windows','Mac']; document.getElementById('osWindows').checked=os.includes('Windows'); document.getElementById('osMac').checked=os.includes('Mac'); document.getElementById('swURL').value=fields.url||''; document.getElementById('swDescription').value=fields.description||''; document.getElementById('swAddedDate').value=fields.addedDate||''; document.getElementById('swNoVerify').checked=!!fields.noVerify; document.getElementById('editingId').value=id; const icon=fields.icon; document.getElementById('swIconCustom').value=''; if(Array.isArray(icon)&&icon[0]?.url) document.getElementById('swIcon').value=icon[0].url; else if(typeof icon==='string'&&(icon.startsWith('http')||icon.startsWith('data:'))) document.getElementById('swIcon').value=icon; else if(typeof icon==='string'&&icon.startsWith('fa-')) document.getElementById('swIcon').value=icon; else document.getElementById('swIcon').value=''; refreshIconPreview(); showToast('加载完成',false); } catch(e){ showToast('加载失败',true); } finally { if(loadingDiv) loadingDiv.style.display='none'; if(formDiv) formDiv.style.opacity='1'; } };
+    // 编辑软件
+    window.editSoftware = async function(id) { 
+        const loadingDiv=document.getElementById('editSoftwareLoading'); 
+        const formDiv=document.getElementById('softwareFormContainer'); 
+        if(loadingDiv) loadingDiv.style.display='block'; 
+        if(formDiv) formDiv.style.opacity='0.5'; 
+        try { 
+            await refreshCategorySelect(); 
+            const {fields}=await airtableRequest('GET',`softwares/${id}`); 
+            document.getElementById('swName').value=fields.name||''; 
+            document.getElementById('swCategory').value=fields.category||'adobe'; 
+            document.getElementById('swVersion').value=fields.version||''; 
+            const os=fields.os||['Windows','Mac']; 
+            document.getElementById('osWindows').checked=os.includes('Windows'); 
+            document.getElementById('osMac').checked=os.includes('Mac'); 
+            document.getElementById('swURL').value=fields.url||''; 
+            document.getElementById('swDescription').value=fields.description||''; 
+            // 编辑时不修改日期
+            document.getElementById('swAddedDate').value=fields.addedDate||''; 
+            document.getElementById('swNoVerify').checked=!!fields.noVerify; 
+            document.getElementById('editingId').value=id; 
+            const icon=fields.icon; 
+            document.getElementById('swIconCustom').value=''; 
+            if(Array.isArray(icon)&&icon[0]?.url) document.getElementById('swIcon').value=icon[0].url; 
+            else if(typeof icon==='string'&&(icon.startsWith('http')||icon.startsWith('data:'))) document.getElementById('swIcon').value=icon; 
+            else if(typeof icon==='string'&&icon.startsWith('fa-')) document.getElementById('swIcon').value=icon; 
+            else document.getElementById('swIcon').value=''; 
+            refreshIconPreview(); 
+            showToast('加载完成',false); 
+        } catch(e){ showToast('加载失败',true); } 
+        finally { if(loadingDiv) loadingDiv.style.display='none'; if(formDiv) formDiv.style.opacity='1'; } 
+    };
+    
     window.deleteSoftware = async function(id) { if(!confirm('确定删除？')) return; try{ await airtableRequest('DELETE',`softwares/${id}`); showToast('已删除'); loadSoftwares(); loadDashboard(); } catch(e){ showToast('删除失败',true); } };
+    
+    // 保存软件时自动填充日期（新建时）
+    async function saveSoftware() {
+        let finalIcon=document.getElementById('swIcon').value; 
+        const custom=document.getElementById('swIconCustom').value.trim(); 
+        if(custom) finalIcon=custom; 
+        const os=[]; 
+        if(document.getElementById('osWindows').checked) os.push('Windows'); 
+        if(document.getElementById('osMac').checked) os.push('Mac'); 
+        if(!os.length) return showToast('请至少选择系统',true); 
+        const fields={ 
+            name:document.getElementById('swName').value.trim(), 
+            category:document.getElementById('swCategory').value, 
+            version:document.getElementById('swVersion').value.trim(), 
+            os, 
+            url:document.getElementById('swURL').value.trim(), 
+            description:document.getElementById('swDescription').value.trim(), 
+            icon:finalIcon||'', 
+            noVerify:document.getElementById('swNoVerify').checked 
+        }; 
+        if(!fields.icon) fields.icon=getSmartAbbreviation(fields.name); 
+        if(!fields.name||!fields.url) return showToast('名称和链接必填',true); 
+        const id=document.getElementById('editingId').value; 
+        // 新增时自动设置添加日期
+        if(!id) {
+            fields.addedDate = new Date().toISOString().slice(0,10);
+        } else {
+            // 编辑时保持原有日期（从隐藏域获取）
+            const existingDate = document.getElementById('swAddedDate').value;
+            if(existingDate) fields.addedDate = existingDate;
+        }
+        try{ 
+            if(id) await airtableRequest('PATCH',`softwares/${id}`,{fields}); 
+            else await airtableRequest('POST','softwares',{fields}); 
+            showToast('保存成功'); 
+            loadSoftwares(); 
+            loadDashboard(); 
+            document.getElementById('cancelEditBtn').click(); 
+        } catch(e){ showToast('保存失败:'+e.message,true); } 
+    }
+    
+    // 其他原有函数（广告、用户、留言等保持不变）
+    async function loadAds() { try { const data=await airtableRequest('GET','Ads?maxRecords=50'); const tbody=document.getElementById('adsTbody'); if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无广告数据</tr>'; return; } tbody.innerHTML=data.records.map(r=>{ const f=r.fields; const img=f.Image||f.image||''; return `<tr><td><img src="${img}" style="width:80px;height:40px;object-fit:cover;border-radius:8px;" loading="lazy" onerror="this.style.display='none'"></td><td>${f.Title||f.title||''}</td><td><span class="position-badge ${f.Position||'sidebar'}">${f.Position||'sidebar'}</span></td><td style="max-width:150px;overflow:hidden;">${f.Link||f.link||''}</td><td>${f.Enabled!==false?'✅ 启用':'⏸️ 禁用'}</td><td class="action-btns"><button onclick="editAd('${r.id}')"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteAd('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }).join(''); } catch(e) { document.getElementById('adsTbody').innerHTML='<tr class="empty-row"><td colspan="6">加载广告失败</tr>'; showToast('加载广告失败',true); } }
+    async function loadUsers() { try { const data=await airtableRequest('GET','Users?maxRecords=100'); const tbody=document.getElementById('usersTbody'); if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="4">暂无用户</tr>'; return; } tbody.innerHTML=data.records.map(r=>`<tr><td>${r.fields.Email||''}</td><td>${r.fields.Username||''}</td><td>${r.fields.Role||'user'}</td><td><button onclick="deleteUser('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); } catch(e) { document.getElementById('usersTbody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</tr>'; showToast('加载用户失败',true); } }
+    async function loadMessages() { try { const data=await airtableRequest('GET','messages?maxRecords=50'); const tbody=document.getElementById('messagesTbody'); if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="4">暂无留言</tr>'; return; } tbody.innerHTML=data.records.map(r=>`<tr><td>${r.fields.Name||'网友'}</td><td>${r.fields.Message||''}</td><td>${r.fields.CreatedAt||''}</td><td><button onclick="deleteMessage('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join(''); } catch(e) { document.getElementById('messagesTbody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</tr>'; showToast('加载留言失败',true); } }
+    async function loadDashboard() { try { const [users, sw, msgs, visits] = await Promise.all([airtableRequest('GET','Users'), airtableRequest('GET','softwares'), airtableRequest('GET','messages'), airtableRequest('GET','Visits?maxRecords=1')]); document.getElementById('statUsers').innerText=users.records.length; document.getElementById('statSoftwares').innerText=sw.records.length; document.getElementById('statMessages').innerText=msgs.records.length; const visitCount=visits.records[0]?.fields?.Count||0; document.getElementById('statVisits').innerText=visitCount; const recent=await airtableRequest('GET','Users?maxRecords=5'); document.getElementById('recentUsersTbody').innerHTML=recent.records.map(r=>`<tr><td>${r.fields.Email||''}</td><td>${r.fields.Username||''}</td><td>${r.fields.CreatedAt?new Date(r.fields.CreatedAt).toLocaleString('zh-CN'):'未知'}</td></tr>`).join(''); } catch(e) { showToast('仪表盘加载失败',true); document.getElementById('statUsers').innerText='0'; document.getElementById('statSoftwares').innerText='0'; document.getElementById('statMessages').innerText='0'; document.getElementById('statVisits').innerText='0'; } }
     window.editAd = async function(id) { try { const data=await airtableRequest('GET',`Ads/${id}`); const f=data.fields; document.getElementById('adTitle').value=f.Title||f.title||''; document.getElementById('adLink').value=f.Link||f.link||''; document.getElementById('adImageUrl').value=f.Image||f.image||''; document.getElementById('adPosition').value=f.Position||f.position||'sidebar'; document.getElementById('adEnabled').checked=f.Enabled!==undefined?f.Enabled:true; document.getElementById('editingAdId').value=id; const previewImg=document.getElementById('adPreviewImage'); if(f.Image||f.image){ previewImg.src=f.Image||f.image; previewImg.style.display='block'; document.getElementById('adPreviewPlaceholder').style.display='none'; } else { previewImg.style.display='none'; document.getElementById('adPreviewPlaceholder').style.display='block'; } } catch(e){ showToast('加载广告失败',true); } };
     window.deleteAd = async function(id) { if(!confirm('确定删除？')) return; try{ await airtableRequest('DELETE',`Ads/${id}`); showToast('已删除'); loadAds(); } catch(e){ showToast('删除失败',true); } };
     window.deleteUser = async (id) => { if(confirm('删除用户？')) { try{ await airtableRequest('DELETE',`Users/${id}`); loadUsers(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
@@ -223,28 +481,40 @@
     
     // 登录逻辑
     const loginOverlay=document.getElementById('loginOverlay'); const mainContent=document.getElementById('mainContent'); const loginBtn=document.getElementById('loginBtn'); const loginPasswordInput=document.getElementById('loginPasswordInput'); const loginError=document.getElementById('loginError');
-    function checkLogin() { if(loginPasswordInput.value===atob(ENCODED_PASSWORD)) { sessionStorage.setItem('admin_logged','true'); loginOverlay.style.display='none'; mainContent.style.display='block'; initIconPanel(); loadDashboard(); refreshIconPreview(); } else { loginError.textContent='密码错误'; } }
+    function checkLogin() { if(loginPasswordInput.value===atob(ENCODED_PASSWORD)) { sessionStorage.setItem('admin_logged','true'); loginOverlay.style.display='none'; mainContent.style.display='block'; initIconPanel(); loadDashboard(); refreshIconPreview(); refreshCategorySelect(); } else { loginError.textContent='密码错误'; } }
     loginBtn.addEventListener('click',checkLogin); loginPasswordInput.addEventListener('keypress',e=>{if(e.key==='Enter') checkLogin();});
-    if(sessionStorage.getItem('admin_logged')==='true') { loginOverlay.style.display='none'; mainContent.style.display='block'; initIconPanel(); loadDashboard(); refreshIconPreview(); } else { loginOverlay.style.display='flex'; mainContent.style.display='none'; }
+    if(sessionStorage.getItem('admin_logged')==='true') { loginOverlay.style.display='none'; mainContent.style.display='block'; initIconPanel(); loadDashboard(); refreshIconPreview(); refreshCategorySelect(); } else { loginOverlay.style.display='flex'; mainContent.style.display='none'; }
     document.getElementById('logoutBtn').addEventListener('click',()=>{ sessionStorage.removeItem('admin_logged'); window.location.reload(); });
     
-    // 事件绑定 (等待DOM完全就绪)
+    // 事件绑定
     document.addEventListener('DOMContentLoaded',()=>{
-        // 图标面板开关
         document.getElementById('openIconPanel')?.addEventListener('click',e=>{ e.stopPropagation(); document.getElementById('iconPanel')?.classList.toggle('show'); });
         document.getElementById('iconSearchInput')?.addEventListener('input',e=>{ const val=e.target.value.toLowerCase(); if(val) document.getElementById('iconGrid').innerHTML=allIcons.filter(i=>i.includes(val)).map(icon=>`<div class="icon-item" onclick="selectPresetIcon('${icon}')"><i class="fas ${icon}"></i><span>${icon.replace('fa-','')}</span></div>`).join(''); else renderIconGrid(currentIconCat); });
         window.addEventListener('click',()=>document.getElementById('iconPanel')?.classList.remove('show'));
         document.getElementById('iconFileInput')?.addEventListener('change',async e=>{ if(e.target.files[0]) await handleImageUpload(e.target.files[0],'swIconCustom',null,null); });
         document.getElementById('adImageFile')?.addEventListener('change',async e=>{ if(e.target.files[0]) await handleImageUpload(e.target.files[0],'adImageUrl','adPreviewImage','adPreviewPlaceholder'); });
-        document.getElementById('saveSoftwareBtn')?.addEventListener('click',async()=>{ let finalIcon=document.getElementById('swIcon').value; const custom=document.getElementById('swIconCustom').value.trim(); if(custom) finalIcon=custom; const os=[]; if(document.getElementById('osWindows').checked) os.push('Windows'); if(document.getElementById('osMac').checked) os.push('Mac'); if(!os.length) return showToast('请至少选择系统',true); const fields={ name:document.getElementById('swName').value.trim(), category:document.getElementById('swCategory').value, version:document.getElementById('swVersion').value.trim(), os, url:document.getElementById('swURL').value.trim(), description:document.getElementById('swDescription').value.trim(), icon:finalIcon||'', addedDate:document.getElementById('swAddedDate').value, noVerify:document.getElementById('swNoVerify').checked }; if(!fields.icon) fields.icon=getSmartAbbreviation(fields.name); if(!fields.name||!fields.url) return showToast('名称和链接必填',true); const id=document.getElementById('editingId').value; try{ if(id) await airtableRequest('PATCH',`softwares/${id}`,{fields}); else await airtableRequest('POST','softwares',{fields}); showToast('保存成功'); loadSoftwares(); loadDashboard(); document.getElementById('cancelEditBtn').click(); } catch(e){ showToast('保存失败:'+e.message,true); } });
+        document.getElementById('saveSoftwareBtn')?.addEventListener('click', saveSoftware);
         document.getElementById('cancelEditBtn')?.addEventListener('click',()=>{ ['swName','swVersion','swURL','swDescription','swIconCustom','swIcon'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';}); document.getElementById('swIconType').value='text'; document.getElementById('osWindows').checked=true; document.getElementById('osMac').checked=true; document.getElementById('editingId').value=''; document.getElementById('swNoVerify').checked=false; refreshIconPreview(); });
         document.getElementById('saveAdBtn')?.addEventListener('click',async()=>{ const title=document.getElementById('adTitle').value.trim(), link=document.getElementById('adLink').value.trim(), image=document.getElementById('adImageUrl').value.trim(), position=document.getElementById('adPosition').value, enabled=document.getElementById('adEnabled').checked; if(!link||!image) return showToast('链接和图片不能为空',true); const fields={ Title:title, Link:link, Image:image, Position:position, Enabled:enabled }; const id=document.getElementById('editingAdId').value; try{ if(id) await airtableRequest('PATCH',`Ads/${id}`,{fields}); else await airtableRequest('POST','Ads',{fields}); showToast('广告保存成功'); loadAds(); document.getElementById('cancelAdBtn').click(); } catch(e){ showToast('保存失败',true); } });
         document.getElementById('cancelAdBtn')?.addEventListener('click',()=>{ document.getElementById('adTitle').value=''; document.getElementById('adLink').value=''; document.getElementById('adImageUrl').value=''; document.getElementById('adPosition').value='sidebar'; document.getElementById('adEnabled').checked=true; document.getElementById('editingAdId').value=''; document.getElementById('adPreviewImage').style.display='none'; document.getElementById('adPreviewPlaceholder').style.display='block'; });
         document.getElementById('addUserBtn')?.addEventListener('click',async()=>{ const email=document.getElementById('newUserEmail').value.trim(), username=document.getElementById('newUsername').value.trim(), pwd=document.getElementById('newUserPassword').value.trim(), role=document.getElementById('newUserRole').value; if(!email||!username||!pwd) return showToast('请填写完整',true); try{ await airtableRequest('POST','Users',{ fields:{ Email:email, Username:username, Password:CryptoJS.SHA256(pwd).toString(), Role:role } }); showToast('用户添加成功'); loadUsers(); loadDashboard(); document.getElementById('newUserEmail').value=''; document.getElementById('newUsername').value=''; document.getElementById('newUserPassword').value=''; } catch(e){ showToast('添加失败',true); } });
+        // 分类管理按钮
+        document.getElementById('manageCategoriesBtn')?.addEventListener('click', async () => {
+            await renderCategoryModal();
+            document.getElementById('categoryModal').classList.add('active');
+        });
+        document.getElementById('closeCategoryModal')?.addEventListener('click', () => {
+            document.getElementById('categoryModal').classList.remove('active');
+        });
+        document.getElementById('addCategoryBtn')?.addEventListener('click', async () => {
+            const name = document.getElementById('newCatName').value.trim();
+            await addCategory(name);
+            document.getElementById('newCatName').value = '';
+        });
         // Tab切换
-        document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const tab=btn.dataset.tab; document.getElementById('dashboardPanel').style.display=tab==='dashboard'?'block':'none'; document.getElementById('softwaresPanel').style.display=tab==='softwares'?'block':'none'; document.getElementById('adsPanel').style.display=tab==='ads'?'block':'none'; document.getElementById('usersPanel').style.display=tab==='users'?'block':'none'; document.getElementById('messagesPanel').style.display=tab==='messages'?'block':'none'; if(tab==='dashboard') loadDashboard(); if(tab==='softwares') loadSoftwares(); if(tab==='ads') loadAds(); if(tab==='users') loadUsers(); if(tab==='messages') loadMessages(); }));
-        // 预加载当前激活面板 (默认为dashboard)
+        document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const tab=btn.dataset.tab; document.getElementById('dashboardPanel').style.display=tab==='dashboard'?'block':'none'; document.getElementById('softwaresPanel').style.display=tab==='softwares'?'block':'none'; document.getElementById('adsPanel').style.display=tab==='ads'?'block':'none'; document.getElementById('usersPanel').style.display=tab==='users'?'block':'none'; document.getElementById('messagesPanel').style.display=tab==='messages'?'block':'none'; if(tab==='dashboard') loadDashboard(); if(tab==='softwares') { refreshCategorySelect(); loadSoftwares(); } if(tab==='ads') loadAds(); if(tab==='users') loadUsers(); if(tab==='messages') loadMessages(); }));
         loadDashboard();
+        refreshCategorySelect();
     });
 </script>
 </body>
