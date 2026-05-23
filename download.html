@@ -264,6 +264,9 @@
             let lastScrollY = 0;
             let scrollTimer = null;
 
+            // 分类映射表（从 Categories 表加载）
+            let categoryNameMap = {};
+
             function showToast(m, t = 'success') { const d = document.createElement('div'); d.className = `toast-message ${t}`; d.innerHTML = `<i class="fas ${t==='success'?'fa-check-circle':'fa-exclamation-triangle'}"></i> ${m}`; document.body.appendChild(d); setTimeout(() => d.remove(), 3000); }
             function esc(s) { return String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' })[m]); }
             function sanitizeHtml(html) { if (!html) return ''; const temp = document.createElement('div'); temp.textContent = html; let safe = temp.innerHTML; safe = safe.replace(/&lt;(\/?(?:br|p|strong|em|b|i|ul|li|ol|a|img))&gt;/gi, '<$1>'); safe = safe.replace(/&lt;(\/?a)&gt;([^&]*)&lt;(\/a)&gt;/gi, '<$1>$2</$3>'); safe = safe.replace(/href\s*=\s*['"]([^'"]*)['"]/gi, (m, url) => `href="${url.replace(/javascript:/gi, '')}"`); return safe; }
@@ -287,20 +290,315 @@
             async function fetchWithTimeout(url, opts, to = 5000) { if (isLocalFile) throw new Error('本地跳过'); const controller = new AbortController(); const id = setTimeout(() => controller.abort(), to); try { const r = await fetch(url, { ...opts, signal: controller.signal }); clearTimeout(id); return r; } catch (e) { clearTimeout(id); throw e; } }
             async function airReq(method, path, body = null, retries = 2) { if (isLocalFile) throw new Error('本地模式'); const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`; const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' }; const opts = { method, headers }; if (body) opts.body = JSON.stringify(body); for (let i = 0; i <= retries; i++) { try { const r = await fetchWithTimeout(url, opts, 5000); if (!r.ok) { const errText = await r.text(); throw new Error(`HTTP ${r.status}: ${errText.substring(0,100)}`); } return await r.json(); } catch (e) { if (i === retries) throw e; await new Promise(r => setTimeout(r, 600 * (i + 2))); } } }
             function getFieldValue(fields, possibleNames, defaultValue = '') { for (let name of possibleNames) { if (fields[name] !== undefined) return fields[name]; const lowerName = name.toLowerCase(); for (let key in fields) { if (key.toLowerCase() === lowerName) return fields[key]; } } return defaultValue; }
-            async function fetchSoftwares(forceRefresh = false) { if (!forceRefresh) { const cached = localStorage.getItem('cachedSoft'); if (cached) { try { const result = JSON.parse(cached); if (result && result.length) return result; } catch(e) {} } } if (isLocalFile) { const defaultSoft = [ { name: "Adobe Camera RAW", category: "adobe", version: "全版本", description: "用于处理RAW格式图像的工具", os: ["Windows", "Mac"], downloads: 2035, addedDate: "2026-04-22", icon: "https://via.placeholder.com/36x36?text=ACR", url: "#" }, { name: "DaVinci Resolve", category: "other", version: "最新", description: "视频调色软件", os: ["Windows", "Mac"], downloads: 1674, addedDate: "2026-04-21", icon: "https://via.placeholder.com/36x36?text=DR", url: "#" }, { name: "Acrobat DC", category: "adobe", version: "AcrXi Pro-2026", description: "PDF编辑与转换", os: ["Windows", "Mac"], downloads: 1909, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PDF", url: "#" }, { name: "PhotoShop", category: "adobe", version: "CS6-2026", description: "图像处理软件", os: ["Windows", "Mac"], downloads: 1273, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PS", url: "#" }, { name: "Illustrator", category: "adobe", version: "CS6-2026", description: "矢量图形设计", os: ["Windows", "Mac"], downloads: 2089, addedDate: "2026-04-22", icon: "https://via.placeholder.com/36x36?text=AI", url: "#" }, { name: "Premiere Pro", category: "adobe", version: "CS6-2026", description: "视频编辑软件", os: ["Windows", "Mac"], downloads: 2052, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PR", url: "#" }, { name: "AutoCAD", category: "autodesk", version: "2025", description: "计算机辅助设计", os: ["Windows", "Mac"], downloads: 1567, addedDate: "2026-04-18", icon: "https://via.placeholder.com/36x36?text=CAD", url: "#" }, { name: "Cinema 4D", category: "c4d", version: "R19-2025", description: "三维建模、动画", os: ["Windows", "Mac"], downloads: 1432, addedDate: "2026-04-16", icon: "https://via.placeholder.com/36x36?text=C4D", url: "#" }, { name: "Rhino 7/8", category: "rhino", version: "5.0-8.28", description: "工业设计、建筑设计", os: ["Windows", "Mac"], downloads: 876, addedDate: "2026-04-14", icon: "https://via.placeholder.com/36x36?text=RH", url: "#" } ]; return defaultSoft.map(s => ({ ...s, id: Math.random().toString(36) })); } try { const data = await airReq('GET', 'softwares?maxRecords=100'); const result = data.records.map(rec => { const f = rec.fields; const name = getFieldValue(f, ['Name', 'A name', 'name', '软件名称'], '未命名软件'); const category = getFieldValue(f, ['Category', 'A category', 'category', '分类'], 'other'); const version = getFieldValue(f, ['Version', 'version'], ''); const description = getFieldValue(f, ['Description', 'description'], ''); let icon = getFieldValue(f, ['Icon', 'icon', '图片', 'image'], null); let iconUrl = ''; if (icon) { if (Array.isArray(icon) && icon.length > 0 && icon[0].url) iconUrl = icon[0].url; else if (typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('data:image'))) iconUrl = icon; } if (!iconUrl) iconUrl = 'https://via.placeholder.com/36x36?text=' + encodeURIComponent(name.slice(0,2).toUpperCase()); const url = getFieldValue(f, ['URL', 'url'], '#'); const addedDate = getFieldValue(f, ['AddedDate', 'addedDate'], new Date().toISOString().split('T')[0]); const downloads = Number(getFieldValue(f, ['Downloads', 'downloads'], Math.floor(Math.random() * 4000) + 100)); let os = getFieldValue(f, ['OS', 'os'], ['Windows', 'Mac']); if (typeof os === 'string') os = os.split(',').map(s => s.trim()); if (!Array.isArray(os)) os = ['Windows', 'Mac']; return { id: rec.id, name, category, version, description, icon: iconUrl, url, addedDate, downloads, os }; }); localStorage.setItem('cachedSoft', JSON.stringify(result)); return result; } catch (e) { const cached = localStorage.getItem('cachedSoft'); return cached ? JSON.parse(cached) : []; } }
-            async function fetchAds(forceRefresh = false) { if (!forceRefresh) { const cached = localStorage.getItem('cachedAds'); if (cached) { try { const result = JSON.parse(cached); if (result && result.length) return result; } catch(e) {} } } if (isLocalFile) { return [ { image: "https://picsum.photos/800/400?random=1", link: "#", title: "广告1", position: "banner", enabled: true }, { image: "https://picsum.photos/300/200?random=2", link: "#", title: "广告2", position: "sidebar", enabled: true } ]; } try { const data = await airReq('GET', 'Ads?maxRecords=50'); const result = data.records.map(r => { const f = r.fields; let img = getFieldValue(f, ['Image', 'image'], ''); if (Array.isArray(img) && img[0] && img[0].url) img = img[0].url; return { image: img, link: getFieldValue(f, ['Link', 'link'], '#'), title: getFieldValue(f, ['Title', 'title'], ''), position: (getFieldValue(f, ['Position', 'position'], 'sidebar')).toLowerCase(), enabled: getFieldValue(f, ['Enabled', 'enabled'], true) !== false }; }).filter(a => a.enabled && a.image); localStorage.setItem('cachedAds', JSON.stringify(result)); return result; } catch (e) { const cached = localStorage.getItem('cachedAds'); return cached ? JSON.parse(cached) : []; } }
-            async function fetchArticles() { if (isLocalFile) return []; try { const data = await airReq('GET', 'Articles?maxRecords=100&sort[0][field]=CreatedAt&sort[0][direction]=desc'); return data.records.map(rec => ({ id: rec.id, title: rec.fields.Title || '无标题', cover: rec.fields.Cover || '', excerpt: rec.fields.Excerpt || '', content: rec.fields.Content || '', tags: rec.fields.Tags || '', createdAt: rec.fields.CreatedAt || new Date().toISOString() })); } catch (e) { return []; } }
-            async function createArticle(art) { if (isLocalFile) throw new Error('本地不支持'); return await airReq('POST', 'Articles', { fields: { Title: art.title, Cover: art.cover, Excerpt: art.excerpt, Content: art.content, Tags: art.tags } }); }
-            async function updateArticle(id, art) { if (isLocalFile) throw new Error('本地不支持'); return await airReq('PATCH', `Articles/${id}`, { fields: { Title: art.title, Cover: art.cover, Excerpt: art.excerpt, Content: art.content, Tags: art.tags } }); }
-            async function deleteArticle(id) { if (isLocalFile) throw new Error('本地不支持'); return await airReq('DELETE', `Articles/${id}`); }
-            function renderAdmin() { const container = document.getElementById('articleAdminList'); if (!articles.length) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-inbox"></i> 暂无文章，点击"新增文章"创建</div>'; return; } let html = ''; articles.forEach(article => { const coverHtml = article.cover ? `<img class="article-admin-cover" src="${esc(article.cover)}" loading="lazy" onerror="this.style.display='none';">` : `<div class="article-admin-cover" style="background: var(--bg); display: flex; align-items: center; justify-content: center;"><i class="fas fa-file-alt" style="font-size: 24px; color: var(--text-muted);"></i></div>`; const tagsHtml = article.tags ? `<span class="article-admin-tags"><i class="fas fa-tag"></i> ${esc(article.tags)}</span>` : ''; const dateStr = article.createdAt ? new Date(article.createdAt).toLocaleDateString() : '未知日期'; html += `<div class="article-admin-card" data-id="${article.id}">${coverHtml}<div class="article-admin-info"><div class="article-admin-title">${esc(article.title)}</div><div class="article-admin-excerpt">${esc(article.excerpt || '暂无摘要')}</div><div class="article-admin-meta"><span><i class="far fa-calendar-alt"></i> ${dateStr}</span>${tagsHtml}</div><div class="article-admin-actions"><button class="edit-article-btn" data-id="${article.id}"><i class="fas fa-edit"></i> 编辑</button><button class="delete-article-btn" data-id="${article.id}"><i class="fas fa-trash-alt"></i> 删除</button></div></div></div>`; }); container.innerHTML = html; container.querySelectorAll('.edit-article-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.dataset.id; const article = articles.find(a => a.id === id); if (article) showArtForm(article); }); }); container.querySelectorAll('.delete-article-btn').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); if (confirm(`确定要删除文章"${articles.find(a=>a.id===btn.dataset.id)?.title}"吗？`)) { try { await deleteArticle(btn.dataset.id); showToast('删除成功', 'success'); await refreshArticleList(); } catch (err) { showToast('删除失败', 'error'); } } }); }); }
-            function showArtForm(art = null) { editingArticleId = art ? art.id : null; document.getElementById('articleTitle').value = art?.title || ''; document.getElementById('articleCover').value = art?.cover || ''; document.getElementById('articleExcerpt').value = art?.excerpt || ''; document.getElementById('articleContent').value = art?.content || ''; document.getElementById('articleTags').value = art?.tags || ''; document.getElementById('articleFormContainer').style.display = 'block'; }
-            async function refreshArticleList() { document.getElementById('articleAdminList').innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-pulse"></i> 加载中...</div>'; articles = await fetchArticles(); renderAdmin(); renderArtsList(); }
-            async function saveArt() { const title = document.getElementById('articleTitle').value.trim(); if (!title) { showToast('标题不能为空', 'error'); return; } const articleData = { title: title, cover: document.getElementById('articleCover').value.trim(), excerpt: document.getElementById('articleExcerpt').value.trim(), content: document.getElementById('articleContent').value.trim(), tags: document.getElementById('articleTags').value.trim() }; try { if (editingArticleId) { await updateArticle(editingArticleId, articleData); showToast('文章更新成功', 'success'); } else { await createArticle(articleData); showToast('文章创建成功', 'success'); } document.getElementById('articleFormContainer').style.display = 'none'; editingArticleId = null; await refreshArticleList(); } catch (e) { console.error(e); showToast('保存失败，请检查网络或重试', 'error'); } }
-            function renderArtsList() { const el = document.getElementById('articlesList'); if (!articles.length) { el.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>'; return; } const latest = articles.slice(0, 5); el.innerHTML = latest.map(a => `<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}"><div class="article-cover-sm" style="overflow:hidden;">${a.cover?`<img src="${esc(a.cover)}" style="width:100%;height:100%;object-fit:cover;border:none;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div style="display:none;width:100%;height:100%;background:#e8ecf3;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-image"></i></div>`:`<div style="width:100%;height:100%;background:#e8ecf3;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-file"></i></div>`}</div><div style="flex:1;min-width:0;"><div style="font-weight:550;font-size:0.85rem;">${esc(a.title)}</div><div style="font-size:0.6rem;color:var(--text-muted);">${new Date(a.createdAt).toLocaleDateString()}</div></div></div>`).join(''); el.querySelectorAll('[data-id]').forEach(item => item.addEventListener('click', () => { const art = articles.find(a => a.id === item.dataset.id); if (art) { document.getElementById('articleDetailTitle').innerText = art.title; document.getElementById('articleDetailCover').src = art.cover || ''; document.getElementById('articleDetailContent').innerHTML = sanitizeHtml(art.content) || '暂无正文'; document.getElementById('articleDetailModal').classList.add('active'); } })); }
-            async function findUserByEmail(email) { if (isLocalFile) { const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]'); return users.find(u => u.email === email) || null; } if (emailCache.has(email)) { return emailCache.get(email); } const data = await airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`); const result = data.records.length ? data.records[0] : null; emailCache.set(email, result); setTimeout(() => emailCache.delete(email), 30000); return result; }
-            async function findUserByInviteCode(code) { if (isLocalFile) { const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]'); return users.find(u => u.inviteCode === code) || null; } const data = await airReq('GET', `Users?filterByFormula={InviteCode}="${encodeURIComponent(code)}"`); return data.records.length ? data.records[0] : null; }
-            async function registerUser(email, password, username, inviteCode = '') { if (isLocalFile) { if (await findUserByEmail(email)) throw new Error('邮箱已注册'); const hash = CryptoJS.SHA256(password).toString(); const userCode = Math.random().toString(36).substring(2, 10).toUpperCase(); let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]'); let newUser = { email, password: hash, username, role: 'user', inviteCode: userCode, downloadCount: 0, createdAt: new Date().toISOString() }; if (inviteCode) { const inviter = users.find(u => u.inviteCode === inviteCode); if (inviter) { await addDownloadBonus(inviter.email, 5); showToast(`邀请成功！您获得了5次额外下载`, 'success'); } else { showToast('邀请码无效', 'warning'); } } users.push(newUser); localStorage.setItem('lezhe_users', JSON.stringify(users)); emailCache.delete(email); cachedUsersList = null; cachedUsersListTime = 0; return; } if (await findUserByEmail(email)) throw new Error('邮箱已注册'); const hash = CryptoJS.SHA256(password).toString(); const userCode = Math.random().toString(36).substring(2, 10).toUpperCase(); let fields = { Email: email, Password: hash, Username: username, Role: 'user', InviteCode: userCode, SignInData: '[]', ExtraQuota: 0 }; if (inviteCode) { const inviter = await findUserByInviteCode(inviteCode); if (inviter) { await addDownloadBonus(inviter.fields.Email, 5); showToast(`邀请成功！您获得了5次额外下载`, 'success'); } else { showToast('邀请码无效', 'warning'); } } await airReq('POST', 'Users', { fields }); emailCache.delete(email); cachedUsersList = null; cachedUsersListTime = 0; // 立即将新用户写入本地缓存，以便登录时快速命中
+
+            // 加载分类映射表
+            async function loadCategoryMapping() {
+                try {
+                    const data = await airReq('GET', 'Categories?maxRecords=100');
+                    const map = {};
+                    data.records.forEach(rec => {
+                        const key = rec.fields.Key;
+                        const name = rec.fields.Name;
+                        if (key && name) map[key] = name;
+                        // 同时存储 Name->Name 的映射，确保中文也能直接显示
+                        if (name) map[name] = name;
+                    });
+                    // 默认分类兜底
+                    const defaultMap = {
+                        'adobe': 'Adobe系列', 'autodesk': 'Autodesk系列', 'c4d': 'Cinema 4D',
+                        'sketchup': '草图大师', 'rhino': '犀牛软件', 'plugin': '插件工具', 'other': '其他',
+                        'video_editing': '视频剪辑', '3d_modeling': '3D建模'
+                    };
+                    Object.assign(map, defaultMap);
+                    categoryNameMap = map;
+                    localStorage.setItem('categoryMapCache', JSON.stringify(map));
+                } catch(e) {
+                    console.warn('加载分类映射失败，使用默认映射');
+                    const cached = localStorage.getItem('categoryMapCache');
+                    if (cached) {
+                        categoryNameMap = JSON.parse(cached);
+                    } else {
+                        categoryNameMap = {
+                            'adobe': 'Adobe系列', 'autodesk': 'Autodesk系列', 'c4d': 'Cinema 4D',
+                            'sketchup': '草图大师', 'rhino': '犀牛软件', 'plugin': '插件工具', 'other': '其他',
+                            'video_editing': '视频剪辑', '3d_modeling': '3D建模'
+                        };
+                    }
+                }
+            }
+
+            function getCategoryDisplayName(catKey) {
+                if (!catKey) return '未分类';
+                if (/[\u4e00-\u9fa5]/.test(catKey)) return catKey;
+                return categoryNameMap[catKey] || catKey;
+            }
+
+            async function fetchSoftwares(forceRefresh = false) {
+                if (!forceRefresh) {
+                    const cached = localStorage.getItem('cachedSoft');
+                    if (cached) {
+                        try {
+                            const result = JSON.parse(cached);
+                            if (result && result.length) return result;
+                        } catch(e) {}
+                    }
+                }
+                if (isLocalFile) {
+                    const defaultSoft = [
+                        { name: "Adobe Camera RAW", category: "adobe", version: "全版本", description: "用于处理RAW格式图像的工具", os: ["Windows", "Mac"], downloads: 2035, addedDate: "2026-04-22", icon: "https://via.placeholder.com/36x36?text=ACR", url: "#" },
+                        { name: "DaVinci Resolve", category: "other", version: "最新", description: "视频调色软件", os: ["Windows", "Mac"], downloads: 1674, addedDate: "2026-04-21", icon: "https://via.placeholder.com/36x36?text=DR", url: "#" },
+                        { name: "Acrobat DC", category: "adobe", version: "AcrXi Pro-2026", description: "PDF编辑与转换", os: ["Windows", "Mac"], downloads: 1909, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PDF", url: "#" },
+                        { name: "PhotoShop", category: "adobe", version: "CS6-2026", description: "图像处理软件", os: ["Windows", "Mac"], downloads: 1273, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PS", url: "#" },
+                        { name: "Illustrator", category: "adobe", version: "CS6-2026", description: "矢量图形设计", os: ["Windows", "Mac"], downloads: 2089, addedDate: "2026-04-22", icon: "https://via.placeholder.com/36x36?text=AI", url: "#" },
+                        { name: "Premiere Pro", category: "adobe", version: "CS6-2026", description: "视频编辑软件", os: ["Windows", "Mac"], downloads: 2052, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PR", url: "#" },
+                        { name: "AutoCAD", category: "autodesk", version: "2025", description: "计算机辅助设计", os: ["Windows", "Mac"], downloads: 1567, addedDate: "2026-04-18", icon: "https://via.placeholder.com/36x36?text=CAD", url: "#" },
+                        { name: "Cinema 4D", category: "c4d", version: "R19-2025", description: "三维建模、动画", os: ["Windows", "Mac"], downloads: 1432, addedDate: "2026-04-16", icon: "https://via.placeholder.com/36x36?text=C4D", url: "#" },
+                        { name: "Rhino 7/8", category: "rhino", version: "5.0-8.28", description: "工业设计、建筑设计", os: ["Windows", "Mac"], downloads: 876, addedDate: "2026-04-14", icon: "https://via.placeholder.com/36x36?text=RH", url: "#" }
+                    ];
+                    return defaultSoft.map(s => ({ ...s, id: Math.random().toString(36) }));
+                }
+                try {
+                    const data = await airReq('GET', 'softwares?maxRecords=100');
+                    const result = data.records.map(rec => {
+                        const f = rec.fields;
+                        const name = getFieldValue(f, ['Name', 'A name', 'name', '软件名称'], '未命名软件');
+                        const category = getFieldValue(f, ['Category', 'A category', 'category', '分类'], 'other');
+                        const version = getFieldValue(f, ['Version', 'version'], '');
+                        const description = getFieldValue(f, ['Description', 'description'], '');
+                        let icon = getFieldValue(f, ['Icon', 'icon', '图片', 'image'], null);
+                        let iconUrl = '';
+                        if (icon) {
+                            if (Array.isArray(icon) && icon.length > 0 && icon[0].url) iconUrl = icon[0].url;
+                            else if (typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('data:image'))) iconUrl = icon;
+                        }
+                        if (!iconUrl) iconUrl = 'https://via.placeholder.com/36x36?text=' + encodeURIComponent(name.slice(0,2).toUpperCase());
+                        const url = getFieldValue(f, ['URL', 'url'], '#');
+                        const addedDate = getFieldValue(f, ['AddedDate', 'addedDate'], new Date().toISOString().split('T')[0]);
+                        const downloads = Number(getFieldValue(f, ['Downloads', 'downloads'], Math.floor(Math.random() * 4000) + 100));
+                        let os = getFieldValue(f, ['OS', 'os'], ['Windows', 'Mac']);
+                        if (typeof os === 'string') os = os.split(',').map(s => s.trim());
+                        if (!Array.isArray(os)) os = ['Windows', 'Mac'];
+                        return { id: rec.id, name, category, version, description, icon: iconUrl, url, addedDate, downloads, os };
+                    });
+                    localStorage.setItem('cachedSoft', JSON.stringify(result));
+                    return result;
+                } catch (e) {
+                    const cached = localStorage.getItem('cachedSoft');
+                    return cached ? JSON.parse(cached) : [];
+                }
+            }
+
+            async function fetchAds(forceRefresh = false) {
+                if (!forceRefresh) {
+                    const cached = localStorage.getItem('cachedAds');
+                    if (cached) {
+                        try {
+                            const result = JSON.parse(cached);
+                            if (result && result.length) return result;
+                        } catch(e) {}
+                    }
+                }
+                if (isLocalFile) {
+                    return [ { image: "https://picsum.photos/800/400?random=1", link: "#", title: "广告1", position: "banner", enabled: true }, { image: "https://picsum.photos/300/200?random=2", link: "#", title: "广告2", position: "sidebar", enabled: true } ];
+                }
+                try {
+                    const data = await airReq('GET', 'Ads?maxRecords=50');
+                    const result = data.records.map(r => {
+                        const f = r.fields;
+                        let img = getFieldValue(f, ['Image', 'image'], '');
+                        if (Array.isArray(img) && img[0] && img[0].url) img = img[0].url;
+                        return { image: img, link: getFieldValue(f, ['Link', 'link'], '#'), title: getFieldValue(f, ['Title', 'title'], ''), position: (getFieldValue(f, ['Position', 'position'], 'sidebar')).toLowerCase(), enabled: getFieldValue(f, ['Enabled', 'enabled'], true) !== false };
+                    }).filter(a => a.enabled && a.image);
+                    localStorage.setItem('cachedAds', JSON.stringify(result));
+                    return result;
+                } catch (e) {
+                    const cached = localStorage.getItem('cachedAds');
+                    return cached ? JSON.parse(cached) : [];
+                }
+            }
+
+            async function fetchArticles() {
+                if (isLocalFile) return [];
+                try {
+                    const data = await airReq('GET', 'Articles?maxRecords=100&sort[0][field]=CreatedAt&sort[0][direction]=desc');
+                    return data.records.map(rec => ({ id: rec.id, title: rec.fields.Title || '无标题', cover: rec.fields.Cover || '', excerpt: rec.fields.Excerpt || '', content: rec.fields.Content || '', tags: rec.fields.Tags || '', createdAt: rec.fields.CreatedAt || new Date().toISOString() }));
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            async function createArticle(art) {
+                if (isLocalFile) throw new Error('本地不支持');
+                return await airReq('POST', 'Articles', { fields: { Title: art.title, Cover: art.cover, Excerpt: art.excerpt, Content: art.content, Tags: art.tags } });
+            }
+            async function updateArticle(id, art) {
+                if (isLocalFile) throw new Error('本地不支持');
+                return await airReq('PATCH', `Articles/${id}`, { fields: { Title: art.title, Cover: art.cover, Excerpt: art.excerpt, Content: art.content, Tags: art.tags } });
+            }
+            async function deleteArticle(id) {
+                if (isLocalFile) throw new Error('本地不支持');
+                return await airReq('DELETE', `Articles/${id}`);
+            }
+
+            function renderAdmin() {
+                const container = document.getElementById('articleAdminList');
+                if (!articles.length) {
+                    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><i class="fas fa-inbox"></i> 暂无文章，点击"新增文章"创建</div>';
+                    return;
+                }
+                let html = '';
+                articles.forEach(article => {
+                    const coverHtml = article.cover ? `<img class="article-admin-cover" src="${esc(article.cover)}" loading="lazy" onerror="this.style.display='none';">` : `<div class="article-admin-cover" style="background: var(--bg); display: flex; align-items: center; justify-content: center;"><i class="fas fa-file-alt" style="font-size: 24px; color: var(--text-muted);"></i></div>`;
+                    const tagsHtml = article.tags ? `<span class="article-admin-tags"><i class="fas fa-tag"></i> ${esc(article.tags)}</span>` : '';
+                    const dateStr = article.createdAt ? new Date(article.createdAt).toLocaleDateString() : '未知日期';
+                    html += `<div class="article-admin-card" data-id="${article.id}">${coverHtml}<div class="article-admin-info"><div class="article-admin-title">${esc(article.title)}</div><div class="article-admin-excerpt">${esc(article.excerpt || '暂无摘要')}</div><div class="article-admin-meta"><span><i class="far fa-calendar-alt"></i> ${dateStr}</span>${tagsHtml}</div><div class="article-admin-actions"><button class="edit-article-btn" data-id="${article.id}"><i class="fas fa-edit"></i> 编辑</button><button class="delete-article-btn" data-id="${article.id}"><i class="fas fa-trash-alt"></i> 删除</button></div></div></div>`;
+                });
+                container.innerHTML = html;
+                container.querySelectorAll('.edit-article-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = btn.dataset.id;
+                        const article = articles.find(a => a.id === id);
+                        if (article) showArtForm(article);
+                    });
+                });
+                container.querySelectorAll('.delete-article-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        if (confirm(`确定要删除文章"${articles.find(a=>a.id===btn.dataset.id)?.title}"吗？`)) {
+                            try {
+                                await deleteArticle(btn.dataset.id);
+                                showToast('删除成功', 'success');
+                                await refreshArticleList();
+                            } catch (err) {
+                                showToast('删除失败', 'error');
+                            }
+                        }
+                    });
+                });
+            }
+
+            function showArtForm(art = null) {
+                editingArticleId = art ? art.id : null;
+                document.getElementById('articleTitle').value = art?.title || '';
+                document.getElementById('articleCover').value = art?.cover || '';
+                document.getElementById('articleExcerpt').value = art?.excerpt || '';
+                document.getElementById('articleContent').value = art?.content || '';
+                document.getElementById('articleTags').value = art?.tags || '';
+                document.getElementById('articleFormContainer').style.display = 'block';
+            }
+
+            async function refreshArticleList() {
+                document.getElementById('articleAdminList').innerHTML = '<div style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-pulse"></i> 加载中...</div>';
+                articles = await fetchArticles();
+                renderAdmin();
+                renderArtsList();
+            }
+
+            async function saveArt() {
+                const title = document.getElementById('articleTitle').value.trim();
+                if (!title) { showToast('标题不能为空', 'error'); return; }
+                const articleData = {
+                    title: title,
+                    cover: document.getElementById('articleCover').value.trim(),
+                    excerpt: document.getElementById('articleExcerpt').value.trim(),
+                    content: document.getElementById('articleContent').value.trim(),
+                    tags: document.getElementById('articleTags').value.trim()
+                };
+                try {
+                    if (editingArticleId) {
+                        await updateArticle(editingArticleId, articleData);
+                        showToast('文章更新成功', 'success');
+                    } else {
+                        await createArticle(articleData);
+                        showToast('文章创建成功', 'success');
+                    }
+                    document.getElementById('articleFormContainer').style.display = 'none';
+                    editingArticleId = null;
+                    await refreshArticleList();
+                } catch (e) {
+                    console.error(e);
+                    showToast('保存失败，请检查网络或重试', 'error');
+                }
+            }
+
+            function renderArtsList() {
+                const el = document.getElementById('articlesList');
+                if (!articles.length) {
+                    el.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-muted);">暂无文章</div>';
+                    return;
+                }
+                const latest = articles.slice(0, 5);
+                el.innerHTML = latest.map(a => `<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}"><div class="article-cover-sm" style="overflow:hidden;">${a.cover?`<img src="${esc(a.cover)}" style="width:100%;height:100%;object-fit:cover;border:none;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div style="display:none;width:100%;height:100%;background:#e8ecf3;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-image"></i></div>`:`<div style="width:100%;height:100%;background:#e8ecf3;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-file"></i></div>`}</div><div style="flex:1;min-width:0;"><div style="font-weight:550;font-size:0.85rem;">${esc(a.title)}</div><div style="font-size:0.6rem;color:var(--text-muted);">${new Date(a.createdAt).toLocaleDateString()}</div></div></div>`).join('');
+                el.querySelectorAll('[data-id]').forEach(item => item.addEventListener('click', () => {
+                    const art = articles.find(a => a.id === item.dataset.id);
+                    if (art) {
+                        document.getElementById('articleDetailTitle').innerText = art.title;
+                        document.getElementById('articleDetailCover').src = art.cover || '';
+                        document.getElementById('articleDetailContent').innerHTML = sanitizeHtml(art.content) || '暂无正文';
+                        document.getElementById('articleDetailModal').classList.add('active');
+                    }
+                }));
+            }
+
+            async function findUserByEmail(email) {
+                if (isLocalFile) {
+                    const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    return users.find(u => u.email === email) || null;
+                }
+                if (emailCache.has(email)) return emailCache.get(email);
+                const data = await airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`);
+                const result = data.records.length ? data.records[0] : null;
+                emailCache.set(email, result);
+                setTimeout(() => emailCache.delete(email), 30000);
+                return result;
+            }
+
+            async function findUserByInviteCode(code) {
+                if (isLocalFile) {
+                    const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    return users.find(u => u.inviteCode === code) || null;
+                }
+                const data = await airReq('GET', `Users?filterByFormula={InviteCode}="${encodeURIComponent(code)}"`);
+                return data.records.length ? data.records[0] : null;
+            }
+
+            async function registerUser(email, password, username, inviteCode = '') {
+                if (isLocalFile) {
+                    if (await findUserByEmail(email)) throw new Error('邮箱已注册');
+                    const hash = CryptoJS.SHA256(password).toString();
+                    const userCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+                    let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    let newUser = { email, password: hash, username, role: 'user', inviteCode: userCode, downloadCount: 0, createdAt: new Date().toISOString() };
+                    if (inviteCode) {
+                        const inviter = users.find(u => u.inviteCode === inviteCode);
+                        if (inviter) {
+                            await addDownloadBonus(inviter.email, 5);
+                            showToast(`邀请成功！您获得了5次额外下载`, 'success');
+                        } else { showToast('邀请码无效', 'warning'); }
+                    }
+                    users.push(newUser);
+                    localStorage.setItem('lezhe_users', JSON.stringify(users));
+                    emailCache.delete(email);
+                    cachedUsersList = null;
+                    cachedUsersListTime = 0;
+                    return;
+                }
+                if (await findUserByEmail(email)) throw new Error('邮箱已注册');
+                const hash = CryptoJS.SHA256(password).toString();
+                const userCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+                let fields = { Email: email, Password: hash, Username: username, Role: 'user', InviteCode: userCode, SignInData: '[]', ExtraQuota: 0 };
+                if (inviteCode) {
+                    const inviter = await findUserByInviteCode(inviteCode);
+                    if (inviter) {
+                        await addDownloadBonus(inviter.fields.Email, 5);
+                        showToast(`邀请成功！您获得了5次额外下载`, 'success');
+                    } else { showToast('邀请码无效', 'warning'); }
+                }
+                await airReq('POST', 'Users', { fields });
+                emailCache.delete(email);
+                cachedUsersList = null;
+                cachedUsersListTime = 0;
                 const cachedUsersData = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
                 const existingIdx = cachedUsersData.findIndex(u => u.email === email);
                 const userCacheEntry = { id: null, email: email, username: username, role: 'user', inviteCode: userCode, password: hash, downloadCount: 0 };
@@ -308,67 +606,821 @@
                 else cachedUsersData.push(userCacheEntry);
                 localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsersData));
             }
-            async function loginUser(email, password) { if (isLocalFile) { let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]'); let user = users.find(u => u.email === email); if (!user) throw new Error('邮箱未注册'); const hash = CryptoJS.SHA256(password).toString(); if (user.password !== hash) throw new Error('密码错误'); if (!user.inviteCode) { user.inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase(); localStorage.setItem('lezhe_users', JSON.stringify(users)); } return { id: user.email, email: user.email, username: user.username, role: user.role || 'user', inviteCode: user.inviteCode, downloadCount: user.downloadCount || 0 }; } const cachedUsersData = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]'); const cachedUser = cachedUsersData.find(u => u.email === email); const passwordHash = CryptoJS.SHA256(password).toString(); if (cachedUser && passwordHash === cachedUser.password) { syncSignInData(email); const extra = await syncExtraFromServer(email); if (extra > 0) { const data = getUserDownloadData(email); if (data.extra !== extra) { data.extra = extra; saveUserDownloadData(email, data.count, extra); } } setTimeout(() => { airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`).then(data => { if (data.records.length) { const rec = data.records[0]; const syncedUser = { id: rec.id, email: rec.fields.Email, username: rec.fields.Username || email.split('@')[0], role: rec.fields.Role || 'user', inviteCode: rec.fields.InviteCode || '', downloadCount: Number(rec.fields.DownloadCount || 0) }; const idx = cachedUsersData.findIndex(u => u.email === email); if (idx >= 0) cachedUsersData[idx] = { ...cachedUsersData[idx], ...syncedUser, password: cachedUsersData[idx].password }; else cachedUsersData.push({ ...syncedUser, password: cachedUser.password }); localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsersData)); if (currentUser && currentUser.email === email) { currentUser = syncedUser; updateUserUI(); } } }).catch(() => {}); }, 0); return { id: cachedUser.id || email, email: cachedUser.email, username: cachedUser.username, role: cachedUser.role || 'user', inviteCode: cachedUser.inviteCode || '', downloadCount: cachedUser.downloadCount || 0 }; } const rec = await findUserByEmail(email); if (!rec) throw new Error('邮箱未注册'); if (rec.fields.Password !== passwordHash) throw new Error('密码错误'); let inviteCode = rec.fields.InviteCode || ''; if (!inviteCode) { inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase(); try { await airReq('PATCH', `Users/${rec.id}`, { fields: { InviteCode: inviteCode } }); } catch(e) {} } const userData = { id: rec.id, email: rec.fields.Email, username: rec.fields.Username || email.split('@')[0], role: rec.fields.Role || 'user', inviteCode: inviteCode, downloadCount: Number(rec.fields.DownloadCount || 0) }; const extra = rec.fields.ExtraQuota || 0; if (extra > 0) { const localData = getUserDownloadData(email); if (localData.extra !== extra) { saveUserDownloadData(email, localData.count, extra); } } const existing = cachedUsersData.findIndex(u => u.email === email); if (existing >= 0) cachedUsersData[existing] = { ...userData, password: rec.fields.Password }; else cachedUsersData.push({ ...userData, password: rec.fields.Password }); localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsersData)); syncSignInData(email); return userData; }
-            async function updatePassword(email, newPass) { if (isLocalFile) { let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]'); const user = users.find(u => u.email === email); if (!user) throw new Error('邮箱不存在'); user.password = CryptoJS.SHA256(newPass).toString(); localStorage.setItem('lezhe_users', JSON.stringify(users)); return; } const rec = await findUserByEmail(email); if (!rec) throw new Error('邮箱不存在'); await airReq('PATCH', `Users/${rec.id}`, { fields: { Password: CryptoJS.SHA256(newPass).toString() } }); }
-            async function updateUserRole(userId, newRole) { if (isLocalFile) { let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]'); const user = users.find(u => u.email === userId); if (user) user.role = newRole; localStorage.setItem('lezhe_users', JSON.stringify(users)); return; } await airReq('PATCH', `Users/${userId}`, { fields: { Role: newRole } }); }
-            async function getAllUsers(forceRefresh = false) { if (isLocalFile) { const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]'); return users.map(u => ({ id: u.email, fields: { Email: u.email, Username: u.username, Role: u.role, DownloadCount: u.downloadCount || 0, CreatedAt: u.createdAt || new Date().toISOString(), ExtraQuota: 0 }, createdTime: u.createdAt || new Date().toISOString() })); } const now = Date.now(); if (!forceRefresh && cachedUsersList && (now - cachedUsersListTime) < USER_CACHE_TTL) { return cachedUsersList; } const data = await airReq('GET', 'Users?maxRecords=100'); const users = data.records.map(r => ({ id: r.id, fields: r.fields, createdTime: r.createdTime })); cachedUsersList = users; cachedUsersListTime = now; return users; }
-            async function sendResetCode(email) { const rec = await findUserByEmail(email); if (!rec) throw new Error('该邮箱未注册'); const code = Math.floor(100000 + Math.random() * 900000).toString(); await emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_RESET, { email: email, code: code, expires: '5分钟' }); return code; }
+
+            async function loginUser(email, password) {
+                if (isLocalFile) {
+                    let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    let user = users.find(u => u.email === email);
+                    if (!user) throw new Error('邮箱未注册');
+                    const hash = CryptoJS.SHA256(password).toString();
+                    if (user.password !== hash) throw new Error('密码错误');
+                    if (!user.inviteCode) {
+                        user.inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+                        localStorage.setItem('lezhe_users', JSON.stringify(users));
+                    }
+                    return { id: user.email, email: user.email, username: user.username, role: user.role || 'user', inviteCode: user.inviteCode, downloadCount: user.downloadCount || 0 };
+                }
+                const cachedUsersData = JSON.parse(localStorage.getItem('lezhe_users_cache') || '[]');
+                const cachedUser = cachedUsersData.find(u => u.email === email);
+                const passwordHash = CryptoJS.SHA256(password).toString();
+                if (cachedUser && passwordHash === cachedUser.password) {
+                    syncSignInData(email);
+                    const extra = await syncExtraFromServer(email);
+                    if (extra > 0) {
+                        const data = getUserDownloadData(email);
+                        if (data.extra !== extra) { data.extra = extra; saveUserDownloadData(email, data.count, extra); }
+                    }
+                    setTimeout(() => {
+                        airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`).then(data => {
+                            if (data.records.length) {
+                                const rec = data.records[0];
+                                const syncedUser = { id: rec.id, email: rec.fields.Email, username: rec.fields.Username || email.split('@')[0], role: rec.fields.Role || 'user', inviteCode: rec.fields.InviteCode || '', downloadCount: Number(rec.fields.DownloadCount || 0) };
+                                const idx = cachedUsersData.findIndex(u => u.email === email);
+                                if (idx >= 0) cachedUsersData[idx] = { ...cachedUsersData[idx], ...syncedUser, password: cachedUsersData[idx].password };
+                                else cachedUsersData.push({ ...syncedUser, password: cachedUser.password });
+                                localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsersData));
+                                if (currentUser && currentUser.email === email) { currentUser = syncedUser; updateUserUI(); }
+                            }
+                        }).catch(() => {});
+                    }, 0);
+                    return { id: cachedUser.id || email, email: cachedUser.email, username: cachedUser.username, role: cachedUser.role || 'user', inviteCode: cachedUser.inviteCode || '', downloadCount: cachedUser.downloadCount || 0 };
+                }
+                const rec = await findUserByEmail(email);
+                if (!rec) throw new Error('邮箱未注册');
+                if (rec.fields.Password !== passwordHash) throw new Error('密码错误');
+                let inviteCode = rec.fields.InviteCode || '';
+                if (!inviteCode) {
+                    inviteCode = Math.random().toString(36).substring(2, 10).toUpperCase();
+                    try { await airReq('PATCH', `Users/${rec.id}`, { fields: { InviteCode: inviteCode } }); } catch(e) {}
+                }
+                const userData = { id: rec.id, email: rec.fields.Email, username: rec.fields.Username || email.split('@')[0], role: rec.fields.Role || 'user', inviteCode: inviteCode, downloadCount: Number(rec.fields.DownloadCount || 0) };
+                const extra = rec.fields.ExtraQuota || 0;
+                if (extra > 0) {
+                    const localData = getUserDownloadData(email);
+                    if (localData.extra !== extra) { saveUserDownloadData(email, localData.count, extra); }
+                }
+                const existing = cachedUsersData.findIndex(u => u.email === email);
+                if (existing >= 0) cachedUsersData[existing] = { ...userData, password: rec.fields.Password };
+                else cachedUsersData.push({ ...userData, password: rec.fields.Password });
+                localStorage.setItem('lezhe_users_cache', JSON.stringify(cachedUsersData));
+                syncSignInData(email);
+                return userData;
+            }
+
+            async function updatePassword(email, newPass) {
+                if (isLocalFile) {
+                    let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    const user = users.find(u => u.email === email);
+                    if (!user) throw new Error('邮箱不存在');
+                    user.password = CryptoJS.SHA256(newPass).toString();
+                    localStorage.setItem('lezhe_users', JSON.stringify(users));
+                    return;
+                }
+                const rec = await findUserByEmail(email);
+                if (!rec) throw new Error('邮箱不存在');
+                await airReq('PATCH', `Users/${rec.id}`, { fields: { Password: CryptoJS.SHA256(newPass).toString() } });
+            }
+
+            async function updateUserRole(userId, newRole) {
+                if (isLocalFile) {
+                    let users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    const user = users.find(u => u.email === userId);
+                    if (user) user.role = newRole;
+                    localStorage.setItem('lezhe_users', JSON.stringify(users));
+                    return;
+                }
+                await airReq('PATCH', `Users/${userId}`, { fields: { Role: newRole } });
+            }
+
+            async function getAllUsers(forceRefresh = false) {
+                if (isLocalFile) {
+                    const users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+                    return users.map(u => ({ id: u.email, fields: { Email: u.email, Username: u.username, Role: u.role, DownloadCount: u.downloadCount || 0, CreatedAt: u.createdAt || new Date().toISOString(), ExtraQuota: 0 }, createdTime: u.createdAt || new Date().toISOString() }));
+                }
+                const now = Date.now();
+                if (!forceRefresh && cachedUsersList && (now - cachedUsersListTime) < USER_CACHE_TTL) return cachedUsersList;
+                const data = await airReq('GET', 'Users?maxRecords=100');
+                const users = data.records.map(r => ({ id: r.id, fields: r.fields, createdTime: r.createdTime }));
+                cachedUsersList = users;
+                cachedUsersListTime = now;
+                return users;
+            }
+
+            async function sendResetCode(email) {
+                const rec = await findUserByEmail(email);
+                if (!rec) throw new Error('该邮箱未注册');
+                const code = Math.floor(100000 + Math.random() * 900000).toString();
+                await emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_RESET, { email: email, code: code, expires: '5分钟' });
+                return code;
+            }
+
             function getCurrentMonthKey() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}`; }
-            function getUserDownloadData(email) { const key = `download_${email}`; const data = localStorage.getItem(key); if (!data) return { month: getCurrentMonthKey(), count: 0, extra: 0 }; try { const parsed = JSON.parse(data); if (parsed.month !== getCurrentMonthKey()) return { month: getCurrentMonthKey(), count: 0, extra: parsed.extra || 0 }; return { month: parsed.month, count: parsed.count || 0, extra: parsed.extra || 0 }; } catch (e) { return { month: getCurrentMonthKey(), count: 0, extra: 0 }; } }
+            function getUserDownloadData(email) {
+                const key = `download_${email}`;
+                const data = localStorage.getItem(key);
+                if (!data) return { month: getCurrentMonthKey(), count: 0, extra: 0 };
+                try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.month !== getCurrentMonthKey()) return { month: getCurrentMonthKey(), count: 0, extra: parsed.extra || 0 };
+                    return { month: parsed.month, count: parsed.count || 0, extra: parsed.extra || 0 };
+                } catch (e) { return { month: getCurrentMonthKey(), count: 0, extra: 0 }; }
+            }
             function saveUserDownloadData(email, count, extra = 0) { localStorage.setItem(`download_${email}`, JSON.stringify({ month: getCurrentMonthKey(), count: count, extra: extra })); }
-            async function addDownloadBonus(email, bonus) { const data = getUserDownloadData(email); const newExtra = Math.max(0, (data.extra || 0) + bonus); saveUserDownloadData(email, data.count, newExtra); if (!isLocalFile) { await syncExtraToServer(email, newExtra); } }
-            function getRemainingCount(user) { if (!user) return 0; if (user.role === 'vip' || user.role === 'admin') return Infinity; const data = getUserDownloadData(user.email); const total = DEFAULT_MONTHLY_QUOTA + (data.extra || 0); return Math.max(0, total - data.count); }
-            function canDownload(user) { if (!user) return false; if (user.role === 'vip' || user.role === 'admin') return true; const data = getUserDownloadData(user.email); const total = DEFAULT_MONTHLY_QUOTA + (data.extra || 0); return data.count < total; }
-            function recordDownload(user) { if (!user || user.role === 'vip' || user.role === 'admin') return true; const data = getUserDownloadData(user.email); saveUserDownloadData(user.email, data.count + 1, data.extra); return (data.count + 1) <= (DEFAULT_MONTHLY_QUOTA + data.extra); }
+            async function addDownloadBonus(email, bonus) {
+                const data = getUserDownloadData(email);
+                const newExtra = Math.max(0, (data.extra || 0) + bonus);
+                saveUserDownloadData(email, data.count, newExtra);
+                if (!isLocalFile) await syncExtraToServer(email, newExtra);
+            }
+            function getRemainingCount(user) {
+                if (!user) return 0;
+                if (user.role === 'vip' || user.role === 'admin') return Infinity;
+                const data = getUserDownloadData(user.email);
+                const total = DEFAULT_MONTHLY_QUOTA + (data.extra || 0);
+                return Math.max(0, total - data.count);
+            }
+            function canDownload(user) {
+                if (!user) return false;
+                if (user.role === 'vip' || user.role === 'admin') return true;
+                const data = getUserDownloadData(user.email);
+                const total = DEFAULT_MONTHLY_QUOTA + (data.extra || 0);
+                return data.count < total;
+            }
+            function recordDownload(user) {
+                if (!user || user.role === 'vip' || user.role === 'admin') return true;
+                const data = getUserDownloadData(user.email);
+                saveUserDownloadData(user.email, data.count + 1, data.extra);
+                return (data.count + 1) <= (DEFAULT_MONTHLY_QUOTA + data.extra);
+            }
             function resetUserQuota(email) { saveUserDownloadData(email, 0, 0); }
-            function setUserUsedCount(email, count) { const data = getUserDownloadData(email); saveUserDownloadData(email, Math.max(0, Math.min(count, 999)), data.extra); }
-            function getStdAbbr(n) { if (!n) return 'SW'; const l = n.toLowerCase(); const map = { 'photoshop': 'PS', 'illustrator': 'AI', 'premiere pro': 'PR', 'after effects': 'AE', 'lightroom': 'LR', 'indesign': 'ID', 'cinema 4d': 'C4D', 'c4d': 'C4D', 'autocad': 'AC', 'cad': 'CAD', '3ds max': '3DS', 'maya': 'MA', 'sketchup': 'SU', 'rhino': 'RH', 'blender': 'BL' }; if (map[l]) return map[l]; for (let k in map) if (l.includes(k)) return map[k]; return n.slice(0, 2).toUpperCase(); }
-            function getColor(n) { let h = 0; for (let i = 0; i < n.length; i++) h = n.charCodeAt(i) + ((h << 5) - h); return `hsl(${Math.abs(h)%360},70%,55%)`; }
-            function renderIconHtml(iconUrl, name) { const validUrl = (iconUrl && typeof iconUrl === 'string' && (iconUrl.startsWith('http') || iconUrl.startsWith('data:image'))) ? iconUrl : 'https://via.placeholder.com/36x36?text=' + encodeURIComponent(getStdAbbr(name)); return `<img src="${esc(validUrl)}" style="width:100%;height:100%;object-fit:cover;border:none;outline:none;display:block;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="icon-fallback" style="background:${getColor(name)};display:none;align-items:center;justify-content:center;width:100%;height:100%;">${esc(getStdAbbr(name))}</div>`; }
-            const CAT_MAP = { 'adobe': 'Adobe系列', 'autodesk': 'Autodesk系列', 'c4d': 'Cinema 4D', 'sketchup': '草图大师', 'rhino': '犀牛软件', 'plugin': '插件工具', 'other': '其他' };
-            function renderCats() { const el = document.getElementById('categoryTabs'); const map = new Map(); softwares.forEach(s => map.set(CAT_MAP[s.category] || s.category, s.category)); let html = `<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all">全部</button>`; [...map.entries()].sort().forEach(([d, k]) => html += `<button class="cat-chip ${currentCategory===k?'active':''}" data-cat="${k}">${d}</button>`); el.innerHTML = html; document.querySelectorAll('.cat-chip').forEach(btn => btn.addEventListener('click', () => { currentCategory = btn.dataset.cat; showAll = false; renderCats(); renderGrid(); })); }
-            function renderGrid() { const filtered = softwares.filter(s => (currentCategory === 'all' || s.category === currentCategory) && s.name.toLowerCase().includes(searchKeyword.toLowerCase())); const items = showAll ? filtered : filtered.slice(0, DEFAULT_LIMIT); const container = document.getElementById('softwareGridContainer'); if (!items.length) { container.innerHTML = '<div class="no-results"><i class="fas fa-box-open"></i> 没有找到相关软件</div>'; document.getElementById('loadMoreContainer').style.display = 'none'; return; } container.innerHTML = items.map(sw => { const isNew = (new Date() - new Date(sw.addedDate || '2024-01-01')) < 7 * 86400000; const isHot = sw.downloads > 2000; // 修改开始：支持安卓和苹果系统图标
+            function setUserUsedCount(email, count) {
+                const data = getUserDownloadData(email);
+                saveUserDownloadData(email, Math.max(0, Math.min(count, 999)), data.extra);
+            }
+            function getStdAbbr(n) {
+                if (!n) return 'SW';
+                const l = n.toLowerCase();
+                const map = { 'photoshop': 'PS', 'illustrator': 'AI', 'premiere pro': 'PR', 'after effects': 'AE', 'lightroom': 'LR', 'indesign': 'ID', 'cinema 4d': 'C4D', 'c4d': 'C4D', 'autocad': 'AC', 'cad': 'CAD', '3ds max': '3DS', 'maya': 'MA', 'sketchup': 'SU', 'rhino': 'RH', 'blender': 'BL' };
+                if (map[l]) return map[l];
+                for (let k in map) if (l.includes(k)) return map[k];
+                return n.slice(0, 2).toUpperCase();
+            }
+            function getColor(n) {
+                let h = 0;
+                for (let i = 0; i < n.length; i++) h = n.charCodeAt(i) + ((h << 5) - h);
+                return `hsl(${Math.abs(h)%360},70%,55%)`;
+            }
+            function renderIconHtml(iconUrl, name) {
+                const validUrl = (iconUrl && typeof iconUrl === 'string' && (iconUrl.startsWith('http') || iconUrl.startsWith('data:image'))) ? iconUrl : 'https://via.placeholder.com/36x36?text=' + encodeURIComponent(getStdAbbr(name));
+                return `<img src="${esc(validUrl)}" style="width:100%;height:100%;object-fit:cover;border:none;outline:none;display:block;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="icon-fallback" style="background:${getColor(name)};display:none;align-items:center;justify-content:center;width:100%;height:100%;">${esc(getStdAbbr(name))}</div>`;
+            }
+
+            // 渲染分类标签和软件网格（关键修复）
+            function renderCats() {
+                const cats = new Set();
+                softwares.forEach(s => {
+                    if (s.category) cats.add(s.category);
+                });
+                let html = `<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all">全部</button>`;
+                for (let catKey of cats) {
+                    const displayName = getCategoryDisplayName(catKey);
+                    html += `<button class="cat-chip ${currentCategory===catKey?'active':''}" data-cat="${catKey}">${displayName}</button>`;
+                }
+                document.getElementById('categoryTabs').innerHTML = html;
+                document.querySelectorAll('.cat-chip').forEach(btn => btn.addEventListener('click', () => {
+                    currentCategory = btn.dataset.cat;
+                    showAll = false;
+                    renderCats();
+                    renderGrid();
+                }));
+            }
+
+            function renderGrid() {
+                const filtered = softwares.filter(s => (currentCategory === 'all' || s.category === currentCategory) && s.name.toLowerCase().includes(searchKeyword.toLowerCase()));
+                const items = showAll ? filtered : filtered.slice(0, DEFAULT_LIMIT);
+                const container = document.getElementById('softwareGridContainer');
+                if (!items.length) {
+                    container.innerHTML = '<div class="no-results"><i class="fas fa-box-open"></i> 没有找到相关软件</div>';
+                    document.getElementById('loadMoreContainer').style.display = 'none';
+                    return;
+                }
+                container.innerHTML = items.map(sw => {
+                    const isNew = (new Date() - new Date(sw.addedDate || '2024-01-01')) < 7 * 86400000;
+                    const isHot = sw.downloads > 2000;
+                    const catDisplay = getCategoryDisplayName(sw.category);
                     const osTagsHtml = sw.os.map(o => {
                         let icon = '';
                         if (o === 'Windows') icon = '<i class="fab fa-windows"></i>';
                         else if (o === 'Mac') icon = '<i class="fab fa-apple"></i>';
                         else if (o === '安卓') icon = '<i class="fab fa-android"></i>';
                         else if (o === '苹果') icon = '<i class="fab fa-apple"></i>';
-                        else icon = '';
                         return `<span class="os-badge">${icon} ${o}</span>`;
                     }).join('');
-                    // 修改结束
-                return `<div class="software-card" data-name="${esc(sw.name)}">${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}<div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon, sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div><div class="version">版本 ${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${osTagsHtml}</div><div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`; }).join(''); document.getElementById('loadMoreContainer').style.display = (!showAll && filtered.length > DEFAULT_LIMIT) ? 'block' : 'none'; document.querySelectorAll('.software-card').forEach(card => card.addEventListener('click', () => { const sw = softwares.find(s => s.name === card.dataset.name); if (sw) downloadSoftware(sw); })); }
+                    return `<div class="software-card" data-name="${esc(sw.name)}">${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}<div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon, sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div><div class="version">版本 ${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${osTagsHtml}</div><div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span><span style="margin-left:8px;color:#4f6ef6;">${catDisplay}</span></div></div>`;
+                }).join('');
+                document.getElementById('loadMoreContainer').style.display = (!showAll && filtered.length > DEFAULT_LIMIT) ? 'block' : 'none';
+                document.querySelectorAll('.software-card').forEach(card => card.addEventListener('click', () => {
+                    const sw = softwares.find(s => s.name === card.dataset.name);
+                    if (sw) downloadSoftware(sw);
+                }));
+            }
+
             window._loadMore = () => { showAll = true; renderGrid(); };
-            async function downloadSoftware(sw) { if (!currentUser) { showToast('请先登录后再下载软件', 'error'); openAuth('login'); return; } if (!sw.url || sw.url === '#') { showToast('该软件下载链接暂不可用，请联系管理员', 'warning'); return; } if (!canDownload(currentUser)) { document.getElementById('insufficientModal').classList.add('active'); return; } recordDownload(currentUser); updateUserUI(); addHistory(sw); window.open(sw.url, '_blank'); if (sw.id && !sw.id.startsWith('b')) incDownloadCount(sw.id); showToast(`下载成功！剩余${getRemainingCount(currentUser)===Infinity?'∞':getRemainingCount(currentUser)}次`, 'success'); }
-            function addHistory(sw) { let h = JSON.parse(localStorage.getItem('browseHistory') || '[]'); h = h.filter(i => i.name !== sw.name); h.unshift({ name: sw.name }); if (h.length > 10) h.pop(); localStorage.setItem('browseHistory', JSON.stringify(h)); renderHistory(); }
-            function renderHistory() { const h = JSON.parse(localStorage.getItem('browseHistory') || '[]'); document.getElementById('historyList').innerHTML = h.length ? h.map(i => `<div class="history-item">${esc(i.name)}</div>`).join('') : '<div style="color:var(--text-muted);">暂无</div>'; }
+
+            async function downloadSoftware(sw) {
+                if (!currentUser) { showToast('请先登录后再下载软件', 'error'); openAuth('login'); return; }
+                if (!sw.url || sw.url === '#') { showToast('该软件下载链接暂不可用，请联系管理员', 'warning'); return; }
+                if (!canDownload(currentUser)) { document.getElementById('insufficientModal').classList.add('active'); return; }
+                recordDownload(currentUser);
+                updateUserUI();
+                addHistory(sw);
+                window.open(sw.url, '_blank');
+                if (sw.id && !sw.id.startsWith('b')) incDownloadCount(sw.id);
+                showToast(`下载成功！剩余${getRemainingCount(currentUser)===Infinity?'∞':getRemainingCount(currentUser)}次`, 'success');
+            }
+
+            function addHistory(sw) {
+                let h = JSON.parse(localStorage.getItem('browseHistory') || '[]');
+                h = h.filter(i => i.name !== sw.name);
+                h.unshift({ name: sw.name });
+                if (h.length > 10) h.pop();
+                localStorage.setItem('browseHistory', JSON.stringify(h));
+                renderHistory();
+            }
+            function renderHistory() {
+                const h = JSON.parse(localStorage.getItem('browseHistory') || '[]');
+                document.getElementById('historyList').innerHTML = h.length ? h.map(i => `<div class="history-item">${esc(i.name)}</div>`).join('') : '<div style="color:var(--text-muted);">暂无</div>';
+            }
             document.getElementById('clearHistoryBtn').addEventListener('click', () => { localStorage.removeItem('browseHistory'); renderHistory(); });
-            async function incDownloadCount(id) { if (isLocalFile) return; try { const r = await airReq('GET', `softwares/${id}`); await airReq('PATCH', `softwares/${id}`, { fields: { downloads: (r.fields.downloads || 0) + 1 } }); const sw = softwares.find(s => s.id === id); if (sw) sw.downloads++; renderRank(); } catch (e) {} }
-            function renderRank() { const sorted = [...softwares].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)); document.getElementById('rankList').innerHTML = sorted.slice(0, 5).map((sw, i) => `<div class="rank-item"><span class="rank-index ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</span> ${esc(sw.name)}</div>`).join(''); }
-            const hotScroll = document.getElementById('hotScroll'); let hotInt = null; let isHotTouching = false;
-            function startHot() { if (!hotScroll) return; clearInterval(hotInt); hotInt = setInterval(() => { if (isHotTouching) return; if (hotScroll.scrollLeft >= hotScroll.scrollWidth - hotScroll.clientWidth - 10) hotScroll.scrollTo({ left: 0, behavior: 'smooth' }); else hotScroll.scrollBy({ left: 200, behavior: 'smooth' }); }, 2000); }
+
+            async function incDownloadCount(id) {
+                if (isLocalFile) return;
+                try {
+                    const r = await airReq('GET', `softwares/${id}`);
+                    await airReq('PATCH', `softwares/${id}`, { fields: { downloads: (r.fields.downloads || 0) + 1 } });
+                    const sw = softwares.find(s => s.id === id);
+                    if (sw) sw.downloads++;
+                    renderRank();
+                } catch (e) {}
+            }
+
+            function renderRank() {
+                const sorted = [...softwares].sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                document.getElementById('rankList').innerHTML = sorted.slice(0, 5).map((sw, i) => `<div class="rank-item"><span class="rank-index ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</span> ${esc(sw.name)}</div>`).join('');
+            }
+
+            const hotScroll = document.getElementById('hotScroll');
+            let hotInt = null;
+            let isHotTouching = false;
+            function startHot() {
+                if (!hotScroll) return;
+                clearInterval(hotInt);
+                hotInt = setInterval(() => {
+                    if (isHotTouching) return;
+                    if (hotScroll.scrollLeft >= hotScroll.scrollWidth - hotScroll.clientWidth - 10) hotScroll.scrollTo({ left: 0, behavior: 'smooth' });
+                    else hotScroll.scrollBy({ left: 200, behavior: 'smooth' });
+                }, 2000);
+            }
             function stopHot() { clearInterval(hotInt); }
-            function renderHot() { if (!softwares.length) return; const hotItems = [...softwares].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)).slice(0, 6); hotScroll.innerHTML = hotItems.map(sw => `<div class="hot-card" data-name="${esc(sw.name)}"><div class="hot-icon">${renderIconHtml(sw.icon, sw.name)}</div><div class="hot-name">${esc(sw.name)}</div><div class="hot-meta"><span>${sw.os.join(' · ')}</span><span class="hot-downloads"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`).join(''); hotScroll.querySelectorAll('.hot-card').forEach(c => c.addEventListener('click', () => { const sw = softwares.find(s => s.name === c.dataset.name); if (sw) downloadSoftware(sw); })); hotScroll.addEventListener('touchstart', () => { isHotTouching = true; stopHot(); }); hotScroll.addEventListener('touchend', () => { isHotTouching = false; startHot(); }); hotScroll.addEventListener('mouseenter', stopHot); hotScroll.addEventListener('mouseleave', startHot); startHot(); }
-            async function renderFeedback() { if (isLocalFile) { const list = JSON.parse(localStorage.getItem('feedback_list') || '[]'); const container = document.getElementById('feedbackListContainer'); if (list.length) { container.innerHTML = list.map(m => `<div style="padding:8px 0;border-bottom:1px solid var(--border-light);"><strong>${esc(m.name)}</strong><div style="font-size:0.7rem;margin-top:4px;">${esc(m.message)}</div></div>`).join(''); } else { container.innerHTML = '<div style="color:var(--text-muted);">暂无留言</div>'; } return; } try { const data = await airReq('GET', 'Messages?maxRecords=30&sort[0][field]=CreatedAt&sort[0][direction]=desc'); const container = document.getElementById('feedbackListContainer'); if (data.records && data.records.length) { container.innerHTML = data.records.map(r => `<div style="padding:8px 0;border-bottom:1px solid var(--border-light);"><strong>${esc(r.fields.Name||'网友')}</strong><div style="font-size:0.7rem;margin-top:4px;">${esc(r.fields.Message||'')}</div></div>`).join(''); } else { container.innerHTML = '<div style="color:var(--text-muted);">暂无留言</div>'; } } catch (e) { document.getElementById('feedbackListContainer').innerHTML = '<div style="color:var(--text-muted);">加载留言失败</div>'; } }
-            async function refreshUserListAndRender(force = false) { const container = document.getElementById('adminUserList'); container.innerHTML = '<div class="admin-loading"><div class="loading-spinner" style="width:30px;height:30px;"></div> 加载中...</div>'; try { const users = await getAllUsers(force); allAdminUsers = users; renderAdminUserList(users); } catch (err) { container.innerHTML = '<div class="admin-loading">加载失败，请重试</div>'; } }
-            function renderAdminUserList(users) { const container = document.getElementById('adminUserList'); const term = document.getElementById('adminSearchInput').value.toLowerCase().trim(); const filtered = term ? users.filter(u => { const email = (u.fields.Email || '').toLowerCase(); const name = (u.fields.Username || '').toLowerCase(); return email.includes(term) || name.includes(term); }) : users; if (!filtered || filtered.length === 0) { container.innerHTML = '<div class="admin-loading">暂无用户</div>'; return; } let html = ''; for (let u of filtered) { const role = u.fields.Role || 'user'; const isVip = role === 'vip' || role === 'admin'; const isAdmin = role === 'admin'; const avatarIcon = isAdmin ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>'); const createdAt = u.createdTime || u.fields.CreatedAt; const registerDate = createdAt ? new Date(createdAt).toLocaleString() : '未知'; html += `<div class="admin-user-card" data-id="${u.id}"><div class="admin-user-info"><div class="admin-user-avatar">${avatarIcon}</div><div class="admin-user-details"><div class="admin-user-email">${esc(u.fields.Email)}</div><div class="admin-user-name">${esc(u.fields.Username || '未设置')}</div><div class="admin-register-time">🕒 ${registerDate}</div></div><div class="admin-user-role ${isVip ? 'vip' : (isAdmin ? 'admin' : '')}">${isVip ? 'VIP会员' : (isAdmin ? '管理员' : '普通会员')}</div></div><div style="display:flex; gap:8px; flex-wrap:wrap;"><button class="admin-action-btn upgrade-vip-btn" data-id="${u.id}" data-role="${role}">${isVip ? '<i class="fas fa-arrow-down"></i> 降级' : (isAdmin ? '<i class="fas fa-lock"></i> 不可降级' : '<i class="fas fa-crown"></i> 升级VIP')}</button><button class="admin-action-btn reset-download-btn" data-email="${u.fields.Email}" style="background:#10b981;">重置次数</button><button class="admin-action-btn set-download-btn" data-email="${u.fields.Email}" style="background:#3b82f6;">设置次数</button><button class="admin-action-btn add-download-btn" data-email="${u.fields.Email}" style="background:#f59e0b;">增加次数</button></div></div>`; } container.innerHTML = html; bindAdminCardEvents(); }
-            function bindAdminCardEvents() { const container = document.getElementById('adminUserList'); container.querySelectorAll('.upgrade-vip-btn').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); const userId = btn.dataset.id, currentRole = btn.dataset.role; if (currentRole === 'admin') { showToast('管理员角色不能通过此界面修改', 'error'); return; } const newRole = currentRole === 'vip' ? 'user' : 'vip'; btn.innerHTML = '<span class="loading-spinner" style="width:14px;height:14px;"></span>'; btn.disabled = true; try { await updateUserRole(userId, newRole); await refreshUserListAndRender(true); if (currentUser && currentUser.id === userId) { currentUser.role = newRole; localStorage.setItem('lezhe_user', JSON.stringify(currentUser)); updateUserUI(); } showToast(`用户已${newRole === 'vip' ? '升级为VIP' : '降级为普通会员'}`, 'success'); } catch (err) { showToast('操作失败，请重试', 'error'); btn.innerHTML = currentRole === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级' : '<i class="fas fa-crown"></i> 升级VIP'; btn.disabled = false; } }); }); container.querySelectorAll('.reset-download-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const email = btn.dataset.email; resetUserQuota(email); showToast('已重置该用户本月下载次数（配额恢复默认）', 'success'); if (currentUser && currentUser.email === email) updateUserUI(); }); }); container.querySelectorAll('.set-download-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const email = btn.dataset.email; const data = getUserDownloadData(email); const total = DEFAULT_MONTHLY_QUOTA + data.extra; const promptText = `当前总配额：${total} 次\n已用：${data.count} 次，剩余：${total - data.count} 次\n输入新的已用次数（0~999）`; const newCount = prompt(promptText, data.count); if (newCount !== null && !isNaN(parseInt(newCount))) { setUserUsedCount(email, parseInt(newCount)); showToast(`已更新，剩余 ${getRemainingCount(currentUser)} 次`, 'success'); if (currentUser && currentUser.email === email) updateUserUI(); } }); }); container.querySelectorAll('.add-download-btn').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); const email = btn.dataset.email; const add = prompt('请输入要增加的下载次数（1~999）', '5'); if (add !== null && !isNaN(parseInt(add))) { const amount = Math.max(1, Math.min(parseInt(add), 999)); await addDownloadBonus(email, amount); showToast(`已为该用户总配额增加 ${amount} 次，最新剩余次数请刷新页面或重新登录后查看`, 'success'); if (currentUser && currentUser.email === email) { updateUserUI(); } else { showToast(`如为目标用户本人，请刷新页面同步数据`, 'warning'); } } }); }); }
-            async function openAdminModal() { if (cachedUsersList && (Date.now() - cachedUsersListTime) < USER_CACHE_TTL) { renderAdminUserList(cachedUsersList); document.getElementById('adminModal').classList.add('active'); refreshUserListAndRender(true); } else { await refreshUserListAndRender(); document.getElementById('adminModal').classList.add('active'); } }
-            function openAuth(tab = 'login') { const m = document.getElementById('authModal'); document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none'; document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none'; document.getElementById('forgotForm').style.display = tab === 'forgot' ? 'block' : 'none'; document.getElementById('authModalTitle').innerText = tab === 'register' ? '注册' : (tab === 'forgot' ? '找回密码' : '登录'); m.classList.add('active'); if (tab === 'login') refCap('loginCaptchaQuestion', 'loginCaptchaInput'); else if (tab === 'register') refCap('regCaptchaQuestion', 'regCaptchaInput'); else refCap('forgotCaptchaQuestion', 'forgotCaptchaInput'); }
-            function bindAuthEvents() { document.getElementById('refreshLoginCaptcha').addEventListener('click', () => refCap('loginCaptchaQuestion', 'loginCaptchaInput')); document.getElementById('refreshRegCaptcha').addEventListener('click', () => refCap('regCaptchaQuestion', 'regCaptchaInput')); document.getElementById('refreshForgotCaptcha').addEventListener('click', () => refCap('forgotCaptchaQuestion', 'forgotCaptchaInput')); document.getElementById('registerBtn').addEventListener('click', async () => { const btn = document.getElementById('registerBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerHTML = '<span class="loading-spinner" style="width:16px;height:16px;"></span> 注册中...'; const username = document.getElementById('regUsername').value.trim(); const email = document.getElementById('regEmail').value.trim(); const pwd = document.getElementById('regPassword').value; const confirm = document.getElementById('regConfirm').value; const inviteCode = document.getElementById('regInviteCode').value.trim(); const cap = document.getElementById('regCaptchaInput').value.trim(); if (!username) { showToast('用户名不能为空', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; } if (!email) { showToast('邮箱不能为空', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; } if (pwd.length < 6) { showToast('密码长度至少6位', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; } if (pwd !== confirm) { showToast('两次输入的密码不一致', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; } if (!cap || parseInt(cap) !== currentCaptcha.answer) { showToast('验证码错误', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; } try { if (await findUserByEmail(email)) { showToast('邮箱已注册', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; } await registerUser(email, pwd, username, inviteCode); showToast('注册成功！请登录', 'success'); openAuth('login'); document.getElementById('loginEmail').value = email; document.getElementById('regUsername').value = ''; document.getElementById('regEmail').value = ''; document.getElementById('regPassword').value = ''; document.getElementById('regConfirm').value = ''; document.getElementById('regInviteCode').value = ''; document.getElementById('regCaptchaInput').value = ''; } catch (e) { showToast(e.message || '注册失败', 'error'); } finally { btn.disabled = false; btn.innerHTML = originalText; } }); document.getElementById('loginBtn').addEventListener('click', async () => { const btn = document.getElementById('loginBtn'); const originalText = btn.innerText; btn.disabled = true; btn.innerHTML = '<span class="loading-spinner" style="width:16px;height:16px;"></span> 登录中...'; const email = document.getElementById('loginEmail').value.trim(); const pwd = document.getElementById('loginPassword').value; const cap = document.getElementById('loginCaptchaInput').value.trim(); if (!cap || parseInt(cap) !== currentCaptcha.answer) { showToast('验证码错误', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; } try { currentUser = await loginUser(email, pwd); localStorage.setItem('lezhe_user', JSON.stringify(currentUser)); updateUserUI(); document.getElementById('authModal').classList.remove('active'); showToast('登录成功', 'success'); renderCalendar(); if (!isLocalFile) { airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`).then(data => { if (data.records.length) { const rec = data.records[0]; currentUser.downloadCount = Number(rec.fields.DownloadCount || 0); currentUser.role = rec.fields.Role || 'user'; updateUserUI(); } }).catch(() => {}); } } catch (e) { showToast(e.message, 'error'); } finally { btn.disabled = false; btn.innerHTML = originalText; } }); let countdown = 0; const sendBtn = document.getElementById('sendResetCodeBtn'); sendBtn.addEventListener('click', async () => { if (countdown > 0) return showToast(`请等待 ${countdown} 秒后再试`, 'warning'); const email = document.getElementById('forgotEmail').value.trim(); if (!email) return showToast('请输入邮箱', 'error'); try { sendBtn.disabled = true; sendBtn.textContent = '发送中...'; const code = await sendResetCode(email); resetCode = code; resetEmail = email; resetCodeExpire = Date.now() + 5 * 60 * 1000; showToast('验证码已发送，请查收邮件', 'success'); countdown = 60; const timer = setInterval(() => { countdown--; if (countdown <= 0) { clearInterval(timer); sendBtn.disabled = false; sendBtn.textContent = '发送验证码'; } else { sendBtn.textContent = `${countdown}秒后重发`; } }, 1000); } catch (e) { showToast(e.message, 'error'); sendBtn.disabled = false; sendBtn.textContent = '发送验证码'; } }); document.getElementById('resetPasswordBtn').addEventListener('click', async () => { const email = document.getElementById('forgotEmail').value.trim(); const code = document.getElementById('resetCodeInput').value.trim(); const newPwd = document.getElementById('newPassword').value; const confirm = document.getElementById('confirmNewPassword').value; const cap = document.getElementById('forgotCaptchaInput').value.trim(); if (!email || newPwd !== confirm || newPwd.length < 6) return showToast('信息错误', 'error'); if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error'); if (email !== resetEmail || !code || code !== resetCode || Date.now() > resetCodeExpire) return showToast('验证码错误或已过期', 'error'); const rec = await findUserByEmail(email); if (rec && rec.fields && rec.fields.Password === CryptoJS.SHA256(newPwd).toString()) { return showToast('新密码不能与旧密码相同', 'error'); } try { await updatePassword(email, newPwd); showToast('密码重置成功', 'success'); openAuth('login'); resetCode = ''; resetEmail = ''; } catch (e) { showToast(e.message, 'error'); } }); document.getElementById('showForgotBtn').addEventListener('click', () => openAuth('forgot')); document.getElementById('backToLoginFromForgot').addEventListener('click', () => openAuth('login')); document.getElementById('closeAuthModal').addEventListener('click', () => document.getElementById('authModal').classList.remove('active')); document.querySelectorAll('.auth-tab').forEach(t => t.addEventListener('click', () => openAuth(t.dataset.tab))); document.getElementById('manageArticlesBtn').addEventListener('click', async () => { await refreshArticleList(); document.getElementById('articleManageModal').classList.add('active'); }); document.getElementById('closeArticleModal').addEventListener('click', () => { document.getElementById('articleManageModal').classList.remove('active'); document.getElementById('articleFormContainer').style.display = 'none'; editingArticleId = null; }); document.getElementById('addNewArticleBtn').addEventListener('click', () => showArtForm(null)); document.getElementById('saveArticleBtn').addEventListener('click', saveArt); document.getElementById('cancelArticleBtn').addEventListener('click', () => { document.getElementById('articleFormContainer').style.display = 'none'; editingArticleId = null; }); document.getElementById('closeDetailModal').addEventListener('click', () => document.getElementById('articleDetailModal').classList.remove('active')); document.getElementById('closeProfileModal').addEventListener('click', () => document.getElementById('profileModal').classList.remove('active')); document.getElementById('saveProfileBtn').addEventListener('click', async function() { const newPwd = document.getElementById('profileNewPwd').value; const confirm = document.getElementById('profileConfirmPwd').value; if (newPwd && newPwd !== confirm) return showToast('两次密码不一致', 'error'); if (newPwd && newPwd.length < 6) return showToast('密码至少6位', 'error'); if (newPwd) { const user = await findUserByEmail(currentUser.email); if (user && user.fields && user.fields.Password === CryptoJS.SHA256(newPwd).toString()) { return showToast('新密码不能与旧密码相同', 'error'); } } try { if (newPwd) await updatePassword(currentUser.email, newPwd); showToast('资料更新成功', 'success'); document.getElementById('profileModal').classList.remove('active'); } catch (e) { showToast('更新失败', 'error'); } }); document.getElementById('closeAdminModal').addEventListener('click', () => document.getElementById('adminModal').classList.remove('active')); document.getElementById('refreshUserListBtn').addEventListener('click', async () => { await refreshUserListAndRender(true); showToast('用户列表已刷新', 'success'); }); document.getElementById('closeInsufficientModal').addEventListener('click', () => document.getElementById('insufficientModal').classList.remove('active')); document.getElementById('submitFeedbackBtn').addEventListener('click', async function() { const msg = document.getElementById('feedbackMessage').value.trim(); if (!msg) return showToast('请填写内容', 'error'); this.disabled = true; try { if (isLocalFile) { let list = JSON.parse(localStorage.getItem('feedback_list') || '[]'); list.unshift({ name: document.getElementById('feedbackName').value || '网友', message: msg }); if (list.length > 20) list.pop(); localStorage.setItem('feedback_list', JSON.stringify(list)); } else { await airReq('POST', 'Messages', { fields: { Name: document.getElementById('feedbackName').value || '网友', Message: msg } }); } showToast('留言成功'); document.getElementById('feedbackMessage').value = ''; renderFeedback(); } catch (e) { showToast('提交失败', 'error'); } this.disabled = false; }); document.querySelectorAll('.buy-package').forEach(btn => { btn.addEventListener('click', function() { const permanent = this.dataset.permanent === 'true'; const amount = this.dataset.amount; const price = this.dataset.price; showToast(`购买${permanent?'永久VIP':amount+'次下载'}（${price}元）请联系客服微信 Win_Mac_123 付款。`, 'warning'); document.getElementById('insufficientModal').classList.remove('active'); }); }); document.getElementById('copyInviteCodeInsufficient').addEventListener('click', () => { if (currentUser && currentUser.inviteCode) { window.copyText(currentUser.inviteCode); } else { showToast('请先登录获取邀请码', 'error'); } }); document.getElementById('refreshArticleListBtn').addEventListener('click', async () => { await refreshArticleList(); showToast('文章列表已刷新', 'success'); }); }
-            const searchInput = document.getElementById('searchInput'); const searchSug = document.getElementById('searchSuggestions'); searchInput.addEventListener('input', e => { searchKeyword = e.target.value; renderGrid(); const v = searchKeyword.toLowerCase().trim(); if (!v) { searchSug.classList.remove('active'); return; } const matches = softwares.filter(s => s.name.toLowerCase().includes(v)).slice(0, 5); if (!matches.length) { searchSug.classList.remove('active'); return; } searchSug.innerHTML = matches.map(s => `<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join(''); searchSug.classList.add('active'); }); searchInput.addEventListener('focus', () => { if (window.innerWidth <= 768) { searchSug.style.top = 'auto'; searchSug.style.bottom = '100%'; } else { searchSug.style.top = '100%'; searchSug.style.bottom = 'auto'; } }); document.addEventListener('click', e => { if (!searchSug.contains(e.target) && e.target !== searchInput) searchSug.classList.remove('active'); }); searchSug.addEventListener('click', e => { const item = e.target.closest('.suggestion-item'); if (item) { searchInput.value = item.dataset.name; searchKeyword = item.dataset.name; searchSug.classList.remove('active'); renderGrid(); } }); document.getElementById('searchBtn').addEventListener('click', () => { searchKeyword = searchInput.value; renderGrid(); });
-            window.addEventListener('scroll', () => { const nav = document.getElementById('topNav'); if (!nav) return; if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(() => { const currentScrollY = window.scrollY; if (currentScrollY > lastScrollY && currentScrollY > 100) nav.classList.add('hide'); else if (currentScrollY < lastScrollY) nav.classList.remove('hide'); lastScrollY = currentScrollY; document.getElementById('backToTop').classList.toggle('show', currentScrollY > 300); }, 50); });
+            function renderHot() {
+                if (!softwares.length) return;
+                const hotItems = [...softwares].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)).slice(0, 6);
+                hotScroll.innerHTML = hotItems.map(sw => `<div class="hot-card" data-name="${esc(sw.name)}"><div class="hot-icon">${renderIconHtml(sw.icon, sw.name)}</div><div class="hot-name">${esc(sw.name)}</div><div class="hot-meta"><span>${sw.os.join(' · ')}</span><span class="hot-downloads"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`).join('');
+                hotScroll.querySelectorAll('.hot-card').forEach(c => c.addEventListener('click', () => {
+                    const sw = softwares.find(s => s.name === c.dataset.name);
+                    if (sw) downloadSoftware(sw);
+                }));
+                hotScroll.addEventListener('touchstart', () => { isHotTouching = true; stopHot(); });
+                hotScroll.addEventListener('touchend', () => { isHotTouching = false; startHot(); });
+                hotScroll.addEventListener('mouseenter', stopHot);
+                hotScroll.addEventListener('mouseleave', startHot);
+                startHot();
+            }
+
+            async function renderFeedback() {
+                if (isLocalFile) {
+                    const list = JSON.parse(localStorage.getItem('feedback_list') || '[]');
+                    const container = document.getElementById('feedbackListContainer');
+                    if (list.length) {
+                        container.innerHTML = list.map(m => `<div style="padding:8px 0;border-bottom:1px solid var(--border-light);"><strong>${esc(m.name)}</strong><div style="font-size:0.7rem;margin-top:4px;">${esc(m.message)}</div></div>`).join('');
+                    } else { container.innerHTML = '<div style="color:var(--text-muted);">暂无留言</div>'; }
+                    return;
+                }
+                try {
+                    const data = await airReq('GET', 'Messages?maxRecords=30&sort[0][field]=CreatedAt&sort[0][direction]=desc');
+                    const container = document.getElementById('feedbackListContainer');
+                    if (data.records && data.records.length) {
+                        container.innerHTML = data.records.map(r => `<div style="padding:8px 0;border-bottom:1px solid var(--border-light);"><strong>${esc(r.fields.Name||'网友')}</strong><div style="font-size:0.7rem;margin-top:4px;">${esc(r.fields.Message||'')}</div></div>`).join('');
+                    } else { container.innerHTML = '<div style="color:var(--text-muted);">暂无留言</div>'; }
+                } catch (e) { document.getElementById('feedbackListContainer').innerHTML = '<div style="color:var(--text-muted);">加载留言失败</div>'; }
+            }
+
+            async function refreshUserListAndRender(force = false) {
+                const container = document.getElementById('adminUserList');
+                container.innerHTML = '<div class="admin-loading"><div class="loading-spinner" style="width:30px;height:30px;"></div> 加载中...</div>';
+                try {
+                    const users = await getAllUsers(force);
+                    allAdminUsers = users;
+                    renderAdminUserList(users);
+                } catch (err) { container.innerHTML = '<div class="admin-loading">加载失败，请重试</div>'; }
+            }
+
+            function renderAdminUserList(users) {
+                const container = document.getElementById('adminUserList');
+                const term = document.getElementById('adminSearchInput').value.toLowerCase().trim();
+                const filtered = term ? users.filter(u => {
+                    const email = (u.fields.Email || '').toLowerCase();
+                    const name = (u.fields.Username || '').toLowerCase();
+                    return email.includes(term) || name.includes(term);
+                }) : users;
+                if (!filtered || filtered.length === 0) { container.innerHTML = '<div class="admin-loading">暂无用户</div>'; return; }
+                let html = '';
+                for (let u of filtered) {
+                    const role = u.fields.Role || 'user';
+                    const isVip = role === 'vip' || role === 'admin';
+                    const isAdmin = role === 'admin';
+                    const avatarIcon = isAdmin ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
+                    const createdAt = u.createdTime || u.fields.CreatedAt;
+                    const registerDate = createdAt ? new Date(createdAt).toLocaleString() : '未知';
+                    html += `<div class="admin-user-card" data-id="${u.id}"><div class="admin-user-info"><div class="admin-user-avatar">${avatarIcon}</div><div class="admin-user-details"><div class="admin-user-email">${esc(u.fields.Email)}</div><div class="admin-user-name">${esc(u.fields.Username || '未设置')}</div><div class="admin-register-time">🕒 ${registerDate}</div></div><div class="admin-user-role ${isVip ? 'vip' : (isAdmin ? 'admin' : '')}">${isVip ? 'VIP会员' : (isAdmin ? '管理员' : '普通会员')}</div></div><div style="display:flex; gap:8px; flex-wrap:wrap;"><button class="admin-action-btn upgrade-vip-btn" data-id="${u.id}" data-role="${role}">${isVip ? '<i class="fas fa-arrow-down"></i> 降级' : (isAdmin ? '<i class="fas fa-lock"></i> 不可降级' : '<i class="fas fa-crown"></i> 升级VIP')}</button><button class="admin-action-btn reset-download-btn" data-email="${u.fields.Email}" style="background:#10b981;">重置次数</button><button class="admin-action-btn set-download-btn" data-email="${u.fields.Email}" style="background:#3b82f6;">设置次数</button><button class="admin-action-btn add-download-btn" data-email="${u.fields.Email}" style="background:#f59e0b;">增加次数</button></div></div>`;
+                }
+                container.innerHTML = html;
+                bindAdminCardEvents();
+            }
+
+            function bindAdminCardEvents() {
+                const container = document.getElementById('adminUserList');
+                container.querySelectorAll('.upgrade-vip-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const userId = btn.dataset.id, currentRole = btn.dataset.role;
+                        if (currentRole === 'admin') { showToast('管理员角色不能通过此界面修改', 'error'); return; }
+                        const newRole = currentRole === 'vip' ? 'user' : 'vip';
+                        btn.innerHTML = '<span class="loading-spinner" style="width:14px;height:14px;"></span>';
+                        btn.disabled = true;
+                        try {
+                            await updateUserRole(userId, newRole);
+                            await refreshUserListAndRender(true);
+                            if (currentUser && currentUser.id === userId) {
+                                currentUser.role = newRole;
+                                localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
+                                updateUserUI();
+                            }
+                            showToast(`用户已${newRole === 'vip' ? '升级为VIP' : '降级为普通会员'}`, 'success');
+                        } catch (err) {
+                            showToast('操作失败，请重试', 'error');
+                            btn.innerHTML = currentRole === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级' : '<i class="fas fa-crown"></i> 升级VIP';
+                            btn.disabled = false;
+                        }
+                    });
+                });
+                container.querySelectorAll('.reset-download-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const email = btn.dataset.email;
+                        resetUserQuota(email);
+                        showToast('已重置该用户本月下载次数（配额恢复默认）', 'success');
+                        if (currentUser && currentUser.email === email) updateUserUI();
+                    });
+                });
+                container.querySelectorAll('.set-download-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const email = btn.dataset.email;
+                        const data = getUserDownloadData(email);
+                        const total = DEFAULT_MONTHLY_QUOTA + data.extra;
+                        const promptText = `当前总配额：${total} 次\n已用：${data.count} 次，剩余：${total - data.count} 次\n输入新的已用次数（0~999）`;
+                        const newCount = prompt(promptText, data.count);
+                        if (newCount !== null && !isNaN(parseInt(newCount))) {
+                            setUserUsedCount(email, parseInt(newCount));
+                            showToast(`已更新，剩余 ${getRemainingCount(currentUser)} 次`, 'success');
+                            if (currentUser && currentUser.email === email) updateUserUI();
+                        }
+                    });
+                });
+                container.querySelectorAll('.add-download-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const email = btn.dataset.email;
+                        const add = prompt('请输入要增加的下载次数（1~999）', '5');
+                        if (add !== null && !isNaN(parseInt(add))) {
+                            const amount = Math.max(1, Math.min(parseInt(add), 999));
+                            await addDownloadBonus(email, amount);
+                            showToast(`已为该用户总配额增加 ${amount} 次，最新剩余次数请刷新页面或重新登录后查看`, 'success');
+                            if (currentUser && currentUser.email === email) { updateUserUI(); }
+                            else { showToast(`如为目标用户本人，请刷新页面同步数据`, 'warning'); }
+                        }
+                    });
+                });
+            }
+
+            async function openAdminModal() {
+                if (cachedUsersList && (Date.now() - cachedUsersListTime) < USER_CACHE_TTL) {
+                    renderAdminUserList(cachedUsersList);
+                    document.getElementById('adminModal').classList.add('active');
+                    refreshUserListAndRender(true);
+                } else {
+                    await refreshUserListAndRender();
+                    document.getElementById('adminModal').classList.add('active');
+                }
+            }
+
+            function openAuth(tab = 'login') {
+                const m = document.getElementById('authModal');
+                document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+                document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+                document.getElementById('forgotForm').style.display = tab === 'forgot' ? 'block' : 'none';
+                document.getElementById('authModalTitle').innerText = tab === 'register' ? '注册' : (tab === 'forgot' ? '找回密码' : '登录');
+                m.classList.add('active');
+                if (tab === 'login') refCap('loginCaptchaQuestion', 'loginCaptchaInput');
+                else if (tab === 'register') refCap('regCaptchaQuestion', 'regCaptchaInput');
+                else refCap('forgotCaptchaQuestion', 'forgotCaptchaInput');
+            }
+
+            function bindAuthEvents() {
+                document.getElementById('refreshLoginCaptcha').addEventListener('click', () => refCap('loginCaptchaQuestion', 'loginCaptchaInput'));
+                document.getElementById('refreshRegCaptcha').addEventListener('click', () => refCap('regCaptchaQuestion', 'regCaptchaInput'));
+                document.getElementById('refreshForgotCaptcha').addEventListener('click', () => refCap('forgotCaptchaQuestion', 'forgotCaptchaInput'));
+
+                document.getElementById('registerBtn').addEventListener('click', async () => {
+                    const btn = document.getElementById('registerBtn');
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="loading-spinner" style="width:16px;height:16px;"></span> 注册中...';
+                    const username = document.getElementById('regUsername').value.trim();
+                    const email = document.getElementById('regEmail').value.trim();
+                    const pwd = document.getElementById('regPassword').value;
+                    const confirm = document.getElementById('regConfirm').value;
+                    const inviteCode = document.getElementById('regInviteCode').value.trim();
+                    const cap = document.getElementById('regCaptchaInput').value.trim();
+                    if (!username) { showToast('用户名不能为空', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; }
+                    if (!email) { showToast('邮箱不能为空', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; }
+                    if (pwd.length < 6) { showToast('密码长度至少6位', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; }
+                    if (pwd !== confirm) { showToast('两次输入的密码不一致', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; }
+                    if (!cap || parseInt(cap) !== currentCaptcha.answer) { showToast('验证码错误', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; }
+                    try {
+                        if (await findUserByEmail(email)) { showToast('邮箱已注册', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; }
+                        await registerUser(email, pwd, username, inviteCode);
+                        showToast('注册成功！请登录', 'success');
+                        openAuth('login');
+                        document.getElementById('loginEmail').value = email;
+                        document.getElementById('regUsername').value = '';
+                        document.getElementById('regEmail').value = '';
+                        document.getElementById('regPassword').value = '';
+                        document.getElementById('regConfirm').value = '';
+                        document.getElementById('regInviteCode').value = '';
+                        document.getElementById('regCaptchaInput').value = '';
+                    } catch (e) { showToast(e.message || '注册失败', 'error'); }
+                    finally { btn.disabled = false; btn.innerHTML = originalText; }
+                });
+
+                document.getElementById('loginBtn').addEventListener('click', async () => {
+                    const btn = document.getElementById('loginBtn');
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="loading-spinner" style="width:16px;height:16px;"></span> 登录中...';
+                    const email = document.getElementById('loginEmail').value.trim();
+                    const pwd = document.getElementById('loginPassword').value;
+                    const cap = document.getElementById('loginCaptchaInput').value.trim();
+                    if (!cap || parseInt(cap) !== currentCaptcha.answer) { showToast('验证码错误', 'error'); btn.disabled = false; btn.innerHTML = originalText; return; }
+                    try {
+                        currentUser = await loginUser(email, pwd);
+                        localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
+                        updateUserUI();
+                        document.getElementById('authModal').classList.remove('active');
+                        showToast('登录成功', 'success');
+                        renderCalendar();
+                        if (!isLocalFile) {
+                            airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`).then(data => {
+                                if (data.records.length) {
+                                    const rec = data.records[0];
+                                    currentUser.downloadCount = Number(rec.fields.DownloadCount || 0);
+                                    currentUser.role = rec.fields.Role || 'user';
+                                    updateUserUI();
+                                }
+                            }).catch(() => {});
+                        }
+                    } catch (e) { showToast(e.message, 'error'); }
+                    finally { btn.disabled = false; btn.innerHTML = originalText; }
+                });
+
+                let countdown = 0;
+                const sendBtn = document.getElementById('sendResetCodeBtn');
+                sendBtn.addEventListener('click', async () => {
+                    if (countdown > 0) return showToast(`请等待 ${countdown} 秒后再试`, 'warning');
+                    const email = document.getElementById('forgotEmail').value.trim();
+                    if (!email) return showToast('请输入邮箱', 'error');
+                    try {
+                        sendBtn.disabled = true;
+                        sendBtn.textContent = '发送中...';
+                        const code = await sendResetCode(email);
+                        resetCode = code;
+                        resetEmail = email;
+                        resetCodeExpire = Date.now() + 5 * 60 * 1000;
+                        showToast('验证码已发送，请查收邮件', 'success');
+                        countdown = 60;
+                        const timer = setInterval(() => {
+                            countdown--;
+                            if (countdown <= 0) { clearInterval(timer); sendBtn.disabled = false; sendBtn.textContent = '发送验证码'; }
+                            else { sendBtn.textContent = `${countdown}秒后重发`; }
+                        }, 1000);
+                    } catch (e) { showToast(e.message, 'error'); sendBtn.disabled = false; sendBtn.textContent = '发送验证码'; }
+                });
+
+                document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
+                    const email = document.getElementById('forgotEmail').value.trim();
+                    const code = document.getElementById('resetCodeInput').value.trim();
+                    const newPwd = document.getElementById('newPassword').value;
+                    const confirm = document.getElementById('confirmNewPassword').value;
+                    const cap = document.getElementById('forgotCaptchaInput').value.trim();
+                    if (!email || newPwd !== confirm || newPwd.length < 6) return showToast('信息错误', 'error');
+                    if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error');
+                    if (email !== resetEmail || !code || code !== resetCode || Date.now() > resetCodeExpire) return showToast('验证码错误或已过期', 'error');
+                    const rec = await findUserByEmail(email);
+                    if (rec && rec.fields && rec.fields.Password === CryptoJS.SHA256(newPwd).toString()) { return showToast('新密码不能与旧密码相同', 'error'); }
+                    try {
+                        await updatePassword(email, newPwd);
+                        showToast('密码重置成功', 'success');
+                        openAuth('login');
+                        resetCode = '';
+                        resetEmail = '';
+                    } catch (e) { showToast(e.message, 'error'); }
+                });
+
+                document.getElementById('showForgotBtn').addEventListener('click', () => openAuth('forgot'));
+                document.getElementById('backToLoginFromForgot').addEventListener('click', () => openAuth('login'));
+                document.getElementById('closeAuthModal').addEventListener('click', () => document.getElementById('authModal').classList.remove('active'));
+                document.querySelectorAll('.auth-tab').forEach(t => t.addEventListener('click', () => openAuth(t.dataset.tab)));
+
+                document.getElementById('manageArticlesBtn').addEventListener('click', async () => {
+                    await refreshArticleList();
+                    document.getElementById('articleManageModal').classList.add('active');
+                });
+                document.getElementById('closeArticleModal').addEventListener('click', () => {
+                    document.getElementById('articleManageModal').classList.remove('active');
+                    document.getElementById('articleFormContainer').style.display = 'none';
+                    editingArticleId = null;
+                });
+                document.getElementById('addNewArticleBtn').addEventListener('click', () => showArtForm(null));
+                document.getElementById('saveArticleBtn').addEventListener('click', saveArt);
+                document.getElementById('cancelArticleBtn').addEventListener('click', () => {
+                    document.getElementById('articleFormContainer').style.display = 'none';
+                    editingArticleId = null;
+                });
+                document.getElementById('closeDetailModal').addEventListener('click', () => document.getElementById('articleDetailModal').classList.remove('active'));
+                document.getElementById('closeProfileModal').addEventListener('click', () => document.getElementById('profileModal').classList.remove('active'));
+                document.getElementById('saveProfileBtn').addEventListener('click', async function() {
+                    const newPwd = document.getElementById('profileNewPwd').value;
+                    const confirm = document.getElementById('profileConfirmPwd').value;
+                    if (newPwd && newPwd !== confirm) return showToast('两次密码不一致', 'error');
+                    if (newPwd && newPwd.length < 6) return showToast('密码至少6位', 'error');
+                    if (newPwd) {
+                        const user = await findUserByEmail(currentUser.email);
+                        if (user && user.fields && user.fields.Password === CryptoJS.SHA256(newPwd).toString()) { return showToast('新密码不能与旧密码相同', 'error'); }
+                    }
+                    try {
+                        if (newPwd) await updatePassword(currentUser.email, newPwd);
+                        showToast('资料更新成功', 'success');
+                        document.getElementById('profileModal').classList.remove('active');
+                    } catch (e) { showToast('更新失败', 'error'); }
+                });
+                document.getElementById('closeAdminModal').addEventListener('click', () => document.getElementById('adminModal').classList.remove('active'));
+                document.getElementById('refreshUserListBtn').addEventListener('click', async () => {
+                    await refreshUserListAndRender(true);
+                    showToast('用户列表已刷新', 'success');
+                });
+                document.getElementById('closeInsufficientModal').addEventListener('click', () => document.getElementById('insufficientModal').classList.remove('active'));
+                document.getElementById('submitFeedbackBtn').addEventListener('click', async function() {
+                    const msg = document.getElementById('feedbackMessage').value.trim();
+                    if (!msg) return showToast('请填写内容', 'error');
+                    this.disabled = true;
+                    try {
+                        if (isLocalFile) {
+                            let list = JSON.parse(localStorage.getItem('feedback_list') || '[]');
+                            list.unshift({ name: document.getElementById('feedbackName').value || '网友', message: msg });
+                            if (list.length > 20) list.pop();
+                            localStorage.setItem('feedback_list', JSON.stringify(list));
+                        } else {
+                            await airReq('POST', 'Messages', { fields: { Name: document.getElementById('feedbackName').value || '网友', Message: msg } });
+                        }
+                        showToast('留言成功');
+                        document.getElementById('feedbackMessage').value = '';
+                        renderFeedback();
+                    } catch (e) { showToast('提交失败', 'error'); }
+                    this.disabled = false;
+                });
+                document.querySelectorAll('.buy-package').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const permanent = this.dataset.permanent === 'true';
+                        const amount = this.dataset.amount;
+                        const price = this.dataset.price;
+                        showToast(`购买${permanent?'永久VIP':amount+'次下载'}（${price}元）请联系客服微信 Win_Mac_123 付款。`, 'warning');
+                        document.getElementById('insufficientModal').classList.remove('active');
+                    });
+                });
+                document.getElementById('copyInviteCodeInsufficient').addEventListener('click', () => {
+                    if (currentUser && currentUser.inviteCode) { window.copyText(currentUser.inviteCode); }
+                    else { showToast('请先登录获取邀请码', 'error'); }
+                });
+                document.getElementById('refreshArticleListBtn').addEventListener('click', async () => {
+                    await refreshArticleList();
+                    showToast('文章列表已刷新', 'success');
+                });
+            }
+
+            const searchInput = document.getElementById('searchInput');
+            const searchSug = document.getElementById('searchSuggestions');
+            searchInput.addEventListener('input', e => {
+                searchKeyword = e.target.value;
+                renderGrid();
+                const v = searchKeyword.toLowerCase().trim();
+                if (!v) { searchSug.classList.remove('active'); return; }
+                const matches = softwares.filter(s => s.name.toLowerCase().includes(v)).slice(0, 5);
+                if (!matches.length) { searchSug.classList.remove('active'); return; }
+                searchSug.innerHTML = matches.map(s => `<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join('');
+                searchSug.classList.add('active');
+            });
+            searchInput.addEventListener('focus', () => {
+                if (window.innerWidth <= 768) { searchSug.style.top = 'auto'; searchSug.style.bottom = '100%'; }
+                else { searchSug.style.top = '100%'; searchSug.style.bottom = 'auto'; }
+            });
+            document.addEventListener('click', e => {
+                if (!searchSug.contains(e.target) && e.target !== searchInput) searchSug.classList.remove('active');
+            });
+            searchSug.addEventListener('click', e => {
+                const item = e.target.closest('.suggestion-item');
+                if (item) {
+                    searchInput.value = item.dataset.name;
+                    searchKeyword = item.dataset.name;
+                    searchSug.classList.remove('active');
+                    renderGrid();
+                }
+            });
+            document.getElementById('searchBtn').addEventListener('click', () => {
+                searchKeyword = searchInput.value;
+                renderGrid();
+            });
+
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('topNav');
+                if (!nav) return;
+                if (scrollTimer) clearTimeout(scrollTimer);
+                scrollTimer = setTimeout(() => {
+                    const currentScrollY = window.scrollY;
+                    if (currentScrollY > lastScrollY && currentScrollY > 100) nav.classList.add('hide');
+                    else if (currentScrollY < lastScrollY) nav.classList.remove('hide');
+                    lastScrollY = currentScrollY;
+                    document.getElementById('backToTop').classList.toggle('show', currentScrollY > 300);
+                }, 50);
+            });
             document.getElementById('backToTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-            async function loadAll() { const cachedSoft = localStorage.getItem('cachedSoft'); const cachedAds = localStorage.getItem('cachedAds'); if (cachedSoft) { try { softwares = JSON.parse(cachedSoft); if (softwares.length) { renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory(); } } catch (e) {} } if (cachedAds) { try { const ads = JSON.parse(cachedAds); if (Array.isArray(ads)) { const bn = ads.filter(a => a.position === 'banner'); const sb = ads.filter(a => a.position === 'sidebar'); if (bn.length) { bannerAds = bn; renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true); startCar(true); } if (sb.length) { sidebarAds = sb; renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false); startCar(false); } } } catch (e) {} } if (!isLocalFile) { try { const [swData, adData] = await Promise.all([fetchSoftwares(true), fetchAds(true)]); if (swData.length) softwares = swData; const bn = adData.filter(a => a.position === 'banner'); const sb = adData.filter(a => a.position === 'sidebar'); if (bn.length) { bannerAds = bn; renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true); startCar(true); } if (sb.length) { sidebarAds = sb; renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false); startCar(false); } renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory(); } catch (e) { console.warn('网络数据更新失败，保留缓存显示', e); } } else { if (!bannerAds.length || !sidebarAds.length) { const ads = await fetchAds(); bannerAds = ads.filter(a => a.position === 'banner'); sidebarAds = ads.filter(a => a.position === 'sidebar'); renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds, true); startCar(true); renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds, false); startCar(false); } if (!softwares.length) { softwares = await fetchSoftwares(); renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory(); } } articles = await fetchArticles(); renderArtsList(); await renderFeedback(); }
+
+            async function loadAll() {
+                const cachedSoft = localStorage.getItem('cachedSoft');
+                const cachedAds = localStorage.getItem('cachedAds');
+                if (cachedSoft) {
+                    try {
+                        softwares = JSON.parse(cachedSoft);
+                        if (softwares.length) {
+                            renderCats();
+                            renderGrid();
+                            renderHot();
+                            renderRank();
+                            renderHistory();
+                        }
+                    } catch(e) {}
+                }
+                if (cachedAds) {
+                    try {
+                        const ads = JSON.parse(cachedAds);
+                        if (Array.isArray(ads)) {
+                            const bn = ads.filter(a => a.position === 'banner');
+                            const sb = ads.filter(a => a.position === 'sidebar');
+                            if (bn.length) {
+                                bannerAds = bn;
+                                renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true);
+                                startCar(true);
+                            }
+                            if (sb.length) {
+                                sidebarAds = sb;
+                                renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false);
+                                startCar(false);
+                            }
+                        }
+                    } catch(e) {}
+                }
+                if (!isLocalFile) {
+                    try {
+                        const [swData, adData] = await Promise.all([fetchSoftwares(true), fetchAds(true)]);
+                        if (swData.length) softwares = swData;
+                        const bn = adData.filter(a => a.position === 'banner');
+                        const sb = adData.filter(a => a.position === 'sidebar');
+                        if (bn.length) {
+                            bannerAds = bn;
+                            renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true);
+                            startCar(true);
+                        }
+                        if (sb.length) {
+                            sidebarAds = sb;
+                            renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false);
+                            startCar(false);
+                        }
+                        renderCats();
+                        renderGrid();
+                        renderHot();
+                        renderRank();
+                        renderHistory();
+                    } catch (e) { console.warn('网络数据更新失败，保留缓存显示', e); }
+                } else {
+                    if (!bannerAds.length || !sidebarAds.length) {
+                        const ads = await fetchAds();
+                        bannerAds = ads.filter(a => a.position === 'banner');
+                        sidebarAds = ads.filter(a => a.position === 'sidebar');
+                        renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds, true);
+                        startCar(true);
+                        renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds, false);
+                        startCar(false);
+                    }
+                    if (!softwares.length) {
+                        softwares = await fetchSoftwares();
+                        renderCats();
+                        renderGrid();
+                        renderHot();
+                        renderRank();
+                        renderHistory();
+                    }
+                }
+                articles = await fetchArticles();
+                renderArtsList();
+                await renderFeedback();
+            }
+
             let bannerInt = null, sidebarInt = null, curB = 0, curS = 0;
-            function renderCarousel(slides, dots, ads, isB) { slides.innerHTML = ads.map((a, i) => `<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="lazy" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join(''); if (ads.length <= 1) { dots.style.display = 'none'; return; } dots.style.display = 'flex'; dots.innerHTML = ads.map((_, i) => `<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join(''); const update = (idx) => { if (isB) curB = idx; else curS = idx; slides.style.transform = `translateX(-${idx*100}%)`; dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === idx)); }; dots.querySelectorAll('.carousel-dot').forEach(d => d.addEventListener('click', e => { update(parseInt(e.target.dataset.index)); resetCar(isB); })); return update; }
-            function startCar(isB) { clearInterval(isB ? bannerInt : sidebarInt); const ads = isB ? bannerAds : sidebarAds; if (ads.length <= 1) return; const int = setInterval(() => { const nxt = ((isB ? curB : curS) + 1) % ads.length; if (isB) curB = nxt; else curS = nxt; const slides = isB ? document.getElementById('categoryBannerSlides') : document.getElementById('sidebarCarouselSlides'); const dots = isB ? document.getElementById('categoryBannerDots') : document.getElementById('sidebarCarouselDots'); slides.style.transform = `translateX(-${nxt*100}%)`; dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === nxt)); }, 4000); if (isB) bannerInt = int; else sidebarInt = int; }
+            function renderCarousel(slides, dots, ads, isB) {
+                slides.innerHTML = ads.map((a, i) => `<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="lazy" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join('');
+                if (ads.length <= 1) { dots.style.display = 'none'; return; }
+                dots.style.display = 'flex';
+                dots.innerHTML = ads.map((_, i) => `<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join('');
+                const update = (idx) => {
+                    if (isB) curB = idx; else curS = idx;
+                    slides.style.transform = `translateX(-${idx*100}%)`;
+                    dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+                };
+                dots.querySelectorAll('.carousel-dot').forEach(d => d.addEventListener('click', e => { update(parseInt(e.target.dataset.index)); resetCar(isB); }));
+                return update;
+            }
+
+            function startCar(isB) {
+                clearInterval(isB ? bannerInt : sidebarInt);
+                const ads = isB ? bannerAds : sidebarAds;
+                if (ads.length <= 1) return;
+                const int = setInterval(() => {
+                    const nxt = ((isB ? curB : curS) + 1) % ads.length;
+                    if (isB) curB = nxt; else curS = nxt;
+                    const slides = isB ? document.getElementById('categoryBannerSlides') : document.getElementById('sidebarCarouselSlides');
+                    const dots = isB ? document.getElementById('categoryBannerDots') : document.getElementById('sidebarCarouselDots');
+                    slides.style.transform = `translateX(-${nxt*100}%)`;
+                    dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === nxt));
+                }, 4000);
+                if (isB) bannerInt = int; else sidebarInt = int;
+            }
+
             function resetCar(isB) { clearInterval(isB ? bannerInt : sidebarInt); startCar(isB); }
-            function updateUserUI() { const area = document.getElementById('userArea'); if (currentUser) { const remaining = getRemainingCount(currentUser); const remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining; area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`; document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); }); document.getElementById('logoutBtn').addEventListener('click', () => { currentUser = null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出登录', 'success'); location.reload(); }); document.getElementById('profileBtn').addEventListener('click', openProfileModal); if (currentUser.role === 'admin') document.getElementById('adminBtn').addEventListener('click', openAdminModal); if (currentUser.role === 'admin') document.getElementById('manageArticlesBtn').style.display = 'block'; } else { area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>'; document.getElementById('showAuthBtn').addEventListener('click', () => openAuth('login')); document.getElementById('manageArticlesBtn').style.display = 'none'; } }
-            async function openProfileModal() { if (!currentUser) return; document.getElementById('profileUsername').innerText = currentUser.username; document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`; document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser); document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无（请重新登录）'; document.getElementById('profileModal').classList.add('active'); }
+
+            function updateUserUI() {
+                const area = document.getElementById('userArea');
+                if (currentUser) {
+                    const remaining = getRemainingCount(currentUser);
+                    const remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining;
+                    area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;
+                    document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
+                    document.getElementById('logoutBtn').addEventListener('click', () => { currentUser = null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出登录', 'success'); location.reload(); });
+                    document.getElementById('profileBtn').addEventListener('click', openProfileModal);
+                    if (currentUser.role === 'admin') document.getElementById('adminBtn').addEventListener('click', openAdminModal);
+                    if (currentUser.role === 'admin') document.getElementById('manageArticlesBtn').style.display = 'block';
+                } else {
+                    area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>';
+                    document.getElementById('showAuthBtn').addEventListener('click', () => openAuth('login'));
+                    document.getElementById('manageArticlesBtn').style.display = 'none';
+                }
+            }
+
+            async function openProfileModal() {
+                if (!currentUser) return;
+                document.getElementById('profileUsername').innerText = currentUser.username;
+                document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`;
+                document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser);
+                document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无（请重新登录）';
+                document.getElementById('profileModal').classList.add('active');
+            }
+
             if (localStorage.getItem('lezhe_user')) { try { currentUser = JSON.parse(localStorage.getItem('lezhe_user')); } catch (e) {} }
-            updateUserUI(); bindAuthEvents(); refCap('loginCaptchaQuestion', 'loginCaptchaInput'); loadAll();
+            updateUserUI();
+            bindAuthEvents();
+            refCap('loginCaptchaQuestion', 'loginCaptchaInput');
+            loadCategoryMapping().then(() => {
+                loadAll();
+            });
         })();
     </script>
 </body>
