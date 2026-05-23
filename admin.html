@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>乐哲软件 · 管理后台</title>
+    <title>乐哲软件 · 管理后台（全功能修复版）</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
@@ -218,7 +218,7 @@
     <!-- 留言管理面板 -->
     <div id="messagesPanel" class="panel" style="display:none;">
         <h2><i class="fas fa-comments"></i> 留言管理</h2>
-        <table class="table"><thead><tr><th>昵称</th><th>留言内容</th><th>时间</th><th>操作</th><tr></thead><tbody id="messagesTbody"><tr class="empty-row"><td colspan="4">加载中...</tbody></table>
+        <table class="table"><thead><tr><th>昵称</th><th>留言内容</th><th>时间</th><th>操作</th></tr></thead><tbody id="messagesTbody"><tr class="empty-row"><td colspan="4">加载中...</tbody></table>
     </div>
 </div>
 </div>
@@ -343,7 +343,6 @@
         select.innerHTML = cats.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
         if(currentVal && cats.some(c => c.name === currentVal)) select.value = currentVal;
         else if(cats.length) select.value = cats[0].name;
-        // 自动填充日期（新建状态下）
         setDefaultAddedDate();
     }
     
@@ -399,8 +398,11 @@
             if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无软件数据</td></tr>'; return; }
             tbody.innerHTML = data.records.map(r => {
                 const f = r.fields;
-                let osList = f.os || [];
-                let osDisplay = osList.join(', ');
+                // os 字段可能是数组（老数据）或字符串（新数据），统一转换为字符串显示
+                let osDisplay = '';
+                if (Array.isArray(f.os)) osDisplay = f.os.join(', ');
+                else if (typeof f.os === 'string') osDisplay = f.os;
+                else osDisplay = '';
                 return `<tr>
                     <td>${f.name||''}</td>
                     <td>${f.category||''}</td>
@@ -475,11 +477,15 @@
             document.getElementById('swName').value=fields.name||'';
             document.getElementById('swCategory').value=fields.category||'';
             document.getElementById('swVersion').value=fields.version||'';
-            const os=fields.os||[];
-            document.getElementById('osWindows').checked=os.includes('Windows');
-            document.getElementById('osMac').checked=os.includes('Mac');
-            document.getElementById('osAndroid').checked=os.includes('安卓');
-            document.getElementById('osiOS').checked=os.includes('苹果');
+            // 处理 os 字段：可能是字符串或数组，统一转成列表
+            let osList = [];
+            if (Array.isArray(fields.os)) osList = fields.os;
+            else if (typeof fields.os === 'string') osList = fields.os.split(',').map(s=>s.trim());
+            else osList = [];
+            document.getElementById('osWindows').checked = osList.includes('Windows');
+            document.getElementById('osMac').checked = osList.includes('Mac');
+            document.getElementById('osAndroid').checked = osList.includes('安卓');
+            document.getElementById('osiOS').checked = osList.includes('苹果');
             document.getElementById('swURL').value=fields.url||'';
             document.getElementById('swDescription').value=fields.description||'';
             if(fields.addedDate) document.getElementById('swAddedDate').value=fields.addedDate;
@@ -517,24 +523,26 @@
     window.deleteUser = async (id) => { if(confirm('删除用户？')) { try{ await airtableRequest('DELETE',`Users/${id}`); loadUsers(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
     window.deleteMessage = async (id) => { if(confirm('删除留言？')) { try{ await airtableRequest('DELETE',`messages/${id}`); loadMessages(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
     
-    // 保存软件（分类直接保存下拉框的中文值，系统支持数组包含新选项）
+    // 保存软件（关键修复：os 字段转为逗号分隔的字符串）
     document.getElementById('saveSoftwareBtn')?.addEventListener('click', async () => {
         let finalIcon = document.getElementById('swIcon').value;
         const custom = document.getElementById('swIconCustom').value.trim();
         if(custom) finalIcon = custom;
-        const os = [];
-        if(document.getElementById('osWindows').checked) os.push('Windows');
-        if(document.getElementById('osMac').checked) os.push('Mac');
-        if(document.getElementById('osAndroid').checked) os.push('安卓');
-        if(document.getElementById('osiOS').checked) os.push('苹果');
-        if(!os.length) return showToast('请至少选择一个系统', true);
+        const osArray = [];
+        if(document.getElementById('osWindows').checked) osArray.push('Windows');
+        if(document.getElementById('osMac').checked) osArray.push('Mac');
+        if(document.getElementById('osAndroid').checked) osArray.push('安卓');
+        if(document.getElementById('osiOS').checked) osArray.push('苹果');
+        if(osArray.length === 0) return showToast('请至少选择一个系统', true);
         const category = document.getElementById('swCategory').value.trim();
         if(!category) return showToast('请选择分类', true);
+        // 将系统数组转为逗号分隔的字符串（适配单行文本字段）
+        const osString = osArray.join(',');
         const fields = {
             name: document.getElementById('swName').value.trim(),
             category: category,
             version: document.getElementById('swVersion').value.trim(),
-            os: os,
+            os: osString,
             url: document.getElementById('swURL').value.trim(),
             description: document.getElementById('swDescription').value.trim(),
             icon: finalIcon || '',
