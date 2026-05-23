@@ -291,7 +291,7 @@
             async function airReq(method, path, body = null, retries = 2) { if (isLocalFile) throw new Error('本地模式'); const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`; const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' }; const opts = { method, headers }; if (body) opts.body = JSON.stringify(body); for (let i = 0; i <= retries; i++) { try { const r = await fetchWithTimeout(url, opts, 5000); if (!r.ok) { const errText = await r.text(); throw new Error(`HTTP ${r.status}: ${errText.substring(0,100)}`); } return await r.json(); } catch (e) { if (i === retries) throw e; await new Promise(r => setTimeout(r, 600 * (i + 2))); } } }
             function getFieldValue(fields, possibleNames, defaultValue = '') { for (let name of possibleNames) { if (fields[name] !== undefined) return fields[name]; const lowerName = name.toLowerCase(); for (let key in fields) { if (key.toLowerCase() === lowerName) return fields[key]; } } return defaultValue; }
 
-            // 加载分类映射表（从 Categories 表）
+            // 加载分类映射表
             async function loadCategoryMapping() {
                 try {
                     const data = await airReq('GET', 'Categories?maxRecords=100');
@@ -300,20 +300,12 @@
                         const key = rec.fields.Key;
                         const name = rec.fields.Name;
                         if (key && name) map[key] = name;
-                        // 同时也存储 name->name，便于直接显示中文
                         if (name) map[name] = name;
                     });
-                    // 默认分类兜底（保证常用英文 key 有中文）
                     const defaultMap = {
-                        'adobe': 'Adobe系列',
-                        'autodesk': 'Autodesk系列',
-                        'c4d': 'Cinema 4D',
-                        'sketchup': '草图大师',
-                        'rhino': '犀牛软件',
-                        'plugin': '插件工具',
-                        'other': '其他',
-                        'video_editing': '视频剪辑',
-                        '3d_modeling': '3D建模'
+                        'adobe': 'Adobe系列', 'autodesk': 'Autodesk系列', 'c4d': 'Cinema 4D',
+                        'sketchup': '草图大师', 'rhino': '犀牛软件', 'plugin': '插件工具', 'other': '其他',
+                        'video_editing': '视频剪辑', '3d_modeling': '3D建模'
                     };
                     Object.assign(map, defaultMap);
                     categoryNameMap = map;
@@ -335,9 +327,7 @@
 
             function getCategoryDisplayName(catKey) {
                 if (!catKey) return '未分类';
-                // 如果已经是中文（包含汉字），直接返回
                 if (/[\u4e00-\u9fa5]/.test(catKey)) return catKey;
-                // 否则尝试从映射表获取
                 return categoryNameMap[catKey] || catKey;
             }
 
@@ -397,7 +387,6 @@
                 }
             }
 
-            // 广告、文章等函数（完整保留，无省略）
             async function fetchAds(forceRefresh = false) {
                 if (!forceRefresh) {
                     const cached = localStorage.getItem('cachedAds');
@@ -776,10 +765,10 @@
             function resetUserQuota(email) { saveUserDownloadData(email, 0, 0); }
             function setUserUsedCount(email, count) { const data = getUserDownloadData(email); saveUserDownloadData(email, Math.max(0, Math.min(count, 999)), data.extra); }
 
+            // 辅助函数：图标和颜色
             function getStdAbbr(n) { if (!n) return 'SW'; const l = n.toLowerCase(); const map = { 'photoshop': 'PS', 'illustrator': 'AI', 'premiere pro': 'PR', 'after effects': 'AE', 'lightroom': 'LR', 'indesign': 'ID', 'cinema 4d': 'C4D', 'c4d': 'C4D', 'autocad': 'AC', 'cad': 'CAD', '3ds max': '3DS', 'maya': 'MA', 'sketchup': 'SU', 'rhino': 'RH', 'blender': 'BL' }; if (map[l]) return map[l]; for (let k in map) if (l.includes(k)) return map[k]; return n.slice(0, 2).toUpperCase(); }
             function getColor(n) { let h = 0; for (let i = 0; i < n.length; i++) h = n.charCodeAt(i) + ((h << 5) - h); return `hsl(${Math.abs(h)%360},70%,55%)`; }
             function renderIconHtml(iconUrl, name) { const validUrl = (iconUrl && typeof iconUrl === 'string' && (iconUrl.startsWith('http') || iconUrl.startsWith('data:image'))) ? iconUrl : 'https://via.placeholder.com/36x36?text=' + encodeURIComponent(getStdAbbr(name)); return `<img src="${esc(validUrl)}" style="width:100%;height:100%;object-fit:cover;border:none;outline:none;display:block;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="icon-fallback" style="background:${getColor(name)};display:none;align-items:center;justify-content:center;width:100%;height:100%;">${esc(getStdAbbr(name))}</div>`; }
-
             // 核心渲染函数（修复重复分类标签）
             function renderGrid() {
                 const filtered = softwares.filter(s => (currentCategory === 'all' || s.category === currentCategory) && s.name.toLowerCase().includes(searchKeyword.toLowerCase()));
@@ -814,14 +803,12 @@
 
             window._loadMore = () => { showAll = true; renderGrid(); };
 
-            // 渲染分类标签（关键修复：基于 category 原始值去重，避免重复标签）
+            // 渲染分类标签（基于 category 原始值去重，避免重复）
             async function renderCats() {
-                // 收集所有唯一的 category 值（原始存储值，如 "adobe", "插件工具", "3d_modeling" 等）
                 const uniqueCats = new Set();
                 softwares.forEach(s => {
                     if (s.category) uniqueCats.add(s.category);
                 });
-                // 转换为数组并排序（可选）
                 const catsArray = Array.from(uniqueCats).sort();
                 let html = `<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all">全部</button>`;
                 for (let catKey of catsArray) {
@@ -1501,8 +1488,8 @@
             updateUserUI();
             bindAuthEvents();
             refCap('loginCaptchaQuestion', 'loginCaptchaInput');
-            await loadCategoryMapping();  // 先加载分类映射
-            await loadAll();              // 再加载软件和其他数据
+            await loadCategoryMapping();
+            await loadAll();
         })();
     </script>
 </body>
