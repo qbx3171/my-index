@@ -18,7 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ========== 完整样式 ========== */
+        /* ========== 完整样式 (与原版完全一致，无省略) ========== */
         :root { --bg: #f3f4f8; --surface: #ffffff; --border: #e8ecf3; --border-light: #f0f2f7; --text: #1a1d2e; --text-secondary: #4a5068; --text-muted: #8b90a5; --primary: #4f6ef6; --primary-light: #eef1fd; --primary-hover: #3b54d4; --success: #10b981; --shadow-sm: 0 1px 3px rgba(0,0,0,0.04); --shadow-md: 0 4px 16px rgba(0,0,0,0.05); --shadow-lg: 0 12px 36px rgba(0,0,0,0.07); --radius-sm: 8px; --radius: 16px; --radius-lg: 22px; --radius-xl: 28px; --radius-full: 60px; --transition-fast: 0.18s ease; --font-xs: 0.68rem; --font-sm: 0.78rem; --font-base: 0.9rem; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
@@ -185,6 +185,7 @@
         .input-check-status.valid { color: var(--success); }
         .input-check-status.invalid { color: #ef4444; }
         .loading-spinner-small { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; }
+        .default-software-icon { background: linear-gradient(135deg, #4f6ef6, #3b54d4); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; width: 100%; height: 100%; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -193,7 +194,7 @@
         <div class="top-nav" id="topNav"><div class="nav-inner"><div class="logo-area"><span class="logo">乐哲软件</span></div><button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button><div class="nav-links" id="navLinks"><a href="index.html">首页</a><a href="service.html">服务项目</a><a href="download.html" class="active">软件下载</a><a href="copyright.html">版权声明</a></div><div class="user-area"><div id="userArea"></div></div></div></div>
         <div class="main"><div class="content-wrapper"><div class="main-content"><div class="carousel-container" id="categoryBannerContainer"><div class="carousel-slides" id="categoryBannerSlides"></div><div class="carousel-dots" id="categoryBannerDots"></div></div><div class="hot-section"><div class="hot-header"><h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3></div><div class="hot-scroll" id="hotScroll"></div></div><div class="category-row" id="categoryTabs"></div><div id="softwareGridContainer" class="grid"></div><div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;" onclick="window._loadMore()">加载更多</button></div></div><div class="sidebar"><div class="sidebar-search"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="搜软件..." autocomplete="off"><button id="searchBtn"><i class="fas fa-arrow-right"></i></button></div><div class="search-suggestions" id="searchSuggestions"></div></div><div class="carousel-container" id="adContainer"><div class="carousel-slides" id="sidebarCarouselSlides"></div><div class="carousel-dots" id="sidebarCarouselDots"></div></div><div class="sidebar-card"><div class="calendar-header"><span id="calendarMonthYear"></span><div class="calendar-nav"><button id="prevMonth"><i class="fas fa-chevron-left"></i></button><button id="nextMonth"><i class="fas fa-chevron-right"></i></button></div></div><div class="calendar-grid" id="calendarDays"></div><div style="text-align:center; margin-top:10px;"><button id="dailyCheckinBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:8px 16px; font-size:0.75rem; cursor:pointer;">📅 每日签到 (+1次)</button></div></div><div class="feedback-section" id="sidebarFeedback"><div style="font-weight:650;font-size:var(--font-base);margin-bottom:10px;display:flex;align-items:center;gap:7px;"><i class="fas fa-comment-dots"></i> 用户留言</div><input type="text" id="feedbackName" class="feedback-input" placeholder="昵称 (选填)"><textarea id="feedbackMessage" class="feedback-textarea" rows="2" placeholder="分享你想要的软件..."></textarea><button id="submitFeedbackBtn" class="feedback-submit-btn"><i class="fas fa-paper-plane"></i> 提交</button><div id="feedbackListContainer" style="margin-top:12px;font-size:var(--font-xs);"></div></div><div class="sidebar-card"><h3><i class="fas fa-newspaper"></i> 最新文章 <button id="manageArticlesBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:5px 12px; font-size:0.65rem; cursor:pointer; display:none; font-weight:550; min-height:32px;">管理</button></h3><div id="articlesList"></div></div><div class="sidebar-card"><h3><i class="fas fa-chart-line"></i> 下载排行榜</h3><div id="rankList"></div></div><div class="sidebar-card"><h3><i class="fas fa-history"></i> 最近浏览</h3><div id="historyList"></div><div class="clear-history"><button id="clearHistoryBtn"><i class="fas fa-trash-alt"></i> 清空历史</button></div></div></div></div><div class="friend-links-wrapper"><div class="friend-links-title">友情链接</div><div class="friend-links-row"><a href="https://foxirj.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 佛系软件</a><a href="https://www.ruancang.net/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 软仓</a><a href="https://www.macwk.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> MacWK</a><a href="https://www.ifmac.cn/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> ifMac</a><a href="https://www.macku.pro/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 迈克库软件</a></div></div><footer style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.7rem; line-height:1.8;">版权所有 © 乐哲软件<br>乐哲软件博客 · 原版安装包推荐，安全无捆绑<br>www.lezhesoft.cn | 个人技术分享</footer></div></div>
 
-    <!-- 模态框 -->
+    <!-- 模态框 (完整保留) -->
     <div id="authModal" class="modal-overlay"><div class="modal-card" style="max-width:440px;"><div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div><div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"></div><button id="showForgotBtn" style="background:none;border:none;color:var(--primary);margin-bottom:12px;">忘记密码？</button><button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;min-height:44px;">登录</button></div><div id="registerForm" style="display:none;"><input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><div id="emailCheckStatus" class="input-check-status"></div><input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><input type="text" id="regInviteCode" placeholder="邀请码（选填）" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><div id="inviteCodeStatus" class="input-check-status"></div><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"></div><button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;min-height:44px;">注册</button></div><div id="forgotForm" style="display:none;"><input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><div style="display:flex; gap:10px; margin-bottom:12px;"><button id="sendResetCodeBtn" class="send-code-btn" style="flex:1; background:var(--primary); color:#fff; border:none; border-radius:40px; padding:10px; cursor:pointer; min-height:44px;">发送验证码</button><input type="text" id="resetCodeInput" placeholder="验证码" style="flex:1; padding:10px; border:1px solid var(--border); border-radius:12px;min-height:44px;"></div><input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="forgotCaptchaQuestion"></span><button id="refreshForgotCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);min-height:44px;"></div><button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;min-height:44px;">重置密码</button><button id="backToLoginFromForgot" style="background:none;border:none;color:var(--primary);margin-top:10px;">返回登录</button></div></div></div>
     <div id="profileModal" class="modal-overlay"><div class="modal-card" style="max-width:440px;"><div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span style="font-weight:700;">个人中心</span><button id="closeProfileModal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-muted);"><i class="fas fa-times"></i></button></div><div><strong>用户名：</strong> <span id="profileUsername"></span></div><div><strong>会员等级：</strong> <span id="profileRole"></span></div><div><strong>本月剩余下载：</strong> <span id="profileRemaining"></span> 次</div><div><strong>我的邀请码：</strong><div class="invite-code-box" style="background:#f0f4fe;border:1px solid var(--primary);border-radius:12px;padding:12px;text-align:center;font-weight:600;margin:8px 0;" id="myInviteCode"></div><div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">邀请好友注册，双方各得5次下载机会</div></div><div style="margin-top:16px;"><strong>修改密码（选填）</strong></div><input type="password" id="profileNewPwd" placeholder="新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;min-height:44px;"><input type="password" id="profileConfirmPwd" placeholder="确认新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;min-height:44px;"><button id="saveProfileBtn" style="width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:30px;min-height:44px;">保存修改</button></div></div>
     <div id="adminModal" class="modal-overlay"><div class="modal-card" style="max-width:800px;"><div style="display:flex;justify-content:space-between;margin-bottom:20px;align-items:center;"><h3 style="font-weight:700;"><i class="fas fa-users"></i> 用户管理</h3><button id="closeAdminModal" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">&times;</button></div><div class="admin-search-bar"><input type="text" id="adminSearchInput" placeholder="🔍 搜索用户邮箱或名称..."><button id="refreshUserListBtn"><i class="fas fa-sync-alt"></i> 刷新</button></div><div id="adminUserList" style="max-height:65vh;overflow-y:auto;padding-right:4px;"></div></div></div>
@@ -205,6 +206,7 @@
     <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
 
     <script>
+        // ==================== 全局配置 ====================
         emailjs.init('9VF7tzRthx9_nkchu');
         if (typeof window.copyText !== 'function') {
             window.copyText = function(text) {
@@ -225,8 +227,9 @@
                 document.body.removeChild(ta);
             }
         }
+
         (function() {
-            // 粒子动画
+            // 粒子动画（完整保留）
             const c = document.getElementById('particles-canvas'), ctx = c.getContext('2d');
             let w, h, m = { x: -1e3, y: -1e3 }, p = [];
             function r() { w = innerWidth; h = innerHeight; c.width = w; c.height = h }
@@ -262,15 +265,18 @@
             let lastScrollY = 0;
             let scrollTimer = null;
 
+            // 辅助函数
             function showToast(m, t = 'success') { const d = document.createElement('div'); d.className = `toast-message ${t}`; d.innerHTML = `<i class="fas ${t==='success'?'fa-check-circle':'fa-exclamation-triangle'}"></i> ${m}`; document.body.appendChild(d); setTimeout(() => d.remove(), 3000); }
             function esc(s) { return String(s).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' })[m]); }
             function sanitizeHtml(html) { if (!html) return ''; const temp = document.createElement('div'); temp.textContent = html; let safe = temp.innerHTML; safe = safe.replace(/&lt;(\/?(?:br|p|strong|em|b|i|ul|li|ol|a|img))&gt;/gi, '<$1>'); safe = safe.replace(/&lt;(\/?a)&gt;([^&]*)&lt;(\/a)&gt;/gi, '<$1>$2</$3>'); safe = safe.replace(/href\s*=\s*['"]([^'"]*)['"]/gi, (m, url) => `href="${url.replace(/javascript:/gi, '')}"`); return safe; }
             function genCap() { let a = Math.floor(Math.random() * 10) + 1, b = Math.floor(Math.random() * 10) + 1, op = Math.random() > 0.5 ? '+' : '-', ans = op === '+' ? a + b : a - b; if (ans < 0) return genCap(); return { question: `${a} ${op} ${b} = ?`, answer: ans }; }
             function refCap(q, i) { let c = genCap(); currentCaptcha = c; document.getElementById(q).innerText = c.question; document.getElementById(i).value = ''; }
 
+            // 汉堡菜单
             const hamburger = document.getElementById('hamburgerBtn'), navLinks = document.getElementById('navLinks');
             if (hamburger && navLinks) { hamburger.addEventListener('click', (e) => { e.stopPropagation(); hamburger.classList.toggle('active'); navLinks.classList.toggle('show'); }); document.addEventListener('click', (e) => { if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) { navLinks.classList.remove('show'); hamburger.classList.remove('active'); } }); navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', () => { hamburger.classList.remove('active'); navLinks.classList.remove('show'); })); }
 
+            // 日历签到
             let currentDate = new Date();
             function renderCalendar() { const y = currentDate.getFullYear(), m = currentDate.getMonth(); const fd = new Date(y, m, 1).getDay(); const days = new Date(y, m + 1, 0).getDate(); const mn = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']; document.getElementById('calendarMonthYear').innerText = `${y}年 ${mn[m]}`; const el = document.getElementById('calendarDays'); const signKey = currentUser ? `signin_${currentUser.email}_${y}-${m+1}` : null; const signedDays = signKey ? JSON.parse(localStorage.getItem(signKey) || '[]') : []; let h = '<div class="calendar-day-name">一</div><div class="calendar-day-name">二</div><div class="calendar-day-name">三</div><div class="calendar-day-name">四</div><div class="calendar-day-name">五</div><div class="calendar-day-name">六</div><div class="calendar-day-name">日</div>'; let d = 1; for (let i = 0; i < 6; i++) { for (let j = 0; j < 7; j++) { if (i === 0 && j < (fd === 0 ? 6 : fd - 1)) h += '<div class="calendar-day"></div>'; else if (d > days) h += '<div class="calendar-day"></div>'; else { const isToday = (d === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear()); const isSigned = signedDays.includes(d); let cls = 'calendar-day'; if (isToday) cls += ' today'; if (isSigned) cls += ' signed'; h += `<div class="${cls}" data-day="${d}">${d}</div>`; d++; } } } el.innerHTML = h; if (currentUser) { const todayDiv = el.querySelector('.calendar-day.today'); if (todayDiv && !todayDiv.classList.contains('signed')) { todayDiv.addEventListener('click', () => performCheckin()); } } }
             async function syncExtraToServer(email, extra) { if (isLocalFile) return; try { const user = await findUserByEmail(email); if (user) { await airReq('PATCH', `Users/${user.id}`, { fields: { ExtraQuota: extra } }); } } catch(e) {} }
@@ -282,10 +288,27 @@
             document.getElementById('dailyCheckinBtn').addEventListener('click', performCheckin);
             renderCalendar();
 
+            // Airtable 请求
             async function fetchWithTimeout(url, opts, to = 5000) { if (isLocalFile) throw new Error('本地跳过'); const controller = new AbortController(); const id = setTimeout(() => controller.abort(), to); try { const r = await fetch(url, { ...opts, signal: controller.signal }); clearTimeout(id); return r; } catch (e) { clearTimeout(id); throw e; } }
             async function airReq(method, path, body = null, retries = 2) { if (isLocalFile) throw new Error('本地模式'); const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`; const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' }; const opts = { method, headers }; if (body) opts.body = JSON.stringify(body); for (let i = 0; i <= retries; i++) { try { const r = await fetchWithTimeout(url, opts, 5000); if (!r.ok) { const errText = await r.text(); throw new Error(`HTTP ${r.status}: ${errText.substring(0,100)}`); } return await r.json(); } catch (e) { if (i === retries) throw e; await new Promise(r => setTimeout(r, 600 * (i + 2))); } } }
             function getFieldValue(fields, possibleNames, defaultValue = '') { for (let name of possibleNames) { if (fields[name] !== undefined) return fields[name]; const lowerName = name.toLowerCase(); for (let key in fields) { if (key.toLowerCase() === lowerName) return fields[key]; } } return defaultValue; }
-            async function fetchSoftwares(forceRefresh = false) { if (!forceRefresh) { const cached = localStorage.getItem('cachedSoft'); if (cached) { try { const result = JSON.parse(cached); if (result && result.length) return result; } catch(e) {} } } if (isLocalFile) { const defaultSoft = [ { name: "Adobe Camera RAW", category: "adobe", version: "全版本", description: "用于处理RAW格式图像的工具", os: ["Windows", "Mac"], downloads: 2035, addedDate: "2026-04-22", icon: "fa-camera", url: "#" }, { name: "DaVinci Resolve", category: "other", version: "最新", description: "视频调色软件", os: ["Windows", "Mac"], downloads: 1674, addedDate: "2026-04-21", icon: "fa-video", url: "#" }, { name: "Acrobat DC", category: "adobe", version: "AcrXi Pro-2026", description: "PDF编辑与转换", os: ["Windows", "Mac"], downloads: 1909, addedDate: "2026-04-23", icon: "fa-file-pdf", url: "#" }, { name: "PhotoShop", category: "adobe", version: "CS6-2026", description: "图像处理软件", os: ["Windows", "Mac"], downloads: 1273, addedDate: "2026-04-23", icon: "fa-image", url: "#" }, { name: "Illustrator", category: "adobe", version: "CS6-2026", description: "矢量图形设计", os: ["Windows", "Mac"], downloads: 2089, addedDate: "2026-04-22", icon: "fa-paint-brush", url: "#" }, { name: "Premiere Pro", category: "adobe", version: "CS6-2026", description: "视频编辑软件", os: ["Windows", "Mac"], downloads: 2052, addedDate: "2026-04-23", icon: "fa-film", url: "#" }, { name: "AutoCAD", category: "autodesk", version: "2025", description: "计算机辅助设计", os: ["Windows", "Mac"], downloads: 1567, addedDate: "2026-04-18", icon: "fa-cube", url: "#" }, { name: "Cinema 4D", category: "c4d", version: "R19-2025", description: "三维建模、动画", os: ["Windows", "Mac"], downloads: 1432, addedDate: "2026-04-16", icon: "fa-cube", url: "#" }, { name: "Rhino 7/8", category: "rhino", version: "5.0-8.28", description: "工业设计、建筑设计", os: ["Windows", "Mac"], downloads: 876, addedDate: "2026-04-14", icon: "fa-ruler-combined", url: "#" } ]; return defaultSoft.map(s => ({ ...s, id: Math.random().toString(36) })); } try { const data = await airReq('GET', 'softwares?maxRecords=100'); const result = data.records.map(rec => { const f = rec.fields; const name = getFieldValue(f, ['Name', 'A name', 'name', '软件名称'], '未命名软件'); const category = getFieldValue(f, ['Category', 'A category', 'category', '分类'], 'other'); const version = getFieldValue(f, ['Version', 'version'], ''); const description = getFieldValue(f, ['Description', 'description'], ''); let icon = getFieldValue(f, ['Icon', 'icon', '图片', 'image'], null); const url = getFieldValue(f, ['URL', 'url'], '#'); const addedDate = getFieldValue(f, ['AddedDate', 'addedDate'], new Date().toISOString().split('T')[0]); const downloads = Number(getFieldValue(f, ['Downloads', 'downloads'], Math.floor(Math.random() * 4000) + 100)); let os = getFieldValue(f, ['OS', 'os'], ['Windows', 'Mac']); if (typeof os === 'string') os = os.split(',').map(s => s.trim()); if (!Array.isArray(os)) os = ['Windows', 'Mac']; return { id: rec.id, name, category, version, description, icon, url, addedDate, downloads, os }; }); localStorage.setItem('cachedSoft', JSON.stringify(result)); return result; } catch (e) { const cached = localStorage.getItem('cachedSoft'); return cached ? JSON.parse(cached) : []; } }
+
+            // 拉取软件数据（支持缓存）
+            async function fetchSoftwares(forceRefresh = false) { if (!forceRefresh) { const cached = localStorage.getItem('cachedSoft'); if (cached) { try { const result = JSON.parse(cached); if (result && result.length) return result; } catch(e) {} } } if (isLocalFile) { const defaultSoft = [ { name: "Adobe Camera RAW", category: "adobe", version: "全版本", description: "用于处理RAW格式图像的工具", os: ["Windows", "Mac"], downloads: 2035, addedDate: "2026-04-22", icon: "https://via.placeholder.com/36x36?text=ACR", url: "#" }, { name: "DaVinci Resolve", category: "other", version: "最新", description: "视频调色软件", os: ["Windows", "Mac"], downloads: 1674, addedDate: "2026-04-21", icon: "https://via.placeholder.com/36x36?text=DR", url: "#" }, { name: "Acrobat DC", category: "adobe", version: "AcrXi Pro-2026", description: "PDF编辑与转换", os: ["Windows", "Mac"], downloads: 1909, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PDF", url: "#" }, { name: "PhotoShop", category: "adobe", version: "CS6-2026", description: "图像处理软件", os: ["Windows", "Mac"], downloads: 1273, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PS", url: "#" }, { name: "Illustrator", category: "adobe", version: "CS6-2026", description: "矢量图形设计", os: ["Windows", "Mac"], downloads: 2089, addedDate: "2026-04-22", icon: "https://via.placeholder.com/36x36?text=AI", url: "#" }, { name: "Premiere Pro", category: "adobe", version: "CS6-2026", description: "视频编辑软件", os: ["Windows", "Mac"], downloads: 2052, addedDate: "2026-04-23", icon: "https://via.placeholder.com/36x36?text=PR", url: "#" }, { name: "AutoCAD", category: "autodesk", version: "2025", description: "计算机辅助设计", os: ["Windows", "Mac"], downloads: 1567, addedDate: "2026-04-18", icon: "https://via.placeholder.com/36x36?text=CAD", url: "#" }, { name: "Cinema 4D", category: "c4d", version: "R19-2025", description: "三维建模、动画", os: ["Windows", "Mac"], downloads: 1432, addedDate: "2026-04-16", icon: "https://via.placeholder.com/36x36?text=C4D", url: "#" }, { name: "Rhino 7/8", category: "rhino", version: "5.0-8.28", description: "工业设计、建筑设计", os: ["Windows", "Mac"], downloads: 876, addedDate: "2026-04-14", icon: "https://via.placeholder.com/36x36?text=RH", url: "#" } ]; return defaultSoft.map(s => ({ ...s, id: Math.random().toString(36) })); } try { const data = await airReq('GET', 'softwares?maxRecords=100'); const result = data.records.map(rec => { const f = rec.fields; const name = getFieldValue(f, ['Name', 'A name', 'name', '软件名称'], '未命名软件'); const category = getFieldValue(f, ['Category', 'A category', 'category', '分类'], 'other'); const version = getFieldValue(f, ['Version', 'version'], ''); const description = getFieldValue(f, ['Description', 'description'], ''); let icon = getFieldValue(f, ['Icon', 'icon', '图片', 'image'], null); // 统一提取图片URL：如果是Airtable附件，取第一张图片URL；如果是字符串且是http开头，直接使用；否则使用默认图
+                let iconUrl = '';
+                if (icon) {
+                    if (Array.isArray(icon) && icon.length > 0 && icon[0].url) iconUrl = icon[0].url;
+                    else if (typeof icon === 'string' && (icon.startsWith('http') || icon.startsWith('data:image'))) iconUrl = icon;
+                }
+                if (!iconUrl) iconUrl = 'https://via.placeholder.com/36x36?text=' + encodeURIComponent(name.slice(0,2).toUpperCase());
+                const url = getFieldValue(f, ['URL', 'url'], '#');
+                const addedDate = getFieldValue(f, ['AddedDate', 'addedDate'], new Date().toISOString().split('T')[0]);
+                const downloads = Number(getFieldValue(f, ['Downloads', 'downloads'], Math.floor(Math.random() * 4000) + 100));
+                let os = getFieldValue(f, ['OS', 'os'], ['Windows', 'Mac']);
+                if (typeof os === 'string') os = os.split(',').map(s => s.trim());
+                if (!Array.isArray(os)) os = ['Windows', 'Mac'];
+                return { id: rec.id, name, category, version, description, icon: iconUrl, url, addedDate, downloads, os };
+            }); localStorage.setItem('cachedSoft', JSON.stringify(result)); return result; } catch (e) { const cached = localStorage.getItem('cachedSoft'); return cached ? JSON.parse(cached) : []; } }
             async function fetchAds(forceRefresh = false) { if (!forceRefresh) { const cached = localStorage.getItem('cachedAds'); if (cached) { try { const result = JSON.parse(cached); if (result && result.length) return result; } catch(e) {} } } if (isLocalFile) { return [ { image: "https://picsum.photos/800/400?random=1", link: "#", title: "广告1", position: "banner", enabled: true }, { image: "https://picsum.photos/300/200?random=2", link: "#", title: "广告2", position: "sidebar", enabled: true } ]; } try { const data = await airReq('GET', 'Ads?maxRecords=50'); const result = data.records.map(r => { const f = r.fields; let img = getFieldValue(f, ['Image', 'image'], ''); if (Array.isArray(img) && img[0] && img[0].url) img = img[0].url; return { image: img, link: getFieldValue(f, ['Link', 'link'], '#'), title: getFieldValue(f, ['Title', 'title'], ''), position: (getFieldValue(f, ['Position', 'position'], 'sidebar')).toLowerCase(), enabled: getFieldValue(f, ['Enabled', 'enabled'], true) !== false }; }).filter(a => a.enabled && a.image); localStorage.setItem('cachedAds', JSON.stringify(result)); return result; } catch (e) { const cached = localStorage.getItem('cachedAds'); return cached ? JSON.parse(cached) : []; } }
             async function fetchArticles() { if (isLocalFile) return []; try { const data = await airReq('GET', 'Articles?maxRecords=100&sort[0][field]=CreatedAt&sort[0][direction]=desc'); return data.records.map(rec => ({ id: rec.id, title: rec.fields.Title || '无标题', cover: rec.fields.Cover || '', excerpt: rec.fields.Excerpt || '', content: rec.fields.Content || '', tags: rec.fields.Tags || '', createdAt: rec.fields.CreatedAt || new Date().toISOString() })); } catch (e) { return []; } }
             async function createArticle(art) { if (isLocalFile) throw new Error('本地不支持'); return await airReq('POST', 'Articles', { fields: { Title: art.title, Cover: art.cover, Excerpt: art.excerpt, Content: art.content, Tags: art.tags } }); }
@@ -315,8 +338,11 @@
             function setUserUsedCount(email, count) { const data = getUserDownloadData(email); saveUserDownloadData(email, Math.max(0, Math.min(count, 999)), data.extra); }
             function getStdAbbr(n) { if (!n) return 'SW'; const l = n.toLowerCase(); const map = { 'photoshop': 'PS', 'illustrator': 'AI', 'premiere pro': 'PR', 'after effects': 'AE', 'lightroom': 'LR', 'indesign': 'ID', 'cinema 4d': 'C4D', 'c4d': 'C4D', 'autocad': 'AC', 'cad': 'CAD', '3ds max': '3DS', 'maya': 'MA', 'sketchup': 'SU', 'rhino': 'RH', 'blender': 'BL' }; if (map[l]) return map[l]; for (let k in map) if (l.includes(k)) return map[k]; return n.slice(0, 2).toUpperCase(); }
             function getColor(n) { let h = 0; for (let i = 0; i < n.length; i++) h = n.charCodeAt(i) + ((h << 5) - h); return `hsl(${Math.abs(h)%360},70%,55%)`; }
-            function parseIcon(iconField, name) { if (!iconField) return { type: 'text', value: getStdAbbr(name) }; if (Array.isArray(iconField) && iconField.length > 0) { const first = iconField[0]; if (first && first.url) return { type: 'image', value: first.url }; if (first && typeof first === 'string') return { type: 'image', value: first }; } if (typeof iconField === 'string') { const str = iconField.trim(); if (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('data:image')) { return { type: 'image', value: str }; } if (str.startsWith('fa-') || str.includes('fa-')) { let clean = str; if (!clean.startsWith('fas ') && !clean.startsWith('far ') && !clean.startsWith('fab ')) { clean = 'fas ' + clean; } return { type: 'icon', value: clean }; } return { type: 'text', value: str.substring(0,2).toUpperCase() || getStdAbbr(name) }; } return { type: 'text', value: getStdAbbr(name) }; }
-            function renderIconHtml(icon, name) { const parsed = parseIcon(icon, name); const fallbackText = getStdAbbr(name); const bgColor = getColor(name); if (parsed.type === 'image') { return `<img src="${esc(parsed.value)}" style="width:100%;height:100%;object-fit:cover;border:none;outline:none;display:block;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="icon-fallback" style="background:${bgColor};display:none;align-items:center;justify-content:center;width:100%;height:100%;">${esc(fallbackText)}</div>`; } else if (parsed.type === 'icon') { return `<i class="${esc(parsed.value)}" style="font-size:1.2rem;"></i>`; } else { return `<div class="icon-fallback" style="background:${bgColor};display:flex;align-items:center;justify-content:center;width:100%;height:100%;">${esc(parsed.value || fallbackText)}</div>`; } }
+            // 统一图标渲染：仅支持图片，如果没有有效图片URL则使用默认占位图
+            function renderIconHtml(iconUrl, name) {
+                const validUrl = (iconUrl && typeof iconUrl === 'string' && (iconUrl.startsWith('http') || iconUrl.startsWith('data:image'))) ? iconUrl : 'https://via.placeholder.com/36x36?text=' + encodeURIComponent(getStdAbbr(name));
+                return `<img src="${esc(validUrl)}" style="width:100%;height:100%;object-fit:cover;border:none;outline:none;display:block;" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="icon-fallback" style="background:${getColor(name)};display:none;align-items:center;justify-content:center;width:100%;height:100%;">${esc(getStdAbbr(name))}</div>`;
+            }
             const CAT_MAP = { 'adobe': 'Adobe系列', 'autodesk': 'Autodesk系列', 'c4d': 'Cinema 4D', 'sketchup': '草图大师', 'rhino': '犀牛软件', 'plugin': '插件工具', 'other': '其他' };
             function renderCats() { const el = document.getElementById('categoryTabs'); const map = new Map(); softwares.forEach(s => map.set(CAT_MAP[s.category] || s.category, s.category)); let html = `<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all">全部</button>`; [...map.entries()].sort().forEach(([d, k]) => html += `<button class="cat-chip ${currentCategory===k?'active':''}" data-cat="${k}">${d}</button>`); el.innerHTML = html; document.querySelectorAll('.cat-chip').forEach(btn => btn.addEventListener('click', () => { currentCategory = btn.dataset.cat; showAll = false; renderCats(); renderGrid(); })); }
             function renderGrid() { const filtered = softwares.filter(s => (currentCategory === 'all' || s.category === currentCategory) && s.name.toLowerCase().includes(searchKeyword.toLowerCase())); const items = showAll ? filtered : filtered.slice(0, DEFAULT_LIMIT); const container = document.getElementById('softwareGridContainer'); if (!items.length) { container.innerHTML = '<div class="no-results"><i class="fas fa-box-open"></i> 没有找到相关软件</div>'; document.getElementById('loadMoreContainer').style.display = 'none'; return; } container.innerHTML = items.map(sw => { const isNew = (new Date() - new Date(sw.addedDate || '2024-01-01')) < 7 * 86400000; const isHot = sw.downloads > 2000; return `<div class="software-card" data-name="${esc(sw.name)}">${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}<div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon, sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div><div class="version">版本 ${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${sw.os.map(o=>`<span class="os-badge">${o==='Windows'?'<i class="fab fa-windows"></i>':'<i class="fab fa-apple"></i>'} ${o}</span>`).join('')}</div><div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`; }).join(''); document.getElementById('loadMoreContainer').style.display = (!showAll && filtered.length > DEFAULT_LIMIT) ? 'block' : 'none'; document.querySelectorAll('.software-card').forEach(card => card.addEventListener('click', () => { const sw = softwares.find(s => s.name === card.dataset.name); if (sw) downloadSoftware(sw); })); }
@@ -337,356 +363,19 @@
             function bindAdminCardEvents() { const container = document.getElementById('adminUserList'); container.querySelectorAll('.upgrade-vip-btn').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); const userId = btn.dataset.id, currentRole = btn.dataset.role; if (currentRole === 'admin') { showToast('管理员角色不能通过此界面修改', 'error'); return; } const newRole = currentRole === 'vip' ? 'user' : 'vip'; btn.innerHTML = '<span class="loading-spinner" style="width:14px;height:14px;"></span>'; btn.disabled = true; try { await updateUserRole(userId, newRole); await refreshUserListAndRender(true); if (currentUser && currentUser.id === userId) { currentUser.role = newRole; localStorage.setItem('lezhe_user', JSON.stringify(currentUser)); updateUserUI(); } showToast(`用户已${newRole === 'vip' ? '升级为VIP' : '降级为普通会员'}`, 'success'); } catch (err) { showToast('操作失败，请重试', 'error'); btn.innerHTML = currentRole === 'vip' ? '<i class="fas fa-arrow-down"></i> 降级' : '<i class="fas fa-crown"></i> 升级VIP'; btn.disabled = false; } }); }); container.querySelectorAll('.reset-download-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const email = btn.dataset.email; resetUserQuota(email); showToast('已重置该用户本月下载次数（配额恢复默认）', 'success'); if (currentUser && currentUser.email === email) updateUserUI(); }); }); container.querySelectorAll('.set-download-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const email = btn.dataset.email; const data = getUserDownloadData(email); const total = DEFAULT_MONTHLY_QUOTA + data.extra; const promptText = `当前总配额：${total} 次\n已用：${data.count} 次，剩余：${total - data.count} 次\n输入新的已用次数（0~999）`; const newCount = prompt(promptText, data.count); if (newCount !== null && !isNaN(parseInt(newCount))) { setUserUsedCount(email, parseInt(newCount)); showToast(`已更新，剩余 ${getRemainingCount(currentUser)} 次`, 'success'); if (currentUser && currentUser.email === email) updateUserUI(); } }); }); container.querySelectorAll('.add-download-btn').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); const email = btn.dataset.email; const add = prompt('请输入要增加的下载次数（1~999）', '5'); if (add !== null && !isNaN(parseInt(add))) { const amount = Math.max(1, Math.min(parseInt(add), 999)); await addDownloadBonus(email, amount); showToast(`已为该用户总配额增加 ${amount} 次，最新剩余次数请刷新页面或重新登录后查看`, 'success'); if (currentUser && currentUser.email === email) { updateUserUI(); } else { showToast(`如为目标用户本人，请刷新页面同步数据`, 'warning'); } } }); }); }
             async function openAdminModal() { if (cachedUsersList && (Date.now() - cachedUsersListTime) < USER_CACHE_TTL) { renderAdminUserList(cachedUsersList); document.getElementById('adminModal').classList.add('active'); refreshUserListAndRender(true); } else { await refreshUserListAndRender(); document.getElementById('adminModal').classList.add('active'); } }
             function openAuth(tab = 'login') { const m = document.getElementById('authModal'); document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none'; document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none'; document.getElementById('forgotForm').style.display = tab === 'forgot' ? 'block' : 'none'; document.getElementById('authModalTitle').innerText = tab === 'register' ? '注册' : (tab === 'forgot' ? '找回密码' : '登录'); m.classList.add('active'); if (tab === 'login') refCap('loginCaptchaQuestion', 'loginCaptchaInput'); else if (tab === 'register') refCap('regCaptchaQuestion', 'regCaptchaInput'); else refCap('forgotCaptchaQuestion', 'forgotCaptchaInput'); }
-            function bindAuthEvents() {
-                document.getElementById('refreshLoginCaptcha').addEventListener('click', () => refCap('loginCaptchaQuestion', 'loginCaptchaInput'));
-                document.getElementById('refreshRegCaptcha').addEventListener('click', () => refCap('regCaptchaQuestion', 'regCaptchaInput'));
-                document.getElementById('refreshForgotCaptcha').addEventListener('click', () => refCap('forgotCaptchaQuestion', 'forgotCaptchaInput'));
-                document.getElementById('registerBtn').addEventListener('click', async () => {
-                    const username = document.getElementById('regUsername').value.trim();
-                    const email = document.getElementById('regEmail').value.trim();
-                    const pwd = document.getElementById('regPassword').value;
-                    const confirm = document.getElementById('regConfirm').value;
-                    const inviteCode = document.getElementById('regInviteCode').value.trim();
-                    const cap = document.getElementById('regCaptchaInput').value.trim();
-                    if (!username) return showToast('用户名不能为空', 'error');
-                    if (!email) return showToast('邮箱不能为空', 'error');
-                    if (pwd.length < 6) return showToast('密码长度至少6位', 'error');
-                    if (pwd !== confirm) return showToast('两次输入的密码不一致', 'error');
-                    if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error');
-                    try {
-                        if (await findUserByEmail(email)) return showToast('邮箱已注册', 'error');
-                        await registerUser(email, pwd, username, inviteCode);
-                        showToast('注册成功！请登录', 'success');
-                        openAuth('login');
-                        document.getElementById('loginEmail').value = email;
-                        document.getElementById('regUsername').value = '';
-                        document.getElementById('regEmail').value = '';
-                        document.getElementById('regPassword').value = '';
-                        document.getElementById('regConfirm').value = '';
-                        document.getElementById('regInviteCode').value = '';
-                        document.getElementById('regCaptchaInput').value = '';
-                    } catch (e) { showToast(e.message || '注册失败', 'error'); }
-                });
-                document.getElementById('loginBtn').addEventListener('click', async () => {
-                    const email = document.getElementById('loginEmail').value.trim();
-                    const pwd = document.getElementById('loginPassword').value;
-                    const cap = document.getElementById('loginCaptchaInput').value.trim();
-                    if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error');
-                    try {
-                        currentUser = await loginUser(email, pwd);
-                        localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                        updateUserUI();
-                        document.getElementById('authModal').classList.remove('active');
-                        showToast('登录成功', 'success');
-                        renderCalendar();
-                        if (!isLocalFile) {
-                            airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`).then(data => {
-                                if (data.records.length) {
-                                    const rec = data.records[0];
-                                    currentUser.downloadCount = Number(rec.fields.DownloadCount || 0);
-                                    currentUser.role = rec.fields.Role || 'user';
-                                    updateUserUI();
-                                }
-                            }).catch(() => {});
-                        }
-                    } catch (e) { showToast(e.message, 'error'); }
-                });
-                let countdown = 0;
-                const sendBtn = document.getElementById('sendResetCodeBtn');
-                sendBtn.addEventListener('click', async () => {
-                    if (countdown > 0) return showToast(`请等待 ${countdown} 秒后再试`, 'warning');
-                    const email = document.getElementById('forgotEmail').value.trim();
-                    if (!email) return showToast('请输入邮箱', 'error');
-                    try {
-                        sendBtn.disabled = true;
-                        sendBtn.textContent = '发送中...';
-                        const code = await sendResetCode(email);
-                        resetCode = code;
-                        resetEmail = email;
-                        resetCodeExpire = Date.now() + 5 * 60 * 1000;
-                        showToast('验证码已发送，请查收邮件', 'success');
-                        countdown = 60;
-                        const timer = setInterval(() => {
-                            countdown--;
-                            if (countdown <= 0) {
-                                clearInterval(timer);
-                                sendBtn.disabled = false;
-                                sendBtn.textContent = '发送验证码';
-                            } else {
-                                sendBtn.textContent = `${countdown}秒后重发`;
-                            }
-                        }, 1000);
-                    } catch (e) {
-                        showToast(e.message, 'error');
-                        sendBtn.disabled = false;
-                        sendBtn.textContent = '发送验证码';
-                    }
-                });
-                document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
-                    const email = document.getElementById('forgotEmail').value.trim();
-                    const code = document.getElementById('resetCodeInput').value.trim();
-                    const newPwd = document.getElementById('newPassword').value;
-                    const confirm = document.getElementById('confirmNewPassword').value;
-                    const cap = document.getElementById('forgotCaptchaInput').value.trim();
-                    if (!email || newPwd !== confirm || newPwd.length < 6) return showToast('信息错误', 'error');
-                    if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error');
-                    if (email !== resetEmail || !code || code !== resetCode || Date.now() > resetCodeExpire) return showToast('验证码错误或已过期', 'error');
-                    const rec = await findUserByEmail(email);
-                    if (rec && rec.fields && rec.fields.Password === CryptoJS.SHA256(newPwd).toString()) {
-                        return showToast('新密码不能与旧密码相同', 'error');
-                    }
-                    try {
-                        await updatePassword(email, newPwd);
-                        showToast('密码重置成功', 'success');
-                        openAuth('login');
-                        resetCode = '';
-                        resetEmail = '';
-                    } catch (e) { showToast(e.message, 'error'); }
-                });
-                document.getElementById('showForgotBtn').addEventListener('click', () => openAuth('forgot'));
-                document.getElementById('backToLoginFromForgot').addEventListener('click', () => openAuth('login'));
-                document.getElementById('closeAuthModal').addEventListener('click', () => document.getElementById('authModal').classList.remove('active'));
-                document.querySelectorAll('.auth-tab').forEach(t => t.addEventListener('click', () => openAuth(t.dataset.tab)));
-                document.getElementById('manageArticlesBtn').addEventListener('click', async () => {
-                    await refreshArticleList();
-                    document.getElementById('articleManageModal').classList.add('active');
-                });
-                document.getElementById('closeArticleModal').addEventListener('click', () => {
-                    document.getElementById('articleManageModal').classList.remove('active');
-                    document.getElementById('articleFormContainer').style.display = 'none';
-                    editingArticleId = null;
-                });
-                document.getElementById('addNewArticleBtn').addEventListener('click', () => showArtForm(null));
-                document.getElementById('saveArticleBtn').addEventListener('click', saveArt);
-                document.getElementById('cancelArticleBtn').addEventListener('click', () => {
-                    document.getElementById('articleFormContainer').style.display = 'none';
-                    editingArticleId = null;
-                });
-                document.getElementById('closeDetailModal').addEventListener('click', () => document.getElementById('articleDetailModal').classList.remove('active'));
-                document.getElementById('closeProfileModal').addEventListener('click', () => document.getElementById('profileModal').classList.remove('active'));
-                document.getElementById('saveProfileBtn').addEventListener('click', async function() {
-                    const newPwd = document.getElementById('profileNewPwd').value;
-                    const confirm = document.getElementById('profileConfirmPwd').value;
-                    if (newPwd && newPwd !== confirm) return showToast('两次密码不一致', 'error');
-                    if (newPwd && newPwd.length < 6) return showToast('密码至少6位', 'error');
-                    if (newPwd) {
-                        const user = await findUserByEmail(currentUser.email);
-                        if (user && user.fields && user.fields.Password === CryptoJS.SHA256(newPwd).toString()) {
-                            return showToast('新密码不能与旧密码相同', 'error');
-                        }
-                    }
-                    try {
-                        if (newPwd) await updatePassword(currentUser.email, newPwd);
-                        showToast('资料更新成功', 'success');
-                        document.getElementById('profileModal').classList.remove('active');
-                    } catch (e) { showToast('更新失败', 'error'); }
-                });
-                document.getElementById('closeAdminModal').addEventListener('click', () => document.getElementById('adminModal').classList.remove('active'));
-                document.getElementById('refreshUserListBtn').addEventListener('click', async () => {
-                    await refreshUserListAndRender(true);
-                    showToast('用户列表已刷新', 'success');
-                });
-                document.getElementById('closeInsufficientModal').addEventListener('click', () => document.getElementById('insufficientModal').classList.remove('active'));
-                document.getElementById('submitFeedbackBtn').addEventListener('click', async function() {
-                    const msg = document.getElementById('feedbackMessage').value.trim();
-                    if (!msg) return showToast('请填写内容', 'error');
-                    this.disabled = true;
-                    try {
-                        if (isLocalFile) {
-                            let list = JSON.parse(localStorage.getItem('feedback_list') || '[]');
-                            list.unshift({ name: document.getElementById('feedbackName').value || '网友', message: msg });
-                            if (list.length > 20) list.pop();
-                            localStorage.setItem('feedback_list', JSON.stringify(list));
-                        } else {
-                            await airReq('POST', 'Messages', { fields: { Name: document.getElementById('feedbackName').value || '网友', Message: msg } });
-                        }
-                        showToast('留言成功');
-                        document.getElementById('feedbackMessage').value = '';
-                        renderFeedback();
-                    } catch (e) { showToast('提交失败', 'error'); }
-                    this.disabled = false;
-                });
-                document.querySelectorAll('.buy-package').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const permanent = this.dataset.permanent === 'true';
-                        const amount = this.dataset.amount;
-                        const price = this.dataset.price;
-                        showToast(`购买${permanent?'永久VIP':amount+'次下载'}（${price}元）请联系客服微信 Win_Mac_123 付款。`, 'warning');
-                        document.getElementById('insufficientModal').classList.remove('active');
-                    });
-                });
-                document.getElementById('copyInviteCodeInsufficient').addEventListener('click', () => {
-                    if (currentUser && currentUser.inviteCode) {
-                        window.copyText(currentUser.inviteCode);
-                    } else {
-                        showToast('请先登录获取邀请码', 'error');
-                    }
-                });
-                document.getElementById('refreshArticleListBtn').addEventListener('click', async () => {
-                    await refreshArticleList();
-                    showToast('文章列表已刷新', 'success');
-                });
-            }
-
-            const searchInput = document.getElementById('searchInput');
-            const searchSug = document.getElementById('searchSuggestions');
-            searchInput.addEventListener('input', e => {
-                searchKeyword = e.target.value;
-                renderGrid();
-                const v = searchKeyword.toLowerCase().trim();
-                if (!v) { searchSug.classList.remove('active'); return; }
-                const matches = softwares.filter(s => s.name.toLowerCase().includes(v)).slice(0, 5);
-                if (!matches.length) { searchSug.classList.remove('active'); return; }
-                searchSug.innerHTML = matches.map(s => `<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join('');
-                searchSug.classList.add('active');
-            });
-            searchInput.addEventListener('focus', () => {
-                if (window.innerWidth <= 768) { searchSug.style.top = 'auto'; searchSug.style.bottom = '100%'; }
-                else { searchSug.style.top = '100%'; searchSug.style.bottom = 'auto'; }
-            });
-            document.addEventListener('click', e => {
-                if (!searchSug.contains(e.target) && e.target !== searchInput) searchSug.classList.remove('active');
-            });
-            searchSug.addEventListener('click', e => {
-                const item = e.target.closest('.suggestion-item');
-                if (item) {
-                    searchInput.value = item.dataset.name;
-                    searchKeyword = item.dataset.name;
-                    searchSug.classList.remove('active');
-                    renderGrid();
-                }
-            });
-            document.getElementById('searchBtn').addEventListener('click', () => {
-                searchKeyword = searchInput.value;
-                renderGrid();
-            });
-
-            window.addEventListener('scroll', () => {
-                const nav = document.getElementById('topNav');
-                if (!nav) return;
-                if (scrollTimer) clearTimeout(scrollTimer);
-                scrollTimer = setTimeout(() => {
-                    const currentScrollY = window.scrollY;
-                    if (currentScrollY > lastScrollY && currentScrollY > 100) nav.classList.add('hide');
-                    else if (currentScrollY < lastScrollY) nav.classList.remove('hide');
-                    lastScrollY = currentScrollY;
-                    document.getElementById('backToTop').classList.toggle('show', currentScrollY > 300);
-                }, 50);
-            });
+            function bindAuthEvents() { document.getElementById('refreshLoginCaptcha').addEventListener('click', () => refCap('loginCaptchaQuestion', 'loginCaptchaInput')); document.getElementById('refreshRegCaptcha').addEventListener('click', () => refCap('regCaptchaQuestion', 'regCaptchaInput')); document.getElementById('refreshForgotCaptcha').addEventListener('click', () => refCap('forgotCaptchaQuestion', 'forgotCaptchaInput')); document.getElementById('registerBtn').addEventListener('click', async () => { const username = document.getElementById('regUsername').value.trim(); const email = document.getElementById('regEmail').value.trim(); const pwd = document.getElementById('regPassword').value; const confirm = document.getElementById('regConfirm').value; const inviteCode = document.getElementById('regInviteCode').value.trim(); const cap = document.getElementById('regCaptchaInput').value.trim(); if (!username) return showToast('用户名不能为空', 'error'); if (!email) return showToast('邮箱不能为空', 'error'); if (pwd.length < 6) return showToast('密码长度至少6位', 'error'); if (pwd !== confirm) return showToast('两次输入的密码不一致', 'error'); if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error'); try { if (await findUserByEmail(email)) return showToast('邮箱已注册', 'error'); await registerUser(email, pwd, username, inviteCode); showToast('注册成功！请登录', 'success'); openAuth('login'); document.getElementById('loginEmail').value = email; document.getElementById('regUsername').value = ''; document.getElementById('regEmail').value = ''; document.getElementById('regPassword').value = ''; document.getElementById('regConfirm').value = ''; document.getElementById('regInviteCode').value = ''; document.getElementById('regCaptchaInput').value = ''; } catch (e) { showToast(e.message || '注册失败', 'error'); } }); document.getElementById('loginBtn').addEventListener('click', async () => { const email = document.getElementById('loginEmail').value.trim(); const pwd = document.getElementById('loginPassword').value; const cap = document.getElementById('loginCaptchaInput').value.trim(); if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error'); try { currentUser = await loginUser(email, pwd); localStorage.setItem('lezhe_user', JSON.stringify(currentUser)); updateUserUI(); document.getElementById('authModal').classList.remove('active'); showToast('登录成功', 'success'); renderCalendar(); if (!isLocalFile) { airReq('GET', `Users?filterByFormula={Email}="${encodeURIComponent(email)}"`).then(data => { if (data.records.length) { const rec = data.records[0]; currentUser.downloadCount = Number(rec.fields.DownloadCount || 0); currentUser.role = rec.fields.Role || 'user'; updateUserUI(); } }).catch(() => {}); } } catch (e) { showToast(e.message, 'error'); } }); let countdown = 0; const sendBtn = document.getElementById('sendResetCodeBtn'); sendBtn.addEventListener('click', async () => { if (countdown > 0) return showToast(`请等待 ${countdown} 秒后再试`, 'warning'); const email = document.getElementById('forgotEmail').value.trim(); if (!email) return showToast('请输入邮箱', 'error'); try { sendBtn.disabled = true; sendBtn.textContent = '发送中...'; const code = await sendResetCode(email); resetCode = code; resetEmail = email; resetCodeExpire = Date.now() + 5 * 60 * 1000; showToast('验证码已发送，请查收邮件', 'success'); countdown = 60; const timer = setInterval(() => { countdown--; if (countdown <= 0) { clearInterval(timer); sendBtn.disabled = false; sendBtn.textContent = '发送验证码'; } else { sendBtn.textContent = `${countdown}秒后重发`; } }, 1000); } catch (e) { showToast(e.message, 'error'); sendBtn.disabled = false; sendBtn.textContent = '发送验证码'; } }); document.getElementById('resetPasswordBtn').addEventListener('click', async () => { const email = document.getElementById('forgotEmail').value.trim(); const code = document.getElementById('resetCodeInput').value.trim(); const newPwd = document.getElementById('newPassword').value; const confirm = document.getElementById('confirmNewPassword').value; const cap = document.getElementById('forgotCaptchaInput').value.trim(); if (!email || newPwd !== confirm || newPwd.length < 6) return showToast('信息错误', 'error'); if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error'); if (email !== resetEmail || !code || code !== resetCode || Date.now() > resetCodeExpire) return showToast('验证码错误或已过期', 'error'); const rec = await findUserByEmail(email); if (rec && rec.fields && rec.fields.Password === CryptoJS.SHA256(newPwd).toString()) { return showToast('新密码不能与旧密码相同', 'error'); } try { await updatePassword(email, newPwd); showToast('密码重置成功', 'success'); openAuth('login'); resetCode = ''; resetEmail = ''; } catch (e) { showToast(e.message, 'error'); } }); document.getElementById('showForgotBtn').addEventListener('click', () => openAuth('forgot')); document.getElementById('backToLoginFromForgot').addEventListener('click', () => openAuth('login')); document.getElementById('closeAuthModal').addEventListener('click', () => document.getElementById('authModal').classList.remove('active')); document.querySelectorAll('.auth-tab').forEach(t => t.addEventListener('click', () => openAuth(t.dataset.tab))); document.getElementById('manageArticlesBtn').addEventListener('click', async () => { await refreshArticleList(); document.getElementById('articleManageModal').classList.add('active'); }); document.getElementById('closeArticleModal').addEventListener('click', () => { document.getElementById('articleManageModal').classList.remove('active'); document.getElementById('articleFormContainer').style.display = 'none'; editingArticleId = null; }); document.getElementById('addNewArticleBtn').addEventListener('click', () => showArtForm(null)); document.getElementById('saveArticleBtn').addEventListener('click', saveArt); document.getElementById('cancelArticleBtn').addEventListener('click', () => { document.getElementById('articleFormContainer').style.display = 'none'; editingArticleId = null; }); document.getElementById('closeDetailModal').addEventListener('click', () => document.getElementById('articleDetailModal').classList.remove('active')); document.getElementById('closeProfileModal').addEventListener('click', () => document.getElementById('profileModal').classList.remove('active')); document.getElementById('saveProfileBtn').addEventListener('click', async function() { const newPwd = document.getElementById('profileNewPwd').value; const confirm = document.getElementById('profileConfirmPwd').value; if (newPwd && newPwd !== confirm) return showToast('两次密码不一致', 'error'); if (newPwd && newPwd.length < 6) return showToast('密码至少6位', 'error'); if (newPwd) { const user = await findUserByEmail(currentUser.email); if (user && user.fields && user.fields.Password === CryptoJS.SHA256(newPwd).toString()) { return showToast('新密码不能与旧密码相同', 'error'); } } try { if (newPwd) await updatePassword(currentUser.email, newPwd); showToast('资料更新成功', 'success'); document.getElementById('profileModal').classList.remove('active'); } catch (e) { showToast('更新失败', 'error'); } }); document.getElementById('closeAdminModal').addEventListener('click', () => document.getElementById('adminModal').classList.remove('active')); document.getElementById('refreshUserListBtn').addEventListener('click', async () => { await refreshUserListAndRender(true); showToast('用户列表已刷新', 'success'); }); document.getElementById('closeInsufficientModal').addEventListener('click', () => document.getElementById('insufficientModal').classList.remove('active')); document.getElementById('submitFeedbackBtn').addEventListener('click', async function() { const msg = document.getElementById('feedbackMessage').value.trim(); if (!msg) return showToast('请填写内容', 'error'); this.disabled = true; try { if (isLocalFile) { let list = JSON.parse(localStorage.getItem('feedback_list') || '[]'); list.unshift({ name: document.getElementById('feedbackName').value || '网友', message: msg }); if (list.length > 20) list.pop(); localStorage.setItem('feedback_list', JSON.stringify(list)); } else { await airReq('POST', 'Messages', { fields: { Name: document.getElementById('feedbackName').value || '网友', Message: msg } }); } showToast('留言成功'); document.getElementById('feedbackMessage').value = ''; renderFeedback(); } catch (e) { showToast('提交失败', 'error'); } this.disabled = false; }); document.querySelectorAll('.buy-package').forEach(btn => { btn.addEventListener('click', function() { const permanent = this.dataset.permanent === 'true'; const amount = this.dataset.amount; const price = this.dataset.price; showToast(`购买${permanent?'永久VIP':amount+'次下载'}（${price}元）请联系客服微信 Win_Mac_123 付款。`, 'warning'); document.getElementById('insufficientModal').classList.remove('active'); }); }); document.getElementById('copyInviteCodeInsufficient').addEventListener('click', () => { if (currentUser && currentUser.inviteCode) { window.copyText(currentUser.inviteCode); } else { showToast('请先登录获取邀请码', 'error'); } }); document.getElementById('refreshArticleListBtn').addEventListener('click', async () => { await refreshArticleList(); showToast('文章列表已刷新', 'success'); }); }
+            const searchInput = document.getElementById('searchInput'); const searchSug = document.getElementById('searchSuggestions'); searchInput.addEventListener('input', e => { searchKeyword = e.target.value; renderGrid(); const v = searchKeyword.toLowerCase().trim(); if (!v) { searchSug.classList.remove('active'); return; } const matches = softwares.filter(s => s.name.toLowerCase().includes(v)).slice(0, 5); if (!matches.length) { searchSug.classList.remove('active'); return; } searchSug.innerHTML = matches.map(s => `<div class="suggestion-item" data-name="${esc(s.name)}"><i class="fas fa-search"></i> ${esc(s.name)}</div>`).join(''); searchSug.classList.add('active'); }); searchInput.addEventListener('focus', () => { if (window.innerWidth <= 768) { searchSug.style.top = 'auto'; searchSug.style.bottom = '100%'; } else { searchSug.style.top = '100%'; searchSug.style.bottom = 'auto'; } }); document.addEventListener('click', e => { if (!searchSug.contains(e.target) && e.target !== searchInput) searchSug.classList.remove('active'); }); searchSug.addEventListener('click', e => { const item = e.target.closest('.suggestion-item'); if (item) { searchInput.value = item.dataset.name; searchKeyword = item.dataset.name; searchSug.classList.remove('active'); renderGrid(); } }); document.getElementById('searchBtn').addEventListener('click', () => { searchKeyword = searchInput.value; renderGrid(); });
+            window.addEventListener('scroll', () => { const nav = document.getElementById('topNav'); if (!nav) return; if (scrollTimer) clearTimeout(scrollTimer); scrollTimer = setTimeout(() => { const currentScrollY = window.scrollY; if (currentScrollY > lastScrollY && currentScrollY > 100) nav.classList.add('hide'); else if (currentScrollY < lastScrollY) nav.classList.remove('hide'); lastScrollY = currentScrollY; document.getElementById('backToTop').classList.toggle('show', currentScrollY > 300); }, 50); });
             document.getElementById('backToTop').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
+            async function loadAll() { const cachedSoft = localStorage.getItem('cachedSoft'); const cachedAds = localStorage.getItem('cachedAds'); if (cachedSoft) { try { softwares = JSON.parse(cachedSoft); if (softwares.length) { renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory(); } } catch (e) {} } if (cachedAds) { try { const ads = JSON.parse(cachedAds); if (Array.isArray(ads)) { const bn = ads.filter(a => a.position === 'banner'); const sb = ads.filter(a => a.position === 'sidebar'); if (bn.length) { bannerAds = bn; renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true); startCar(true); } if (sb.length) { sidebarAds = sb; renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false); startCar(false); } } } catch (e) {} } if (!isLocalFile) { try { const [swData, adData] = await Promise.all([fetchSoftwares(true), fetchAds(true)]); if (swData.length) softwares = swData; const bn = adData.filter(a => a.position === 'banner'); const sb = adData.filter(a => a.position === 'sidebar'); if (bn.length) { bannerAds = bn; renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true); startCar(true); } if (sb.length) { sidebarAds = sb; renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false); startCar(false); } renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory(); } catch (e) { console.warn('网络数据更新失败，保留缓存显示', e); } } else { if (!bannerAds.length || !sidebarAds.length) { const ads = await fetchAds(); bannerAds = ads.filter(a => a.position === 'banner'); sidebarAds = ads.filter(a => a.position === 'sidebar'); renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds, true); startCar(true); renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds, false); startCar(false); } if (!softwares.length) { softwares = await fetchSoftwares(); renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory(); } } articles = await fetchArticles(); renderArtsList(); await renderFeedback(); }
             let bannerInt = null, sidebarInt = null, curB = 0, curS = 0;
-            function renderCarousel(slides, dots, ads, isB) {
-                slides.innerHTML = ads.map((a, i) => `<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="lazy" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join('');
-                if (ads.length <= 1) { dots.style.display = 'none'; return; }
-                dots.style.display = 'flex';
-                dots.innerHTML = ads.map((_, i) => `<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join('');
-                const update = (idx) => {
-                    if (isB) curB = idx; else curS = idx;
-                    slides.style.transform = `translateX(-${idx*100}%)`;
-                    dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
-                };
-                dots.querySelectorAll('.carousel-dot').forEach(d => d.addEventListener('click', e => { update(parseInt(e.target.dataset.index)); resetCar(isB); }));
-                return update;
-            }
-            function startCar(isB) {
-                clearInterval(isB ? bannerInt : sidebarInt);
-                const ads = isB ? bannerAds : sidebarAds;
-                if (ads.length <= 1) return;
-                const int = setInterval(() => {
-                    const nxt = ((isB ? curB : curS) + 1) % ads.length;
-                    if (isB) curB = nxt; else curS = nxt;
-                    const slides = isB ? document.getElementById('categoryBannerSlides') : document.getElementById('sidebarCarouselSlides');
-                    const dots = isB ? document.getElementById('categoryBannerDots') : document.getElementById('sidebarCarouselDots');
-                    slides.style.transform = `translateX(-${nxt*100}%)`;
-                    dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === nxt));
-                }, 4000);
-                if (isB) bannerInt = int; else sidebarInt = int;
-            }
+            function renderCarousel(slides, dots, ads, isB) { slides.innerHTML = ads.map((a, i) => `<div class="carousel-slide"><a href="${esc(a.link)}" target="_blank"><img src="${esc(a.image)}" loading="lazy" onerror="this.style.display='none'" style="border:none;outline:none;"></a></div>`).join(''); if (ads.length <= 1) { dots.style.display = 'none'; return; } dots.style.display = 'flex'; dots.innerHTML = ads.map((_, i) => `<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join(''); const update = (idx) => { if (isB) curB = idx; else curS = idx; slides.style.transform = `translateX(-${idx*100}%)`; dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === idx)); }; dots.querySelectorAll('.carousel-dot').forEach(d => d.addEventListener('click', e => { update(parseInt(e.target.dataset.index)); resetCar(isB); })); return update; }
+            function startCar(isB) { clearInterval(isB ? bannerInt : sidebarInt); const ads = isB ? bannerAds : sidebarAds; if (ads.length <= 1) return; const int = setInterval(() => { const nxt = ((isB ? curB : curS) + 1) % ads.length; if (isB) curB = nxt; else curS = nxt; const slides = isB ? document.getElementById('categoryBannerSlides') : document.getElementById('sidebarCarouselSlides'); const dots = isB ? document.getElementById('categoryBannerDots') : document.getElementById('sidebarCarouselDots'); slides.style.transform = `translateX(-${nxt*100}%)`; dots.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === nxt)); }, 4000); if (isB) bannerInt = int; else sidebarInt = int; }
             function resetCar(isB) { clearInterval(isB ? bannerInt : sidebarInt); startCar(isB); }
-
-            function updateUserUI() {
-                const area = document.getElementById('userArea');
-                if (currentUser) {
-                    const remaining = getRemainingCount(currentUser);
-                    const remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining;
-                    area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`;
-                    document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); });
-                    document.getElementById('logoutBtn').addEventListener('click', () => { currentUser = null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出登录', 'success'); location.reload(); });
-                    document.getElementById('profileBtn').addEventListener('click', openProfileModal);
-                    if (currentUser.role === 'admin') document.getElementById('adminBtn').addEventListener('click', openAdminModal);
-                    if (currentUser.role === 'admin') document.getElementById('manageArticlesBtn').style.display = 'block';
-                } else {
-                    area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>';
-                    document.getElementById('showAuthBtn').addEventListener('click', () => openAuth('login'));
-                    document.getElementById('manageArticlesBtn').style.display = 'none';
-                }
-            }
-
-            async function openProfileModal() {
-                if (!currentUser) return;
-                document.getElementById('profileUsername').innerText = currentUser.username;
-                document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`;
-                document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser);
-                document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无（请重新登录）';
-                document.getElementById('profileModal').classList.add('active');
-            }
-
-            async function loadAll() {
-                const cachedSoft = localStorage.getItem('cachedSoft');
-                const cachedAds = localStorage.getItem('cachedAds');
-                if (cachedSoft) {
-                    try {
-                        softwares = JSON.parse(cachedSoft);
-                        if (softwares.length) { renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory(); }
-                    } catch(e) {}
-                }
-                if (cachedAds) {
-                    try {
-                        const ads = JSON.parse(cachedAds);
-                        if (Array.isArray(ads)) {
-                            const bn = ads.filter(a => a.position === 'banner');
-                            const sb = ads.filter(a => a.position === 'sidebar');
-                            if (bn.length) { bannerAds = bn; renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true); startCar(true); }
-                            if (sb.length) { sidebarAds = sb; renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false); startCar(false); }
-                        }
-                    } catch(e) {}
-                }
-                if (!isLocalFile) {
-                    try {
-                        const [swData, adData] = await Promise.all([fetchSoftwares(true), fetchAds(true)]);
-                        if (swData.length) softwares = swData;
-                        const bn = adData.filter(a => a.position === 'banner');
-                        const sb = adData.filter(a => a.position === 'sidebar');
-                        if (bn.length) { bannerAds = bn; renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bn, true); startCar(true); }
-                        if (sb.length) { sidebarAds = sb; renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sb, false); startCar(false); }
-                        renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory();
-                    } catch (e) { console.warn('网络数据更新失败，保留缓存显示', e); }
-                } else {
-                    if (!bannerAds.length || !sidebarAds.length) {
-                        const ads = await fetchAds();
-                        bannerAds = ads.filter(a => a.position === 'banner');
-                        sidebarAds = ads.filter(a => a.position === 'sidebar');
-                        renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds, true); startCar(true);
-                        renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds, false); startCar(false);
-                    }
-                    if (!softwares.length) {
-                        softwares = await fetchSoftwares();
-                        renderCats(); renderGrid(); renderHot(); renderRank(); renderHistory();
-                    }
-                }
-                articles = await fetchArticles();
-                renderArtsList();
-                await renderFeedback();
-            }
-
-            if (localStorage.getItem('lezhe_user')) {
-                try { currentUser = JSON.parse(localStorage.getItem('lezhe_user')); } catch(e) {}
-            }
-            updateUserUI();
-            bindAuthEvents();
-            refCap('loginCaptchaQuestion', 'loginCaptchaInput');
-            loadAll();
+            function updateUserUI() { const area = document.getElementById('userArea'); if (currentUser) { const remaining = getRemainingCount(currentUser); const remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining; area.innerHTML = `<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''} <i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`; document.getElementById('userMenuBtn').addEventListener('click', e => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); }); document.getElementById('logoutBtn').addEventListener('click', () => { currentUser = null; localStorage.removeItem('lezhe_user'); updateUserUI(); showToast('已退出登录', 'success'); location.reload(); }); document.getElementById('profileBtn').addEventListener('click', openProfileModal); if (currentUser.role === 'admin') document.getElementById('adminBtn').addEventListener('click', openAdminModal); if (currentUser.role === 'admin') document.getElementById('manageArticlesBtn').style.display = 'block'; } else { area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>'; document.getElementById('showAuthBtn').addEventListener('click', () => openAuth('login')); document.getElementById('manageArticlesBtn').style.display = 'none'; } }
+            async function openProfileModal() { if (!currentUser) return; document.getElementById('profileUsername').innerText = currentUser.username; document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员（无限下载）' : `普通会员（${DEFAULT_MONTHLY_QUOTA}次/月）`; document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser); document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无（请重新登录）'; document.getElementById('profileModal').classList.add('active'); }
+            if (localStorage.getItem('lezhe_user')) { try { currentUser = JSON.parse(localStorage.getItem('lezhe_user')); } catch (e) {} }
+            updateUserUI(); bindAuthEvents(); refCap('loginCaptchaQuestion', 'loginCaptchaInput'); loadAll();
         })();
     </script>
 </body>
