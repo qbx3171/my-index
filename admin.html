@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>乐哲软件 · 管理后台</title>
+    <title>乐哲软件 · 管理后台（分类修复完整版）</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
@@ -340,7 +340,9 @@
         if(!select) return;
         const cats = await loadCategories();
         const currentVal = select.value;
+        // 关键修复：使用 cat.name 作为 option 的 value 和显示文本，保证保存中文
         select.innerHTML = cats.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
+        // 如果当前有值（编辑时），并且存在于新列表中，则选中；否则选中第一个
         if(currentVal && cats.some(c => c.name === currentVal)) select.value = currentVal;
         else if(cats.length) select.value = cats[0].name;
         setDefaultAddedDate();
@@ -398,7 +400,7 @@
             if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无软件数据</td></tr>'; return; }
             tbody.innerHTML = data.records.map(r => {
                 const f = r.fields;
-                // os 字段可能是数组（老数据）或字符串（新数据），统一转换为字符串显示
+                // os 字段可能是数组或字符串，统一转为显示文本
                 let osDisplay = '';
                 if (Array.isArray(f.os)) osDisplay = f.os.join(', ');
                 else if (typeof f.os === 'string') osDisplay = f.os;
@@ -472,12 +474,13 @@
         if(loadingDiv) loadingDiv.style.display='block';
         if(formDiv) formDiv.style.opacity='0.5';
         try {
-            await refreshCategorySelect();
+            await refreshCategorySelect(); // 确保下拉框已加载最新分类
             const {fields}=await airtableRequest('GET',`softwares/${id}`);
             document.getElementById('swName').value=fields.name||'';
-            document.getElementById('swCategory').value=fields.category||'';
+            // 关键修复：设置分类下拉框的值（这里 category 应该是中文）
+            document.getElementById('swCategory').value = fields.category || '';
             document.getElementById('swVersion').value=fields.version||'';
-            // 处理 os 字段：可能是字符串或数组，统一转成列表
+            // 处理 os 字段
             let osList = [];
             if (Array.isArray(fields.os)) osList = fields.os;
             else if (typeof fields.os === 'string') osList = fields.os.split(',').map(s=>s.trim());
@@ -523,7 +526,7 @@
     window.deleteUser = async (id) => { if(confirm('删除用户？')) { try{ await airtableRequest('DELETE',`Users/${id}`); loadUsers(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
     window.deleteMessage = async (id) => { if(confirm('删除留言？')) { try{ await airtableRequest('DELETE',`messages/${id}`); loadMessages(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
     
-    // 保存软件（关键修复：os 字段转为逗号分隔的字符串）
+    // 保存软件（分类直接保存下拉框的中文值，os 转为逗号分隔字符串）
     document.getElementById('saveSoftwareBtn')?.addEventListener('click', async () => {
         let finalIcon = document.getElementById('swIcon').value;
         const custom = document.getElementById('swIconCustom').value.trim();
@@ -536,7 +539,7 @@
         if(osArray.length === 0) return showToast('请至少选择一个系统', true);
         const category = document.getElementById('swCategory').value.trim();
         if(!category) return showToast('请选择分类', true);
-        // 将系统数组转为逗号分隔的字符串（适配单行文本字段）
+        // 将系统数组转为逗号分隔的字符串
         const osString = osArray.join(',');
         const fields = {
             name: document.getElementById('swName').value.trim(),
@@ -692,7 +695,7 @@
             document.getElementById('usersPanel').style.display = tab === 'users' ? 'block' : 'none';
             document.getElementById('messagesPanel').style.display = tab === 'messages' ? 'block' : 'none';
             if(tab === 'dashboard') loadDashboard();
-            if(tab === 'softwares') loadSoftwares();
+            if(tab === 'softwares') { refreshCategorySelect(); loadSoftwares(); }
             if(tab === 'ads') loadAds();
             if(tab === 'users') loadUsers();
             if(tab === 'messages') loadMessages();
