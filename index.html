@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>乐哲软件 | 正版软件·插件与创意工具服务</title>
   <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
   <link rel="preconnect" href="https://cdn.tailwindcss.com">
@@ -24,6 +24,7 @@
       --primary-glow: rgba(59,130,246,0.15);
       --card-bg: rgba(20,20,31,0.8);
       --shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      --review-card-bg: rgba(20,20,31,0.6);
     }
     .light {
       --bg: #f8fafc;
@@ -35,6 +36,7 @@
       --primary-glow: rgba(37,99,235,0.1);
       --card-bg: rgba(255,255,255,0.9);
       --shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+      --review-card-bg: rgba(255,255,255,0.7);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -104,7 +106,7 @@
     }
     .btn-ghost:hover { background: var(--primary); color: white; }
     .section-title {
-      font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em;
+      font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em;
     }
     .online-dot { animation: pulse 2s infinite; }
     @keyframes pulse {
@@ -133,6 +135,89 @@
     .light .nav-blur {
       background: rgba(255,255,255,0.8); backdrop-filter: blur(20px);
     }
+    /* 高级好评卡片样式 */
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary-glow); border-radius: 40px; padding: 6px 16px;
+    }
+    .pulse-dot {
+      width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;
+      box-shadow: 0 0 0 0 #10b981; animation: livePulse 1.5s infinite;
+    }
+    @keyframes livePulse {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      70% { transform: scale(1.2); opacity: 0; }
+      100% { transform: scale(0.8); opacity: 0; }
+    }
+    .review-card {
+      background: var(--review-card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px;
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    .review-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+    }
+    .stars i {
+      margin-right: 2px;
+      color: #fbbf24;
+      font-size: 0.9rem;
+    }
+    .verified-badge {
+      background: rgba(16,185,129,0.12);
+      color: #10b981;
+      font-size: 11px;
+      border-radius: 40px;
+      padding: 4px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--primary), #8b5cf6);
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .review-quote {
+      font-style: normal;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin: 12px 0 0 0;
+      font-size: 0.95rem;
+      border-left: 2px solid var(--primary);
+      padding-left: 14px;
+    }
+    @media (max-width: 768px) {
+      .card { padding: 24px; }
+      .review-card { padding: 20px; }
+      .avatar { width: 38px; height: 38px; font-size: 0.9rem; }
+      .review-quote { font-size: 0.85rem; }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -140,12 +225,9 @@
 <div id="progress-bar"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 
-<!-- 导航栏（PC一行，移动端汉堡菜单） -->
 <nav class="nav-blur fixed top-0 left-0 w-full z-50 py-4">
   <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
     <a href="index.html" class="text-2xl font-extrabold" style="color: var(--primary);">乐哲软件</a>
-    
-    <!-- 桌面端导航 -->
     <div class="hidden md:flex gap-8 items-center text-sm font-medium" style="color: var(--text-secondary);">
       <a href="service.html" class="hover:text-[var(--primary)] transition">服务项目</a>
       <a href="download.html" class="hover:text-[var(--primary)] transition">软件下载</a>
@@ -156,14 +238,10 @@
         <i id="themeIcon" class="fa fa-sun-o"></i>
       </button>
     </div>
-
-    <!-- 移动端汉堡按钮 -->
     <button id="menuToggle" class="md:hidden text-xl" style="color: var(--text);">
       <i class="fa fa-bars"></i>
     </button>
   </div>
-
-  <!-- 移动端下拉菜单 -->
   <div id="mobileMenu" class="md:hidden hidden px-6 pb-4 space-y-3 text-sm font-medium" style="color: var(--text-secondary);">
     <a href="service.html" class="block py-2 hover:text-[var(--primary)] transition">服务项目</a>
     <a href="download.html" class="block py-2 hover:text-[var(--primary)] transition">软件下载</a>
@@ -176,7 +254,6 @@
   </div>
 </nav>
 
-<!-- Hero 区域（保持原样） -->
 <section class="relative h-screen flex items-center justify-center overflow-hidden pt-20">
   <canvas id="particleCanvas" class="absolute inset-0 z-0"></canvas>
   <div class="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-[var(--primary-glow)] opacity-30"></div>
@@ -200,7 +277,6 @@
   </div>
 </section>
 
-<!-- 软件支持网格（保留） -->
 <section class="py-24 relative" style="background: var(--surface);">
   <div class="max-w-6xl mx-auto px-6">
     <div class="text-center mb-16 reveal">
@@ -208,47 +284,16 @@
       <p class="text-lg mt-4" style="color: var(--text-secondary);">覆盖设计、视频、音频、工程全场景需求</p>
     </div>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-      <div class="card tilt text-center p-6 !rounded-2xl">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(59,130,246,0.1);">
-          <span class="text-xl font-bold" style="color: #3b82f6;">Ps</span>
-        </div>
-        <span class="text-sm font-medium">Photoshop</span>
-      </div>
-      <div class="card tilt text-center p-6 !rounded-2xl">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(236,72,153,0.1);">
-          <span class="text-xl font-bold" style="color: #ec4899;">Ai</span>
-        </div>
-        <span class="text-sm font-medium">Illustrator</span>
-      </div>
-      <div class="card tilt text-center p-6 !rounded-2xl">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(139,92,246,0.1);">
-          <span class="text-xl font-bold" style="color: #8b5cf6;">Ae</span>
-        </div>
-        <span class="text-sm font-medium">After Effects</span>
-      </div>
-      <div class="card tilt text-center p-6 !rounded-2xl">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(99,102,241,0.1);">
-          <span class="text-xl font-bold" style="color: #6366f1;">Pr</span>
-        </div>
-        <span class="text-sm font-medium">Premiere Pro</span>
-      </div>
-      <div class="card tilt text-center p-6 !rounded-2xl">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(6,182,212,0.1);">
-          <span class="text-xl font-bold" style="color: #06b6d4;">Au</span>
-        </div>
-        <span class="text-sm font-medium">Audition</span>
-      </div>
-      <div class="card tilt text-center p-6 !rounded-2xl">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(148,163,184,0.1);">
-          <span class="text-xl font-bold" style="color: #94a3b8;">CAD</span>
-        </div>
-        <span class="text-sm font-medium">AutoCAD</span>
-      </div>
+      <div class="card tilt text-center p-6 !rounded-2xl"><div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(59,130,246,0.1);"><span class="text-xl font-bold" style="color: #3b82f6;">Ps</span></div><span class="text-sm font-medium">Photoshop</span></div>
+      <div class="card tilt text-center p-6 !rounded-2xl"><div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(236,72,153,0.1);"><span class="text-xl font-bold" style="color: #ec4899;">Ai</span></div><span class="text-sm font-medium">Illustrator</span></div>
+      <div class="card tilt text-center p-6 !rounded-2xl"><div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(139,92,246,0.1);"><span class="text-xl font-bold" style="color: #8b5cf6;">Ae</span></div><span class="text-sm font-medium">After Effects</span></div>
+      <div class="card tilt text-center p-6 !rounded-2xl"><div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(99,102,241,0.1);"><span class="text-xl font-bold" style="color: #6366f1;">Pr</span></div><span class="text-sm font-medium">Premiere Pro</span></div>
+      <div class="card tilt text-center p-6 !rounded-2xl"><div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(6,182,212,0.1);"><span class="text-xl font-bold" style="color: #06b6d4;">Au</span></div><span class="text-sm font-medium">Audition</span></div>
+      <div class="card tilt text-center p-6 !rounded-2xl"><div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style="background: rgba(148,163,184,0.1);"><span class="text-xl font-bold" style="color: #94a3b8;">CAD</span></div><span class="text-sm font-medium">AutoCAD</span></div>
     </div>
   </div>
 </section>
 
-<!-- 插件推荐（保留） -->
 <section class="py-24 relative" style="background: var(--bg);">
   <div class="max-w-6xl mx-auto px-6">
     <div class="text-center mb-16 reveal">
@@ -257,29 +302,14 @@
       <p class="text-lg mt-4" style="color: var(--text-secondary);">Red Giant、Trapcode、Element 3D…… 合规授权，安全稳定</p>
     </div>
     <div class="grid md:grid-cols-3 gap-8">
-      <div class="card tilt reveal" style="transform: translateY(-12px);">
-        <i class="fa fa-plug text-3xl mb-5" style="color: var(--primary);"></i>
-        <h3 class="text-xl font-bold mb-3">全系列增效工具</h3>
-        <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">Red Giant、Magic Bullet 等正版插件采集指引，合规更安心。</p>
-      </div>
-      <div class="card tilt reveal" style="transition-delay: 0.1s;">
-        <i class="fa fa-diamond text-3xl mb-5" style="color: #8b5cf6;"></i>
-        <h3 class="text-xl font-bold mb-3">正版合作授权</h3>
-        <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">Adobe、Autodesk 官方插件商店授权渠道，版权清晰无忧。</p>
-      </div>
-      <div class="card tilt reveal" style="transition-delay: 0.2s; transform: translateY(12px);">
-        <i class="fa fa-shield text-3xl mb-5" style="color: #06b6d4;"></i>
-        <h3 class="text-xl font-bold mb-3">技术支持保障</h3>
-        <p class="text-sm leading-relaxed" style="color: var(--text-secondary);">专业团队负责插件适配、性能优化，7x24小时响应。</p>
-      </div>
+      <div class="card tilt reveal" style="transform: translateY(-12px);"><i class="fa fa-plug text-3xl mb-5" style="color: var(--primary);"></i><h3 class="text-xl font-bold mb-3">全系列增效工具</h3><p class="text-sm leading-relaxed" style="color: var(--text-secondary);">Red Giant、Magic Bullet 等正版插件采集指引，合规更安心。</p></div>
+      <div class="card tilt reveal" style="transition-delay: 0.1s;"><i class="fa fa-diamond text-3xl mb-5" style="color: #8b5cf6;"></i><h3 class="text-xl font-bold mb-3">正版合作授权</h3><p class="text-sm leading-relaxed" style="color: var(--text-secondary);">Adobe、Autodesk 官方插件商店授权渠道，版权清晰无忧。</p></div>
+      <div class="card tilt reveal" style="transition-delay: 0.2s; transform: translateY(12px);"><i class="fa fa-shield text-3xl mb-5" style="color: #06b6d4;"></i><h3 class="text-xl font-bold mb-3">技术支持保障</h3><p class="text-sm leading-relaxed" style="color: var(--text-secondary);">专业团队负责插件适配、性能优化，7x24小时响应。</p></div>
     </div>
-    <div class="text-center mt-12 reveal">
-      <button class="btn-primary btn-ghost">查询全部插件报价 <i class="fa fa-arrow-right"></i></button>
-    </div>
+    <div class="text-center mt-12 reveal"><button class="btn-primary btn-ghost">查询全部插件报价 <i class="fa fa-arrow-right"></i></button></div>
   </div>
 </section>
 
-<!-- 主营业务（保留） -->
 <section class="py-24 relative" style="background: var(--surface);">
   <div class="max-w-6xl mx-auto px-6">
     <div class="text-center mb-16 reveal">
@@ -287,97 +317,59 @@
       <p class="text-lg mt-4" style="color: var(--text-secondary);">正版授权 + 专业技术服务</p>
     </div>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="card tilt reveal flex items-start gap-4">
-        <i class="fa fa-paint-brush text-3xl" style="color: var(--primary);"></i>
-        <div>
-          <h4 class="font-bold text-lg">Adobe 正版授权</h4>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">Photoshop, Premiere, AE 全系列</p>
-        </div>
-      </div>
-      <div class="card tilt reveal flex items-start gap-4">
-        <i class="fa fa-cube text-3xl" style="color: #8b5cf6;"></i>
-        <div>
-          <h4 class="font-bold text-lg">Autodesk 授权</h4>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">AutoCAD, Maya, 3ds Max</p>
-        </div>
-      </div>
-      <div class="card tilt reveal flex items-start gap-4">
-        <i class="fa fa-file-excel-o text-3xl" style="color: #10b981;"></i>
-        <div>
-          <h4 class="font-bold text-lg">Office 365</h4>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">商业/个人版正版授权</p>
-        </div>
-      </div>
-      <div class="card tilt reveal flex items-start gap-4">
-        <i class="fa fa-windows text-3xl" style="color: #0ea5e9;"></i>
-        <div>
-          <h4 class="font-bold text-lg">系统重装优化</h4>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">Windows/macOS 极速优化</p>
-        </div>
-      </div>
-      <div class="card tilt reveal flex items-start gap-4">
-        <i class="fa fa-puzzle-piece text-3xl" style="color: #6366f1;"></i>
-        <div>
-          <h4 class="font-bold text-lg">Adobe插件部署</h4>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">正版插件一站式安装</p>
-        </div>
-      </div>
-      <div class="card tilt reveal flex items-start gap-4">
-        <i class="fa fa-database text-3xl" style="color: #06b6d4;"></i>
-        <div>
-          <h4 class="font-bold text-lg">数据恢复</h4>
-          <p class="text-sm mt-1" style="color: var(--text-secondary);">误删/格式化救援</p>
-        </div>
-      </div>
+      <div class="card tilt reveal flex items-start gap-4"><i class="fa fa-paint-brush text-3xl" style="color: var(--primary);"></i><div><h4 class="font-bold text-lg">Adobe 正版授权</h4><p class="text-sm mt-1" style="color: var(--text-secondary);">Photoshop, Premiere, AE 全系列</p></div></div>
+      <div class="card tilt reveal flex items-start gap-4"><i class="fa fa-cube text-3xl" style="color: #8b5cf6;"></i><div><h4 class="font-bold text-lg">Autodesk 授权</h4><p class="text-sm mt-1" style="color: var(--text-secondary);">AutoCAD, Maya, 3ds Max</p></div></div>
+      <div class="card tilt reveal flex items-start gap-4"><i class="fa fa-file-excel-o text-3xl" style="color: #10b981;"></i><div><h4 class="font-bold text-lg">Office 365</h4><p class="text-sm mt-1" style="color: var(--text-secondary);">商业/个人版正版授权</p></div></div>
+      <div class="card tilt reveal flex items-start gap-4"><i class="fa fa-windows text-3xl" style="color: #0ea5e9;"></i><div><h4 class="font-bold text-lg">系统重装优化</h4><p class="text-sm mt-1" style="color: var(--text-secondary);">Windows/macOS 极速优化</p></div></div>
+      <div class="card tilt reveal flex items-start gap-4"><i class="fa fa-puzzle-piece text-3xl" style="color: #6366f1;"></i><div><h4 class="font-bold text-lg">Adobe插件部署</h4><p class="text-sm mt-1" style="color: var(--text-secondary);">正版插件一站式安装</p></div></div>
+      <div class="card tilt reveal flex items-start gap-4"><i class="fa fa-database text-3xl" style="color: #06b6d4;"></i><div><h4 class="font-bold text-lg">数据恢复</h4><p class="text-sm mt-1" style="color: var(--text-secondary);">误删/格式化救援</p></div></div>
     </div>
   </div>
 </section>
 
-<!-- 信任数字 -->
 <section class="py-24 relative" style="background: var(--bg);">
   <div class="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-center reveal">
-    <div>
-      <div class="text-7xl font-black" style="background: linear-gradient(135deg, var(--primary), #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        <span class="count-up" data-target="200">0</span>+
+    <div><div class="text-7xl font-black" style="background: linear-gradient(135deg, var(--primary), #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"><span class="count-up" data-target="200">0</span>+</div><div class="text-sm mt-2 uppercase tracking-widest" style="color: var(--text-secondary);">服务客户</div></div>
+    <div><div class="text-7xl font-black" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">1V1</div><div class="text-sm mt-2 uppercase tracking-widest" style="color: var(--text-secondary);">专业顾问</div></div>
+    <div><div class="text-7xl font-black" style="background: linear-gradient(135deg, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">7×24</div><div class="text-sm mt-2 uppercase tracking-widest" style="color: var(--text-secondary);">技术支持</div></div>
+  </div>
+</section>
+
+<section class="py-24 relative" style="background: var(--surface);" id="reviewsSection">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-12 reveal">
+      <div class="live-badge inline-flex items-center gap-2 mb-4">
+        <span class="pulse-dot"></span>
+        <span class="text-sm font-semibold tracking-wide" style="color: var(--primary);">实时口碑 · 用户评价</span>
+        <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-2">动态更新</span>
       </div>
-      <div class="text-sm mt-2 uppercase tracking-widest" style="color: var(--text-secondary);">服务客户</div>
+      <h2 class="section-title">客户反馈</h2>
+      <p class="text-lg mt-3" style="color: var(--text-secondary);">来自真实用户的分享</p>
     </div>
-    <div>
-      <div class="text-7xl font-black" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">1V1</div>
-      <div class="text-sm mt-2 uppercase tracking-widest" style="color: var(--text-secondary);">专业顾问</div>
+    <div id="reviewsContainer" class="grid md:grid-cols-3 gap-6">
+      <!-- 骨架占位，确保不空白 -->
+      <div class="review-card"><div class="animate-pulse flex space-x-4"><div class="rounded-full bg-slate-700 h-10 w-10"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-700 rounded w-3/4"></div><div class="h-3 bg-slate-700 rounded w-full"></div><div class="h-3 bg-slate-700 rounded w-5/6"></div></div></div></div>
+      <div class="review-card"><div class="animate-pulse flex space-x-4"><div class="rounded-full bg-slate-700 h-10 w-10"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-700 rounded w-3/4"></div><div class="h-3 bg-slate-700 rounded w-full"></div><div class="h-3 bg-slate-700 rounded w-5/6"></div></div></div></div>
+      <div class="review-card"><div class="animate-pulse flex space-x-4"><div class="rounded-full bg-slate-700 h-10 w-10"></div><div class="flex-1 space-y-2"><div class="h-4 bg-slate-700 rounded w-3/4"></div><div class="h-3 bg-slate-700 rounded w-full"></div><div class="h-3 bg-slate-700 rounded w-5/6"></div></div></div></div>
     </div>
-    <div>
-      <div class="text-7xl font-black" style="background: linear-gradient(135deg, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">7×24</div>
-      <div class="text-sm mt-2 uppercase tracking-widest" style="color: var(--text-secondary);">技术支持</div>
+    <div class="text-center mt-8 text-xs opacity-70" style="color: var(--text-secondary);">
+      <i class="fa fa-refresh"></i> 每10秒更新 · 每次展示不同客户真实反馈
     </div>
   </div>
 </section>
 
-<!-- 联系区域 -->
-<section id="contact" class="py-24 relative" style="background: var(--surface);">
+<section id="contact" class="py-24 relative" style="background: var(--bg);">
   <div class="max-w-2xl mx-auto px-6 text-center reveal">
     <h2 class="section-title">开启合规之旅</h2>
     <p class="text-lg mt-4 mb-12" style="color: var(--text-secondary);">添加微信，1小时内获取专属方案</p>
     <div class="card flex flex-col items-center gap-6 !p-10">
-      <div class="w-16 h-16 rounded-2xl flex items-center justify-center" style="background: rgba(16,185,129,0.1);">
-        <i class="fa fa-weixin text-3xl" style="color: #10b981;"></i>
-      </div>
-      <div>
-        <p class="text-sm" style="color: var(--text-secondary);">官方微信号</p>
-        <p class="text-3xl font-bold">Win_Mac_123</p>
-      </div>
-      <button id="contact-cta" class="btn-primary" style="background: #10b981;">
-        <i class="fa fa-weixin"></i> 添加微信咨询
-        <span class="relative flex h-3 w-3 ml-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-        </span>
-      </button>
+      <div class="w-16 h-16 rounded-2xl flex items-center justify-center" style="background: rgba(16,185,129,0.1);"><i class="fa fa-weixin text-3xl" style="color: #10b981;"></i></div>
+      <div><p class="text-sm" style="color: var(--text-secondary);">官方微信号</p><p class="text-3xl font-bold">Win_Mac_123</p></div>
+      <button id="contact-cta" class="btn-primary" style="background: #10b981;"><i class="fa fa-weixin"></i> 添加微信咨询<span class="relative flex h-3 w-3 ml-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span></button>
     </div>
   </div>
 </section>
 
-<!-- 悬浮微信 / 返回顶部 -->
 <div class="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3">
   <button id="float-cta" class="btn-primary !p-3 !rounded-full relative group" style="background: #10b981;">
     <i class="fa fa-weixin text-xl"></i>
@@ -387,28 +379,18 @@
 </div>
 <button id="back-to-top"><i class="fa fa-arrow-up"></i></button>
 
-<!-- 弹窗 -->
 <div id="contactModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
   <div class="card max-w-md w-full !p-8" style="background: var(--card-bg);">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-2xl font-bold"><i class="fa fa-weixin text-green-500 mr-2"></i>添加微信</h3>
-      <button id="closeModal" class="text-2xl" style="color: var(--text-secondary);"><i class="fa fa-times"></i></button>
-    </div>
+    <div class="flex justify-between items-center mb-4"><h3 class="text-2xl font-bold"><i class="fa fa-weixin text-green-500 mr-2"></i>添加微信</h3><button id="closeModal" class="text-2xl" style="color: var(--text-secondary);"><i class="fa fa-times"></i></button></div>
     <p class="mb-6" style="color: var(--text-secondary);">添加请备注来意</p>
-    <div class="rounded-xl px-4 py-3 flex items-center gap-3 mb-6" style="background: rgba(0,0,0,0.05);">
-      <i class="fa fa-weixin text-green-500 text-xl"></i>
-      <span class="text-lg font-semibold">Win_Mac_123</span>
-    </div>
+    <div class="rounded-xl px-4 py-3 flex items-center gap-3 mb-6" style="background: rgba(0,0,0,0.05);"><i class="fa fa-weixin text-green-500 text-xl"></i><span class="text-lg font-semibold">Win_Mac_123</span></div>
     <button id="copyBtn" class="btn-primary w-full justify-center">复制微信号</button>
   </div>
 </div>
 
 <footer class="py-10 text-center text-sm" style="color: var(--text-secondary); border-top: 1px solid var(--border);">
   <div class="max-w-3xl mx-auto px-6 space-y-6">
-    <div class="flex flex-wrap justify-center gap-6">
-      <span>总访问 <span id="busuanzi_value_site_pv" style="color: var(--text);">--</span></span>
-      <span>独立访客 <span id="busuanzi_value_site_uv" style="color: var(--text);">--</span></span>
-    </div>
+    <div class="flex flex-wrap justify-center gap-6"><span>总访问 <span id="busuanzi_value_site_pv" style="color: var(--text);">--</span></span><span>独立访客 <span id="busuanzi_value_site_uv" style="color: var(--text);">--</span></span></div>
     <div class="text-left space-y-3" style="font-size: 0.9rem; line-height: 1.7;">
       <p><strong style="color: var(--text);">合规声明</strong></p>
       <p><strong style="color: var(--text);">1. 授权合规</strong> — 本站提供的所有软件均来自官方授权渠道，确保用户获得正版许可，遵守软件发行商的使用条款。</p>
@@ -422,162 +404,166 @@
 
 <script>
   (function() {
-    // 预加载
-    window.addEventListener('load', () => {
-      setTimeout(() => document.getElementById('preloader').classList.add('hide'), 700);
-    });
+    window.addEventListener('load', () => { setTimeout(() => document.getElementById('preloader').classList.add('hide'), 700); });
 
-    // 进度条
     window.addEventListener('scroll', () => {
       const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       document.getElementById('progress-bar').style.width = (winScroll / height) * 100 + '%';
     });
 
-    // 主题切换
     const html = document.documentElement;
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const themeToggleMobile = document.getElementById('themeToggleMobile');
     const themeIconMobile = document.getElementById('themeIconMobile');
     let isLight = localStorage.getItem('theme') === 'light';
-
-    function syncMobileIcon() {
-      if (themeIcon && themeIconMobile) {
-        themeIconMobile.className = themeIcon.className;
-      }
-    }
-
+    function syncMobileIcon() { if (themeIcon && themeIconMobile) themeIconMobile.className = themeIcon.className; }
     function setTheme() {
-      if (isLight) {
-        html.classList.add('light');
-        themeIcon.className = 'fa fa-moon-o';
-      } else {
-        html.classList.remove('light');
-        themeIcon.className = 'fa fa-sun-o';
-      }
+      if (isLight) { html.classList.add('light'); themeIcon.className = 'fa fa-moon-o'; } 
+      else { html.classList.remove('light'); themeIcon.className = 'fa fa-sun-o'; }
       syncMobileIcon();
     }
     setTheme();
+    themeToggle.addEventListener('click', () => { isLight = !isLight; localStorage.setItem('theme', isLight ? 'light' : 'dark'); setTheme(); });
+    if (themeToggleMobile) themeToggleMobile.addEventListener('click', () => { isLight = !isLight; localStorage.setItem('theme', isLight ? 'light' : 'dark'); setTheme(); });
 
-    themeToggle.addEventListener('click', () => {
-      isLight = !isLight;
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      setTheme();
-    });
-    if (themeToggleMobile) {
-      themeToggleMobile.addEventListener('click', () => {
-        isLight = !isLight;
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-        setTheme();
-      });
-    }
-
-    // 移动端菜单
     const menuToggle = document.getElementById('menuToggle');
     const mobileMenu = document.getElementById('mobileMenu');
     if (menuToggle && mobileMenu) {
       menuToggle.addEventListener('click', () => {
         mobileMenu.classList.toggle('hidden');
         const icon = menuToggle.querySelector('i');
-        if (icon) {
-          icon.className = mobileMenu.classList.contains('hidden') ? 'fa fa-bars' : 'fa fa-times';
-        }
+        if (icon) icon.className = mobileMenu.classList.contains('hidden') ? 'fa fa-bars' : 'fa fa-times';
       });
     }
 
-    // 弹窗
     const modal = document.getElementById('contactModal');
     const openModal = () => { modal.classList.add('flex'); modal.classList.remove('hidden'); };
     const closeModal = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
-    document.getElementById('hero-cta').addEventListener('click', openModal);
-    document.getElementById('float-cta').addEventListener('click', openModal);
-    document.getElementById('contact-cta').addEventListener('click', openModal);
-    document.getElementById('closeModal').addEventListener('click', closeModal);
-    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-    document.getElementById('copyBtn').addEventListener('click', async () => {
+    document.getElementById('hero-cta')?.addEventListener('click', openModal);
+    document.getElementById('float-cta')?.addEventListener('click', openModal);
+    document.getElementById('contact-cta')?.addEventListener('click', openModal);
+    document.getElementById('closeModal')?.addEventListener('click', closeModal);
+    if(modal) modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.getElementById('copyBtn')?.addEventListener('click', async () => {
       await navigator.clipboard.writeText('Win_Mac_123');
       const btn = document.getElementById('copyBtn');
-      btn.innerHTML = '<i class="fa fa-check"></i> 复制成功';
-      btn.style.background = '#10b981';
-      setTimeout(() => {
-        btn.innerHTML = '复制微信号';
-        btn.style.background = '';
-      }, 2000);
+      if(btn) { btn.innerHTML = '<i class="fa fa-check"></i> 复制成功'; btn.style.background = '#10b981'; setTimeout(() => { btn.innerHTML = '复制微信号'; btn.style.background = ''; }, 2000); }
     });
 
-    // 粒子背景
     const canvas = document.getElementById('particleCanvas');
     if (canvas) {
       const ctx = canvas.getContext('2d');
       let w, h, particles = [];
       function resize() { w = canvas.parentElement.offsetWidth; h = canvas.parentElement.offsetHeight; canvas.width = w; canvas.height = h; }
-      class Particle {
-        constructor() { this.x = Math.random() * w; this.y = Math.random() * h; this.r = Math.random() * 2 + 1; this.sx = (Math.random() - 0.5) * 0.3; this.sy = (Math.random() - 0.5) * 0.3; }
-        update() { this.x += this.sx; this.y += this.sy; if (this.x < 0 || this.x > w) this.sx *= -1; if (this.y < 0 || this.y > h) this.sy *= -1; }
-        draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fill(); }
-      }
+      class Particle { constructor() { this.x = Math.random() * w; this.y = Math.random() * h; this.r = Math.random() * 2 + 1; this.sx = (Math.random() - 0.5) * 0.3; this.sy = (Math.random() - 0.5) * 0.3; } update() { this.x += this.sx; this.y += this.sy; if (this.x < 0 || this.x > w) this.sx *= -1; if (this.y < 0 || this.y > h) this.sy *= -1; } draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fill(); } }
       function init() { particles = Array.from({ length: 60 }, () => new Particle()); }
       function animate() { ctx.clearRect(0, 0, w, h); particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animate); }
       window.addEventListener('resize', () => { resize(); init(); });
       resize(); init(); animate();
     }
 
-    // 数字滚动
-    function countUp(el) {
-      const target = +el.getAttribute('data-target');
-      let start = null;
-      function step(timestamp) {
-        if (!start) start = timestamp;
-        const progress = Math.min((timestamp - start) / 2000, 1);
-        el.textContent = Math.floor(progress * target);
-        if (progress < 1) requestAnimationFrame(step);
-        else el.textContent = target;
-      }
-      requestAnimationFrame(step);
-    }
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => { if (entry.isIntersecting) { countUp(entry.target); observer.unobserve(entry.target); } });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('.count-up').forEach(el => observer.observe(el));
+    function countUp(el) { const target = +el.getAttribute('data-target'); let start = null; function step(timestamp) { if (!start) start = timestamp; const progress = Math.min((timestamp - start) / 2000, 1); el.textContent = Math.floor(progress * target); if (progress < 1) requestAnimationFrame(step); else el.textContent = target; } requestAnimationFrame(step); }
+    const countObserver = new IntersectionObserver(entries => { entries.forEach(entry => { if (entry.isIntersecting) { countUp(entry.target); countObserver.unobserve(entry.target); } }); }, { threshold: 0.5 });
+    document.querySelectorAll('.count-up').forEach(el => countObserver.observe(el));
 
-    // 滚动渐现
-    const revealObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
-    }, { threshold: 0.1 });
+    const revealObserver = new IntersectionObserver(entries => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } }); }, { threshold: 0.1 });
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-    // 3D倾斜
     document.querySelectorAll('.tilt').forEach(card => {
-      card.addEventListener('mousemove', e => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const rotateX = (y - rect.height / 2) / rect.height * -6;
-        const rotateY = (x - rect.width / 2) / rect.width * 6;
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      });
+      card.addEventListener('mousemove', e => { const rect = card.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top; const rotateX = (y - rect.height / 2) / rect.height * -6; const rotateY = (x - rect.width / 2) / rect.width * 6; card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`; });
       card.addEventListener('mouseleave', () => card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)');
     });
 
-    // 鼠标光晕
     const glow = document.getElementById('cursorGlow');
     document.addEventListener('mousemove', e => { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; });
 
-    // 返回顶部
     const backBtn = document.getElementById('back-to-top');
     window.addEventListener('scroll', () => backBtn.classList.toggle('show', window.scrollY > 500));
     backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-    // 百度推送
-    (function(){
-      var bp = document.createElement('script');
-      var curProtocol = window.location.protocol.split(':')[0];
-      if (curProtocol === 'https') { bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'; }
-      else { bp.src = 'http://push.zhanzhang.baidu.com/push.js'; }
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(bp, s);
-    })();
+    (function(){ var bp = document.createElement('script'); var curProtocol = window.location.protocol.split(':')[0]; if (curProtocol === 'https') { bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'; } else { bp.src = 'http://push.zhanzhang.baidu.com/push.js'; } var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(bp, s); })();
+
+    const reviewPool = [
+      { name: "张明先生", content: "Adobe正版订阅全系列采购，从Photoshop到AE，授权流程正规高效，解决了版权风险。", stars: 5, avatarChar: "张" },
+      { name: "李华女士", content: "Autodesk正版订阅让设计团队合规顺畅，技术支持响应及时。", stars: 5, avatarChar: "李" },
+      { name: "王伟", content: "Office 365 商业高级版部署后，全球协同效率提升，方案性价比合理。", stars: 5, avatarChar: "王" },
+      { name: "陈敏女士", content: "系统重装+深度优化服务，旧电脑运行明显改善，Win11专业版干净稳定。", stars: 5, avatarChar: "陈" },
+      { name: "刘强", content: "误删重要合同文件，数据恢复2小时找回，技术专业。", stars: 5, avatarChar: "刘" },
+      { name: "王总监", content: "Adobe Creative Cloud正版订阅+插件包，价格比官网优惠，还提供了培训支持。", stars: 5, avatarChar: "王" },
+      { name: "赵经理", content: "AutoCAD正版授权+批量管理，全院使用无法律风险，服务效率高。", stars: 5, avatarChar: "赵" },
+      { name: "周先生", content: "Office 365 商业协作版助力远程办公，乐哲提供了专业迁移指导。", stars: 5, avatarChar: "周" },
+      { name: "林主管", content: "全公司Windows系统重装+数据迁移，两天内完成，员工零投诉。", stars: 5, avatarChar: "林" },
+      { name: "吴女士", content: "固态硬盘数据恢复，成功救回重要资料，专业度令人感动。", stars: 5, avatarChar: "吴" },
+      { name: "刘经理", content: "Premiere Pro正版 + Red Giant全家桶，正版授权稳定无崩溃。", stars: 5, avatarChar: "刘" },
+      { name: "陈先生", content: "Autodesk 3ds Max正版授权，渲染无弹窗，价格透明，服务贴心。", stars: 5, avatarChar: "陈" },
+      { name: "徐女士", content: "Adobe After Effects正版订阅+粒子插件，技术支持响应快。", stars: 5, avatarChar: "徐" },
+      { name: "郑主管", content: "系统重装+数据备份，老电脑运行速度翻倍，还帮忙安装了正版Office。", stars: 5, avatarChar: "郑" },
+      { name: "孙明", content: "数据恢复完美找回误删的毕业设计，价格合理，售后给了优化建议。", stars: 5, avatarChar: "孙" },
+      { name: "高设计师", content: "Adobe Photoshop正版订阅，AI功能强大，客服解答细致，非常满意。", stars: 5, avatarChar: "高" },
+      { name: "吴总", content: "Office 365 商业版全套部署，乐哲协助完成了数据迁移，效率远超预期。", stars: 5, avatarChar: "吴" },
+      { name: "郑工程师", content: "Autodesk Revit正版授权，解决了团队协同的版权问题，价格公道。", stars: 5, avatarChar: "郑" },
+      { name: "沈女士", content: "电脑突然蓝屏，系统重装后速度飞快，还帮忙安装了正版驱动。", stars: 5, avatarChar: "沈" },
+      { name: "韩先生", content: "不慎格式化移动硬盘，数据恢复找回了全部项目文件，感谢技术团队。", stars: 5, avatarChar: "韩" },
+      { name: "秦总监", content: "Adobe InDesign正版订阅+字体管理，出版流程合规，省心。", stars: 5, avatarChar: "秦" },
+      { name: "魏主管", content: "Autodesk Maya正版授权，渲染农场授权顺利，技术支持7x24在线。", stars: 5, avatarChar: "魏" },
+      { name: "蒋女士", content: "系统重装+SSD优化，老笔记本焕发第二春，开机只需8秒。", stars: 5, avatarChar: "蒋" },
+      { name: "阮先生", content: "数据恢复服务价格透明，恢复率100%，还帮我做了备份方案。", stars: 5, avatarChar: "阮" },
+      { name: "尤经理", content: "Adobe Acrobat Pro正版授权，PDF编辑效率倍增，公司全员使用。", stars: 5, avatarChar: "尤" },
+      { name: "许总", content: "Office 365 企业版部署后，Teams协同效率大幅提升，乐哲团队专业。", stars: 5, avatarChar: "许" },
+      { name: "何工", content: "AutoCAD Mechanical正版授权，机械设计合规无忧，激活及时。", stars: 5, avatarChar: "何" },
+      { name: "宋女士", content: "Mac系统重装+优化，解决了软件兼容问题，还安装了正版Adobe套件。", stars: 5, avatarChar: "宋" },
+      { name: "段先生", content: "误删微信聊天记录，数据恢复找回了重要客户信息，非常感激。", stars: 5, avatarChar: "段" },
+      { name: "金设计师", content: "Adobe XD正版订阅，UI设计团队效率翻倍，正版授权无弹窗。", stars: 5, avatarChar: "金" }
+    ];
+
+    function getRandomReviews() {
+      const shuffled = [...reviewPool];
+      for (let i = shuffled.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; }
+      return shuffled.slice(0, 3);
+    }
+    const timeSuffix = ["刚刚", "2分钟前", "5分钟前", "8分钟前", "12分钟前", "18分钟前", "27分钟前", "35分钟前", "1小时前", "2小时前", "3小时前", "昨天"];
+    function getRandomTime() { return timeSuffix[Math.floor(Math.random() * timeSuffix.length)]; }
+
+    let refreshTimer = null;
+    function renderReviewsWithFade() {
+      const container = document.getElementById('reviewsContainer');
+      if (!container) return;
+      const oldCards = container.querySelectorAll('.review-card');
+      oldCards.forEach(card => { card.style.transition = 'opacity 0.35s ease, transform 0.35s ease'; card.style.opacity = '0'; card.style.transform = 'translateY(8px)'; });
+      setTimeout(() => {
+        const reviews = getRandomReviews();
+        const cardsHtml = reviews.map(rev => `
+          <div class="review-card" style="opacity:0; transform:translateY(8px); transition: opacity 0.4s ease, transform 0.4s ease;">
+            <div class="flex items-start gap-4">
+              <div class="avatar">${rev.avatarChar}</div>
+              <div class="flex-1">
+                <div class="flex flex-wrap items-center justify-between gap-1 mb-1">
+                  <h4 class="font-bold text-base">${rev.name}</h4>
+                  <span class="text-xs" style="color: var(--text-secondary);"><i class="fa fa-clock-o"></i> ${getRandomTime()}</span>
+                </div>
+                <div class="stars flex mb-2">${Array(rev.stars).fill('<i class="fa fa-star"></i>').join('')}${Array(5-rev.stars).fill('<i class="fa fa-star-o"></i>').join('')}</div>
+                <p class="review-quote">${rev.content}</p>
+                <div class="mt-4 flex flex-wrap gap-2 items-center">
+                  <span class="verified-badge"><i class="fa fa-check-circle"></i> 已认证</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full" style="background: var(--primary-glow); color: var(--primary);">正版授权用户</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        container.innerHTML = cardsHtml;
+        const newCards = container.querySelectorAll('.review-card');
+        requestAnimationFrame(() => {
+          newCards.forEach(card => { card.style.opacity = '1'; card.style.transform = 'translateY(0)'; });
+        });
+      }, 400);
+    }
+
+    renderReviewsWithFade();
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(renderReviewsWithFade, 10000);
   })();
 </script>
 </body>
