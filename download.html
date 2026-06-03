@@ -14,6 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
+        /* 原始浅色主题 */
         :root { --bg: #f3f4f8; --surface: #ffffff; --border: #e8ecf3; --border-light: #f0f2f7; --text: #1a1d2e; --text-secondary: #4a5068; --text-muted: #8b90a5; --primary: #4f6ef6; --primary-light: #eef1fd; --primary-hover: #3b54d4; --success: #10b981; --warning: #f59e0b; --shadow-sm: 0 1px 3px rgba(0,0,0,0.04); --shadow-md: 0 4px 16px rgba(0,0,0,0.05); --shadow-lg: 0 12px 36px rgba(0,0,0,0.07); --radius-sm: 8px; --radius: 16px; --radius-lg: 22px; --radius-xl: 28px; --radius-full: 60px; --transition-fast: 0.18s ease; --font-xs: 0.68rem; --font-sm: 0.78rem; --font-base: 0.9rem; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
@@ -21,17 +22,17 @@
         body.dark-mode { --bg: #0f172a; --surface: #1e293b; --border: #334155; --border-light: #334155; --text: #f1f5f9; --text-secondary: #cbd5e1; --text-muted: #94a3b8; }
         #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         
-        /* 优雅加载过渡动画 */
+        /* 高级加载过渡动画 - 流光粒子 + 极速淡出 (0.08s) */
         .loading-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 20, 35, 0.7);
-            backdrop-filter: blur(10px);
+            background: radial-gradient(circle at 30% 40%, rgba(10, 14, 23, 0.96), rgba(18, 22, 45, 0.98));
+            backdrop-filter: blur(12px);
             z-index: 10000;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0.45s;
+            transition: opacity 0.08s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0.08s;
             opacity: 1;
             visibility: visible;
         }
@@ -47,36 +48,40 @@
             height: 100%;
             display: block;
             z-index: 0;
-            opacity: 0.6;
+            opacity: 0.65;
         }
         .loading-content {
             position: relative;
             z-index: 2;
-            background: rgba(20, 25, 45, 0.85);
-            backdrop-filter: blur(16px);
-            padding: 14px 28px;
+            background: rgba(12, 16, 28, 0.65);
+            backdrop-filter: blur(24px);
+            padding: 14px 32px;
             border-radius: 80px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 20px 35px -12px rgba(0,0,0,0.3), 0 0 20px rgba(79,110,246,0.3);
-            animation: softGlow 1.6s ease-in-out infinite;
+            gap: 14px;
+            box-shadow: 0 0 0 1px rgba(109, 142, 255, 0.3), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 30px rgba(79,110,246,0.6);
+            animation: advancedFlow 1.2s ease-in-out infinite;
         }
         .loading-content i {
-            font-size: 1.3rem;
-            color: white;
-            animation: spin 0.8s linear infinite;
+            font-size: 1.4rem;
+            color: #8aaaff;
+            animation: spin 0.6s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(109,142,255,0.9));
         }
         .loading-content span {
             font-size: 1rem;
-            font-weight: 500;
-            color: white;
-            letter-spacing: 0.3px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffffff, #b0c4ff, #6d8eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 0.8px;
         }
-        @keyframes softGlow {
-            0% { box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 20px 35px -12px rgba(0,0,0,0.3), 0 0 12px rgba(79,110,246,0.2); }
-            50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.25), 0 20px 40px -8px rgba(0,0,0,0.4), 0 0 24px rgba(79,110,246,0.5); }
-            100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 20px 35px -12px rgba(0,0,0,0.3), 0 0 12px rgba(79,110,246,0.2); }
+        @keyframes advancedFlow {
+            0% { box-shadow: 0 0 0 1px rgba(109,142,255,0.2), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 15px rgba(79,110,246,0.3); transform: scale(0.98); }
+            50% { box-shadow: 0 0 0 2px rgba(109,142,255,0.6), 0 25px 45px -8px rgba(0,0,0,0.6), 0 0 35px rgba(79,110,246,0.8); transform: scale(1); }
+            100% { box-shadow: 0 0 0 1px rgba(109,142,255,0.2), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 15px rgba(79,110,246,0.3); transform: scale(0.98); }
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
@@ -84,7 +89,7 @@
         
         .app-wrapper {
             opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+            transition: opacity 0.08s ease-in-out;
             position: relative;
             z-index: 1;
         }
@@ -106,7 +111,7 @@
         .hamburger.active span:nth-child(2) { opacity: 0; }
         .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
         @media (max-width:768px) { .nav-inner { justify-content: space-between; } .hamburger { display: flex; } .nav-links { display: none; width: 100%; flex-direction: column; gap: 2px; padding: 12px 0; background: var(--surface); border-radius: var(--radius-lg); margin-top: 10px; box-shadow: var(--shadow-md); border: 1px solid var(--border-light); position: absolute; top: 100%; left: 0; z-index: 1000; } .nav-links.show { display: flex; } .user-area { margin-left: 0; } }
-        .user-area { flex-shrink: 0; }
+        .user-area { flex-shrink: 0; position: relative; }
         .auth-btn { background: linear-gradient(135deg, #4f6ef6, #3b54d4); color: #fff; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-weight: 600; font-size: var(--font-sm); cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 2px 10px rgba(79,110,246,0.15); transition: 0.2s; }
         .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(79,110,246,0.3); }
         .user-name-btn { background: var(--surface); padding: 9px 18px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 7px; cursor: pointer; border: 1px solid var(--border); font-weight: 500; font-size: var(--font-sm); }
@@ -118,7 +123,7 @@
         .level-3 { background: #dcfce7; color: #22c55e; }
         .level-4 { background: #fed7aa; color: #ea580c; }
         .level-5 { background: #fef08a; color: #ca8a04; }
-        .dropdown-content { display: none; position: absolute; right: 0; top: 48px; background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 40px rgba(0,0,0,0.1); padding: 6px; min-width: 160px; z-index: 200; border: 1px solid var(--border); }
+        .dropdown-content { display: none; position: absolute; right: 0; top: 48px; background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 6px; min-width: 160px; z-index: 200; border: 1px solid var(--border); }
         .dropdown-content.show { display: block; }
         .dropdown-content button { display: block; width: 100%; padding: 10px 14px; background: transparent; border: none; text-align: left; border-radius: var(--radius-sm); cursor: pointer; font-size: var(--font-sm); color: var(--text); }
         .dropdown-content button:hover { background: var(--bg); color: var(--primary); }
@@ -274,7 +279,7 @@
 <body>
     <canvas id="particles-canvas"></canvas>
     
-    <!-- 优雅加载过渡动画 -->
+    <!-- 高级加载过渡动画（流光粒子，极速淡出） -->
     <div id="loadingOverlay" class="loading-overlay">
         <canvas id="loadingParticleCanvas" class="loading-particle-canvas"></canvas>
         <div class="loading-content">
@@ -289,13 +294,9 @@
                 <div class="logo-area"><span class="logo">乐哲软件</span></div>
                 <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
                 <div class="nav-links" id="navLinks">
-                    <!-- 首页链接 -->
                     <a href="https://www.lezhesoft.cn/">首页</a>
-                    <!-- 服务项目链接 -->
                     <a href="https://www.lezhesoft.cn/service.html">服务项目</a>
-                    <!-- 软件下载 - 保留平滑滚动，不跳转 -->
                     <a href="#" data-nav="download" class="active">软件下载</a>
-                    <!-- 版权声明链接 -->
                     <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a>
                 </div>
                 <div class="user-area" id="userArea"></div>
@@ -304,7 +305,7 @@
         </div>
         <div class="main"><div class="content-wrapper"><div class="main-content"><div class="carousel-container" id="categoryBannerContainer"><div class="carousel-slides" id="categoryBannerSlides"></div><div class="carousel-dots" id="categoryBannerDots"></div></div><div class="daily-section" id="dailySection" style="display: none;"><div class="daily-header"><h3><i class="fas fa-star" style="color: #f59e0b;"></i> 今日推荐</h3><span style="font-size: 0.7rem; color: var(--text-muted);">每日更新，精选好软</span></div><div class="daily-card" id="dailyCard"><div class="daily-card-content"><div class="daily-icon" id="dailyIcon"><i class="fas fa-gem"></i></div><div class="daily-info"><div class="daily-name" id="dailyName">加载中...</div><div class="daily-desc" id="dailyDesc"></div><div class="daily-meta"><span id="dailyVersion"></span><span id="dailyOs"></span><span id="dailyDownloads"><i class="fas fa-download"></i> 0</span></div></div><button class="daily-download-btn" id="dailyDownloadBtn"><i class="fas fa-download"></i> 立即下载</button></div></div></div><div class="hot-section"><div class="hot-header"><h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3><span style="font-size: 0.7rem; color: var(--text-muted);">本周热门下载</span></div><div class="hot-scroll" id="hotScroll"></div></div><div class="category-row" id="categoryTabs"></div><div id="softwareGridContainer" class="grid"></div><div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;">加载更多</button></div></div><div class="sidebar"><div class="sidebar-search"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="搜软件..." autocomplete="off"><button id="searchBtn"><i class="fas fa-arrow-right"></i></button></div></div><div class="carousel-container" id="adContainer"><div class="carousel-slides" id="sidebarCarouselSlides"></div><div class="carousel-dots" id="sidebarCarouselDots"></div></div><div class="sidebar-card"><div class="calendar-header"><span id="calendarMonthYear"></span><div class="calendar-nav"><button id="prevMonth"><i class="fas fa-chevron-left"></i></button><button id="nextMonth"><i class="fas fa-chevron-right"></i></button></div></div><div class="calendar-grid" id="calendarDays"></div><div style="text-align:center; margin-top:10px;"><button id="dailyCheckinBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:8px 16px; font-size:0.75rem; cursor:pointer;">📅 每日签到 (+1次+2积分)</button></div></div><div class="feedback-section"><div style="font-weight:650;font-size:var(--font-base);margin-bottom:10px;"><i class="fas fa-comment-dots"></i> 用户留言</div><input type="text" id="feedbackName" class="feedback-input" placeholder="昵称 (选填)"><textarea id="feedbackMessage" class="feedback-textarea" rows="2" placeholder="分享你想要的软件..."></textarea><button id="submitFeedbackBtn" class="feedback-submit-btn"><i class="fas fa-paper-plane"></i> 提交</button><div id="feedbackListContainer" style="margin-top:12px;font-size:var(--font-xs);"></div></div><div class="sidebar-card"><h3><i class="fas fa-newspaper"></i> 最新文章 <button id="manageArticlesBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:5px 12px; font-size:0.65rem; cursor:pointer; display:none;">管理</button></h3><div id="articlesList"></div></div><div class="sidebar-card"><h3><i class="fas fa-chart-line"></i> 下载排行榜</h3><div id="rankList"></div></div><div class="sidebar-card"><h3><i class="fas fa-history"></i> 最近浏览</h3><div id="historyList"></div><div class="clear-history" style="margin-top:8px; text-align:right;"><button id="clearHistoryBtn" style="background:none; border:1px solid var(--border); padding:4px 12px; border-radius:20px; font-size:0.65rem; cursor:pointer;">清空历史</button></div></div></div></div><div class="friend-links-wrapper"><div class="friend-links-title">友情链接</div><div class="friend-links-row"><a href="https://foxirj.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 佛系软件</a><a href="https://www.ruancang.net/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 软仓</a><a href="https://www.macwk.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> MacWK</a><a href="https://www.ifmac.cn/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> ifMac</a><a href="https://www.macku.pro/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 迈克库软件</a></div></div><footer style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.7rem;">版权所有 © 乐哲软件 | www.lezhesoft.cn | 个人技术分享</footer></div></div>
 
-    <!-- 模态框区域（完整保留，与原始完全一致） -->
+    <!-- 模态框区域（完整保留） -->
     <div id="authModal" class="modal-overlay"><div class="modal-card" style="max-width:440px;"><div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button></div><div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div><button id="showForgotBtn" style="background:none;border:none;color:var(--primary);margin-bottom:12px;">忘记密码？</button><button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">登录</button></div><div id="registerForm" style="display:none;"><input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div id="emailCheckStatus" class="input-check-status"></div><input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="text" id="regInviteCode" placeholder="邀请码（选填）" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;"></div><button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">注册</button></div><div id="forgotForm" style="display:none;"><input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:10px;margin-bottom:12px;"><button id="sendResetCodeBtn" style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:40px;padding:10px;cursor:pointer;">发送验证码</button><input type="text" id="resetCodeInput" placeholder="验证码" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:12px;"></div><input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="forgotCaptchaQuestion"></span><button id="refreshForgotCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;"></div><button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">重置密码</button><button id="backToLoginFromForgot" style="background:none;border:none;color:var(--primary);margin-top:10px;">返回登录</button></div></div></div>
     <div id="profileModal" class="modal-overlay"><div class="modal-card" style="max-width: 480px;"><div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span style="font-weight:700;">个人中心</span><button id="closeProfileModal" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button></div><div><strong>用户名：</strong> <span id="profileUsername"></span><span id="profileLevelBadge"></span></div><div><strong>会员等级：</strong> <span id="profileRole"></span> <span id="profileLevelTag"></span></div><div class="level-rule-tip" id="levelRuleTip"><span><i class="fas fa-chart-line"></i> 积分等级: 青铜0-29 | 白银30-99 | 黄金100-199 | 铂金200-499 | 钻石≥500</span><span><i class="fas fa-info-circle"></i> 签到/评价/邀请得积分</span></div><div><strong>本月剩余下载：</strong> <span id="profileRemaining"></span> 次</div><div style="margin: 10px 0 6px 0; background: var(--primary-light); border-radius: 20px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;"><span style="font-size: 0.75rem; color: var(--text-secondary);"><i class="fas fa-exclamation-circle"></i> 当月免费次数耗尽后，可联系管理员购买额外下载次数</span><button id="contactAdminBuyBtn" class="contact-buy-btn"><i class="fab fa-weixin"></i> 联系客服购买</button></div><div><strong>累计积分：</strong> <span id="profilePoints"></span> 分</div><div><strong>我的邀请码：</strong><div style="background:#f0f4fe;border:1px solid var(--primary);border-radius:12px;padding:12px;text-align:center;font-weight:600;margin:8px 0;" id="myInviteCode"></div><div style="font-size:0.7rem;color:var(--text-muted);">邀请好友注册，双方各得5次下载机会+10积分</div></div><div><button id="showFavoritesBtn" style="width:100%;padding:10px;margin:8px 0;background:var(--primary-light);color:var(--primary);border:none;border-radius:30px;cursor:pointer;"><i class="fas fa-heart"></i> 我的收藏</button></div><div><button id="showExportBtn" style="width:100%;padding:10px;margin:8px 0;background:var(--primary-light);color:var(--primary);border:none;border-radius:30px;cursor:pointer;"><i class="fas fa-download"></i> 导出数据</button></div><div><button id="showMessagesBtn" style="width:100%;padding:10px;margin:8px 0;background:var(--primary-light);color:var(--primary);border:none;border-radius:30px;cursor:pointer;"><i class="fas fa-envelope"></i> 站内信 <span id="unreadCount" style="background:#ef4444;color:white;border-radius:50%;padding:2px 6px;font-size:0.6rem;margin-left:6px;display:none;">0</span></button></div><div style="margin-top:16px;"><strong>修改密码（选填）</strong></div><input type="password" id="profileNewPwd" placeholder="新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;"><input type="password" id="profileConfirmPwd" placeholder="确认新密码" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:16px;margin-bottom:12px;"><button id="saveProfileBtn" style="width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:30px;">保存修改</button></div></div>
     <div id="adminModal" class="modal-overlay"><div class="modal-card" style="max-width: 900px;"><div style="display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;"><h3><i class="fas fa-users"></i> 管理后台</h3><div><button id="sendMessageTabBtn" style="background:var(--primary-light);color:var(--primary);border:none;border-radius:30px;padding:8px 20px;cursor:pointer;margin-right:8px;"><i class="fas fa-envelope"></i> 发送站内信</button><button id="userManageTabBtn" style="background:var(--primary);color:#fff;border:none;border-radius:30px;padding:8px 20px;cursor:pointer;">用户管理</button><button id="closeAdminModal" style="background:none;border:none;font-size:20px;margin-left:8px;cursor:pointer;">&times;</button></div></div><div id="userManagePanel"><div class="admin-search-bar" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="adminSearchInput" placeholder="搜索用户..." style="flex:1;padding:10px;border-radius:30px;border:1px solid var(--border);background:var(--bg);"><input type="date" id="adminDateFilter" style="padding:10px;border-radius:30px;border:1px solid var(--border);background:var(--bg);"><button id="refreshUserListBtn" style="background:var(--primary);color:#fff;border:none;border-radius:30px;padding:10px 20px;cursor:pointer;">刷新</button></div><div id="adminUserList" style="max-height:55vh;overflow-y:auto;"></div></div><div id="sendMessagePanel" style="display:none;"><div style="margin-bottom:16px;"><label style="display:block;margin-bottom:6px;font-weight:600;">选择接收用户</label><select id="messageRecipient" style="width:100%;padding:12px;border-radius:16px;border:1px solid var(--border);background:var(--bg);"><option value="all">全部用户</option><option value="vip">仅VIP用户</option><option value="normal">仅普通用户</option><option value="custom">选择特定用户</option></select></div><div id="selectedUsersContainer" style="margin-top:10px;display:none;"><label style="display:block;margin-bottom:6px;font-weight:600;">选择特定用户（可多选）</label><div id="userCheckboxList" style="max-height:200px;overflow-y:auto;padding:10px;border:1px solid var(--border);border-radius:16px;background:var(--bg);"></div></div><div style="margin-bottom:16px;"><label style="display:block;margin-bottom:6px;font-weight:600;">消息标题</label><input type="text" id="messageTitle" placeholder="例如：新软件上线通知" style="width:100%;padding:12px;border-radius:16px;border:1px solid var(--border);background:var(--bg);"></div><div style="margin-bottom:16px;"><label style="display:block;margin-bottom:6px;font-weight:600;">消息内容</label><textarea id="messageContent" rows="4" placeholder="输入站内信内容..." style="width:100%;padding:12px;border-radius:16px;border:1px solid var(--border);background:var(--bg);"></textarea></div><button id="sendMessageBtn" style="background:var(--primary);color:#fff;border:none;border-radius:30px;padding:12px 24px;cursor:pointer;width:100%;font-weight:600;"><i class="fas fa-paper-plane"></i> 发送站内信</button></div></div></div>
@@ -320,14 +321,14 @@
     <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
 
     <script>
-        // 加载粒子动画（仅加载遮罩层）
+        // 高级粒子动画（流光效果，背景更深邃）
         (function initLoadingParticles() {
             const canvas = document.getElementById('loadingParticleCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let width, height;
             let particles = [];
-            const PARTICLE_COUNT = 70;
+            const PARTICLE_COUNT = 120;
             function resize() {
                 width = window.innerWidth;
                 height = window.innerHeight;
@@ -340,11 +341,11 @@
                     particles.push({
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        radius: Math.random() * 2 + 1,
-                        speedX: (Math.random() - 0.5) * 0.3,
-                        speedY: (Math.random() - 0.5) * 0.2,
-                        alpha: Math.random() * 0.4 + 0.2,
-                        color: `hsl(${Math.random() * 60 + 200}, 70%, 65%)`
+                        radius: Math.random() * 3 + 1,
+                        speedX: (Math.random() - 0.5) * 0.6,
+                        speedY: (Math.random() - 0.5) * 0.5,
+                        alpha: Math.random() * 0.6 + 0.3,
+                        color: `hsl(${Math.random() * 60 + 210}, 85%, 65%)`
                     });
                 }
             }
@@ -355,7 +356,7 @@
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                     ctx.fillStyle = p.color;
-                    ctx.shadowBlur = 6;
+                    ctx.shadowBlur = 10;
                     ctx.shadowColor = p.color;
                     ctx.globalAlpha = p.alpha;
                     ctx.fill();
@@ -379,7 +380,18 @@
             draw();
         })();
         
-        // 导航栏点击处理：只对“软件下载”执行平滑滚动，其他链接允许默认跳转
+        // 全局点击：点击空白处关闭下拉菜单（修复滚动时自动隐藏的问题，但点击外部才隐藏）
+        document.addEventListener('click', function(e) {
+            const userArea = document.getElementById('userArea');
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                if (!userArea?.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        });
+        
+        // 导航栏点击处理：只对“软件下载”执行平滑滚动
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', (e) => {
                 const isDownload = link.getAttribute('data-nav') === 'download';
@@ -489,17 +501,17 @@
         function sendMessageToSelectedUsers(emails, title, content) { emails.forEach(email => sendMessageToUser(email, title, content)); showToast(`已发送给 ${emails.length} 位用户`, 'success'); }
         function renderUserMessages(){ const msgs=JSON.parse(localStorage.getItem(`messages_${currentUser?.email}`)||'[]'); const container=document.getElementById('messageList'); if(!container)return; if(!msgs.length){container.innerHTML='<div style="padding:20px;text-align:center;">暂无站内信</div>';return;} container.innerHTML=msgs.map((m,idx)=>`<div style="padding:12px;border-bottom:1px solid var(--border-light);${m.read?'opacity:0.7;':'font-weight:600;'}" data-idx="${idx}"><div style="display:flex;justify-content:space-between;"><span>${esc(m.title)}</span><span style="font-size:0.6rem;color:var(--text-muted);">${new Date(m.time).toLocaleString()}</span></div><div style="font-size:0.8rem;margin-top:4px;">${esc(m.content)}</div></div>`).join(''); const unread=msgs.filter(m=>!m.read).length; const unreadSpan=document.getElementById('unreadCount'); if(unreadSpan){unreadSpan.innerText=unread;unreadSpan.style.display=unread?'inline-block':'none';} container.querySelectorAll('[data-idx]').forEach(el=>{el.addEventListener('click',()=>{const idx=parseInt(el.dataset.idx); if(!msgs[idx].read){msgs[idx].read=true;localStorage.setItem(`messages_${currentUser.email}`,JSON.stringify(msgs));renderUserMessages();}});}); }
         async function loadUserCheckboxList() { const container = document.getElementById('userCheckboxList'); if (!container) return; try { const users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]') : await (async () => { const data = await airReq('GET', 'Users?maxRecords=100'); return data.records.map(r => ({ id: r.id, email: r.fields.Email, username: r.fields.Username || r.fields.Email.split('@')[0], role: r.fields.Role || 'user' })); })(); allUsersList = users; container.innerHTML = users.map(u => `<div class="user-checkbox-item"><input type="checkbox" value="${esc(u.email)}" id="user_${u.id}"><label for="user_${u.id}">${esc(u.email)} (${u.role || '普通'})</label></div>`).join(''); } catch(e) { container.innerHTML = '<div style="padding:20px;text-align:center;">加载用户列表失败</div>'; } }
-        function updateUserUI(){ const area=document.getElementById('userArea'); if(!area)return; if(currentUser){ const remaining=getRemainingCount(currentUser); const remainingText=(currentUser.role==='vip'||currentUser.role==='admin')?'∞':remaining; const level=getUserLevel(currentUser.points||0); area.innerHTML=`<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''}<span class="level-badge ${level.badge}">${level.name}</span><i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`; document.getElementById('userMenuBtn').addEventListener('click',e=>{e.stopPropagation();document.getElementById('userDropdown').classList.toggle('show');}); document.getElementById('logoutBtn').addEventListener('click',()=>{currentUser=null;localStorage.removeItem('lezhe_user');updateUserUI();showToast('已退出登录');renderCalendar();}); document.getElementById('profileBtn').addEventListener('click',()=>{document.getElementById('profileUsername').innerText=currentUser.username;document.getElementById('profileRole').innerHTML=(currentUser.role==='vip'||currentUser.role==='admin')?'VIP会员':'普通会员';document.getElementById('profileRemaining').innerText=(currentUser.role==='vip'||currentUser.role==='admin')?'∞':getRemainingCount(currentUser);document.getElementById('profilePoints').innerText=currentUser.points||0;const lvl=getUserLevel(currentUser.points||0);document.getElementById('profileLevelBadge').innerHTML=`<span class="level-badge ${lvl.badge}" style="margin-left:8px;">${lvl.name}</span>`;document.getElementById('myInviteCode').innerText=currentUser.inviteCode||'暂无';document.getElementById('profileModal').classList.add('active');renderUserMessages();}); if(currentUser.role==='admin'){document.getElementById('adminBtn').addEventListener('click',()=>{document.getElementById('adminModal').classList.add('active');refreshUserList();});document.getElementById('manageArticlesBtn').style.display='block';} }else{ area.innerHTML='<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>'; document.getElementById('showAuthBtn').addEventListener('click',()=>openAuth('login')); document.getElementById('manageArticlesBtn').style.display='none'; } }
+        function updateUserUI(){ const area=document.getElementById('userArea'); if(!area)return; if(currentUser){ const remaining=getRemainingCount(currentUser); const remainingText=(currentUser.role==='vip'||currentUser.role==='admin')?'∞':remaining; const level=getUserLevel(currentUser.points||0); area.innerHTML=`<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''}<span class="level-badge ${level.badge}">${level.name}</span><i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`; document.getElementById('userMenuBtn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); }); document.getElementById('logoutBtn').addEventListener('click',()=>{currentUser=null;localStorage.removeItem('lezhe_user');updateUserUI();showToast('已退出登录');renderCalendar();}); document.getElementById('profileBtn').addEventListener('click',()=>{document.getElementById('profileUsername').innerText=currentUser.username;document.getElementById('profileRole').innerHTML=(currentUser.role==='vip'||currentUser.role==='admin')?'VIP会员':'普通会员';document.getElementById('profileRemaining').innerText=(currentUser.role==='vip'||currentUser.role==='admin')?'∞':getRemainingCount(currentUser);document.getElementById('profilePoints').innerText=currentUser.points||0;const lvl=getUserLevel(currentUser.points||0);document.getElementById('profileLevelBadge').innerHTML=`<span class="level-badge ${lvl.badge}" style="margin-left:8px;">${lvl.name}</span>`;document.getElementById('myInviteCode').innerText=currentUser.inviteCode||'暂无';document.getElementById('profileModal').classList.add('active');renderUserMessages();}); if(currentUser.role==='admin'){document.getElementById('adminBtn').addEventListener('click',()=>{document.getElementById('adminModal').classList.add('active');refreshUserList();});document.getElementById('manageArticlesBtn').style.display='block';} }else{ area.innerHTML='<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>'; document.getElementById('showAuthBtn').addEventListener('click',()=>openAuth('login')); document.getElementById('manageArticlesBtn').style.display='none'; } }
         async function refreshUserList(){ const container=document.getElementById('adminUserList'); container.innerHTML='<div style="text-align:center;padding:40px;">加载中...</div>'; try{ const users=isLocalFile?JSON.parse(localStorage.getItem('lezhe_users')||'[]').map(u=>({id:u.email,fields:u,createdTime:u.createdAt})):await (async()=>{const data=await airReq('GET','Users?maxRecords=100'); return data.records.map(r=>({id:r.id,fields:r.fields,createdTime:r.createdTime}));})(); const term=document.getElementById('adminSearchInput')?.value.toLowerCase()||''; const dateFilter=document.getElementById('adminDateFilter')?.value||''; let filtered=users.filter(u=>!term||(u.fields.Email||'').toLowerCase().includes(term)||(u.fields.Username||'').toLowerCase().includes(term)); if(dateFilter)filtered=filtered.filter(u=>{const regDate=u.createdTime||u.fields.CreatedAt; return regDate?new Date(regDate).toISOString().split('T')[0]===dateFilter:false;}); container.innerHTML=filtered.map(u=>{const role=u.fields.Role||'user'; const isVip=role==='vip'||role==='admin'; const avatarIcon=role==='admin'?'<i class="fas fa-crown"></i>':(isVip?'<i class="fas fa-gem"></i>':'<i class="fas fa-user"></i>'); return`<div class="admin-user-card"><div class="admin-user-info"><div class="admin-user-avatar">${avatarIcon}</div><div><div class="admin-user-email">${esc(u.fields.Email)}</div><div class="admin-user-name">${esc(u.fields.Username||'')}</div></div><div class="admin-user-role ${isVip?'vip':''}">${isVip?(role==='admin'?'管理员':'VIP'):'普通'}</div></div><div><button class="admin-action-btn upgrade-vip" data-id="${u.id}" data-role="${role}">${isVip&&role!=='admin'?'降级':'升级VIP'}</button><button class="admin-action-btn add-points" data-email="${u.fields.Email}" style="background:var(--success);">增加积分</button><button class="admin-action-btn reset-download" data-email="${u.fields.Email}" style="background:var(--warning);">重置次数</button></div></div>`;}).join(''); 
             container.querySelectorAll('.upgrade-vip').forEach(btn=>{btn.addEventListener('click',async()=>{const userId=btn.dataset.id,currentRole=btn.dataset.role; if(currentRole==='admin'){showToast('管理员不可降级','error');return;} const newRole=currentRole==='vip'?'user':'vip'; await updateUserRole(userId,newRole); await refreshUserList(); if(currentUser&&currentUser.id===userId){currentUser.role=newRole;localStorage.setItem('lezhe_user',JSON.stringify(currentUser));updateUserUI();} showToast(`已${newRole==='vip'?'升级VIP':'降级'}`,`success`);});}); container.querySelectorAll('.add-points').forEach(btn=>{btn.addEventListener('click',async()=>{const email=btn.dataset.email; const points=prompt('请输入要增加/减少的积分（正数增加，负数减少）','10'); if(points!==null && !isNaN(parseInt(points))){ await addPoints(email, parseInt(points)); showToast(`已调整积分 ${parseInt(points)} 分`,'success'); await refreshUserList(); if(currentUser && currentUser.email===email){ currentUser.points = (currentUser.points||0) + parseInt(points); localStorage.setItem('lezhe_user',JSON.stringify(currentUser)); updateUserUI(); } }});}); container.querySelectorAll('.reset-download').forEach(btn=>{btn.addEventListener('click',()=>{const email=btn.dataset.email; saveUserDownloadData(email,0,0); showToast('已重置下载次数','success'); if(currentUser&&currentUser.email===email)updateUserUI();});}); }catch(e){container.innerHTML='<div style="text-align:center;padding:40px;">加载失败</div>';} }
         function openAuth(tab='login'){ const modal=document.getElementById('authModal'); document.getElementById('loginForm').style.display=tab==='login'?'block':'none'; document.getElementById('registerForm').style.display=tab==='register'?'block':'none'; document.getElementById('forgotForm').style.display=tab==='forgot'?'block':'none'; document.getElementById('authModalTitle').innerText=tab==='register'?'注册':(tab==='forgot'?'找回密码':'登录'); modal.classList.add('active'); if(tab==='login')refreshCaptcha('login'); else if(tab==='register')refreshCaptcha('reg'); else refreshCaptcha('forgot'); }
         function refreshCaptcha(type){ let q=Math.floor(Math.random()*10)+1, b=Math.floor(Math.random()*10)+1, op=Math.random()>0.5?'+':'-', ans=op==='+'?q+b:q-b; if(ans<0)return refreshCaptcha(type); currentCaptcha={question:`${q} ${op} ${b} = ?`,answer:ans}; document.getElementById(`${type}CaptchaQuestion`).innerText=currentCaptcha.question; document.getElementById(`${type}CaptchaInput`).value=''; }
         async function loadAll(){ softwares=await fetchSoftwares(); const adData=await fetchAds(); bannerAds=adData.filter(a=>a.position==='banner'); sidebarAds=adData.filter(a=>a.position==='sidebar'); if(bannerAds.length) renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds); if(sidebarAds.length) renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds); articles=await fetchArticles(); announcements=isLocalFile?[{id:'1',title:'欢迎使用乐哲软件',content:'感谢大家的支持！更多优质软件持续更新中',createdAt:new Date().toISOString()}]:[]; renderCats(); renderGrid(); renderHot(); renderRank(); renderArtsList(); renderHistory(); renderCalendar(); showAnnouncementBar(); setDailyRecommend(); 
-            // 关闭加载遮罩
+            // 极速隐藏加载遮罩（0.08秒过渡）
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
                 overlay.classList.add('hide');
-                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+                setTimeout(() => { overlay.style.display = 'none'; }, 80);
             }
             document.getElementById('appWrapper').classList.add('loaded');
         }
