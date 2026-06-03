@@ -22,17 +22,17 @@
         body.dark-mode { --bg: #0f172a; --surface: #1e293b; --border: #334155; --border-light: #334155; --text: #f1f5f9; --text-secondary: #cbd5e1; --text-muted: #94a3b8; }
         #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         
-        /* 高级加载过渡动画 - 流光粒子 + 快速淡出 (0.08s) */
+        /* 高级加载过渡动画 - 流光渐变 + 发光粒子 */
         .loading-overlay {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 30% 40%, rgba(10, 14, 23, 0.96), rgba(18, 22, 45, 0.98));
-            backdrop-filter: blur(12px);
+            background: linear-gradient(135deg, #0a0e1a 0%, #14182a 50%, #1a1f35 100%);
+            backdrop-filter: blur(0px);
             z-index: 10000;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.08s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0.08s;
+            transition: opacity 0.12s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0.12s;
             opacity: 1;
             visibility: visible;
         }
@@ -48,39 +48,39 @@
             height: 100%;
             display: block;
             z-index: 0;
-            opacity: 0.65;
+            opacity: 0.8;
         }
         .loading-content {
             position: relative;
             z-index: 2;
-            background: rgba(12, 16, 28, 0.65);
-            backdrop-filter: blur(24px);
-            padding: 14px 32px;
+            background: rgba(15, 20, 35, 0.6);
+            backdrop-filter: blur(20px);
+            padding: 16px 36px;
             border-radius: 80px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            box-shadow: 0 0 0 1px rgba(109, 142, 255, 0.3), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 30px rgba(79,110,246,0.6);
-            animation: advancedFlow 1.2s ease-in-out infinite;
+            gap: 16px;
+            box-shadow: 0 0 0 1px rgba(109, 142, 255, 0.3), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 30px rgba(79,110,246,0.4);
+            animation: glowPulse 1.5s ease-in-out infinite;
         }
         .loading-content i {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: #8aaaff;
             animation: spin 0.6s linear infinite;
-            filter: drop-shadow(0 0 8px rgba(109,142,255,0.9));
+            filter: drop-shadow(0 0 10px rgba(109,142,255,0.8));
         }
         .loading-content span {
             font-size: 1rem;
             font-weight: 600;
-            background: linear-gradient(135deg, #ffffff, #b0c4ff, #6d8eff);
+            background: linear-gradient(135deg, #ffffff, #c0d4ff, #8aaaff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: 0.8px;
+            letter-spacing: 1px;
         }
-        @keyframes advancedFlow {
+        @keyframes glowPulse {
             0% { box-shadow: 0 0 0 1px rgba(109,142,255,0.2), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 15px rgba(79,110,246,0.3); transform: scale(0.98); }
-            50% { box-shadow: 0 0 0 2px rgba(109,142,255,0.6), 0 25px 45px -8px rgba(0,0,0,0.6), 0 0 35px rgba(79,110,246,0.8); transform: scale(1); }
+            50% { box-shadow: 0 0 0 2px rgba(109,142,255,0.6), 0 25px 45px -8px rgba(0,0,0,0.6), 0 0 35px rgba(79,110,246,0.7); transform: scale(1); }
             100% { box-shadow: 0 0 0 1px rgba(109,142,255,0.2), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 15px rgba(79,110,246,0.3); transform: scale(0.98); }
         }
         @keyframes spin {
@@ -89,7 +89,7 @@
         
         .app-wrapper {
             opacity: 0;
-            transition: opacity 0.08s ease-in-out;
+            transition: opacity 0.12s ease-in-out;
             position: relative;
             z-index: 1;
         }
@@ -160,14 +160,10 @@
         @media (max-width: 680px) { .daily-card { padding: 16px; } .daily-card-content { gap: 12px; } .daily-icon { width: 48px; height: 48px; font-size: 20px; } .daily-name { font-size: 1rem; } .daily-desc { font-size: 0.7rem; } .daily-meta { gap: 8px; font-size: 0.6rem; } .daily-download-btn { padding: 8px 16px; font-size: 0.75rem; white-space: nowrap; } }
         @media (max-width: 520px) { .daily-card-content { flex-direction: column; align-items: stretch; text-align: center; } .daily-icon { margin: 0 auto; width: 56px; height: 56px; } .daily-info { text-align: center; } .daily-meta { justify-content: center; } .daily-download-btn { width: 100%; text-align: center; white-space: normal; padding: 10px 16px; margin-top: 4px; } }
         
-        /* 热门推荐 - 自动滚动（平滑移动，无跳动） */
+        /* 热门推荐 - 自动滚动，无滚动条 */
         .hot-section { margin-bottom: 18px; position: relative; overflow: hidden; }
         .hot-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .hot-header h3 { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-        .hot-scroll-wrapper {
-            position: relative;
-            overflow-x: hidden;
-        }
         .hot-scroll {
             display: flex;
             gap: 12px;
@@ -178,9 +174,7 @@
             -webkit-overflow-scrolling: touch;
             cursor: grab;
         }
-        .hot-scroll::-webkit-scrollbar {
-            display: none;
-        }
+        .hot-scroll::-webkit-scrollbar { display: none; }
         .hot-card {
             flex: 0 0 170px;
             border-radius: var(--radius-lg);
@@ -290,8 +284,6 @@
         .admin-user-avatar { width: 44px; height: 44px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; }
         .admin-action-btn { background: var(--primary); color: white; border: none; border-radius: 40px; padding: 8px 18px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.2s; min-height: 36px; }
         .admin-action-btn:hover { transform: translateY(-2px); background: var(--primary-hover); }
-        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
-        @keyframes spin { to { transform: rotate(360deg); } }
         .dark-mode-toggle { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; color: var(--text-secondary); }
         .dark-mode-toggle:hover { background: var(--primary-light); color: var(--primary); }
         .user-checkbox-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid var(--border-light); cursor: pointer; }
@@ -302,78 +294,117 @@
         .contact-buy-btn { background: var(--warning); color: #fff; border: none; border-radius: 24px; padding: 5px 12px; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin-left: 8px; }
         .contact-buy-btn:hover { opacity: 0.9; transform: scale(1.02); }
         
-        /* 个人中心卡片式高级排版 */
-        .profile-stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 16px 0;
+        /* ========== 个人中心 - 重新排版，更紧凑 ========== */
+        .profile-modal-card {
+            max-width: 500px;
+            width: 92%;
+            background: var(--surface);
+            border-radius: 32px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 0;
         }
-        .profile-stat-card {
-            background: var(--bg);
-            border-radius: 20px;
-            padding: 14px 12px;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
+        .profile-modal-card::-webkit-scrollbar {
+            display: none;
         }
-        .profile-stat-card i {
-            font-size: 1.6rem;
-            color: var(--primary);
-            margin-bottom: 6px;
-            display: inline-block;
-        }
-        .profile-stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1.2;
-        }
-        .profile-stat-label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        .profile-info-row {
+        .profile-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 20px 24px 12px 24px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .profile-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .profile-content {
+            padding: 16px 24px 24px 24px;
+        }
+        .profile-info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .profile-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
             border-bottom: 1px solid var(--border-light);
         }
         .profile-info-label {
             font-weight: 500;
             color: var(--text-secondary);
             font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .profile-info-value {
             font-weight: 600;
             color: var(--text);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .profile-stat-card {
+            background: linear-gradient(135deg, rgba(79,110,246,0.08), rgba(79,110,246,0.02));
+            border-radius: 20px;
+            padding: 14px 10px;
+            text-align: center;
+            border: 1px solid rgba(79,110,246,0.1);
+        }
+        .profile-stat-card i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .profile-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .profile-stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
         .invite-code-box {
             background: linear-gradient(135deg, var(--primary-light), var(--surface));
             border: 1px solid var(--primary);
             border-radius: 16px;
-            padding: 14px;
+            padding: 12px;
             text-align: center;
-            margin: 12px 0;
+            margin: 16px 0;
         }
         .invite-code-box code {
             font-size: 1rem;
             font-weight: 700;
             letter-spacing: 1px;
             color: var(--primary);
-            background: transparent;
         }
-        .action-button-group {
+        .action-buttons {
             display: flex;
             flex-direction: column;
             gap: 10px;
             margin: 16px 0;
         }
-        .action-button-group button {
+        .action-buttons button {
             width: 100%;
             padding: 12px;
             border-radius: 40px;
@@ -383,19 +414,24 @@
             border: none;
             background: var(--primary-light);
             color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.85rem;
         }
-        .action-button-group button:hover {
+        .action-buttons button:hover {
             transform: translateY(-2px);
             background: var(--primary);
             color: white;
         }
         .password-section {
-            margin-top: 20px;
+            margin-top: 16px;
             padding-top: 16px;
             border-top: 1px solid var(--border-light);
         }
         .password-section h4 {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 12px;
             color: var(--text-secondary);
         }
@@ -403,13 +439,35 @@
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             background: var(--bg);
             margin-bottom: 10px;
             font-size: 0.85rem;
         }
+        .password-section button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .buy-tip {
+            background: var(--primary-light);
+            border-radius: 16px;
+            padding: 10px 14px;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.75rem;
+        }
         
-        @media (max-width:640px) { .calendar-day { width: 24px; height: 24px; font-size: 0.55rem; } .profile-stat-grid { gap: 8px; } .profile-stat-card { padding: 10px 8px; } .profile-stat-value { font-size: 1.2rem; } }
+        @media (max-width:640px) { .calendar-day { width: 24px; height: 24px; font-size: 0.55rem; } .profile-stats { gap: 8px; } .profile-stat-value { font-size: 1.2rem; } }
     </style>
 </head>
 <body>
@@ -441,15 +499,13 @@
         </div>
         <div class="main"><div class="content-wrapper"><div class="main-content"><div class="carousel-container" id="categoryBannerContainer"><div class="carousel-slides" id="categoryBannerSlides"></div><div class="carousel-dots" id="categoryBannerDots"></div></div><div class="daily-section" id="dailySection" style="display: none;"><div class="daily-header"><h3><i class="fas fa-star" style="color: #f59e0b;"></i> 今日推荐</h3><span style="font-size: 0.7rem; color: var(--text-muted);">每日更新，精选好软</span></div><div class="daily-card" id="dailyCard"><div class="daily-card-content"><div class="daily-icon" id="dailyIcon"><i class="fas fa-gem"></i></div><div class="daily-info"><div class="daily-name" id="dailyName">加载中...</div><div class="daily-desc" id="dailyDesc"></div><div class="daily-meta"><span id="dailyVersion"></span><span id="dailyOs"></span><span id="dailyDownloads"><i class="fas fa-download"></i> 0</span></div></div><button class="daily-download-btn" id="dailyDownloadBtn"><i class="fas fa-download"></i> 立即下载</button></div></div></div>
         
-        <!-- 热门推荐 - 自动滚动（平滑滚动无跳动） -->
+        <!-- 热门推荐 -->
         <div class="hot-section">
             <div class="hot-header">
                 <h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3>
                 <span style="font-size: 0.7rem; color: var(--text-muted);">本周热门下载</span>
             </div>
-            <div class="hot-scroll-wrapper">
-                <div class="hot-scroll" id="hotScroll"></div>
-            </div>
+            <div class="hot-scroll" id="hotScroll"></div>
         </div>
         
         <div class="category-row" id="categoryTabs"></div>
@@ -459,63 +515,66 @@
     <!-- 模态框区域 -->
     <div id="authModal" class="modal-overlay"><div class="modal-card" style="max-width:440px;"><div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button></div><div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div><button id="showForgotBtn" style="background:none;border:none;color:var(--primary);margin-bottom:12px;">忘记密码？</button><button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">登录</button></div><div id="registerForm" style="display:none;"><input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div id="emailCheckStatus" class="input-check-status"></div><input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="text" id="regInviteCode" placeholder="邀请码（选填）" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;"></div><button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">注册</button></div><div id="forgotForm" style="display:none;"><input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:10px;margin-bottom:12px;"><button id="sendResetCodeBtn" style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:40px;padding:10px;cursor:pointer;">发送验证码</button><input type="text" id="resetCodeInput" placeholder="验证码" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:12px;"></div><input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="forgotCaptchaQuestion"></span><button id="refreshForgotCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;"></div><button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">重置密码</button><button id="backToLoginFromForgot" style="background:none;border:none;color:var(--primary);margin-top:10px;">返回登录</button></div></div></div>
     
-    <!-- 个人中心 - 卡片式高级排版 -->
+    <!-- 个人中心 - 重新排版，更紧凑，所有按钮可见 -->
     <div id="profileModal" class="modal-overlay">
-        <div class="modal-card" style="max-width: 520px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                <span style="font-weight:700; font-size:1.2rem;"><i class="fas fa-user-circle" style="margin-right:8px; color:var(--primary);"></i> 个人中心</span>
-                <button id="closeProfileModal" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);">&times;</button>
+        <div class="profile-modal-card">
+            <div class="profile-header">
+                <h2><i class="fas fa-user-circle" style="color:var(--primary);"></i> 个人中心</h2>
+                <button id="closeProfileModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">&times;</button>
             </div>
-            
-            <div class="profile-info-row">
-                <span class="profile-info-label"><i class="fas fa-user"></i> 用户名</span>
-                <span class="profile-info-value"><span id="profileUsername"></span><span id="profileLevelBadge"></span></span>
-            </div>
-            <div class="profile-info-row">
-                <span class="profile-info-label"><i class="fas fa-crown"></i> 会员等级</span>
-                <span class="profile-info-value"><span id="profileRole"></span> <span id="profileLevelTag"></span></span>
-            </div>
-            
-            <div class="profile-stat-grid">
-                <div class="profile-stat-card">
-                    <i class="fas fa-download"></i>
-                    <div class="profile-stat-value" id="profileRemaining">0</div>
-                    <div class="profile-stat-label">本月剩余下载</div>
+            <div class="profile-content">
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <span class="profile-info-label"><i class="fas fa-user"></i> 用户名</span>
+                        <span class="profile-info-value"><span id="profileUsername"></span><span id="profileLevelBadge"></span></span>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-info-label"><i class="fas fa-crown"></i> 会员等级</span>
+                        <span class="profile-info-value"><span id="profileRole"></span> <span id="profileLevelTag"></span></span>
+                    </div>
                 </div>
-                <div class="profile-stat-card">
-                    <i class="fas fa-coins"></i>
-                    <div class="profile-stat-value" id="profilePoints">0</div>
-                    <div class="profile-stat-label">累计积分</div>
+                
+                <div class="profile-stats">
+                    <div class="profile-stat-card">
+                        <i class="fas fa-download"></i>
+                        <div class="profile-stat-value" id="profileRemaining">0</div>
+                        <div class="profile-stat-label">本月剩余下载</div>
+                    </div>
+                    <div class="profile-stat-card">
+                        <i class="fas fa-coins"></i>
+                        <div class="profile-stat-value" id="profilePoints">0</div>
+                        <div class="profile-stat-label">累计积分</div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="level-rule-tip" style="margin-bottom:16px;">
-                <span><i class="fas fa-chart-line"></i> 青铜0-29 | 白银30-99 | 黄金100-199 | 铂金200-499 | 钻石≥500</span>
-                <span><i class="fas fa-info-circle"></i> 签到/评价/邀请得积分</span>
-            </div>
-            
-            <div style="background: var(--primary-light); border-radius: 20px; padding: 12px 16px; margin: 12px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                <span style="font-size: 0.8rem; color: var(--text-secondary);"><i class="fas fa-exclamation-circle"></i> 免费次数用完后可联系客服购买</span>
-                <button id="contactAdminBuyBtn" class="contact-buy-btn" style="margin:0;"><i class="fab fa-weixin"></i> 联系客服购买</button>
-            </div>
-            
-            <div class="invite-code-box">
-                <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:6px;">我的邀请码</div>
-                <code id="myInviteCode" style="font-size:1rem; font-weight:700;">----</code>
-                <div style="font-size:0.65rem; color:var(--text-muted); margin-top:6px;">邀请好友注册，双方各得5次下载机会+10积分</div>
-            </div>
-            
-            <div class="action-button-group">
-                <button id="showFavoritesBtn"><i class="fas fa-heart"></i> 我的收藏</button>
-                <button id="showExportBtn"><i class="fas fa-download"></i> 导出数据</button>
-                <button id="showMessagesBtn"><i class="fas fa-envelope"></i> 站内信 <span id="unreadCount" style="background:#ef4444;color:white;border-radius:50%;padding:2px 8px;font-size:0.7rem;margin-left:8px;display:none;">0</span></button>
-            </div>
-            
-            <div class="password-section">
-                <h4><i class="fas fa-lock"></i> 修改密码（选填）</h4>
-                <input type="password" id="profileNewPwd" placeholder="新密码">
-                <input type="password" id="profileConfirmPwd" placeholder="确认新密码">
-                <button id="saveProfileBtn" style="width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:40px;font-weight:600;cursor:pointer;">保存修改</button>
+                
+                <div class="level-rule-tip" style="margin-bottom:12px;">
+                    <span>青铜0-29 | 白银30-99 | 黄金100-199 | 铂金200-499 | 钻石≥500</span>
+                    <span>签到/评价/邀请得积分</span>
+                </div>
+                
+                <div class="buy-tip">
+                    <span><i class="fas fa-exclamation-circle"></i> 免费次数用完后可联系客服购买</span>
+                    <button id="contactAdminBuyBtn" class="contact-buy-btn" style="margin:0; padding:4px 12px;"><i class="fab fa-weixin"></i> 联系客服</button>
+                </div>
+                
+                <div class="invite-code-box">
+                    <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:4px;">我的邀请码</div>
+                    <code id="myInviteCode" style="font-size:1rem; font-weight:700;">----</code>
+                    <div style="font-size:0.6rem; color:var(--text-muted); margin-top:4px;">邀请好友，双方各得5次下载+10积分</div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="showFavoritesBtn"><i class="fas fa-heart"></i> 我的收藏</button>
+                    <button id="showExportBtn"><i class="fas fa-download"></i> 导出数据</button>
+                    <button id="showMessagesBtn"><i class="fas fa-envelope"></i> 站内信 <span id="unreadCount" style="background:#ef4444;color:white;border-radius:50%;padding:2px 10px;font-size:0.7rem;margin-left:8px;display:none;">0</span></button>
+                </div>
+                
+                <div class="password-section">
+                    <h4><i class="fas fa-lock"></i> 修改密码（选填）</h4>
+                    <input type="password" id="profileNewPwd" placeholder="新密码">
+                    <input type="password" id="profileConfirmPwd" placeholder="确认新密码">
+                    <button id="saveProfileBtn">保存修改</button>
+                </div>
             </div>
         </div>
     </div>
@@ -540,7 +599,7 @@
             const ctx = canvas.getContext('2d');
             let width, height;
             let particles = [];
-            const PARTICLE_COUNT = 120;
+            const PARTICLE_COUNT = 150;
             function resize() {
                 width = window.innerWidth;
                 height = window.innerHeight;
@@ -553,11 +612,11 @@
                     particles.push({
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        radius: Math.random() * 3 + 1,
-                        speedX: (Math.random() - 0.5) * 0.6,
-                        speedY: (Math.random() - 0.5) * 0.5,
-                        alpha: Math.random() * 0.6 + 0.3,
-                        color: `hsl(${Math.random() * 60 + 210}, 85%, 65%)`
+                        radius: Math.random() * 3.5 + 1.5,
+                        speedX: (Math.random() - 0.5) * 0.8,
+                        speedY: (Math.random() - 0.5) * 0.6,
+                        alpha: Math.random() * 0.7 + 0.3,
+                        color: `hsl(${Math.random() * 60 + 210}, 90%, 70%)`
                     });
                 }
             }
@@ -568,7 +627,7 @@
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
                     ctx.fillStyle = p.color;
-                    ctx.shadowBlur = 10;
+                    ctx.shadowBlur = 12;
                     ctx.shadowColor = p.color;
                     ctx.globalAlpha = p.alpha;
                     ctx.fill();
@@ -592,9 +651,9 @@
             draw();
         })();
         
-        // 热门推荐自动滚动功能（平滑滚动，每2秒移动固定步长，无跳动感）
+        // 热门推荐自动滚动
         let autoScrollInterval = null;
-        let scrollDirection = 1; // 1: 向右, -1: 向左
+        let scrollDirection = 1;
         let currentScrollPos = 0;
         
         function startAutoScroll() {
@@ -607,8 +666,7 @@
                 const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
                 if (maxScroll <= 0) return;
                 
-                // 每次移动一个卡片的宽度（约182px），实现平滑逐卡滚动
-                const step = 182; // 卡片宽度170 + gap 12
+                const step = 182;
                 let newPos = currentScrollPos + step * scrollDirection;
                 
                 if (newPos >= maxScroll) {
@@ -620,67 +678,44 @@
                 }
                 
                 currentScrollPos = newPos;
-                scrollContainer.scrollTo({
-                    left: currentScrollPos,
-                    behavior: 'smooth'
-                });
+                scrollContainer.scrollTo({ left: currentScrollPos, behavior: 'smooth' });
             }, 2000);
         }
         
         function stopAutoScroll() {
-            if (autoScrollInterval) {
-                clearInterval(autoScrollInterval);
-                autoScrollInterval = null;
-            }
+            if (autoScrollInterval) clearInterval(autoScrollInterval);
+            autoScrollInterval = null;
         }
         
-        // 重置滚动位置和方向
-        function resetAutoScroll() {
-            const scrollContainer = document.getElementById('hotScroll');
-            if (scrollContainer) {
-                currentScrollPos = scrollContainer.scrollLeft;
-                scrollDirection = 1;
-            }
-            startAutoScroll();
-        }
-        
-        // 鼠标悬停时暂停滚动
         document.addEventListener('DOMContentLoaded', () => {
             const hotScrollDiv = document.getElementById('hotScroll');
             if (hotScrollDiv) {
                 hotScrollDiv.addEventListener('mouseenter', stopAutoScroll);
                 hotScrollDiv.addEventListener('mouseleave', startAutoScroll);
-                // 监听滚动结束，更新当前位置
-                hotScrollDiv.addEventListener('scroll', () => {
-                    currentScrollPos = hotScrollDiv.scrollLeft;
-                });
+                hotScrollDiv.addEventListener('scroll', () => { currentScrollPos = hotScrollDiv.scrollLeft; });
             }
         });
         
-        // 全局滚动时自动隐藏下拉菜单
+        // 滚动隐藏下拉菜单
         let scrollTimer = null;
         window.addEventListener('scroll', () => {
             const dropdown = document.getElementById('userDropdown');
             if (dropdown && dropdown.classList.contains('show')) {
                 if (scrollTimer) clearTimeout(scrollTimer);
-                scrollTimer = setTimeout(() => {
-                    dropdown.classList.remove('show');
-                }, 50);
+                scrollTimer = setTimeout(() => dropdown.classList.remove('show'), 50);
             }
         });
         
-        // 全局点击：点击空白处关闭下拉菜单
+        // 点击空白关闭下拉菜单
         document.addEventListener('click', function(e) {
             const userArea = document.getElementById('userArea');
             const dropdown = document.getElementById('userDropdown');
-            if (dropdown && dropdown.classList.contains('show')) {
-                if (!userArea?.contains(e.target)) {
-                    dropdown.classList.remove('show');
-                }
+            if (dropdown && dropdown.classList.contains('show') && !userArea?.contains(e.target)) {
+                dropdown.classList.remove('show');
             }
         });
         
-        // 导航栏点击处理：只对“软件下载”执行平滑滚动
+        // 导航栏点击处理
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', (e) => {
                 const isDownload = link.getAttribute('data-nav') === 'download';
@@ -688,7 +723,6 @@
                     e.preventDefault();
                     document.getElementById('softwareGridContainer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
-                // 移动端关闭菜单
                 const navLinksDiv = document.getElementById('navLinks');
                 const hamburger = document.getElementById('hamburgerBtn');
                 if (navLinksDiv?.classList.contains('show')) {
@@ -698,7 +732,7 @@
             });
         });
         
-        // ========== 以下为原有完整业务代码（精简保留核心逻辑） ==========
+        // 以下为原有完整业务代码（保持不变）
         emailjs.init('9VF7tzRthx9_nkchu');
         window.copyText = function(text) { if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>showToast('复制成功')).catch(()=>fallbackCopy(text)); else fallbackCopy(text); };
         function fallbackCopy(text){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('复制成功'); }
@@ -778,10 +812,7 @@
         function setDailyRecommend() { const today = new Date().toDateString(); const cached = localStorage.getItem('daily_recommend'); if (cached) { const parsed = JSON.parse(cached); if (parsed.date === today && parsed.software) { dailySoftware = parsed.software; renderDailyRecommend(); return; } } const topSoftwares = [...softwares].sort((a,b) => (b.downloads||0) - (a.downloads||0)).slice(0, 10); if (topSoftwares.length) { const randomIndex = Math.floor(Math.random() * Math.min(topSoftwares.length, 5)); dailySoftware = topSoftwares[randomIndex]; localStorage.setItem('daily_recommend', JSON.stringify({ date: today, software: dailySoftware })); renderDailyRecommend(); } }
         function renderDailyRecommend() { const section = document.getElementById('dailySection'); if (!section || !dailySoftware) return; section.style.display = 'block'; document.getElementById('dailyName').innerText = dailySoftware.name; document.getElementById('dailyDesc').innerText = dailySoftware.description || '暂无描述'; document.getElementById('dailyVersion').innerHTML = `<i class="fas fa-code-branch"></i> ${dailySoftware.version || '最新版'}`; document.getElementById('dailyOs').innerHTML = dailySoftware.os.map(o => { if (o === 'Windows') return '<i class="fab fa-windows"></i>'; if (o === 'Mac') return '<i class="fab fa-apple"></i>'; return o; }).join(' · '); document.getElementById('dailyDownloads').innerHTML = `<i class="fas fa-download"></i> ${dailySoftware.downloads || 0}次下载`; const iconContainer = document.getElementById('dailyIcon'); if (dailySoftware.icon && dailySoftware.icon.startsWith('http')) { iconContainer.innerHTML = `<img src="${esc(dailySoftware.icon)}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">`; } else { const abbr = getStdAbbr(dailySoftware.name); iconContainer.innerHTML = `<div style="background:${getColor(dailySoftware.name)};width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:16px;font-size:20px;font-weight:bold;">${abbr}</div>`; } const downloadBtn = document.getElementById('dailyDownloadBtn'); const newBtn = downloadBtn.cloneNode(true); downloadBtn.parentNode.replaceChild(newBtn, downloadBtn); newBtn.addEventListener('click', (e) => { e.stopPropagation(); downloadSoftware(dailySoftware); }); const card = document.getElementById('dailyCard'); const newCard = card.cloneNode(true); card.parentNode.replaceChild(newCard, card); newCard.addEventListener('click', (e) => { if (e.target.closest('.daily-download-btn')) return; downloadSoftware(dailySoftware); }); newCard.id = 'dailyCard'; }
         function renderGrid(){ let filtered=softwares.filter(s=>(currentCategory==='all'||s.category===currentCategory)&&matchesSearch(s,searchKeyword)); const items=showAll?filtered:filtered.slice(0,12); const container=document.getElementById('softwareGridContainer'); if(!items.length){container.innerHTML='<div style="text-align:center;padding:40px;">没有找到相关软件</div>';document.getElementById('loadMoreContainer').style.display='none';return;} const favs=currentUser?JSON.parse(localStorage.getItem(`favorites_${currentUser.email}`)||'[]'):[]; container.innerHTML=items.map(sw=>{ const isFav=favs.some(f=>f.id===sw.id); const isNew=(new Date()-new Date(sw.addedDate||'2024-01-01'))<7*86400000; const isHot=sw.downloads>2000; const osTags=sw.os.map(o=>{let icon='';if(o==='Windows')icon='<i class="fab fa-windows"></i>';else if(o==='Mac')icon='<i class="fab fa-apple"></i>';return`<span class="os-badge">${icon} ${o}</span>`;}).join(''); return`<div class="software-card" data-id="${sw.id}"><button class="favorite-btn ${isFav?'active':''}" data-id="${sw.id}" data-name="${esc(sw.name)}"><i class="fas fa-heart"></i></button>${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}<div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon,sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div><div class="version">${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${osTags}</div><div class="rating-stars" id="rating-${sw.id}"><span style="font-size:0.65rem;color:var(--text-muted);"><i class="far fa-star"></i> 评价</span></div><div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`; }).join(''); document.getElementById('loadMoreContainer').style.display=(!showAll&&filtered.length>12)?'block':'none'; container.querySelectorAll('.software-card').forEach(card=>{card.addEventListener('click',(e)=>{if(e.target.closest('.favorite-btn'))return; const sw=softwares.find(s=>s.id===card.dataset.id); if(sw)downloadSoftware(sw);});}); container.querySelectorAll('.favorite-btn').forEach(btn=>{btn.addEventListener('click',(e)=>{e.stopPropagation(); const isActive=toggleFavorite(btn.dataset.id,btn.dataset.name); btn.classList.toggle('active',isActive);});}); container.querySelectorAll('.rating-stars').forEach(el=>{el.addEventListener('click',(e)=>{e.stopPropagation(); const card=el.closest('.software-card'); const sw=softwares.find(s=>s.id===card.dataset.id); if(sw){document.getElementById('ratingSoftwareName').innerText=sw.name;document.getElementById('ratingSoftwareId').value=sw.id;document.getElementById('ratingModal').classList.add('active');const stars=document.querySelectorAll('#ratingStarsInput i');stars.forEach((star,idx)=>{star.className='far fa-star';star.onclick=()=>{let rating=idx+1;stars.forEach((s,i)=>{if(i<rating){s.className='fas fa-star';s.style.color='#fbbf24';}else{s.className='far fa-star';s.style.color='';}});window.selectedRating=rating;};});}});}); }
-        function renderHot(){ if(!softwares.length)return; const hotItems=[...softwares].sort((a,b)=>(b.downloads||0)-(a.downloads||0)).slice(0,8); const hotScroll=document.getElementById('hotScroll'); hotScroll.innerHTML=hotItems.map(sw=>`<div class="hot-card" data-id="${sw.id}"><div class="hot-icon">${renderIconHtml(sw.icon,sw.name)}</div><div class="hot-name">${esc(sw.name)}</div><div class="hot-meta"><span>${sw.os.join(' · ')}</span><span class="hot-downloads"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`).join(''); hotScroll.querySelectorAll('.hot-card').forEach(c=>c.addEventListener('click',()=>{const sw=softwares.find(s=>s.id===c.dataset.id);if(sw)downloadSoftware(sw);})); 
-            // 启动自动滚动
-            setTimeout(() => { startAutoScroll(); }, 100);
-        }
+        function renderHot(){ if(!softwares.length)return; const hotItems=[...softwares].sort((a,b)=>(b.downloads||0)-(a.downloads||0)).slice(0,8); const hotScroll=document.getElementById('hotScroll'); hotScroll.innerHTML=hotItems.map(sw=>`<div class="hot-card" data-id="${sw.id}"><div class="hot-icon">${renderIconHtml(sw.icon,sw.name)}</div><div class="hot-name">${esc(sw.name)}</div><div class="hot-meta"><span>${sw.os.join(' · ')}</span><span class="hot-downloads"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`).join(''); hotScroll.querySelectorAll('.hot-card').forEach(c=>c.addEventListener('click',()=>{const sw=softwares.find(s=>s.id===c.dataset.id);if(sw)downloadSoftware(sw);})); setTimeout(() => startAutoScroll(), 100); }
         function renderRank(){ const sorted=[...softwares].sort((a,b)=>(b.downloads||0)-(a.downloads||0)); document.getElementById('rankList').innerHTML=sorted.slice(0,5).map((sw,i)=>`<div class="rank-item" data-id="${sw.id}"><span class="rank-index ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${i+1}</span> ${esc(sw.name)}</div>`).join(''); document.querySelectorAll('#rankList .rank-item').forEach(el=>el.addEventListener('click',()=>{const sw=softwares.find(s=>s.id===el.dataset.id);if(sw)downloadSoftware(sw);})); }
         function renderArtsList(){ const container=document.getElementById('articlesList'); if(!articles.length){container.innerHTML='<div style="padding:10px;text-align:center;">暂无文章</div>';return;} container.innerHTML=articles.slice(0,5).map(a=>`<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light);cursor:pointer;" data-id="${a.id}"><div style="width:44px;height:44px;border-radius:10px;overflow:hidden;background:#e8ecf3;display:flex;align-items:center;justify-content:center;">${a.cover?`<img src="${esc(a.cover)}" style="width:100%;height:100%;object-fit:cover;">`:'<i class="fas fa-file-alt"></i>'}</div><div><div style="font-weight:600;font-size:0.85rem;">${esc(a.title)}</div><div style="font-size:0.6rem;color:var(--text-muted);">${new Date(a.createdAt).toLocaleDateString()}</div></div></div>`).join(''); container.querySelectorAll('[data-id]').forEach(el=>el.addEventListener('click',()=>{const a=articles.find(art=>art.id===el.dataset.id);if(a){document.getElementById('articleDetailTitle').innerText=a.title;document.getElementById('articleDetailCover').src=a.cover||'';document.getElementById('articleDetailContent').innerHTML=a.content||'暂无正文';document.getElementById('articleDetailModal').classList.add('active');}})); }
         let currentDate=new Date(); function renderCalendar(){ const y=currentDate.getFullYear(),m=currentDate.getMonth(); const fd=new Date(y,m,1).getDay(); const days=new Date(y,m+1,0).getDate(); const mn=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']; document.getElementById('calendarMonthYear').innerText=`${y}年 ${mn[m]}`; const el=document.getElementById('calendarDays'); const signKey=currentUser?`signin_${currentUser.email}_${y}-${m+1}`:null; const signedDays=signKey?JSON.parse(localStorage.getItem(signKey)||'[]'):[]; let h='<div class="calendar-day-name">一</div><div class="calendar-day-name">二</div><div class="calendar-day-name">三</div><div class="calendar-day-name">四</div><div class="calendar-day-name">五</div><div class="calendar-day-name">六</div><div class="calendar-day-name">日</div>'; let d=1; for(let i=0;i<6;i++){ for(let j=0;j<7;j++){ if(i===0&&j<(fd===0?6:fd-1))h+='<div class="calendar-day"></div>'; else if(d>days)h+='<div class="calendar-day"></div>'; else{ const isToday=(d===new Date().getDate()&&m===new Date().getMonth()&&y===new Date().getFullYear()); const isSigned=signedDays.includes(d); let cls='calendar-day'; if(isToday)cls+=' today'; if(isSigned)cls+=' signed'; h+=`<div class="${cls}" data-day="${d}">${d}</div>`; d++; } } } el.innerHTML=h; if(currentUser){ const todayDiv=el.querySelector('.calendar-day.today'); if(todayDiv&&!todayDiv.classList.contains('signed'))todayDiv.addEventListener('click',()=>performCheckin()); } }
@@ -802,7 +833,7 @@
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
                 overlay.classList.add('hide');
-                setTimeout(() => { overlay.style.display = 'none'; }, 80);
+                setTimeout(() => { overlay.style.display = 'none'; }, 120);
             }
             document.getElementById('appWrapper').classList.add('loaded');
         }
