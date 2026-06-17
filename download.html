@@ -89,7 +89,7 @@
         
         .app-wrapper {
             opacity: 0;
-            transition: opacity 0.12s ease-in-out;
+            transition: opacity 0.15s ease-in-out;
             position: relative;
             z-index: 1;
         }
@@ -895,19 +895,25 @@
         document.getElementById('backToTop')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
         const hamburger=document.getElementById('hamburgerBtn'),navLinks=document.getElementById('navLinks'); hamburger?.addEventListener('click',(e)=>{e.stopPropagation();hamburger.classList.toggle('active');navLinks?.classList.toggle('show');}); document.addEventListener('click',(e)=>{if(!navLinks?.contains(e.target)&&!hamburger?.contains(e.target)){navLinks?.classList.remove('show');hamburger?.classList.remove('active');}});
         if(localStorage.getItem('lezhe_user')){try{currentUser=JSON.parse(localStorage.getItem('lezhe_user'));}catch(e){}} updateUserUI(); renderCalendar(); refreshCaptcha('login'); 
+        // 修复白屏：首次访问显示动画时，同时确保 appWrapper 立即可见
         if(!sessionStorage.getItem('has_loaded_before')) {
             const overlay = document.getElementById('loadingOverlay');
             if(overlay) {
                 overlay.style.display = 'flex';
                 setTimeout(() => {
                     overlay.classList.add('hide');
-                    setTimeout(() => { overlay.style.display = 'none'; }, 150);
+                    // 关键：立即显示 appWrapper，避免白屏
+                    const appW = document.getElementById('appWrapper');
+                    if(appW) appW.classList.add('loaded');
+                    setTimeout(() => { if(overlay) overlay.style.display = 'none'; }, 150);
                 }, 600);
             }
             sessionStorage.setItem('has_loaded_before', 'true');
         } else {
             const overlay = document.getElementById('loadingOverlay');
             if(overlay) overlay.style.display = 'none';
+            // 非首次直接显示
+            document.getElementById('appWrapper').classList.add('loaded');
         }
         loadAll();
     </script>
