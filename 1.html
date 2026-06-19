@@ -20,16 +20,15 @@
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; min-height: 100vh; color: var(--text); background: var(--bg); overflow-x: hidden; position: relative; transition: background 0.3s, color 0.3s; }
         body.dark-mode { --bg: #0f172a; --surface: #1e293b; --border: #334155; --border-light: #334155; --text: #f1f5f9; --text-secondary: #cbd5e1; --text-muted: #94a3b8; }
         #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        .loading-overlay { position: fixed; inset: 0; background: linear-gradient(135deg, #0a0e1a 0%, #14182a 50%, #1a1f35 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; transition: opacity 0.15s ease, visibility 0.15s; opacity: 1; visibility: visible; }
-        .loading-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loading-overlay { position: fixed; inset: 0; background: linear-gradient(135deg, #0a0e1a 0%, #14182a 50%, #1a1f35 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 1; visibility: visible; }
+        .loading-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.25s ease, visibility 0.25s; }
         .loading-particle-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; opacity: 0.8; }
         .loading-content { position: relative; z-index: 2; background: rgba(15,20,35,0.6); backdrop-filter: blur(20px); padding: 16px 36px; border-radius: 80px; display: flex; align-items: center; gap: 16px; box-shadow: 0 0 0 1px rgba(109,142,255,0.3), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 30px rgba(79,110,246,0.4); animation: glowPulse 1.5s ease-in-out infinite; }
         .loading-content i { font-size: 1.5rem; color: #8aaaff; animation: spin 0.6s linear infinite; filter: drop-shadow(0 0 10px rgba(109,142,255,0.8)); }
         .loading-content span { font-size: 1rem; font-weight: 600; background: linear-gradient(135deg, #ffffff, #c0d4ff, #8aaaff); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: 1px; }
         @keyframes glowPulse { 0% { box-shadow: 0 0 0 1px rgba(109,142,255,0.2), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 15px rgba(79,110,246,0.3); transform: scale(0.98); } 50% { box-shadow: 0 0 0 2px rgba(109,142,255,0.6), 0 25px 45px -8px rgba(0,0,0,0.6), 0 0 35px rgba(79,110,246,0.7); transform: scale(1); } 100% { box-shadow: 0 0 0 1px rgba(109,142,255,0.2), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 15px rgba(79,110,246,0.3); transform: scale(0.98); } }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .app-wrapper { opacity: 0; transition: opacity 0.15s ease-in-out; position: relative; z-index: 1; }
-        .app-wrapper.loaded { opacity: 1; }
+        .app-wrapper { opacity: 1; position: relative; z-index: 1; }
         .top-nav { position: sticky; top: 0; z-index: 1000; padding: 0 20px; background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-light); transition: transform 0.3s ease; }
         body.dark-mode .top-nav { background: rgba(30,41,59,0.72); }
         .top-nav.hide { transform: translateY(-100%); }
@@ -228,7 +227,7 @@
 </head>
 <body>
     <canvas id="particles-canvas"></canvas>
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div id="loadingOverlay" class="loading-overlay">
         <canvas id="loadingParticleCanvas" class="loading-particle-canvas"></canvas>
         <div class="loading-content"><i class="fas fa-spinner"></i><span>✨ 精彩内容加载中...</span></div>
     </div>
@@ -460,7 +459,7 @@
         function openAuth(tab='login'){ const modal=document.getElementById('authModal'); document.getElementById('loginForm').style.display=tab==='login'?'block':'none'; document.getElementById('registerForm').style.display=tab==='register'?'block':'none'; document.getElementById('forgotForm').style.display=tab==='forgot'?'block':'none'; document.getElementById('authModalTitle').innerText=tab==='register'?'注册':(tab==='forgot'?'找回密码':'登录'); modal.classList.add('active'); if(tab==='login')refreshCaptcha('login'); else if(tab==='register')refreshCaptcha('reg'); else refreshCaptcha('forgot'); }
         function refreshCaptcha(type){ let q=Math.floor(Math.random()*10)+1, b=Math.floor(Math.random()*10)+1, op=Math.random()>0.5?'+':'-', ans=op==='+'?q+b:q-b; if(ans<0)return refreshCaptcha(type); currentCaptcha={question:`${q} ${op} ${b} = ?`,answer:ans}; document.getElementById(`${type}CaptchaQuestion`).innerText=currentCaptcha.question; document.getElementById(`${type}CaptchaInput`).value=''; }
         async function loadAll(){ 
-            document.getElementById('appWrapper').classList.add('loaded');
+            const overlay = document.getElementById('loadingOverlay');
             softwares=await fetchSoftwares(); 
             const adResult = await fetchAds(); 
             if(adResult.bannerAds) bannerAds = adResult.bannerAds;
@@ -478,9 +477,8 @@
             renderCalendar(); 
             showAnnouncementBar(); 
             setDailyRecommend(); 
-            hideLoadingOverlay();
+            if(overlay) { overlay.classList.add('hide'); }
         }
-        function hideLoadingOverlay() { const overlay = document.getElementById('loadingOverlay'); if (overlay && overlay.style.display !== 'none') { requestAnimationFrame(() => { overlay.classList.add('hide'); setTimeout(() => { overlay.style.display = 'none'; }, 200); }); } }
         function renderCats() { const cats = [...new Set(softwares.map(s => s.category))]; const container = document.getElementById('categoryTabs'); if (!container) return; const isMobile = window.innerWidth <= 768; const visibleLimit = isMobile ? 4 : 5; const hasMore = cats.length > visibleLimit; let html = `<button class="cat-chip ${currentCategory === 'all' ? 'active' : ''}" data-cat="all"><i class="fas fa-th-large"></i> 全部</button>`; const visibleCats = cats.slice(0, visibleLimit); for (let cat of visibleCats) { const icon = cat === '3D建模' ? 'fa-cube' : (cat === '图像处理' ? 'fa-palette' : (cat === '视频剪辑' ? 'fa-video' : (cat === '工程设计' ? 'fa-drafting-compass' : 'fa-tag'))); html += `<button class="cat-chip ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}"><i class="fas ${icon}"></i> ${cat}</button>`; } if (hasMore) { html += `<button class="more-cats-btn" id="moreCatsBtn"><i class="fas fa-chevron-down"></i> 更多分类</button>`; container.innerHTML = html; let menu = document.querySelector('.cat-more-menu'); if (!menu) { menu = document.createElement('div'); menu.className = 'cat-more-menu'; container.appendChild(menu); } const moreBtn = document.getElementById('moreCatsBtn'); const hiddenCats = cats.slice(visibleLimit); menu.innerHTML = hiddenCats.map(cat => { const icon = cat === '3D建模' ? 'fa-cube' : (cat === '图像处理' ? 'fa-palette' : (cat === '视频剪辑' ? 'fa-video' : (cat === '工程设计' ? 'fa-drafting-compass' : 'fa-tag'))); return `<div class="cat-chip-more ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}"><i class="fas ${icon}"></i> ${cat}</div>`; }).join(''); menu.querySelectorAll('.cat-chip-more').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); currentCategory = el.dataset.cat; showAll = false; renderCats(); renderGrid(); menu.classList.remove('show'); }); }); moreBtn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); }); document.addEventListener('click', (e) => { if (menu && !menu.contains(e.target) && e.target !== moreBtn) menu.classList.remove('show'); }); } else { container.innerHTML = html; const oldMenu = container.querySelector('.cat-more-menu'); if (oldMenu) oldMenu.remove(); } container.querySelectorAll('.cat-chip').forEach(btn => { btn.addEventListener('click', () => { currentCategory = btn.dataset.cat; showAll = false; renderCats(); renderGrid(); }); }); }
         window._loadMore=()=>{showAll=true;renderGrid();}; document.getElementById('loadMoreBtn')&&document.getElementById('loadMoreBtn').addEventListener('click',window._loadMore);
         document.getElementById('searchInput')?.addEventListener('input',e=>{searchKeyword=e.target.value;renderGrid();}); document.getElementById('searchBtn')?.addEventListener('click',()=>{searchKeyword=document.getElementById('searchInput').value;renderGrid();});
@@ -523,16 +521,7 @@
         let lastScrollY=0,scrollTimer2; window.addEventListener('scroll',()=>{const nav=document.getElementById('topNav'); if(scrollTimer2)clearTimeout(scrollTimer2); scrollTimer2=setTimeout(()=>{const currentY=window.scrollY; if(currentY>lastScrollY&&currentY>100)nav?.classList.add('hide'); else if(currentY<lastScrollY)nav?.classList.remove('hide'); lastScrollY=currentY; document.getElementById('backToTop')?.classList.toggle('show',currentY>300);},50);});
         document.getElementById('backToTop')?.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
         const hamburger=document.getElementById('hamburgerBtn'),navLinks=document.getElementById('navLinks'); hamburger?.addEventListener('click',(e)=>{e.stopPropagation();hamburger.classList.toggle('active');navLinks?.classList.toggle('show');}); document.addEventListener('click',(e)=>{if(!navLinks?.contains(e.target)&&!hamburger?.contains(e.target)){navLinks?.classList.remove('show');hamburger?.classList.remove('active');}});
-        if(localStorage.getItem('lezhe_user')){try{currentUser=JSON.parse(localStorage.getItem('lezhe_user'));}catch(e){}} updateUserUI(); renderCalendar(); refreshCaptcha('login'); 
-        if(!sessionStorage.getItem('has_loaded_before')) {
-            const overlay = document.getElementById('loadingOverlay');
-            if(overlay) overlay.style.display = 'flex';
-            sessionStorage.setItem('has_loaded_before', 'true');
-        } else {
-            const overlay = document.getElementById('loadingOverlay');
-            if(overlay) overlay.style.display = 'none';
-            document.getElementById('appWrapper').classList.add('loaded');
-        }
+        if(localStorage.getItem('lezhe_user')){try{currentUser=JSON.parse(localStorage.getItem('lezhe_user'));}catch(e){}} updateUserUI(); renderCalendar(); refreshCaptcha('login');
         loadAll();
     </script>
 </body>
