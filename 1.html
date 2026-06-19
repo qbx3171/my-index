@@ -29,7 +29,6 @@
             --primary-hover: #3b54d4;
             --success: #10b981;
             --warning: #f59e0b;
-            --danger: #ef4444;
             --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
             --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.05);
             --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.07);
@@ -88,7 +87,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.35s ease, visibility 0.35s;
+            transition: opacity 0.25s ease, visibility 0.25s;
             opacity: 1;
             visibility: visible;
         }
@@ -155,7 +154,7 @@
         }
         .app-wrapper {
             opacity: 0;
-            transition: opacity 0.35s ease-in-out;
+            transition: opacity 0.2s ease-in-out;
             position: relative;
             z-index: 1;
         }
@@ -1531,79 +1530,6 @@
             flex-wrap: wrap;
             justify-content: flex-end;
         }
-        .profile-avatar-section {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px 0;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .profile-avatar-preview {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #fff;
-            flex-shrink: 0;
-            overflow: hidden;
-            border: 3px solid var(--primary-light);
-            box-shadow: 0 4px 16px rgba(79, 110, 246, 0.2);
-            cursor: pointer;
-            transition: transform 0.2s;
-            position: relative;
-        }
-        .profile-avatar-preview:hover {
-            transform: scale(1.05);
-        }
-        .profile-avatar-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-        .profile-avatar-preview .avatar-overlay {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.2s;
-            color: #fff;
-            font-size: 0.75rem;
-        }
-        .profile-avatar-preview:hover .avatar-overlay {
-            opacity: 1;
-        }
-        .profile-avatar-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .profile-avatar-actions button {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            background: var(--surface);
-            color: var(--text-secondary);
-            font-weight: 500;
-            transition: 0.2s;
-            white-space: nowrap;
-        }
-        .profile-avatar-actions button:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-            border-color: var(--primary);
-        }
         .profile-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1672,15 +1598,6 @@
             transform: translateY(-2px);
             background: var(--primary);
             color: white;
-        }
-        .action-buttons button.danger-action {
-            background: #fef2f2;
-            color: var(--danger);
-            border: 1px solid #fecaca;
-        }
-        .action-buttons button.danger-action:hover {
-            background: var(--danger);
-            color: #fff;
         }
         .password-section {
             margin-top: 16px;
@@ -1804,18 +1721,88 @@
             color: var(--text-muted);
             font-size: 0.75rem;
         }
-        .danger-zone {
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 2px solid #fecaca;
+        .avatar-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 8px 0;
         }
-        .danger-zone h4 {
-            font-size: 0.85rem;
-            margin-bottom: 12px;
-            color: var(--danger);
+        .avatar-option {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: var(--bg);
+        }
+        .avatar-option:hover {
+            transform: scale(1.08);
+        }
+        .avatar-option.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+        .profile-avatar-preview {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+        .profile-avatar-preview:hover {
+            border-color: var(--primary);
+        }
+        .profile-avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .profile-avatar-row .avatar-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+        .profile-bio textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--bg);
+            font-size: 0.8rem;
+            color: var(--text);
+            resize: vertical;
+            min-height: 60px;
+        }
+        .profile-select {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--bg);
+            font-size: 0.8rem;
+            color: var(--text);
+        }
+        .grid-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .grid-loading i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: block;
         }
         @media (max-width:480px) {
             .profile-modal-card {
@@ -1858,17 +1845,12 @@
             .invite-code-box code {
                 font-size: 0.9rem;
             }
-            .profile-avatar-preview {
-                width: 56px;
-                height: 56px;
-                font-size: 1.4rem;
-            }
         }
     </style>
 </head>
 <body>
     <canvas id="particles-canvas"></canvas>
-    <div id="loadingOverlay" class="loading-overlay">
+    <div id="loadingOverlay" class="loading-overlay" style="display:flex;">
         <canvas id="loadingParticleCanvas" class="loading-particle-canvas"></canvas>
         <div class="loading-content">
             <i class="fas fa-spinner"></i>
@@ -1928,28 +1910,34 @@
         <div class="profile-modal-card">
             <div class="profile-header"><h2><i class="fas fa-user-circle" style="color:var(--primary);"></i> 个人中心</h2><button id="closeProfileModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">&times;</button></div>
             <div class="profile-content">
-                <div class="profile-avatar-section">
-                    <div class="profile-avatar-preview" id="profileAvatarPreview" title="点击更换头像">
-                        <span id="profileAvatarText">U</span>
-                        <img id="profileAvatarImg" src="" alt="" style="display:none;">
-                        <div class="avatar-overlay"><i class="fas fa-camera"></i> 更换</div>
+                <div class="profile-avatar-row" style="margin-bottom:16px;">
+                    <div class="profile-avatar-preview" id="profileAvatarPreview"><i class="fas fa-user"></i></div>
+                    <div>
+                        <div style="font-weight:600;font-size:0.9rem;" id="profileAvatarName">头像</div>
+                        <div style="font-size:0.7rem;color:var(--text-muted);">点击头像更换</div>
                     </div>
-                    <div class="profile-avatar-actions">
-                        <button id="uploadAvatarBtn"><i class="fas fa-upload"></i> 上传头像</button>
-                        <button id="resetAvatarBtn"><i class="fas fa-undo"></i> 默认头像</button>
-                        <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
-                    </div>
+                </div>
+                <div id="avatarSelectorContainer" style="display:none;margin-bottom:12px;">
+                    <div class="avatar-selector" id="avatarSelector"></div>
+                    <button id="closeAvatarSelector" style="background:none;border:none;color:var(--text-muted);font-size:0.7rem;cursor:pointer;">收起</button>
                 </div>
                 <div class="profile-info-grid">
                     <div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-user"></i> 用户名</span><span class="profile-info-value"><span id="profileUsername"></span><span id="profileLevelBadge"></span></span></div>
                     <div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-crown"></i> 会员等级</span><span class="profile-info-value"><span id="profileRole"></span> <span id="profileLevelTag"></span></span></div>
                     <div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-calendar-alt"></i> 注册时间</span><span class="profile-info-value" id="profileRegDate">-</span></div>
                     <div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-id-badge"></i> 邀请码</span><span class="profile-info-value"><code id="myInviteCode" style="font-size:0.85rem;font-weight:700;color:var(--primary);">----</code></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-venus-mars"></i> 性别</span><span class="profile-info-value"><select class="profile-select" id="profileGender"><option value="保密">保密</option><option value="男">男</option><option value="女">女</option></select></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-birthday-cake"></i> 生日</span><span class="profile-info-value"><input type="date" id="profileBirthday" style="padding:6px 12px;border:1px solid var(--border);border-radius:20px;background:var(--bg);font-size:0.8rem;color:var(--text);"></span></div>
                 </div>
                 <div class="profile-section-title"><i class="fas fa-user-edit"></i> 修改用户名</div>
-                <div class="profile-inline-edit" style="margin-bottom:12px;">
+                <div class="profile-inline-edit" style="margin-bottom:8px;">
                     <input type="text" id="profileEditUsername" placeholder="输入新用户名">
                     <button id="saveUsernameBtn">保存</button>
+                </div>
+                <div class="profile-section-title"><i class="fas fa-pen"></i> 个人简介</div>
+                <div class="profile-bio" style="margin-bottom:8px;">
+                    <textarea id="profileBio" placeholder="写一段关于自己的简介..." rows="2"></textarea>
+                    <button id="saveBioBtn" style="margin-top:6px;padding:6px 16px;border-radius:20px;background:var(--primary);color:#fff;border:none;font-size:0.7rem;cursor:pointer;">保存简介</button>
                 </div>
                 <div class="profile-stats">
                     <div class="profile-stat-card"><i class="fas fa-download"></i><div class="profile-stat-value" id="profileRemaining">0</div><div class="profile-stat-label">本月剩余下载</div></div>
@@ -1964,7 +1952,6 @@
                     <button id="showPointsLogBtn"><i class="fas fa-list-alt"></i> 积分明细</button>
                     <button id="showMessagesBtn"><i class="fas fa-envelope"></i> 站内信 <span id="unreadCount" style="background:#ef4444;color:white;border-radius:50%;padding:2px 10px;font-size:0.7rem;margin-left:8px;display:none;">0</span></button>
                     <button id="showExportBtn"><i class="fas fa-download"></i> 导出数据</button>
-                    <button id="profileLogoutBtn" style="background:#fef2f2;color:var(--danger);border:1px solid #fecaca;"><i class="fas fa-sign-out-alt"></i> 退出登录</button>
                 </div>
                 <div id="profileDownloadHistory" style="display:none;">
                     <div class="profile-section-title"><i class="fas fa-history"></i> 下载记录 <button id="closeDownloadHistoryBtn" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.7rem;">收起</button></div>
@@ -1979,11 +1966,6 @@
                     <input type="password" id="profileNewPwd" placeholder="新密码">
                     <input type="password" id="profileConfirmPwd" placeholder="确认新密码">
                     <button id="saveProfileBtn">保存修改</button>
-                </div>
-                <div class="danger-zone">
-                    <h4><i class="fas fa-exclamation-triangle"></i> 危险操作</h4>
-                    <button id="deleteAccountBtn" class="admin-action-btn" style="background:var(--danger);width:100%;"><i class="fas fa-trash-alt"></i> 注销账号</button>
-                    <p style="font-size:0.6rem;color:var(--text-muted);margin-top:6px;text-align:center;">注销后所有数据将被清除，不可恢复</p>
                 </div>
             </div>
         </div>
@@ -2114,7 +2096,6 @@
             allUsersList = [];
         const SOFTWARES_CACHE_KEY = 'lezhe_softwares_cache';
         const SITE_VISITED_KEY = 'lezhe_site_visited';
-        const USER_AVATAR_KEY = 'lezhe_user_avatar';
 
         function getCachedSoftwares() { try { const raw = localStorage.getItem(SOFTWARES_CACHE_KEY); if (raw) { const parsed = JSON
                     .parse(raw); if (Array.isArray(parsed) && parsed.length > 0) return parsed; } } catch (e) {} return null; }
@@ -2238,34 +2219,6 @@
                 'lezhe_users') || '[]'); const user = users.find(u => u.email === userId); if (user) user.role = newRole;
             localStorage.setItem('lezhe_users', JSON.stringify(users)); return; } await airReq('PATCH', `Users/${userId}`,
             { fields: { Role: newRole } }); }
-        async function deleteUserAccount(email) { if (isLocalFile) { let users = JSON.parse(localStorage.getItem(
-                'lezhe_users') || '[]');
-            users = users.filter(u => u.email !== email);
-            localStorage.setItem('lezhe_users', JSON.stringify(users));
-            localStorage.removeItem(`download_${email}`);
-            localStorage.removeItem(`favorites_${email}`);
-            localStorage.removeItem(`download_history_${email}`);
-            localStorage.removeItem(`points_log_${email}`);
-            localStorage.removeItem(`messages_${email}`);
-            localStorage.removeItem(USER_AVATAR_KEY + '_' + email);
-            localStorage.removeItem('lezhe_user');
-            localStorage.removeItem('browseHistory');
-            currentUser = null;
-            updateUserUI();
-            renderCalendar();
-            return; } try { const rec = await findUserByEmail(email); if (rec) { await airReq('DELETE',
-            `Users/${rec.id}`); }
-            localStorage.removeItem(`download_${email}`);
-            localStorage.removeItem(`favorites_${email}`);
-            localStorage.removeItem(`download_history_${email}`);
-            localStorage.removeItem(`points_log_${email}`);
-            localStorage.removeItem(`messages_${email}`);
-            localStorage.removeItem(USER_AVATAR_KEY + '_' + email);
-            localStorage.removeItem('lezhe_user');
-            localStorage.removeItem('browseHistory');
-            currentUser = null;
-            updateUserUI();
-            renderCalendar(); } catch (e) { throw e; } }
         async function addPoints(email, points, reason = '') { if (isLocalFile) { const users = JSON.parse(localStorage.getItem(
                 'lezhe_users') || '[]'); const user = users.find(u => u.email === email); if (user) { user.points = (user.points ||
                 0) + points;
@@ -2397,8 +2350,8 @@
             localStorage.setItem('daily_recommend', JSON.stringify({ date: today, software: dailySoftware }));
             renderDailyRecommend(); } }
 
-        function renderDailyRecommend() { const section = document.getElementById('dailySection'); if (!section || !
-                dailySoftware) return;
+        function renderDailyRecommend() { const section = document.getElementById('dailySection'); if (!section || !dailySoftware)
+                return;
             section.style.display = 'block';
             document.getElementById('dailyName').innerText = dailySoftware.name;
             document.getElementById('dailyDesc').innerText = dailySoftware.description || '暂无描述';
@@ -2424,37 +2377,72 @@
                 downloadSoftware(dailySoftware); });
             newCard.id = 'dailyCard'; }
 
-        function renderGrid() { let filtered = softwares.filter(s => (currentCategory === 'all' || s.category ===
-                currentCategory) && matchesSearch(s, searchKeyword)); const items = showAll ? filtered : filtered.slice(0, 12); const
-            container = document.getElementById('softwareGridContainer'); if (!items.length) { container.innerHTML =
-                '<div style="text-align:center;padding:40px;">没有找到相关软件</div>';
-            document.getElementById('loadMoreContainer').style.display = 'none'; return; } const favs = currentUser ? JSON.parse(
-                localStorage.getItem(`favorites_${currentUser.email}`) || '[]') : [];
-            container.innerHTML = items.map(sw => { const isFav = favs.some(f => f.id === sw.id); const isNew = (new Date() -
-                    new Date(sw.addedDate || '2024-01-01')) < 7 * 86400000; const isHot = sw.downloads > 2000; const osTags = (sw
-                    .os || []).map(o => { let icon = ''; if (o === 'Windows') icon = '<i class="fab fa-windows"></i>';
-                    else if (o === 'Mac') icon = '<i class="fab fa-apple"></i>'; return `<span class="os-badge">${icon} ${o}</span>`; })
-                    .join(''); return `<div class="software-card" data-id="${sw.id}"><button class="favorite-btn ${isFav?'active':''}" data-id="${sw.id}" data-name="${esc(sw.name)}"><i class="fas fa-heart"></i></button>${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}<div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon,sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div><div class="version">${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${osTags}</div><div class="rating-stars" id="rating-${sw.id}"><span style="font-size:0.65rem;color:var(--text-muted);"><i class="far fa-star"></i> 评价</span></div><div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`; })
-                .join('');
-            document.getElementById('loadMoreContainer').style.display = (!showAll && filtered.length > 12) ? 'block' : 'none';
-            container.querySelectorAll('.software-card').forEach(card => { card.addEventListener('click', (e) => { if (e.target
-                        .closest('.favorite-btn')) return; const sw = softwares.find(s => s.id === card.dataset.id); if (
-                        sw) downloadSoftware(sw); }); });
-            container.querySelectorAll('.favorite-btn').forEach(btn => { btn.addEventListener('click', (e) => { e
-                    .stopPropagation(); const isActive = toggleFavorite(btn.dataset.id, btn.dataset.name);
-                    btn.classList.toggle('active', isActive); }); });
-            container.querySelectorAll('.rating-stars').forEach(el => { el.addEventListener('click', (e) => { e
-                    .stopPropagation(); const card = el.closest('.software-card'); const sw = softwares.find(s => s.id ===
-                        card.dataset.id); if (sw) { document.getElementById('ratingSoftwareName').innerText = sw.name;
-                    document.getElementById('ratingSoftwareId').value = sw.id;
-                    document.getElementById('ratingModal').classList.add('active'); const stars = document
-                        .querySelectorAll('#ratingStarsInput i');
-                    stars.forEach((star, idx) => { star.className = 'far fa-star';
-                        star.onclick = () => { let rating = idx + 1;
-                            stars.forEach((s, i) => { if (i < rating) { s.className = 'fas fa-star';
-                                    s.style.color = '#fbbf24'; } else { s.className = 'far fa-star';
-                                    s.style.color = ''; } });
-                            window.selectedRating = rating; }; }); } }); }); }
+        function renderGrid(showLoader = true) {
+            const container = document.getElementById('softwareGridContainer');
+            if (showLoader) {
+                container.innerHTML =
+                    `<div class="grid-loading"><i class="fas fa-spinner fa-spin"></i><div>加载软件列表...</div></div>`;
+            }
+            setTimeout(() => {
+                let filtered = softwares.filter(s => (currentCategory === 'all' || s.category === currentCategory) && matchesSearch(s, searchKeyword));
+                const items = showAll ? filtered : filtered.slice(0, 12);
+                if (!items.length) {
+                    container.innerHTML = '<div style="text-align:center;padding:40px;">没有找到相关软件</div>';
+                    document.getElementById('loadMoreContainer').style.display = 'none';
+                    return;
+                }
+                const favs = currentUser ? JSON.parse(localStorage.getItem(`favorites_${currentUser.email}`) || '[]') : [];
+                container.innerHTML = items.map(sw => {
+                    const isFav = favs.some(f => f.id === sw.id);
+                    const isNew = (new Date() - new Date(sw.addedDate || '2024-01-01')) < 7 * 86400000;
+                    const isHot = sw.downloads > 2000;
+                    const osTags = (sw.os || []).map(o => { let icon = ''; if (o === 'Windows') icon = '<i class="fab fa-windows"></i>';
+                        else if (o === 'Mac') icon = '<i class="fab fa-apple"></i>'; return `<span class="os-badge">${icon} ${o}</span>`; })
+                        .join('');
+                    return `<div class="software-card" data-id="${sw.id}"><button class="favorite-btn ${isFav?'active':''}" data-id="${sw.id}" data-name="${esc(sw.name)}"><i class="fas fa-heart"></i></button>${isNew?'<span class="new-badge">✦新</span>':(isHot?'<span class="hot-badge">♨热</span>':'')}<div class="card-header"><div class="card-icon">${renderIconHtml(sw.icon,sw.name)}</div><div class="software-name">${esc(sw.name)}</div></div><div class="version">${esc(sw.version)}</div><div class="description">${esc(sw.description)}</div><div class="os-tags">${osTags}</div><div class="rating-stars" id="rating-${sw.id}"><span style="font-size:0.65rem;color:var(--text-muted);"><i class="far fa-star"></i> 评价</span></div><div class="card-footer"><span class="added-date">${esc(sw.addedDate)}</span><span class="download-count"><i class="fas fa-download"></i> ${sw.downloads||0}</span></div></div>`;
+                }).join('');
+                document.getElementById('loadMoreContainer').style.display = (!showAll && filtered.length > 12) ? 'block' : 'none';
+                container.querySelectorAll('.software-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.favorite-btn')) return;
+                        const sw = softwares.find(s => s.id === card.dataset.id);
+                        if (sw) downloadSoftware(sw);
+                    });
+                });
+                container.querySelectorAll('.favorite-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isActive = toggleFavorite(btn.dataset.id, btn.dataset.name);
+                        btn.classList.toggle('active', isActive);
+                    });
+                });
+                container.querySelectorAll('.rating-stars').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const card = el.closest('.software-card');
+                        const sw = softwares.find(s => s.id === card.dataset.id);
+                        if (sw) {
+                            document.getElementById('ratingSoftwareName').innerText = sw.name;
+                            document.getElementById('ratingSoftwareId').value = sw.id;
+                            document.getElementById('ratingModal').classList.add('active');
+                            const stars = document.querySelectorAll('#ratingStarsInput i');
+                            stars.forEach((star, idx) => {
+                                star.className = 'far fa-star';
+                                star.onclick = () => {
+                                    let rating = idx + 1;
+                                    stars.forEach((s, i) => {
+                                        if (i < rating) { s.className = 'fas fa-star';
+                                            s.style.color = '#fbbf24'; } else { s.className = 'far fa-star';
+                                            s.style.color = ''; }
+                                    });
+                                    window.selectedRating = rating;
+                                };
+                            });
+                        }
+                    });
+                });
+            }, 320);
+        }
 
         function renderHot() { if (!softwares.length) return; const hotItems = [...softwares].sort((a, b) => (b.downloads || 0) - (a
                 .downloads || 0)).slice(0, 8); const hotScroll = document.getElementById('hotScroll');
@@ -2585,20 +2573,38 @@
                 `<div class="profile-log-item"><span class="log-desc">${esc(l.reason)}</span><span class="log-extra">${l.points>0?'+':''}${l.points}分</span><span class="log-time">${new Date(l.time).toLocaleString()}</span></div>`
                 ).join(''); }
 
-        function getUserAvatarDataUrl(email) { const key = USER_AVATAR_KEY + '_' + email; return localStorage.getItem(key) || null; }
+        function getProfileData(email) { const key = `profile_${email}`; const data = localStorage.getItem(key); if (data) try { return JSON
+                    .parse(data); } catch (e) {} return { avatar: '', gender: '保密', birthday: '', bio: '' }; }
 
-        function saveUserAvatarDataUrl(email, dataUrl) { const key = USER_AVATAR_KEY + '_' + email; if (dataUrl) { localStorage
-                .setItem(key, dataUrl); } else { localStorage.removeItem(key); } }
+        function saveProfileData(email, data) { localStorage.setItem(`profile_${email}`, JSON.stringify(data)); }
 
-        function renderProfileAvatar() { if (!currentUser) return; const avatarUrl = getUserAvatarDataUrl(currentUser.email); const
-            preview = document.getElementById('profileAvatarPreview'); const textEl = document.getElementById('profileAvatarText');
-            const imgEl = document.getElementById('profileAvatarImg'); if (!preview || !textEl || !imgEl) return; if (avatarUrl) {
-                imgEl.src = avatarUrl;
-                imgEl.style.display = 'block';
-                textEl.style.display = 'none'; } else { imgEl.style.display = 'none';
-                textEl.style.display = 'flex';
-                textEl.textContent = (currentUser.username || 'U').charAt(0).toUpperCase();
-                preview.style.background = getColor(currentUser.username || 'User'); } }
+        function getAvatarEmoji(avatar) { if (!avatar) return '👤'; const map = { '👤': '👤', '😊': '😊', '😎': '😎', '🤩': '🤩',
+                '🧑‍💻': '🧑‍💻', '👩‍💻': '👩‍💻', '🦊': '🦊', '🐱': '🐱', '🐶': '🐶', '🐼': '🐼', '🌟': '🌟', '🌈': '🌈' }; return map[
+                avatar] || '👤'; }
+
+        function renderProfileAvatar() { if (!currentUser) return; const profile = getProfileData(currentUser.email); const avatarEl =
+                document.getElementById('profileAvatarPreview'); if (avatarEl) { avatarEl.innerHTML = getAvatarEmoji(profile
+                    .avatar || '👤');
+                avatarEl.style.background = profile.avatar ? 'var(--primary-light)' : 'var(--bg)'; } }
+
+        function renderAvatarSelector() { const container = document.getElementById('avatarSelector'); if (!container) return; const
+            options = ['👤', '😊', '😎', '🤩', '🧑‍💻', '👩‍💻', '🦊', '🐱', '🐶', '🐼', '🌟', '🌈']; const current = getProfileData(
+                currentUser.email).avatar || '👤';
+            container.innerHTML = options.map(emoji =>
+                `<div class="avatar-option ${emoji===current?'active':''}" data-avatar="${emoji}">${emoji}</div>`
+                ).join('');
+            container.querySelectorAll('.avatar-option').forEach(el => {
+                el.addEventListener('click', () => {
+                    const avatar = el.dataset.avatar;
+                    const profile = getProfileData(currentUser.email);
+                    profile.avatar = avatar;
+                    saveProfileData(currentUser.email, profile);
+                    renderProfileAvatar();
+                    container.querySelectorAll('.avatar-option').forEach(o => o.classList.toggle('active', o.dataset
+                        .avatar === avatar));
+                    showToast('头像已更换', 'success');
+                });
+            }); }
 
         function updateUserUI() { const area = document.getElementById('userArea'); if (!area) return; if (currentUser) { const
                 remaining = getRemainingCount(currentUser); const remainingText = (currentUser.role === 'vip' || currentUser
@@ -2612,14 +2618,15 @@
                 updateUserUI();
                 showToast('已退出登录');
                 renderCalendar(); });
-            document.getElementById('profileBtn').addEventListener('click', () => { document.getElementById(
-                    'profileUsername').innerText = currentUser.username;
+            document.getElementById('profileBtn').addEventListener('click', () => {
+                const profile = getProfileData(currentUser.email);
+                document.getElementById('profileUsername').innerText = currentUser.username;
                 document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role ===
                     'admin') ? 'VIP会员' : '普通会员';
                 document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role ===
                     'admin') ? '∞' : getRemainingCount(currentUser);
-                document.getElementById('profilePoints').innerText = currentUser.points || 0; const lvl = getUserLevel(
-                    currentUser.points || 0);
+                document.getElementById('profilePoints').innerText = currentUser.points || 0;
+                const lvl = getUserLevel(currentUser.points || 0);
                 document.getElementById('profileLevelBadge').innerHTML =
                     `<span class="level-badge ${lvl.badge}" style="margin-left:8px;">${lvl.name}</span>`;
                 document.getElementById('profileLevelTag').innerHTML =
@@ -2629,11 +2636,17 @@
                 document.getElementById('profileRegDate').innerText = currentUser.createdAt ? new Date(currentUser
                     .createdAt).toLocaleDateString() : '未知';
                 document.getElementById('profileEditUsername').value = currentUser.username || '';
+                document.getElementById('profileGender').value = profile.gender || '保密';
+                document.getElementById('profileBirthday').value = profile.birthday || '';
+                document.getElementById('profileBio').value = profile.bio || '';
+                renderProfileAvatar();
+                renderAvatarSelector();
                 document.getElementById('profileDownloadHistory').style.display = 'none';
                 document.getElementById('profilePointsLog').style.display = 'none';
-                renderProfileAvatar();
                 document.getElementById('profileModal').classList.add('active');
-                renderUserMessages(); }); if (currentUser.role === 'admin') { document.getElementById('adminBtn')
+                renderUserMessages();
+            });
+            if (currentUser.role === 'admin') { document.getElementById('adminBtn')
                 .addEventListener('click', () => { document.getElementById('adminModal').classList.add('active');
                     refreshUserList(); });
                 document.getElementById('manageArticlesBtn').style.display = 'block'; } } else { area.innerHTML =
@@ -2696,13 +2709,18 @@
             document.getElementById(`${type}CaptchaQuestion`).innerText = currentCaptcha.question;
             document.getElementById(`${type}CaptchaInput`).value = ''; }
 
-        function hideLoadingOverlay() { const overlay = document.getElementById('loadingOverlay'); if (overlay) { requestAnimationFrame(() => { overlay.classList.add('hide');
-                setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 350); }); } }
-        async function loadAll() { const cachedSoftwares = getCachedSoftwares(); if (cachedSoftwares && cachedSoftwares.length > 0) {
+        function hideLoadingOverlay() { const overlay = document.getElementById('loadingOverlay'); if (overlay && overlay.style
+                .display !== 'none') { requestAnimationFrame(() => { overlay.classList.add('hide');
+                setTimeout(() => { overlay.style.display = 'none'; }, 250); }); } }
+        async function loadAll() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.style.display = 'flex';
+            const cachedSoftwares = getCachedSoftwares();
+            if (cachedSoftwares && cachedSoftwares.length > 0) {
                 softwares = cachedSoftwares;
                 document.getElementById('appWrapper').classList.add('loaded');
                 renderCats();
-                renderGrid();
+                renderGrid(true);
                 renderHot();
                 renderRank();
                 renderArtsList();
@@ -2710,34 +2728,49 @@
                 renderCalendar();
                 showAnnouncementBar();
                 setDailyRecommend();
-                hideLoadingOverlay(); } else { document.getElementById('appWrapper').classList.add('loaded'); } try { const
-                freshSoftwares = await fetchSoftwares(); if (!cachedSoftwares || JSON.stringify(freshSoftwares) !== JSON.stringify(
-                    cachedSoftwares)) { softwares = freshSoftwares;
-                renderCats();
-                renderGrid();
-                renderHot();
-                renderRank();
-                setDailyRecommend(); } } catch (e) { if (!cachedSoftwares) { softwares = [...DEFAULT_SOFTWARES];
-                setCachedSoftwares(softwares);
-                renderCats();
-                renderGrid();
-                renderHot();
-                renderRank();
-                setDailyRecommend(); } } const adData = await fetchAds();
+                hideLoadingOverlay();
+            } else {
+                document.getElementById('appWrapper').classList.add('loaded');
+            }
+            try {
+                const freshSoftwares = await fetchSoftwares();
+                if (!cachedSoftwares || JSON.stringify(freshSoftwares) !== JSON.stringify(cachedSoftwares)) {
+                    softwares = freshSoftwares;
+                    renderCats();
+                    renderGrid(true);
+                    renderHot();
+                    renderRank();
+                    setDailyRecommend();
+                }
+            } catch (e) {
+                if (!cachedSoftwares) {
+                    softwares = [...DEFAULT_SOFTWARES];
+                    setCachedSoftwares(softwares);
+                    renderCats();
+                    renderGrid(true);
+                    renderHot();
+                    renderRank();
+                    setDailyRecommend();
+                }
+            }
+            const adData = await fetchAds();
             bannerAds = adData.filter(a => a.position === 'banner');
-            sidebarAds = adData.filter(a => a.position === 'sidebar'); if (bannerAds.length) renderCarousel(document.getElementById(
-                'categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds); if (sidebarAds.length)
-            renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'),
-                sidebarAds);
+            sidebarAds = adData.filter(a => a.position === 'sidebar');
+            if (bannerAds.length) renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById(
+                'categoryBannerDots'), bannerAds);
+            if (sidebarAds.length) renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById(
+                'sidebarCarouselDots'), sidebarAds);
             articles = await fetchArticles();
             announcements = isLocalFile ? [{ id: '1', title: '欢迎使用乐哲软件', content: '感谢大家的支持！更多优质软件持续更新中',
                 createdAt: new Date().toISOString() }] : [];
             renderArtsList();
             renderHistory();
             renderCalendar();
-            showAnnouncementBar(); if (!cachedSoftwares || !cachedSoftwares.length) { setDailyRecommend(); }
+            showAnnouncementBar();
+            if (!cachedSoftwares || !cachedSoftwares.length) { setDailyRecommend(); }
             hideLoadingOverlay();
-            localStorage.setItem(SITE_VISITED_KEY, 'true'); }
+            localStorage.setItem(SITE_VISITED_KEY, 'true');
+        }
 
         function renderCats() { const cats = [...new Set(softwares.map(s => s.category))]; const container = document.getElementById(
                 'categoryTabs'); if (!container) return; const isMobile = window.innerWidth <= 768; const visibleLimit = isMobile ?
@@ -2764,7 +2797,7 @@
                         currentCategory = el.dataset.cat;
                         showAll = false;
                         renderCats();
-                        renderGrid();
+                        renderGrid(true);
                         menu.classList.remove('show'); }); });
                 moreBtn.addEventListener('click', (e) => { e.stopPropagation();
                     menu.classList.toggle('show'); });
@@ -2775,15 +2808,15 @@
                     .dataset.cat;
                     showAll = false;
                     renderCats();
-                    renderGrid(); }); }); }
+                    renderGrid(true); }); }); }
         window._loadMore = () => { showAll = true;
-            renderGrid(); };
+            renderGrid(true); };
         document.getElementById('loadMoreBtn') && document.getElementById('loadMoreBtn').addEventListener('click', window._loadMore);
         document.getElementById('searchInput')?.addEventListener('input', e => { searchKeyword = e.target.value;
-            renderGrid(); });
+            renderGrid(true); });
         document.getElementById('searchBtn')?.addEventListener('click', () => { searchKeyword = document.getElementById(
             'searchInput').value;
-            renderGrid(); });
+            renderGrid(true); });
         document.getElementById('clearHistoryBtn')?.addEventListener('click', () => { localStorage.removeItem('browseHistory');
             renderHistory(); });
         document.getElementById('submitFeedbackBtn')?.addEventListener('click', async () => { const msg = document.getElementById(
@@ -2802,15 +2835,35 @@
                 'profileNewPwd').value; const confirm = document.getElementById('profileConfirmPwd').value; if (newPwd && newPwd !==
             confirm) return showToast('两次密码不一致', 'error'); if (newPwd) { await updatePassword(currentUser.email, newPwd);
             showToast('密码修改成功', 'success'); }
-        document.getElementById('profileModal').classList.remove('active'); });
+            document.getElementById('profileModal').classList.remove('active'); });
         document.getElementById('saveUsernameBtn')?.addEventListener('click', async () => { const newUsername = document
             .getElementById('profileEditUsername').value.trim(); if (!newUsername) return showToast('用户名不能为空', 'error'); if (
                 newUsername === currentUser.username) return showToast('用户名未改变', 'warning'); await updateUsername(currentUser
                 .email, newUsername);
             showToast('用户名修改成功', 'success');
             document.getElementById('profileUsername').innerText = newUsername;
-            document.getElementById('profileEditUsername').value = newUsername;
-            renderProfileAvatar(); });
+            document.getElementById('profileEditUsername').value = newUsername; });
+        document.getElementById('saveBioBtn')?.addEventListener('click', () => { if (!currentUser) return; const bio = document
+                .getElementById('profileBio').value.trim(); const profile = getProfileData(currentUser.email);
+            profile.bio = bio;
+            saveProfileData(currentUser.email, profile);
+            showToast('简介已保存', 'success'); });
+        document.getElementById('profileGender')?.addEventListener('change', function() { if (!currentUser) return; const profile =
+                getProfileData(currentUser.email);
+            profile.gender = this.value;
+            saveProfileData(currentUser.email, profile);
+            showToast('性别已保存', 'success'); });
+        document.getElementById('profileBirthday')?.addEventListener('change', function() { if (!currentUser) return; const profile =
+                getProfileData(currentUser.email);
+            profile.birthday = this.value;
+            saveProfileData(currentUser.email, profile);
+            showToast('生日已保存', 'success'); });
+        document.getElementById('profileAvatarPreview')?.addEventListener('click', function() { const container = document
+                .getElementById('avatarSelectorContainer'); if (container) { container.style.display = container.style.display ===
+                    'block' ? 'none' : 'block';
+                renderAvatarSelector(); } });
+        document.getElementById('closeAvatarSelector')?.addEventListener('click', function() { document.getElementById(
+            'avatarSelectorContainer').style.display = 'none'; });
         document.getElementById('showDownloadHistoryBtn')?.addEventListener('click', () => { document.getElementById(
                 'profileDownloadHistory').style.display = 'block';
             document.getElementById('profilePointsLog').style.display = 'none';
@@ -2991,92 +3044,66 @@
             document.getElementById('userManageTabBtn').style.background = 'var(--primary)';
             document.getElementById('userManageTabBtn').style.color = '#fff';
             document.getElementById('sendMessageTabBtn').style.background = 'var(--primary-light)';
-            document.getElementById('sendMessageTabBtn').style.color = 'var(--primary'); });
-        document.getElementById('messageRecipient')?.addEventListener('change', function() { const container = document
-                .getElementById('selectedUsersContainer'); if (this.value === 'custom') { container.style.display = 'block';
-                loadUserCheckboxList(); } else { container.style.display = 'none'; } });
-        document.getElementById('sendMessageBtn')?.addEventListener('click', () => { const filter = document.getElementById(
-                'messageRecipient').value; const title = document.getElementById('messageTitle').value.trim(); const content =
-                document.getElementById('messageContent').value.trim(); if (!title || !content) return showToast('请填写完整信息',
-                'error'); if (filter === 'custom') { const checked = document.querySelectorAll(
-                '#userCheckboxList input:checked'); const emails = Array.from(checked).map(cb => cb.value); if (!emails
-                .length) return showToast('请选择至少一个用户', 'error');
-            sendMessageToSelectedUsers(emails, title, content); } else { sendMessageToAll(title, content, filter); }
+            document.getElementById('sendMessageTabBtn').style.color = 'var(--primary)';
+            refreshUserList(); });
+        document.getElementById('messageRecipient')?.addEventListener('change', (e) => { const container = document.getElementById(
+            'selectedUsersContainer');
+            container.style.display = e.target.value === 'custom' ? 'block' : 'none'; });
+        document.getElementById('sendMessageBtn')?.addEventListener('click', () => { const title = document.getElementById(
+                'messageTitle').value.trim(); const content = document.getElementById('messageContent').value.trim(); if (!title ||
+                !content) { showToast('请填写标题和内容', 'error'); return; } const recipient = document.getElementById(
+                'messageRecipient').value; if (recipient === 'custom') { const selected = Array.from(document.querySelectorAll(
+                    '#userCheckboxList input:checked')).map(cb => cb.value); if (!selected.length) { showToast('请至少选择一位用户',
+                    'error'); return; }
+            sendMessageToSelectedUsers(selected, title, content); } else { sendMessageToAll(title, content, recipient); }
             document.getElementById('messageTitle').value = '';
-            document.getElementById('messageContent').value = '';
-            showToast('站内信发送成功', 'success'); });
-        document.getElementById('profileLogoutBtn')?.addEventListener('click', () => { currentUser = null;
-            localStorage.removeItem('lezhe_user');
-            updateUserUI();
-            document.getElementById('profileModal').classList.remove('active');
-            showToast('已退出登录');
-            renderCalendar(); });
-        document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => { if (!currentUser) return; if (
-                currentUser.role === 'admin') { showToast('管理员账号不可注销', 'warning'); return; } const confirmed = confirm(
-                '确定要注销账号吗？此操作不可撤销，所有数据将被永久删除！'); if (!confirmed) return; const secondConfirm = confirm(
-                '再次确认：注销后您的下载记录、积分、收藏等所有数据都将丢失。确定继续？'); if (!secondConfirm) return; try { await
-                deleteUserAccount(currentUser.email);
-            document.getElementById('profileModal').classList.remove('active');
-            showToast('账号已注销', 'success'); } catch (e) { showToast('注销失败，请稍后重试', 'error'); } });
-        document.getElementById('uploadAvatarBtn')?.addEventListener('click', () => { document.getElementById('avatarFileInput')
-            .click(); });
-        document.getElementById('resetAvatarBtn')?.addEventListener('click', () => { if (!currentUser) return;
-            saveUserAvatarDataUrl(currentUser.email, null);
-            renderProfileAvatar();
-            showToast('头像已恢复默认', 'success'); });
-        document.getElementById('avatarFileInput')?.addEventListener('change', function() { const file = this.files[0]; if (!file)
-            return; if (!file.type.startsWith('image/')) { showToast('请选择图片文件', 'error'); return; } const reader = new
-            FileReader();
-            reader.onload = function(e) { const dataUrl = e.target.result; if (!currentUser) return;
-                saveUserAvatarDataUrl(currentUser.email, dataUrl);
-                renderProfileAvatar();
-                showToast('头像上传成功', 'success'); };
-            reader.readAsDataURL(file); });
-        document.getElementById('profileAvatarPreview')?.addEventListener('click', () => { document.getElementById(
-            'avatarFileInput').click(); });
-        const hamburger = document.getElementById('hamburgerBtn');
-        const navLinks = document.getElementById('navLinks');
-        if (hamburger && navLinks) { hamburger.addEventListener('click', () => { hamburger.classList.toggle('active');
-                navLinks.classList.toggle('show'); }); }
-        document.getElementById('darkModeToggle')?.addEventListener('click', () => { document.body.classList.toggle('dark-mode');
-            const icon = document.querySelector('#darkModeToggle i'); if (icon) { icon.classList.toggle('fa-moon');
-                icon.classList.toggle('fa-sun'); }
-            localStorage.setItem('lezhe_dark_mode', document.body.classList.contains('dark-mode') ? '1' : '0'); });
-        if (localStorage.getItem('lezhe_dark_mode') === '1') { document.body.classList.add('dark-mode'); const icon = document
-                .querySelector('#darkModeToggle i'); if (icon) { icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun'); } }
-        const backToTop = document.getElementById('backToTop');
-        window.addEventListener('scroll', () => { if (backToTop) { backToTop.classList.toggle('show', window.scrollY > 400); } });
-        backToTop?.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-        let lastScrollY = 0;
-        window.addEventListener('scroll', () => { const nav = document.getElementById('topNav'); if (nav) { const currentScroll =
-                window.scrollY; if (currentScroll > lastScrollY && currentScroll > 80) { nav.classList.add('hide'); } else {
-                nav.classList.remove('hide'); }
-            lastScrollY = currentScroll; } });
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('pwaInstallBanner').classList.add('show'); });
-        document.getElementById('pwaInstallBtn')?.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt
-                .prompt(); const result = await deferredPrompt.userChoice;
-            deferredPrompt = null;
-            document.getElementById('pwaInstallBanner').classList.remove('show'); } });
-        document.getElementById('pwaCloseBtn')?.addEventListener('click', () => { document.getElementById('pwaInstallBanner')
-            .classList.remove('show'); });
+            document.getElementById('messageContent').value = ''; if (currentUser && currentUser.email) renderUserMessages(); });
         document.getElementById('contactAdminBuyBtn')?.addEventListener('click', () => { window.copyText('Win_Mac_123');
-            showToast('客服微信已复制：Win_Mac_123', 'success'); });
-        const savedUser = localStorage.getItem('lezhe_user'); if (savedUser) { try { currentUser = JSON.parse(savedUser); } catch (
-            e) { currentUser = null; } }
+            showToast('客服微信已复制，添加时请备注"购买下载次数"', 'success'); });
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault();
+            deferredPrompt = e; const banner = document.getElementById('pwaInstallBanner'); if (banner) banner.classList.add(
+                'show'); });
+        document.getElementById('pwaInstallBtn')?.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt
+                .prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') showToast(
+                    '感谢安装！', 'success');
+            deferredPrompt = null; }
+        document.getElementById('pwaInstallBanner').classList.remove('show'); });
+        document.getElementById('pwaCloseBtn')?.addEventListener('click', () => document.getElementById('pwaInstallBanner')
+            .classList.remove('show'));
+        const darkModeToggle = document.getElementById('darkModeToggle'); if (localStorage.getItem('darkMode') === 'enabled')
+            document.body.classList.add('dark-mode');
+        darkModeToggle?.addEventListener('click', () => { document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+            darkModeToggle.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' :
+                '<i class="fas fa-moon"></i>'; });
+        let lastScrollY = 0,
+            scrollTimer2;
+        window.addEventListener('scroll', () => { const nav = document.getElementById('topNav'); if (scrollTimer2)
+            clearTimeout(scrollTimer2);
+            scrollTimer2 = setTimeout(() => { const currentY = window.scrollY; if (currentY > lastScrollY && currentY > 100)
+                    nav?.classList.add('hide'); else if (currentY < lastScrollY) nav?.classList.remove('hide');
+                lastScrollY = currentY;
+                document.getElementById('backToTop')?.classList.toggle('show', currentY > 300); }, 50); });
+        document.getElementById('backToTop')?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        const hamburger = document.getElementById('hamburgerBtn'),
+            navLinks = document.getElementById('navLinks');
+        hamburger?.addEventListener('click', (e) => { e.stopPropagation();
+            hamburger.classList.toggle('active');
+            navLinks?.classList.toggle('show'); });
+        document.addEventListener('click', (e) => { if (!navLinks?.contains(e.target) && !hamburger?.contains(e.target)) {
+                navLinks?.classList.remove('show');
+                hamburger?.classList.remove('active'); } });
+        if (localStorage.getItem('lezhe_user')) { try { currentUser = JSON.parse(
+                    localStorage.getItem('lezhe_user')); } catch (e) {} }
         updateUserUI();
         renderCalendar();
-        refreshCaptcha('login'); const hasVisited = localStorage.getItem(SITE_VISITED_KEY); const hasCache = !!getCachedSoftwares(); if (
-            !hasVisited && !hasCache) { const overlay = document.getElementById('loadingOverlay'); if (overlay) { overlay.style
-                .display = 'flex';
-            overlay.classList.remove('hide'); } } else { document.getElementById('appWrapper').classList.add('loaded'); const
-            overlay = document.getElementById('loadingOverlay'); if (overlay) { overlay.style.display = 'none';
-            overlay.classList.add('hide'); } }
+        refreshCaptcha('login');
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'flex';
         loadAll();
     </script>
     <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous">
     </script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
