@@ -20,7 +20,6 @@
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; min-height: 100vh; color: var(--text); background: var(--bg); overflow-x: hidden; position: relative; transition: background 0.3s, color 0.3s; }
         body.dark-mode { --bg: #0f172a; --surface: #1e293b; --border: #334155; --border-light: #334155; --text: #f1f5f9; --text-secondary: #cbd5e1; --text-muted: #94a3b8; }
         #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        
         .loading-overlay { position: fixed; inset: 0; background: linear-gradient(135deg, #0a0e1a 0%, #14182a 50%, #1a1f35 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; transition: opacity 0.15s ease, visibility 0.15s; opacity: 1; visibility: visible; }
         .loading-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
         .loading-particle-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; opacity: 0.8; }
@@ -29,10 +28,8 @@
         .loading-content span { font-size: 1rem; font-weight: 600; background: linear-gradient(135deg, #ffffff, #c0d4ff, #8aaaff); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: 1px; }
         @keyframes glowPulse { 0% { box-shadow: 0 0 0 1px rgba(109,142,255,0.2), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 15px rgba(79,110,246,0.3); transform: scale(0.98); } 50% { box-shadow: 0 0 0 2px rgba(109,142,255,0.6), 0 25px 45px -8px rgba(0,0,0,0.6), 0 0 35px rgba(79,110,246,0.7); transform: scale(1); } 100% { box-shadow: 0 0 0 1px rgba(109,142,255,0.2), 0 25px 40px -12px rgba(0,0,0,0.5), 0 0 15px rgba(79,110,246,0.3); transform: scale(0.98); } }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         .app-wrapper { opacity: 0; transition: opacity 0.15s ease-in-out; position: relative; z-index: 1; }
         .app-wrapper.loaded { opacity: 1; }
-        
         .top-nav { position: sticky; top: 0; z-index: 1000; padding: 0 20px; background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-light); transition: transform 0.3s ease; }
         body.dark-mode .top-nav { background: rgba(30,41,59,0.72); }
         .top-nav.hide { transform: translateY(-100%); }
@@ -65,7 +62,6 @@
         .main-content { flex: 1; min-width: 0; }
         .sidebar { width: 290px; flex-shrink: 0; }
         @media (max-width:900px) { .content-wrapper { flex-direction: column; } .sidebar { width: 100%; } #adContainer { display: none !important; } }
-        
         .carousel-container { position: relative; width: 100%; aspect-ratio: 21/9; background: linear-gradient(135deg, #e8ecf3 0%, #d1d5db 100%); border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--border-light); margin-bottom: 18px; }
         .carousel-slides { display: flex; height: 100%; transition: transform 0.5s ease; }
         .carousel-slide { flex: 0 0 100%; height: 100%; background: linear-gradient(135deg, #e8ecf3 0%, #d1d5db 100%); display: flex; align-items: center; justify-content: center; position: relative; }
@@ -73,7 +69,6 @@
         .carousel-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 7px; z-index: 5; }
         .carousel-dot { width: 10px; height: 10px; border-radius: 10px; background: rgba(255,255,255,0.7); cursor: pointer; transition: 0.2s; }
         .carousel-dot.active { width: 22px; background: #fff; }
-        
         .daily-section { margin-bottom: 24px; }
         .daily-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
         .daily-header h3 { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -90,7 +85,6 @@
         .daily-download-btn:hover { background: rgba(255,255,255,0.4); transform: scale(1.02); }
         @media (max-width: 680px) { .daily-card { padding: 16px; } .daily-card-content { gap: 12px; } .daily-icon { width: 48px; height: 48px; font-size: 20px; } .daily-name { font-size: 1rem; } .daily-desc { font-size: 0.7rem; } .daily-meta { gap: 8px; font-size: 0.6rem; } .daily-download-btn { padding: 8px 16px; font-size: 0.75rem; white-space: nowrap; } }
         @media (max-width: 520px) { .daily-card-content { flex-direction: column; align-items: stretch; text-align: center; } .daily-icon { margin: 0 auto; width: 56px; height: 56px; } .daily-info { text-align: center; } .daily-meta { justify-content: center; } .daily-download-btn { width: 100%; text-align: center; white-space: normal; padding: 10px 16px; margin-top: 4px; } }
-        
         .hot-section { margin-bottom: 18px; position: relative; overflow: hidden; }
         .hot-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         .hot-header h3 { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -102,7 +96,6 @@
         .hot-card .hot-name { font-weight: 600; font-size: var(--font-sm); }
         .hot-card .hot-meta { font-size: var(--font-xs); color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
         .hot-card .hot-downloads { color: var(--success); font-weight: 500; }
-        
         .category-row { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; position: relative; }
         .cat-chip { padding: 8px 18px; border-radius: var(--radius-full); font-size: var(--font-sm); font-weight: 500; cursor: pointer; background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); transition: var(--transition-fast); white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
         .cat-chip i { font-size: 0.8rem; }
@@ -113,11 +106,9 @@
         .cat-more-menu.show { display: grid; }
         .cat-more-menu .cat-chip-more { padding: 6px 12px; border-radius: 40px; background: var(--bg); border: 1px solid var(--border-light); cursor: pointer; text-align: center; font-size: 0.75rem; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
         .cat-more-menu .cat-chip-more:hover, .cat-more-menu .cat-chip-more.active { background: var(--primary); color: white; border-color: var(--primary); }
-        
         .grid { display: grid; grid-template-columns: 1fr; gap: 14px; max-width: 1400px; margin: 0 auto; }
         @media (min-width:560px) { .grid { grid-template-columns: repeat(2,1fr); } }
         @media (min-width:901px) { .grid { grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); } }
-        
         .software-card { border-radius: var(--radius-xl); padding: 18px 16px; cursor: pointer; background: var(--surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; will-change: transform; position: relative; overflow: hidden; }
         .software-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
         .favorite-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #ccc; transition: all 0.3s; z-index: 3; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -142,7 +133,6 @@
         .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 10px; margin-top: 4px; }
         .added-date { font-size: 0.6rem; color: var(--text-muted); }
         .download-count { font-size: 0.6rem; color: var(--success); margin-left: 4px; font-weight: 500; }
-        
         .sidebar-card { border-radius: var(--radius-xl); padding: 18px 16px; margin-bottom: 14px; background: var(--surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
         .sidebar-card h3 { font-size: var(--font-base); font-weight: 650; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
         .search-bar { background: var(--surface); border-radius: var(--radius-full); padding: 3px 3px 3px 14px; display: flex; align-items: center; border: 1px solid var(--border); }
@@ -195,8 +185,6 @@
         .level-rule-tip { font-size: 0.7rem; color: var(--text-muted); background: var(--bg); padding: 6px 10px; border-radius: 14px; margin-top: 6px; line-height: 1.4; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: space-between; }
         .contact-buy-btn { background: var(--warning); color: #fff; border: none; border-radius: 24px; padding: 5px 12px; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin-left: 8px; }
         .contact-buy-btn:hover { opacity: 0.9; transform: scale(1.02); }
-        
-        /* 个人中心增强样式 */
         .profile-modal-card { max-width: 520px; width: 92%; background: var(--surface); border-radius: 32px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; padding: 0; max-height: 85vh; margin: 0 auto; }
         .profile-modal-card::-webkit-scrollbar { display: none; }
         .profile-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 12px 20px; border-bottom: 1px solid var(--border-light); }
@@ -240,38 +228,25 @@
 </head>
 <body>
     <canvas id="particles-canvas"></canvas>
-    
     <div id="loadingOverlay" class="loading-overlay" style="display: none;">
         <canvas id="loadingParticleCanvas" class="loading-particle-canvas"></canvas>
-        <div class="loading-content">
-            <i class="fas fa-spinner"></i>
-            <span>✨ 精彩内容加载中...</span>
-        </div>
+        <div class="loading-content"><i class="fas fa-spinner"></i><span>✨ 精彩内容加载中...</span></div>
     </div>
-    
     <div class="app-wrapper" id="appWrapper">
         <div class="top-nav" id="topNav">
             <div class="nav-inner">
                 <div class="logo-area"><span class="logo">乐哲软件</span></div>
                 <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
                 <div class="nav-links" id="navLinks">
-                    <a href="https://www.lezhesoft.cn/">首页</a>
-                    <a href="https://www.lezhesoft.cn/service.html">服务项目</a>
-                    <a href="#" data-nav="download" class="active">软件下载</a>
-                    <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a>
+                    <a href="https://www.lezhesoft.cn/">首页</a><a href="https://www.lezhesoft.cn/service.html">服务项目</a>
+                    <a href="#" data-nav="download" class="active">软件下载</a><a href="https://www.lezhesoft.cn/copyright.html">版权声明</a>
                 </div>
                 <div class="user-area" id="userArea"></div>
                 <button class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></button>
             </div>
         </div>
         <div class="main"><div class="content-wrapper"><div class="main-content"><div class="carousel-container" id="categoryBannerContainer"><div class="carousel-slides" id="categoryBannerSlides"></div><div class="carousel-dots" id="categoryBannerDots"></div></div><div class="daily-section" id="dailySection" style="display: none;"><div class="daily-header"><h3><i class="fas fa-star" style="color: #f59e0b;"></i> 今日推荐</h3><span style="font-size: 0.7rem; color: var(--text-muted);">每日更新，精选好软</span></div><div class="daily-card" id="dailyCard"><div class="daily-card-content"><div class="daily-icon" id="dailyIcon"><i class="fas fa-gem"></i></div><div class="daily-info"><div class="daily-name" id="dailyName">加载中...</div><div class="daily-desc" id="dailyDesc"></div><div class="daily-meta"><span id="dailyVersion"></span><span id="dailyOs"></span><span id="dailyDownloads"><i class="fas fa-download"></i> 0</span></div></div><button class="daily-download-btn" id="dailyDownloadBtn"><i class="fas fa-download"></i> 立即下载</button></div></div></div>
-        <div class="hot-section">
-            <div class="hot-header">
-                <h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3>
-                <span style="font-size: 0.7rem; color: var(--text-muted);">本周热门下载</span>
-            </div>
-            <div class="hot-scroll" id="hotScroll"></div>
-        </div>
+        <div class="hot-section"><div class="hot-header"><h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3><span style="font-size: 0.7rem; color: var(--text-muted);">本周热门下载</span></div><div class="hot-scroll" id="hotScroll"></div></div>
         <div class="category-row" id="categoryTabs"></div>
         <div id="softwareGridContainer" class="grid"></div>
         <div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;">加载更多</button></div></div><div class="sidebar"><div class="sidebar-search"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="搜软件..." autocomplete="off"><button id="searchBtn"><i class="fas fa-arrow-right"></i></button></div></div><div class="carousel-container" id="adContainer"><div class="carousel-slides" id="sidebarCarouselSlides"></div><div class="carousel-dots" id="sidebarCarouselDots"></div></div><div class="sidebar-card"><div class="calendar-header"><span id="calendarMonthYear"></span><div class="calendar-nav"><button id="prevMonth"><i class="fas fa-chevron-left"></i></button><button id="nextMonth"><i class="fas fa-chevron-right"></i></button></div></div><div class="calendar-grid" id="calendarDays"></div><div style="text-align:center; margin-top:10px;"><button id="dailyCheckinBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:8px 16px; font-size:0.75rem; cursor:pointer;">📅 每日签到 (+1次+2积分)</button></div></div><div class="feedback-section"><div style="font-weight:650;font-size:var(--font-base);margin-bottom:10px;"><i class="fas fa-comment-dots"></i> 用户留言</div><input type="text" id="feedbackName" class="feedback-input" placeholder="昵称 (选填)"><textarea id="feedbackMessage" class="feedback-textarea" rows="2" placeholder="分享你想要的软件..."></textarea><button id="submitFeedbackBtn" class="feedback-submit-btn"><i class="fas fa-paper-plane"></i> 提交</button><div id="feedbackListContainer" style="margin-top:12px;font-size:var(--font-xs);"></div></div><div class="sidebar-card"><h3><i class="fas fa-newspaper"></i> 最新文章 <button id="manageArticlesBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:5px 12px; font-size:0.65rem; cursor:pointer; display:none;">管理</button></h3><div id="articlesList"></div></div><div class="sidebar-card"><h3><i class="fas fa-chart-line"></i> 下载排行榜</h3><div id="rankList"></div></div><div class="sidebar-card"><h3><i class="fas fa-history"></i> 最近浏览</h3><div id="historyList"></div><div class="clear-history" style="margin-top:8px; text-align:right;"><button id="clearHistoryBtn" style="background:none; border:1px solid var(--border); padding:4px 12px; border-radius:20px; font-size:0.65rem; cursor:pointer;">清空历史</button></div></div></div></div><div class="friend-links-wrapper"><div class="friend-links-title">友情链接</div><div class="friend-links-row"><a href="https://foxirj.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 佛系软件</a><a href="https://www.ruancang.net/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 软仓</a><a href="https://www.macwk.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> MacWK</a><a href="https://www.ifmac.cn/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> ifMac</a><a href="https://www.macku.pro/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 迈克库软件</a></div></div><footer style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.7rem;">版权所有 © 乐哲软件 | www.lezhesoft.cn | 个人技术分享</footer></div></div>
@@ -303,10 +278,6 @@
                     <div class="profile-info-item">
                         <span class="profile-info-label"><i class="fas fa-crown"></i> 会员等级</span>
                         <span class="profile-info-value"><span id="profileRole"></span> <span id="profileLevelTag"></span></span>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-info-label"><i class="fas fa-calendar-alt"></i> 注册天数</span>
-                        <span class="profile-info-value" id="profileCreatedDays">0 天</span>
                     </div>
                     <div class="profile-info-item">
                         <span class="profile-info-label"><i class="fas fa-cloud-download-alt"></i> 累计下载</span>
@@ -418,8 +389,12 @@
         const CONFIG = { AIRTABLE_TOKEN: 'pat9BdIPuJKKqjBps.e414a0e6b637a6b9bd7bcbfc06c847b5b03853657bef403f11ca83086a68e257', AIRTABLE_BASE_ID: 'appM4Ty76lOlslpU9', EMAILJS_SERVICE_ID: 'service_0jwzfc8', EMAILJS_TEMPLATE_RESET: 'template_xcv0pdc' };
         const isLocalFile = window.location.protocol === 'file:';
         function randomDownloads() { return Math.floor(Math.random() * 9000) + 1000; }
-        let softwares = [{id:'1', name:'Cinema 4D 2025', category:'3D建模', version:'2025', description:'三维建模动画神器，支持GPU渲染', os:['Windows','Mac'], downloads:randomDownloads(), addedDate:'2026-05-15', icon:'', url:'#'},{id:'2', name:'Adobe Photoshop 2026', category:'图像处理', version:'2026', description:'专业图像处理软件，AI智能修图', os:['Windows','Mac'], downloads:randomDownloads(), addedDate:'2026-05-20', icon:'', url:'#'},{id:'3', name:'SketchUp Pro 2025', category:'3D建模', version:'2025', description:'草图大师，3D建模快速上手', os:['Windows','Mac'], downloads:randomDownloads(), addedDate:'2026-05-10', icon:'', url:'#'},{id:'4', name:'Rhino 8', category:'3D建模', version:'8.0', description:'工业设计建模，曲面建模利器', os:['Windows','Mac'], downloads:randomDownloads(), addedDate:'2026-05-05', icon:'', url:'#'},{id:'5', name:'AutoCAD 2026', category:'工程设计', version:'2026', description:'专业CAD设计软件', os:['Windows'], downloads:randomDownloads(), addedDate:'2026-04-28', icon:'', url:'#'}];
-        let bannerAds = [], sidebarAds = [], articles = [], announcements = [];
+        const storedSoftwares = JSON.parse(localStorage.getItem('cached_softwares') || 'null');
+        let softwares = storedSoftwares || [{id:'1', name:'Cinema 4D 2025', category:'3D建模', version:'2025', description:'三维建模动画神器，支持GPU渲染', os:['Windows','Mac'], downloads:randomDownloads(), addedDate:'2026-05-15', icon:'', url:'#'},{id:'2', name:'Adobe Photoshop 2026', category:'图像处理', version:'2026', description:'专业图像处理软件，AI智能修图', os:['Windows','Mac'], downloads:randomDownloads(), addedDate:'2026-05-20', icon:'', url:'#'},{id:'3', name:'SketchUp Pro 2025', category:'3D建模', version:'2025', description:'草图大师，3D建模快速上手', os:['Windows','Mac'], downloads:randomDownloads(), addedDate:'2026-05-10', icon:'', url:'#'},{id:'4', name:'Rhino 8', category:'3D建模', version:'8.0', description:'工业设计建模，曲面建模利器', os:['Windows','Mac'], downloads:randomDownloads(), addedDate:'2026-05-05', icon:'', url:'#'},{id:'5', name:'AutoCAD 2026', category:'工程设计', version:'2026', description:'专业CAD设计软件', os:['Windows'], downloads:randomDownloads(), addedDate:'2026-04-28', icon:'', url:'#'}];
+        let bannerAds = JSON.parse(localStorage.getItem('cached_ads') || '[]');
+        let sidebarAds = [];
+        let articles = JSON.parse(localStorage.getItem('cached_articles') || '[]');
+        let announcements = [];
         let currentUser = null, currentCategory = "all", searchKeyword = "", showAll = false;
         let currentCaptcha = { question: '', answer: 0 };
         let editingArticleId = null, resetCode = '', resetEmail = '', resetCodeExpire = 0;
@@ -430,14 +405,12 @@
         function esc(s){ return String(s||'').replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
         async function airReq(method, path, body=null, retries=2){ if(isLocalFile)throw new Error('本地模式'); const url=`https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`; const headers={'Authorization':`Bearer ${CONFIG.AIRTABLE_TOKEN}`,'Content-Type':'application/json'}; const opts={method,headers}; if(body)opts.body=JSON.stringify(body); for(let i=0;i<=retries;i++){ try{ const r=await fetch(url,opts); if(!r.ok)throw new Error(`HTTP ${r.status}`); return await r.json(); }catch(e){ if(i===retries)throw e; await new Promise(r=>setTimeout(r,600*(i+2))); } } }
         function getFieldValue(fields, possibleNames, defaultValue=''){ for(let name of possibleNames){ if(fields[name]!==undefined)return fields[name]; for(let key in fields){ if(key.toLowerCase()===name.toLowerCase())return fields[key]; } } return defaultValue; }
-        async function fetchSoftwares(){ if(isLocalFile) return softwares; try{ const data=await airReq('GET','softwares?maxRecords=100'); return data.records.map(rec=>({id:rec.id,name:getFieldValue(rec.fields,['Name','name'],'未命名'),category:getFieldValue(rec.fields,['Category','category'],'other'),version:getFieldValue(rec.fields,['Version','version'],''),description:getFieldValue(rec.fields,['Description','description'],''),icon:getFieldValue(rec.fields,['Icon','icon'],''),url:getFieldValue(rec.fields,['URL','url'],'#'),addedDate:getFieldValue(rec.fields,['AddedDate','addedDate'],new Date().toISOString().split('T')[0]),downloads:randomDownloads(),os:(()=>{ const v=getFieldValue(rec.fields,['OS','os'],[]); if(Array.isArray(v)) return v; if(typeof v==='string') return v.split(',').map(s=>s.trim()).filter(s=>s); return ['Windows','Mac']; })()})); }catch(e){ return softwares; } }
-        async function fetchArticles(){ if(isLocalFile)return[]; try{ const data=await airReq('GET','Articles?maxRecords=100'); return data.records.map(rec=>({id:rec.id,title:rec.fields.Title||'',cover:rec.fields.Cover||'',excerpt:rec.fields.Excerpt||'',content:rec.fields.Content||'',tags:rec.fields.Tags||'',createdAt:rec.fields.CreatedAt||new Date().toISOString()})); }catch(e){ return[]; } }
-        async function fetchAds(){ if(isLocalFile)return[{image:"https://picsum.photos/800/400?random=1",link:"#",title:"广告",position:"banner",enabled:true}]; try{ const data=await airReq('GET','Ads?maxRecords=50'); return data.records.map(r=>{const f=r.fields; let img=getFieldValue(f,['Image','image'],''); if(Array.isArray(img)&&img[0]&&img[0].url)img=img[0].url; return{image:img,link:getFieldValue(f,['Link','link'],'#'),title:getFieldValue(f,['Title','title'],''),position:getFieldValue(f,['Position','position'],'sidebar').toLowerCase(),enabled:getFieldValue(f,['Enabled','enabled'],true)!==false};}).filter(a=>a.enabled&&a.image); }catch(e){ return[]; } }
+        async function fetchSoftwares(){ try{ const data=await airReq('GET','softwares?maxRecords=100'); const fetched = data.records.map(rec=>({id:rec.id,name:getFieldValue(rec.fields,['Name','name'],'未命名'),category:getFieldValue(rec.fields,['Category','category'],'other'),version:getFieldValue(rec.fields,['Version','version'],''),description:getFieldValue(rec.fields,['Description','description'],''),icon:getFieldValue(rec.fields,['Icon','icon'],''),url:getFieldValue(rec.fields,['URL','url'],'#'),addedDate:getFieldValue(rec.fields,['AddedDate','addedDate'],new Date().toISOString().split('T')[0]),downloads:randomDownloads(),os:(()=>{ const v=getFieldValue(rec.fields,['OS','os'],[]); if(Array.isArray(v)) return v; if(typeof v==='string') return v.split(',').map(s=>s.trim()).filter(s=>s); return ['Windows','Mac']; })()})); if(fetched.length) { softwares = fetched; localStorage.setItem('cached_softwares', JSON.stringify(softwares)); } }catch(e){} return softwares; }
+        async function fetchArticles(){ try{ const data=await airReq('GET','Articles?maxRecords=100'); const fetched = data.records.map(rec=>({id:rec.id,title:rec.fields.Title||'',cover:rec.fields.Cover||'',excerpt:rec.fields.Excerpt||'',content:rec.fields.Content||'',tags:rec.fields.Tags||'',createdAt:rec.fields.CreatedAt||new Date().toISOString()})); if(fetched.length) { articles = fetched; localStorage.setItem('cached_articles', JSON.stringify(articles)); } }catch(e){} return articles; }
+        async function fetchAds(){ try{ const data=await airReq('GET','Ads?maxRecords=50'); const fetched = data.records.map(r=>{const f=r.fields; let img=getFieldValue(f,['Image','image'],''); if(Array.isArray(img)&&img[0]&&img[0].url)img=img[0].url; return{image:img,link:getFieldValue(f,['Link','link'],'#'),title:getFieldValue(f,['Title','title'],''),position:getFieldValue(f,['Position','position'],'sidebar').toLowerCase(),enabled:getFieldValue(f,['Enabled','enabled'],true)!==false};}).filter(a=>a.enabled&&a.image); if(fetched.length) { bannerAds = fetched.filter(a=>a.position==='banner'); sidebarAds = fetched.filter(a=>a.position==='sidebar'); localStorage.setItem('cached_ads', JSON.stringify(bannerAds.concat(sidebarAds))); } }catch(e){} return { bannerAds, sidebarAds }; }
         function renderCarousel(slidesEl, dotsEl, ads) { if (!ads.length) return; slidesEl.innerHTML = ads.map((ad, idx) => `<div class="carousel-slide"><a href="${esc(ad.link)}" target="_blank" style="display:block;width:100%;height:100%;"><img src="${esc(ad.image)}" loading="lazy" alt="${esc(ad.title)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.querySelector('.loading-placeholder').style.display='flex';"><div class="loading-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8ecf3,#d1d5db);"><i class="fas fa-image"></i> 加载中...</div></a></div>`).join(''); if (ads.length <= 1) { dotsEl.style.display = 'none'; return; } dotsEl.style.display = 'flex'; dotsEl.innerHTML = ads.map((_, i) => `<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join(''); let cur = 0; const upd = (idx) => { cur = idx; slidesEl.style.transform = `translateX(-${idx*100}%)`; dotsEl.querySelectorAll('.carousel-dot').forEach((d,i)=>d.classList.toggle('active',i===idx)); }; dotsEl.querySelectorAll('.carousel-dot').forEach(d => d.addEventListener('click', () => upd(parseInt(d.dataset.index)))); let interval = setInterval(() => { upd((cur+1)%ads.length); }, 4000); const container = slidesEl.closest('.carousel-container'); container.addEventListener('mouseenter', () => clearInterval(interval)); container.addEventListener('mouseleave', () => { interval = setInterval(() => upd((cur+1)%ads.length), 4000); }); return upd; }
         async function findUserByEmail(email){ if(isLocalFile){ const users=JSON.parse(localStorage.getItem('lezhe_users')||'[]'); return users.find(u=>u.email===email)||null; } try{ const data=await airReq('GET',`Users?filterByFormula={Email}="${encodeURIComponent(email)}"`); return data.records.length?data.records[0]:null; }catch(e){ return null; } }
-        async function registerUser(email,password,username,inviteCode=''){ 
-            const avatar = '', signature = '';
-            if(isLocalFile){ if(await findUserByEmail(email))throw new Error('邮箱已注册'); const users=JSON.parse(localStorage.getItem('lezhe_users')||'[]'); const hash=CryptoJS.SHA256(password).toString(); const userCode=Math.random().toString(36).substring(2,10).toUpperCase(); const newUser={email,password:hash,username,role:email==='admin@lezhe.com'?'admin':'user', inviteCode:userCode, points:0, createdAt:new Date().toISOString(), avatar, signature, totalDownloads:0}; if(inviteCode){ const inviter=users.find(u=>u.inviteCode===inviteCode); if(inviter){ inviter.points=(inviter.points||0)+10; await addDownloadBonus(inviter.email,5); showToast('邀请成功！双方各获得5次下载+10积分','success'); } } users.push(newUser); localStorage.setItem('lezhe_users',JSON.stringify(users)); return; } const hash=CryptoJS.SHA256(password).toString(); const userCode=Math.random().toString(36).substring(2,10).toUpperCase(); await airReq('POST','Users',{fields:{Email:email,Password:hash,Username:username,Role:email==='admin@lezhe.com'?'admin':'user',InviteCode:userCode,Points:0,Avatar:avatar,Signature:signature,TotalDownloads:0}}); if(inviteCode){ const inviter=await findUserByInviteCode(inviteCode); if(inviter)await addDownloadBonus(inviter.fields.Email,5); } }
+        async function registerUser(email,password,username,inviteCode=''){ const avatar = '', signature = ''; if(isLocalFile){ if(await findUserByEmail(email))throw new Error('邮箱已注册'); const users=JSON.parse(localStorage.getItem('lezhe_users')||'[]'); const hash=CryptoJS.SHA256(password).toString(); const userCode=Math.random().toString(36).substring(2,10).toUpperCase(); const newUser={email,password:hash,username,role:email==='admin@lezhe.com'?'admin':'user', inviteCode:userCode, points:0, createdAt:new Date().toISOString(), avatar, signature, totalDownloads:0}; if(inviteCode){ const inviter=users.find(u=>u.inviteCode===inviteCode); if(inviter){ inviter.points=(inviter.points||0)+10; await addDownloadBonus(inviter.email,5); showToast('邀请成功！双方各获得5次下载+10积分','success'); } } users.push(newUser); localStorage.setItem('lezhe_users',JSON.stringify(users)); return; } const hash=CryptoJS.SHA256(password).toString(); const userCode=Math.random().toString(36).substring(2,10).toUpperCase(); await airReq('POST','Users',{fields:{Email:email,Password:hash,Username:username,Role:email==='admin@lezhe.com'?'admin':'user',InviteCode:userCode,Points:0,Avatar:avatar,Signature:signature,TotalDownloads:0}}); if(inviteCode){ const inviter=await findUserByInviteCode(inviteCode); if(inviter)await addDownloadBonus(inviter.fields.Email,5); } }
         async function findUserByInviteCode(code){ if(isLocalFile){ const users=JSON.parse(localStorage.getItem('lezhe_users')||'[]'); return users.find(u=>u.inviteCode===code)||null; } const data=await airReq('GET',`Users?filterByFormula={InviteCode}="${encodeURIComponent(code)}"`); return data.records.length?data.records[0]:null; }
         async function loginUser(email,password){ if(isLocalFile){ const users=JSON.parse(localStorage.getItem('lezhe_users')||'[]'); const user=users.find(u=>u.email===email); if(!user)throw new Error('邮箱未注册'); if(user.password!==CryptoJS.SHA256(password).toString())throw new Error('密码错误'); return{id:user.email,email:user.email,username:user.username,role:user.role||'user',inviteCode:user.inviteCode,points:user.points||0,createdAt:user.createdAt,avatar:user.avatar||'',signature:user.signature||'',totalDownloads:user.totalDownloads||0}; } const rec=await findUserByEmail(email); if(!rec)throw new Error('邮箱未注册'); if(rec.fields.Password!==CryptoJS.SHA256(password).toString())throw new Error('密码错误'); return{id:rec.id,email:rec.fields.Email,username:rec.fields.Username||email.split('@')[0],role:rec.fields.Role||'user',inviteCode:rec.fields.InviteCode||'',points:rec.fields.Points||0,createdAt:rec.createdTime,avatar:rec.fields.Avatar||'',signature:rec.fields.Signature||'',totalDownloads:rec.fields.TotalDownloads||0}; }
         async function updatePassword(email,newPass){ if(isLocalFile){ const users=JSON.parse(localStorage.getItem('lezhe_users')||'[]'); const user=users.find(u=>u.email===email); if(user)user.password=CryptoJS.SHA256(newPass).toString(); localStorage.setItem('lezhe_users',JSON.stringify(users)); return; } const rec=await findUserByEmail(email); await airReq('PATCH',`Users/${rec.id}`,{fields:{Password:CryptoJS.SHA256(newPass).toString()}}); }
@@ -478,91 +451,35 @@
         function sendMessageToSelectedUsers(emails, title, content) { emails.forEach(email => sendMessageToUser(email, title, content)); showToast(`已发送给 ${emails.length} 位用户`, 'success'); }
         function renderUserMessages(){ const msgs=JSON.parse(localStorage.getItem(`messages_${currentUser?.email}`)||'[]'); const container=document.getElementById('messageList'); if(!container)return; if(!msgs.length){container.innerHTML='<div style="padding:20px;text-align:center;">暂无站内信</div>';return;} container.innerHTML=msgs.map((m,idx)=>`<div style="padding:12px;border-bottom:1px solid var(--border-light);${m.read?'opacity:0.7;':'font-weight:600;'}" data-idx="${idx}"><div style="display:flex;justify-content:space-between;"><span>${esc(m.title)}</span><span style="font-size:0.6rem;color:var(--text-muted);">${new Date(m.time).toLocaleString()}</span></div><div style="font-size:0.8rem;margin-top:4px;">${esc(m.content)}</div></div>`).join(''); const unread=msgs.filter(m=>!m.read).length; const unreadSpan=document.getElementById('unreadCount'); if(unreadSpan){unreadSpan.innerText=unread;unreadSpan.style.display=unread?'inline-block':'none';} container.querySelectorAll('[data-idx]').forEach(el=>{el.addEventListener('click',()=>{const idx=parseInt(el.dataset.idx); if(!msgs[idx].read){msgs[idx].read=true;localStorage.setItem(`messages_${currentUser.email}`,JSON.stringify(msgs));renderUserMessages();}});}); }
         async function loadUserCheckboxList() { const container = document.getElementById('userCheckboxList'); if (!container) return; try { const users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]') : await (async () => { const data = await airReq('GET', 'Users?maxRecords=100'); return data.records.map(r => ({ id: r.id, email: r.fields.Email, username: r.fields.Username || r.fields.Email.split('@')[0], role: r.fields.Role || 'user' })); })(); allUsersList = users; container.innerHTML = users.map(u => `<div class="user-checkbox-item"><input type="checkbox" value="${esc(u.email)}" id="user_${u.id}"><label for="user_${u.id}">${esc(u.email)} (${u.role || '普通'})</label></div>`).join(''); } catch(e) { container.innerHTML = '<div style="padding:20px;text-align:center;">加载用户列表失败</div>'; } }
-        
-        function saveAvatar() {
-            if (!currentUser) return;
-            const url = document.getElementById('avatarUrlInput').value.trim();
-            currentUser.avatar = url;
-            localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-            updateAvatarDisplay();
-            showToast('头像更新成功', 'success');
-        }
-        function saveSignature() {
-            if (!currentUser) return;
-            const sig = document.getElementById('profileSignature').value;
-            currentUser.signature = sig;
-            localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-        }
-        function updateAvatarDisplay() {
-            const avatarLetterEl = document.getElementById('profileAvatarLetter');
-            const avatarDisplay = document.getElementById('profileAvatarDisplay');
-            const avatarUrl = currentUser?.avatar || '';
-            if (avatarUrl) {
-                if (avatarLetterEl) avatarLetterEl.style.display = 'none';
-                avatarDisplay.innerHTML = `<img src="${esc(avatarUrl)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span id="profileAvatarLetter" style="display:none;">${currentUser?.username?.charAt(0).toUpperCase()||'U'}</span><div class="avatar-overlay"><i class="fas fa-camera"></i></div>`;
-            } else {
-                if (avatarLetterEl) avatarLetterEl.style.display = 'flex';
-                avatarDisplay.innerHTML = `<span id="profileAvatarLetter" style="display:flex;">${currentUser?.username?.charAt(0).toUpperCase()||'U'}</span><div class="avatar-overlay"><i class="fas fa-camera"></i></div>`;
-            }
-        }
-        function updateProfileProgress() {
-            if (!currentUser) return;
-            const pts = currentUser.points || 0;
-            const lvl = getUserLevel(pts);
-            const nextLvl = getNextLevel(pts);
-            const pct = getLevelProgressPercent(pts);
-            const progressText = document.getElementById('profileProgressText');
-            if (progressText) progressText.innerText = pct + '%';
-            const fill = document.getElementById('profileProgressFill');
-            if (fill) fill.style.width = pct + '%';
-            const nextText = document.getElementById('profileNextLevelText');
-            if (nextText) {
-                if (nextLvl) nextText.innerText = `下一级 ${nextLvl.name} 还需 ${nextLvl.need} 积分`;
-                else nextText.innerText = '已达最高等级';
-            }
-            const createdAt = currentUser.createdAt;
-            if (createdAt) {
-                const days = Math.floor((Date.now() - new Date(createdAt).getTime()) / (1000*60*60*24));
-                document.getElementById('profileCreatedDays').innerText = days + ' 天';
-            }
-            document.getElementById('profileTotalDownloads').innerText = (currentUser.totalDownloads || 0) + ' 次';
-        }
-        function updateUserUI(){ 
-            const area=document.getElementById('userArea'); 
-            if(!area)return; 
-            if(currentUser){ 
-                const remaining=getRemainingCount(currentUser); 
-                const remainingText=(currentUser.role==='vip'||currentUser.role==='admin')?'∞':remaining; 
-                const level=getUserLevel(currentUser.points||0); 
-                area.innerHTML=`<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''}<span class="level-badge ${level.badge}">${level.name}</span><i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`; 
-                document.getElementById('userMenuBtn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); }); 
-                document.getElementById('logoutBtn').addEventListener('click',()=>{currentUser=null;localStorage.removeItem('lezhe_user');updateUserUI();showToast('已退出登录');renderCalendar();}); 
-                document.getElementById('profileBtn').addEventListener('click',()=>{
-                    document.getElementById('profileUsername').innerText=currentUser.username;
-                    document.getElementById('profileRole').innerHTML=(currentUser.role==='vip'||currentUser.role==='admin')?'VIP会员':'普通会员';
-                    document.getElementById('profileRemaining').innerText=(currentUser.role==='vip'||currentUser.role==='admin')?'∞':getRemainingCount(currentUser);
-                    document.getElementById('profilePoints').innerText=currentUser.points||0;
-                    const lvl=getUserLevel(currentUser.points||0);
-                    document.getElementById('profileLevelBadge').innerHTML=`<span class="level-badge ${lvl.badge}" style="margin-left:8px;">${lvl.name}</span>`;
-                    document.getElementById('myInviteCode').innerText=currentUser.inviteCode||'暂无';
-                    document.getElementById('avatarUrlInput').value = currentUser.avatar || '';
-                    document.getElementById('profileSignature').value = currentUser.signature || '';
-                    updateAvatarDisplay();
-                    updateProfileProgress();
-                    document.getElementById('profileModal').classList.add('active');
-                    renderUserMessages();
-                }); 
-                if(currentUser.role==='admin'){document.getElementById('adminBtn').addEventListener('click',()=>{document.getElementById('adminModal').classList.add('active');refreshUserList();});document.getElementById('manageArticlesBtn').style.display='block';} 
-            }else{ 
-                area.innerHTML='<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>'; 
-                document.getElementById('showAuthBtn').addEventListener('click',()=>openAuth('login')); 
-                document.getElementById('manageArticlesBtn').style.display='none'; 
-            } 
-        }
+        function saveAvatar() { if (!currentUser) return; const url = document.getElementById('avatarUrlInput').value.trim(); currentUser.avatar = url; localStorage.setItem('lezhe_user', JSON.stringify(currentUser)); updateAvatarDisplay(); showToast('头像更新成功', 'success'); }
+        function saveSignature() { if (!currentUser) return; const sig = document.getElementById('profileSignature').value; currentUser.signature = sig; localStorage.setItem('lezhe_user', JSON.stringify(currentUser)); }
+        function updateAvatarDisplay() { const avatarLetterEl = document.getElementById('profileAvatarLetter'); const avatarDisplay = document.getElementById('profileAvatarDisplay'); const avatarUrl = currentUser?.avatar || ''; if (avatarUrl) { if (avatarLetterEl) avatarLetterEl.style.display = 'none'; avatarDisplay.innerHTML = `<img src="${esc(avatarUrl)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span id="profileAvatarLetter" style="display:none;">${currentUser?.username?.charAt(0).toUpperCase()||'U'}</span><div class="avatar-overlay"><i class="fas fa-camera"></i></div>`; } else { if (avatarLetterEl) avatarLetterEl.style.display = 'flex'; avatarDisplay.innerHTML = `<span id="profileAvatarLetter" style="display:flex;">${currentUser?.username?.charAt(0).toUpperCase()||'U'}</span><div class="avatar-overlay"><i class="fas fa-camera"></i></div>`; } }
+        function updateProfileProgress() { if (!currentUser) return; const pts = currentUser.points || 0; const nextLvl = getNextLevel(pts); const pct = getLevelProgressPercent(pts); const progressText = document.getElementById('profileProgressText'); if (progressText) progressText.innerText = pct + '%'; const fill = document.getElementById('profileProgressFill'); if (fill) fill.style.width = pct + '%'; const nextText = document.getElementById('profileNextLevelText'); if (nextText) { if (nextLvl) nextText.innerText = `下一级 ${nextLvl.name} 还需 ${nextLvl.need} 积分`; else nextText.innerText = '已达最高等级'; } document.getElementById('profileTotalDownloads').innerText = (currentUser.totalDownloads || 0) + ' 次'; }
+        function updateUserUI(){ const area=document.getElementById('userArea'); if(!area)return; if(currentUser){ const remaining=getRemainingCount(currentUser); const remainingText=(currentUser.role==='vip'||currentUser.role==='admin')?'∞':remaining; const level=getUserLevel(currentUser.points||0); area.innerHTML=`<div style="position:relative;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ${esc(currentUser.username)} <span class="download-badge">${remainingText}</span> ${(currentUser.role==='vip'||currentUser.role==='admin')?'<span class="vip-badge">VIP</span>':''}<span class="level-badge ${level.badge}">${level.name}</span><i class="fas fa-chevron-down"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>${currentUser.role==='admin'?'<button id="adminBtn">管理后台</button>':''}<button id="logoutBtn">退出登录</button></div></div>`; document.getElementById('userMenuBtn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('userDropdown').classList.toggle('show'); }); document.getElementById('logoutBtn').addEventListener('click',()=>{currentUser=null;localStorage.removeItem('lezhe_user');updateUserUI();showToast('已退出登录');renderCalendar();}); document.getElementById('profileBtn').addEventListener('click',()=>{document.getElementById('profileUsername').innerText=currentUser.username;document.getElementById('profileRole').innerHTML=(currentUser.role==='vip'||currentUser.role==='admin')?'VIP会员':'普通会员';document.getElementById('profileRemaining').innerText=(currentUser.role==='vip'||currentUser.role==='admin')?'∞':getRemainingCount(currentUser);document.getElementById('profilePoints').innerText=currentUser.points||0;const lvl=getUserLevel(currentUser.points||0);document.getElementById('profileLevelBadge').innerHTML=`<span class="level-badge ${lvl.badge}" style="margin-left:8px;">${lvl.name}</span>`;document.getElementById('myInviteCode').innerText=currentUser.inviteCode||'暂无';document.getElementById('avatarUrlInput').value = currentUser.avatar || '';document.getElementById('profileSignature').value = currentUser.signature || '';updateAvatarDisplay();updateProfileProgress();document.getElementById('profileModal').classList.add('active');renderUserMessages();}); if(currentUser.role==='admin'){document.getElementById('adminBtn').addEventListener('click',()=>{document.getElementById('adminModal').classList.add('active');refreshUserList();});document.getElementById('manageArticlesBtn').style.display='block';} }else{ area.innerHTML='<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>'; document.getElementById('showAuthBtn').addEventListener('click',()=>openAuth('login')); document.getElementById('manageArticlesBtn').style.display='none'; } }
         async function refreshUserList(){ const container=document.getElementById('adminUserList'); container.innerHTML='<div style="text-align:center;padding:40px;">加载中...</div>'; try{ const users=isLocalFile?JSON.parse(localStorage.getItem('lezhe_users')||'[]').map(u=>({id:u.email,fields:u,createdTime:u.createdAt})):await (async()=>{const data=await airReq('GET','Users?maxRecords=100'); return data.records.map(r=>({id:r.id,fields:r.fields,createdTime:r.createdTime}));})(); const term=document.getElementById('adminSearchInput')?.value.toLowerCase()||''; const dateFilter=document.getElementById('adminDateFilter')?.value||''; let filtered=users.filter(u=>!term||(u.fields.Email||'').toLowerCase().includes(term)||(u.fields.Username||'').toLowerCase().includes(term)); if(dateFilter)filtered=filtered.filter(u=>{const regDate=u.createdTime||u.fields.CreatedAt; return regDate?new Date(regDate).toISOString().split('T')[0]===dateFilter:false;}); container.innerHTML=filtered.map(u=>{const role=u.fields.Role||'user'; const isVip=role==='vip'||role==='admin'; const avatarIcon=role==='admin'?'<i class="fas fa-crown"></i>':(isVip?'<i class="fas fa-gem"></i>':'<i class="fas fa-user"></i>'); return`<div class="admin-user-card"><div class="admin-user-info"><div class="admin-user-avatar">${avatarIcon}</div><div><div class="admin-user-email">${esc(u.fields.Email)}</div><div class="admin-user-name">${esc(u.fields.Username||'')}</div></div><div class="admin-user-role ${isVip?'vip':''}">${isVip?(role==='admin'?'管理员':'VIP'):'普通'}</div></div><div><button class="admin-action-btn upgrade-vip" data-id="${u.id}" data-role="${role}">${isVip&&role!=='admin'?'降级':'升级VIP'}</button><button class="admin-action-btn add-points" data-email="${u.fields.Email}" style="background:var(--success);">增加积分</button><button class="admin-action-btn reset-download" data-email="${u.fields.Email}" style="background:var(--warning);">重置次数</button></div></div>`;}).join(''); container.querySelectorAll('.upgrade-vip').forEach(btn=>{btn.addEventListener('click',async()=>{const userId=btn.dataset.id,currentRole=btn.dataset.role; if(currentRole==='admin'){showToast('管理员不可降级','error');return;} const newRole=currentRole==='vip'?'user':'vip'; await updateUserRole(userId,newRole); await refreshUserList(); if(currentUser&&currentUser.id===userId){currentUser.role=newRole;localStorage.setItem('lezhe_user',JSON.stringify(currentUser));updateUserUI();} showToast(`已${newRole==='vip'?'升级VIP':'降级'}`,`success`);});}); container.querySelectorAll('.add-points').forEach(btn=>{btn.addEventListener('click',async()=>{const email=btn.dataset.email; const points=prompt('请输入要增加/减少的积分（正数增加，负数减少）','10'); if(points!==null && !isNaN(parseInt(points))){ await addPoints(email, parseInt(points)); showToast(`已调整积分 ${parseInt(points)} 分`,'success'); await refreshUserList(); if(currentUser && currentUser.email===email){ currentUser.points = (currentUser.points||0) + parseInt(points); localStorage.setItem('lezhe_user',JSON.stringify(currentUser)); updateUserUI(); } }});}); container.querySelectorAll('.reset-download').forEach(btn=>{btn.addEventListener('click',()=>{const email=btn.dataset.email; saveUserDownloadData(email,0,0); showToast('已重置下载次数','success'); if(currentUser&&currentUser.email===email)updateUserUI();});}); }catch(e){container.innerHTML='<div style="text-align:center;padding:40px;">加载失败</div>';} }
         function openAuth(tab='login'){ const modal=document.getElementById('authModal'); document.getElementById('loginForm').style.display=tab==='login'?'block':'none'; document.getElementById('registerForm').style.display=tab==='register'?'block':'none'; document.getElementById('forgotForm').style.display=tab==='forgot'?'block':'none'; document.getElementById('authModalTitle').innerText=tab==='register'?'注册':(tab==='forgot'?'找回密码':'登录'); modal.classList.add('active'); if(tab==='login')refreshCaptcha('login'); else if(tab==='register')refreshCaptcha('reg'); else refreshCaptcha('forgot'); }
         function refreshCaptcha(type){ let q=Math.floor(Math.random()*10)+1, b=Math.floor(Math.random()*10)+1, op=Math.random()>0.5?'+':'-', ans=op==='+'?q+b:q-b; if(ans<0)return refreshCaptcha(type); currentCaptcha={question:`${q} ${op} ${b} = ?`,answer:ans}; document.getElementById(`${type}CaptchaQuestion`).innerText=currentCaptcha.question; document.getElementById(`${type}CaptchaInput`).value=''; }
-        async function loadAll(){ document.getElementById('appWrapper').classList.add('loaded'); softwares=await fetchSoftwares(); const adData=await fetchAds(); bannerAds=adData.filter(a=>a.position==='banner'); sidebarAds=adData.filter(a=>a.position==='sidebar'); if(bannerAds.length) renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds); if(sidebarAds.length) renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds); articles=await fetchArticles(); announcements=isLocalFile?[{id:'1',title:'欢迎使用乐哲软件',content:'感谢大家的支持！更多优质软件持续更新中',createdAt:new Date().toISOString()}]:[]; renderCats(); renderGrid(); renderHot(); renderRank(); renderArtsList(); renderHistory(); renderCalendar(); showAnnouncementBar(); setDailyRecommend(); hideLoadingOverlay(); }
+        async function loadAll(){ 
+            document.getElementById('appWrapper').classList.add('loaded');
+            softwares=await fetchSoftwares(); 
+            const adResult = await fetchAds(); 
+            if(adResult.bannerAds) bannerAds = adResult.bannerAds;
+            if(adResult.sidebarAds) sidebarAds = adResult.sidebarAds;
+            if(bannerAds.length) renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds); 
+            if(sidebarAds.length) renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds); 
+            articles=await fetchArticles(); 
+            announcements=isLocalFile?[{id:'1',title:'欢迎使用乐哲软件',content:'感谢大家的支持！更多优质软件持续更新中',createdAt:new Date().toISOString()}]:[]; 
+            renderCats(); 
+            renderGrid(); 
+            renderHot(); 
+            renderRank(); 
+            renderArtsList(); 
+            renderHistory(); 
+            renderCalendar(); 
+            showAnnouncementBar(); 
+            setDailyRecommend(); 
+            hideLoadingOverlay();
+        }
         function hideLoadingOverlay() { const overlay = document.getElementById('loadingOverlay'); if (overlay && overlay.style.display !== 'none') { requestAnimationFrame(() => { overlay.classList.add('hide'); setTimeout(() => { overlay.style.display = 'none'; }, 200); }); } }
         function renderCats() { const cats = [...new Set(softwares.map(s => s.category))]; const container = document.getElementById('categoryTabs'); if (!container) return; const isMobile = window.innerWidth <= 768; const visibleLimit = isMobile ? 4 : 5; const hasMore = cats.length > visibleLimit; let html = `<button class="cat-chip ${currentCategory === 'all' ? 'active' : ''}" data-cat="all"><i class="fas fa-th-large"></i> 全部</button>`; const visibleCats = cats.slice(0, visibleLimit); for (let cat of visibleCats) { const icon = cat === '3D建模' ? 'fa-cube' : (cat === '图像处理' ? 'fa-palette' : (cat === '视频剪辑' ? 'fa-video' : (cat === '工程设计' ? 'fa-drafting-compass' : 'fa-tag'))); html += `<button class="cat-chip ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}"><i class="fas ${icon}"></i> ${cat}</button>`; } if (hasMore) { html += `<button class="more-cats-btn" id="moreCatsBtn"><i class="fas fa-chevron-down"></i> 更多分类</button>`; container.innerHTML = html; let menu = document.querySelector('.cat-more-menu'); if (!menu) { menu = document.createElement('div'); menu.className = 'cat-more-menu'; container.appendChild(menu); } const moreBtn = document.getElementById('moreCatsBtn'); const hiddenCats = cats.slice(visibleLimit); menu.innerHTML = hiddenCats.map(cat => { const icon = cat === '3D建模' ? 'fa-cube' : (cat === '图像处理' ? 'fa-palette' : (cat === '视频剪辑' ? 'fa-video' : (cat === '工程设计' ? 'fa-drafting-compass' : 'fa-tag'))); return `<div class="cat-chip-more ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}"><i class="fas ${icon}"></i> ${cat}</div>`; }).join(''); menu.querySelectorAll('.cat-chip-more').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); currentCategory = el.dataset.cat; showAll = false; renderCats(); renderGrid(); menu.classList.remove('show'); }); }); moreBtn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); }); document.addEventListener('click', (e) => { if (menu && !menu.contains(e.target) && e.target !== moreBtn) menu.classList.remove('show'); }); } else { container.innerHTML = html; const oldMenu = container.querySelector('.cat-more-menu'); if (oldMenu) oldMenu.remove(); } container.querySelectorAll('.cat-chip').forEach(btn => { btn.addEventListener('click', () => { currentCategory = btn.dataset.cat; showAll = false; renderCats(); renderGrid(); }); }); }
         window._loadMore=()=>{showAll=true;renderGrid();}; document.getElementById('loadMoreBtn')&&document.getElementById('loadMoreBtn').addEventListener('click',window._loadMore);
