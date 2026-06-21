@@ -493,7 +493,6 @@
             background: rgba(239, 68, 68, 0.25);
         }
 
-        /* 开关 */
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -641,7 +640,7 @@
                 <h2 style="margin-bottom:24px; color: var(--primary);">📊 系统概览</h2>
                 <div class="stats-grid" id="dashboardStats"></div>
                 <h3 style="margin-top:24px; color: var(--text-secondary);">🆕 最近注册用户</h3>
-                <table class="table"><thead><tr><th>邮箱</th><th>用户名</th><th>注册时间</th></tr></thead><tbody id="recentUsersTbody"></tbody></table>
+                <table class="table"><thead><tr><th>邮箱</th><th>用户名</th><th>下载次数</th><th>注册时间</th></tr></thead><tbody id="recentUsersTbody"></tbody></table>
             </div>
 
             <div id="softwaresPanel" class="panel" style="display:none;">
@@ -694,6 +693,7 @@
                     <div class="form-group"><label>用户名</label><input type="text" id="newUsername"></div>
                     <div class="form-group"><label>密码</label><input type="password" id="newUserPassword"></div>
                     <div class="form-group"><label>角色</label><select id="newUserRole"><option value="user">普通</option><option value="vip">VIP</option><option value="admin">管理员</option></select></div>
+                    <div class="form-group"><label>下载次数</label><input type="number" id="newUserDownloads" value="0" min="0"></div>
                 </div>
                 <button class="btn-primary" id="addUserBtn" style="margin-top:16px;">添加用户</button>
                 <div class="software-toolbar" style="margin-top:24px;">
@@ -703,7 +703,7 @@
                     </div>
                 </div>
                 <table class="table">
-                    <thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>注册时间</th><th>操作</th></tr></thead>
+                    <thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>下载次数</th><th>注册时间</th><th>操作</th></tr></thead>
                     <tbody id="usersTbody"></tbody>
                 </table>
             </div>
@@ -734,6 +734,10 @@
                     <option value="vip">VIP</option>
                     <option value="admin">管理员</option>
                 </select>
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+                <label>下载次数</label>
+                <input type="number" id="editUserDownloads" value="0" min="0">
             </div>
             <div class="form-group" style="margin-bottom:20px;">
                 <label>新密码 (留空不修改)</label>
@@ -875,7 +879,7 @@
                 `).join('');
             }
             window.deleteCategory = async function(name) {
-                if (!confirm(`确定删除分类“${name}”？`)) return;
+                if (!confirm(`确定删除分类"${name}"？`)) return;
                 try {
                     const data = await airtableRequest('GET', `Categories?filterByFormula={Name}="${name}"`);
                     if (data.records.length) await airtableRequest('DELETE', `Categories/${data.records[0].id}`);
@@ -962,7 +966,6 @@
                 document.getElementById('osAndroid').checked = (sw.os || '').includes('安卓');
                 document.getElementById('osiOS').checked = (sw.os || '').includes('iOS');
                 document.getElementById('swURL').value = sw.url || '';
-                document.getElementById('swDescription').value = sw.description || '';
                 document.getElementById('swAddedDate').value = sw.addedDate || new Date().toISOString().slice(0,10);
                 document.getElementById('swNoVerify').checked = !!sw.noVerify;
                 document.getElementById('swIconCustom').value = typeof sw.icon === 'string' ? sw.icon : '';
@@ -987,7 +990,6 @@
                     version: document.getElementById('swVersion').value.trim(),
                     os: osArr.join(', '),
                     url: document.getElementById('swURL').value.trim(),
-                    description: document.getElementById('swDescription').value.trim(),
                     icon: document.getElementById('swIconCustom').value.trim() || document.getElementById('swIcon').value,
                     addedDate: document.getElementById('swAddedDate').value,
                     noVerify: document.getElementById('swNoVerify').checked
@@ -995,15 +997,21 @@
                 if (!fields.name || !fields.url) return showToast('名称和链接必填', true);
                 const id = document.getElementById('editingId').value;
                 try {
-                    if (id) await airtableRequest('PATCH', `softwares/${id}`, { fields });
-                    else await airtableRequest('POST', 'softwares', { fields });
+                    if (id) {
+                        await airtableRequest('PATCH', `softwares/${id}`, { fields });
+                    } else {
+                        await airtableRequest('POST', 'softwares', { fields });
+                    }
                     showToast('保存成功');
                     document.getElementById('cancelEditBtn').click();
                     loadSoftwares();
-                } catch (e) { showToast('保存失败', true); }
+                } catch (e) {
+                    console.error(e);
+                    showToast('保存失败: ' + e.message, true);
+                }
             });
             document.getElementById('cancelEditBtn').addEventListener('click', () => {
-                ['swName','swVersion','swURL','swDescription','swIconCustom'].forEach(id => document.getElementById(id).value = '');
+                ['swName','swVersion','swURL','swIconCustom'].forEach(id => document.getElementById(id).value = '');
                 document.getElementById('editingId').value = '';
                 document.getElementById('swAddedDate').value = new Date().toISOString().slice(0,10);
                 refreshIconPreview();
@@ -1090,7 +1098,7 @@
                         createdTime: r.createdTime
                     }));
                     renderUsersTable();
-                } catch (e) { document.getElementById('usersTbody').innerHTML = '<tr><td colspan="5">加载失败</td></tr>'; }
+                } catch (e) { document.getElementById('usersTbody').innerHTML = '<tr><td colspan="6">加载失败</td></tr>'; }
             }
 
             function renderUsersTable() {
@@ -1105,17 +1113,19 @@
                 const tbody = document.getElementById('usersTbody');
                 tbody.innerHTML = filtered.map(u => {
                     const createdDate = u.createdTime ? new Date(u.createdTime).toLocaleString('zh-CN') : '未知';
+                    const downloads = u.Downloads !== undefined && u.Downloads !== null ? u.Downloads : 0;
                     return `<tr>
                         <td>${u.Email||''}</td>
                         <td>${u.Username||''}</td>
                         <td>${u.Role||'user'}</td>
+                        <td><span style="font-weight:600; color:var(--primary);">${downloads}</span></td>
                         <td>${createdDate}</td>
                         <td>
                             <button class="btn-edit-advanced" onclick="openUserEditModal('${u.id}')"><i class="fas fa-edit"></i> 编辑</button>
                             <button class="btn-delete-advanced" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>`;
-                }).join('') || '<tr><td colspan="5" style="text-align:center;">暂无用户</td></tr>';
+                }).join('') || '<tr><td colspan="6" style="text-align:center;">暂无用户</td></tr>';
             }
             window.deleteUser = async (id) => {
                 if (confirm('删除用户？')) {
@@ -1129,6 +1139,7 @@
                 document.getElementById('editUserEmail').value = user.Email || '';
                 document.getElementById('editUserUsername').value = user.Username || '';
                 document.getElementById('editUserRole').value = user.Role || 'user';
+                document.getElementById('editUserDownloads').value = (user.Downloads !== undefined && user.Downloads !== null) ? user.Downloads : 0;
                 document.getElementById('editUserPassword').value = '';
                 document.getElementById('userEditModal').classList.add('active');
             };
@@ -1137,9 +1148,11 @@
             });
             document.getElementById('saveUserEditBtn').addEventListener('click', async () => {
                 const id = document.getElementById('editingUserId').value;
+                const downloadsVal = parseInt(document.getElementById('editUserDownloads').value) || 0;
                 const fields = {
                     Username: document.getElementById('editUserUsername').value.trim(),
-                    Role: document.getElementById('editUserRole').value
+                    Role: document.getElementById('editUserRole').value,
+                    Downloads: Math.max(0, downloadsVal)
                 };
                 const newPwd = document.getElementById('editUserPassword').value.trim();
                 if (newPwd) {
@@ -1150,6 +1163,7 @@
                     showToast('用户信息已更新');
                     document.getElementById('userEditModal').classList.remove('active');
                     loadUsers();
+                    loadDashboard();
                 } catch (e) { showToast('更新失败', true); }
             });
 
@@ -1159,15 +1173,17 @@
                 const username = document.getElementById('newUsername').value.trim();
                 const pwd = document.getElementById('newUserPassword').value.trim();
                 const role = document.getElementById('newUserRole').value;
+                const downloadsVal = parseInt(document.getElementById('newUserDownloads').value) || 0;
                 if (!email || !username || !pwd) return showToast('请填写完整', true);
                 try {
-                    await airtableRequest('POST', 'Users', { fields: { Email: email, Username: username, Password: CryptoJS.SHA256(pwd).toString(), Role: role } });
+                    await airtableRequest('POST', 'Users', { fields: { Email: email, Username: username, Password: CryptoJS.SHA256(pwd).toString(), Role: role, Downloads: Math.max(0, downloadsVal) } });
                     showToast('添加成功');
                     loadUsers();
                     loadDashboard();
                     document.getElementById('newUserEmail').value = '';
                     document.getElementById('newUsername').value = '';
                     document.getElementById('newUserPassword').value = '';
+                    document.getElementById('newUserDownloads').value = '0';
                 } catch (e) { showToast('失败', true); }
             });
 
@@ -1182,15 +1198,18 @@
             async function loadDashboard() {
                 try {
                     const [users, sw, msgs] = await Promise.all([airtableRequest('GET', 'Users'), airtableRequest('GET', 'softwares'), airtableRequest('GET', 'messages')]);
+                    const totalDownloads = users.records.reduce((sum, r) => { const d = r.fields.Downloads; return sum + (typeof d === 'number' ? d : 0); }, 0);
                     document.getElementById('dashboardStats').innerHTML = `
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${users.records.length}</div><div class="stat-label">注册用户</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(0,229,255,0.15);"><i class="fas fa-cubes"></i></div><div class="stat-value">${sw.records.length}</div><div class="stat-label">软件数量</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981;"><i class="fas fa-comments"></i></div><div class="stat-value">${msgs.records.length}</div><div class="stat-label">留言总数</div></div>
+                        <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;"><i class="fas fa-download"></i></div><div class="stat-value">${totalDownloads}</div><div class="stat-label">总下载次数</div></div>
                     `;
                     const recentUsers = users.records.slice(0, 5);
                     document.getElementById('recentUsersTbody').innerHTML = recentUsers.map(r => {
                         const createdDate = r.createdTime ? new Date(r.createdTime).toLocaleString('zh-CN') : '未知';
-                        return `<tr><td>${r.fields.Email}</td><td>${r.fields.Username||''}</td><td>${createdDate}</td></tr>`;
+                        const downloads = r.fields.Downloads !== undefined && r.fields.Downloads !== null ? r.fields.Downloads : 0;
+                        return `<tr><td>${r.fields.Email}</td><td>${r.fields.Username||''}</td><td style="font-weight:600; color:var(--primary);">${downloads}</td><td>${createdDate}</td></tr>`;
                     }).join('');
                 } catch (e) { showToast('仪表盘加载失败', true); }
             }
