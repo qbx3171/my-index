@@ -3,714 +3,1251 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>乐哲软件 · 管理后台（完整版）</title>
+    <title>乐哲软件 · 管理后台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        body { background: #f5f7fb; padding: 24px; color: #1e293b; }
-        .admin-container { max-width: 1400px; margin: 0 auto; }
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f5f7fb; display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .login-card { background: white; border-radius: 32px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); text-align: center; }
-        .login-card h2 { font-size: 24px; margin-bottom: 8px; }
-        .login-card p { color: #64748b; margin-bottom: 28px; }
-        .login-card input { width: 100%; padding: 16px 20px; border: 1.5px solid #e2e8f0; border-radius: 60px; font-size: 16px; margin-bottom: 20px; outline: none; }
-        .login-card input:focus { border-color: #1e6bdf; }
-        .login-card button { width: 100%; padding: 16px; background: #1e6bdf; color: white; border: none; border-radius: 60px; font-weight: 600; font-size: 16px; cursor: pointer; }
-        .login-error { color: #ef4444; margin-top: 12px; font-size: 14px; }
-        #mainContent { display: none; }
-        h1 { font-size: 28px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
-        h1 i { color: #a855f7; }
-        .tabs { display: flex; gap: 8px; margin-bottom: 28px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; flex-wrap: wrap; }
-        .tab-btn { padding: 8px 20px; border: none; background: transparent; font-size: 15px; font-weight: 600; color: #64748b; cursor: pointer; border-radius: 40px; transition: 0.2s; }
-        .tab-btn.active { background: #1e6bdf; color: white; }
-        .tab-btn:hover:not(.active) { background: #eef2ff; color: #1e6bdf; }
-        .panel { background: white; border-radius: 24px; padding: 28px; box-shadow: 0 8px 20px rgba(0,0,0,0.02); border: 1px solid #f0f2f5; transition: all 0.2s; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
-        .stat-card { background: linear-gradient(145deg, #ffffff, #fafcff); border-radius: 20px; padding: 24px; border: 1px solid #eef2fc; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        .stat-card .stat-icon { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
-        .stat-card .stat-value { font-size: 36px; font-weight: 700; color: #0a2540; line-height: 1.2; }
-        .stat-card .stat-label { font-size: 14px; color: #64748b; margin-top: 4px; }
-        .stat-card .stat-trend { font-size: 12px; color: #10b981; margin-top: 8px; }
-        .recent-users { margin-top: 24px; }
-        .recent-users h3 { font-size: 16px; margin-bottom: 12px; }
-        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px 30px; margin-bottom: 24px; }
-        .form-group { display: flex; flex-direction: column; gap: 8px; }
-        .form-group label { font-weight: 600; font-size: 13px; color: #475569; }
-        .form-group input, .form-group select, .form-group textarea { padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 16px; font-size: 14px; transition: 0.2s; background: white; }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1e6bdf; outline: none; box-shadow: 0 0 0 3px rgba(30,107,223,0.1); }
-        .checkbox-group { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; }
-        .checkbox-group label { display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer; }
-        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #1e6bdf; }
-        .icon-selector-wrapper { position: relative; }
-        .icon-preview { display: flex; align-items: center; gap: 12px; }
-        .icon-preview i, .icon-preview img, .icon-text-badge { width: 48px; height: 48px; object-fit: contain; border-radius: 12px; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-weight: 600; color: white; }
-        .icon-preview i { font-size: 32px; color: #1e6bdf; background: transparent; }
-        .icon-input-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-        .icon-picker-btn { padding: 12px 16px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; white-space: nowrap; }
-        .icon-picker-btn:hover { background: #eef2ff; border-color: #1e6bdf; }
-        .icon-custom-input { flex: 1; min-width: 200px; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 16px; font-size: 14px; }
-        .upload-btn { background: #f1f5f9; border: 1.5px dashed #cbd5e1; padding: 12px 16px; border-radius: 16px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        .upload-btn:hover { background: #eef2ff; border-color: #1e6bdf; }
-        .icon-panel { position: absolute; top: 100%; left: 0; width: 360px; max-height: 400px; background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; z-index: 100; margin-top: 8px; overflow: hidden; display: none; }
-        .icon-panel.show { display: block; }
-        .icon-search { padding: 12px; border-bottom: 1px solid #eef2fc; }
-        .icon-search input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 40px; font-size: 13px; }
-        .icon-categories { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px; border-bottom: 1px solid #eef2fc; }
-        .icon-cat { padding: 4px 12px; border-radius: 30px; font-size: 12px; background: #f1f5f9; cursor: pointer; border: none; }
-        .icon-cat.active { background: #1e6bdf; color: white; }
-        .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 12px; max-height: 260px; overflow-y: auto; }
-        .icon-item { display: flex; flex-direction: column; align-items: center; padding: 8px 4px; border-radius: 12px; cursor: pointer; transition: 0.1s; }
-        .icon-item:hover { background: #eef2ff; }
-        .icon-item i { font-size: 22px; margin-bottom: 4px; color: #334155; }
-        .icon-item span { font-size: 9px; color: #64748b; text-align: center; word-break: break-word; }
-        .auto-suggest { margin-top: 6px; font-size: 12px; color: #64748b; }
-        .auto-suggest span { display: inline-block; background: #eef2ff; padding: 4px 10px; border-radius: 30px; margin-right: 6px; cursor: pointer; }
-        .auto-suggest span:hover { background: #1e6bdf; color: white; }
-        .btn-primary { background: #1e6bdf; color: white; border: none; padding: 14px 28px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-primary:hover { background: #1557b0; }
-        .btn-secondary { background: #f1f5f9; border: none; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; }
-        .btn-outline { background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 40px; font-weight: 500; cursor: pointer; }
-        .btn-outline:hover { background: #f1f5f9; }
-        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .table th { text-align: left; padding: 14px 8px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600; font-size: 13px; }
-        .table td { padding: 14px 8px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
-        .action-btns button { background: none; border: none; margin-right: 12px; cursor: pointer; color: #64748b; font-size: 15px; }
-        .action-btns button:hover { color: #1e6bdf; }
-        .action-btns button.delete:hover { color: #ef4444; }
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 12px 24px; border-radius: 60px; font-size: 14px; z-index: 10000; }
-        .logout-btn { float: right; }
-        .hint-text { font-size: 12px; color: #64748b; margin-top: 4px; }
-        .file-input { display: none; }
-        .icon-text-badge { font-size: 18px; font-weight: 600; text-transform: uppercase; color: white; background: #1e6bdf; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-        .table .icon-text-badge { width: 32px; height: 32px; font-size: 14px; border-radius: 8px; }
-        .table i { font-size: 24px; color: #1e6bdf; }
-        .table img { width: 32px; height: 32px; object-fit: contain; border-radius: 8px; }
-        .ad-preview-img { max-width: 200px; max-height: 80px; border-radius: 12px; border: 1px solid #e2e8f0; object-fit: cover; }
-        .size-tip { background: #eef2ff; padding: 8px 16px; border-radius: 40px; font-size: 13px; color: #1e6bdf; display: inline-block; margin-bottom: 16px; }
-        .position-badge { display: inline-block; padding: 4px 12px; border-radius: 30px; font-size: 12px; font-weight: 500; }
-        .position-badge.top { background: #fef3c7; color: #d97706; }
-        .position-badge.banner { background: #dcfce7; color: #16a34a; }
-        .position-badge.sidebar { background: #e0f2fe; color: #0284c7; }
-        .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(0,0,0,0.1); border-radius: 50%; border-top-color: #1e6bdf; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .edit-loading { background: #f8fafc; text-align: center; padding: 20px; color: #1e6bdf; border-radius: 20px; }
-        .empty-row td { text-align: center; padding: 40px; color: #94a3b8; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 20000; }
-        .modal.active { display: flex; }
-        .modal-card { background: white; border-radius: 32px; width: 90%; max-width: 600px; max-height: 80vh; overflow: auto; padding: 28px; }
-        .modal-card h3 { margin-bottom: 20px; }
-        .category-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 8px; border-bottom: 1px solid #eef2fc; }
-        .category-key { font-family: monospace; font-size: 12px; color: #64748b; margin-left: 8px; }
-        .delete-cat-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 16px; }
-        .delete-cat-btn:hover { opacity: 0.7; }
-        .delete-cat-btn.disabled { color: #cbd5e1; cursor: not-allowed; }
+        :root {
+            --bg: #0b1120;
+            --surface: rgba(18, 25, 48, 0.85);
+            --surface-solid: #111827;
+            --border: rgba(0, 230, 250, 0.18);
+            --text: #e2e8f0;
+            --text-secondary: #a0b3d0;
+            --text-muted: #6b7c93;
+            --primary: #00e5ff;
+            --primary-light: rgba(0, 229, 255, 0.12);
+            --primary-glow: #00bcd4;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 22px;
+            --radius-sm: 14px;
+            --shadow: 0 0 30px rgba(0, 229, 255, 0.08);
+            --shadow-hover: 0 0 45px rgba(0, 229, 255, 0.2);
+            --glass-bg: rgba(15, 23, 42, 0.55);
+            --glass-border: rgba(0, 229, 255, 0.22);
+            --glass-blur: blur(18px);
+            --transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(0, 229, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+                linear-gradient(0deg, rgba(0, 229, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 28px 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 42px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.15), inset 0 0 30px rgba(0, 229, 255, 0.05);
+            text-align: center;
+        }
+        .login-card h2 {
+            font-size: 30px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00e5ff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+        .login-card p {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+            background: rgba(0, 0, 0, 0.35);
+            color: white;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .login-card input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.3);
+        }
+        .login-card button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+            border: none;
+            border-radius: 30px;
+            font-weight: 650;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            letter-spacing: 1px;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+        }
+        .login-card button:hover {
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.75);
+            transform: translateY(-2px);
+        }
+        .login-error {
+            color: var(--danger);
+            margin-top: 12px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 34px;
+            font-weight: 750;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #00e5ff, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header h1 i {
+            color: #00e5ff;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            padding: 8px;
+            border-radius: 40px;
+            border: 1px solid var(--glass-border);
+            display: inline-flex;
+            flex-wrap: wrap;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 550;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 30px;
+            transition: var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 18px rgba(0, 229, 255, 0.4);
+        }
+        .tab-btn:hover:not(.active) {
+            background: rgba(0, 229, 255, 0.12);
+            color: #e0e7ff;
+        }
+
+        .panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 28px;
+            transition: var(--transition);
+        }
+        .panel:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: rgba(18, 25, 48, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #00e5ff, #8b5cf6);
+            border-radius: 4px 0 0 4px;
+        }
+        .stat-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: 750;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+        }
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .software-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            transition: var(--transition);
+        }
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+            outline: none;
+        }
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+        }
+        .filter-select {
+            padding: 12px 36px 12px 18px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%2300e5ff'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: auto;
+        }
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+        .page-btn.active {
+            background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+            border-color: transparent;
+        }
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .table th,
+        .table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+        .table th {
+            background: rgba(0, 229, 255, 0.06);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+        .table tbody tr:hover {
+            background: rgba(0, 229, 255, 0.04);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 14px 18px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            transition: var(--transition);
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            padding-top: 8px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 35px rgba(0, 229, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: var(--primary);
+            color: white;
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+        .btn-edit-advanced {
+            background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+        .btn-edit-advanced:hover {
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
+            transform: translateY(-1px);
+        }
+        .btn-delete-advanced {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+        .btn-delete-advanced:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* 开关 */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 28px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid var(--glass-border);
+            border-radius: 34px;
+            transition: .3s;
+        }
+        .slider:before {
+            content: "";
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 2px;
+            bottom: 2px;
+            background: white;
+            border-radius: 50%;
+            transition: .3s;
+            box-shadow: 0 0 8px rgba(0,229,255,0.3);
+        }
+        input:checked + .slider {
+            background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+            border-color: transparent;
+        }
+        input:checked + .slider:before {
+            transform: translateX(28px);
+            box-shadow: 0 0 12px rgba(0,229,255,0.6);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-size: 14px;
+            z-index: 10000;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.4);
+            border: 1px solid var(--glass-border);
+        }
+
+        .icon-preview-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .icon-preview-display {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: rgba(0, 229, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 32px;
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.2);
+            color: var(--text);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-container {
+                padding: 16px;
+            }
+            .tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+        }
     </style>
 </head>
 <body>
-<div id="loginOverlay" class="login-overlay">
-    <div class="login-card">
-        <h2><i class="fas fa-lock" style="color:#1e6bdf;"></i> 管理后台</h2>
-        <p>请输入访问密码</p>
-        <input type="password" id="loginPasswordInput" placeholder="密码" onkeypress="if(event.key==='Enter')document.getElementById('loginBtn').click()">
-        <button id="loginBtn">登 录</button>
-        <div id="loginError" class="login-error"></div>
-    </div>
-</div>
-
-<div id="mainContent">
-<div class="admin-container">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h1><i class="fas fa-crown" style="color:#a855f7;"></i> 乐哲软件 · 管理后台</h1>
-        <button class="btn-secondary" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出</button>
-    </div>
-    <div class="tabs">
-        <button class="tab-btn active" data-tab="dashboard">📊 仪表盘</button>
-        <button class="tab-btn" data-tab="softwares">📦 软件管理</button>
-        <button class="tab-btn" data-tab="ads">🎬 广告管理</button>
-        <button class="tab-btn" data-tab="users">👥 用户管理</button>
-        <button class="tab-btn" data-tab="messages">💬 留言管理</button>
-    </div>
-
-    <!-- 仪表盘面板 -->
-    <div id="dashboardPanel" class="panel">
-        <h2 style="margin-bottom: 24px;"><i class="fas fa-chart-pie"></i> 数据概览</h2>
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-icon" style="background: #e0f2fe; color: #0284c7;"><i class="fas fa-users"></i></div><div class="stat-value" id="statUsers">-</div><div class="stat-label">注册用户</div><div class="stat-trend"><i class="fas fa-database"></i> 累计总数</div></div>
-            <div class="stat-card"><div class="stat-icon" style="background: #fce7f3; color: #db2777;"><i class="fas fa-cubes"></i></div><div class="stat-value" id="statSoftwares">-</div><div class="stat-label">软件数量</div><div class="stat-trend"><i class="fas fa-box"></i> 资源库</div></div>
-            <div class="stat-card"><div class="stat-icon" style="background: #dcfce7; color: #16a34a;"><i class="fas fa-comments"></i></div><div class="stat-value" id="statMessages">-</div><div class="stat-label">留言总数</div><div class="stat-trend"><i class="fas fa-message"></i> 用户反馈</div></div>
-            <div class="stat-card"><div class="stat-icon" style="background: #fef3c7; color: #d97706;"><i class="fas fa-eye"></i></div><div class="stat-value" id="statVisits">-</div><div class="stat-label">累计访问</div><div class="stat-trend"><i class="fas fa-chart-line"></i> 网站访问量</div></div>
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-card">
+            <h2>⚡ 乐哲控制台</h2>
+            <p>请输入管理密钥</p>
+            <input type="password" id="loginPasswordInput" placeholder="········" onkeypress="if(event.key==='Enter')document.getElementById('loginBtn').click()">
+            <button id="loginBtn">验证访问</button>
+            <div id="loginError" class="login-error"></div>
         </div>
-        <div class="recent-users"><h3><i class="fas fa-user-plus"></i> 最近注册用户</h3><table class="table"><thead><tr><th>邮箱</th><th>用户名</th><th>注册时间</th></tr></thead><tbody id="recentUsersTbody"></tbody></table></div>
     </div>
 
-    <!-- 软件管理面板 -->
-    <div id="softwaresPanel" class="panel" style="display:none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin:0;"><i class="fas fa-cubes"></i> 添加 / 编辑软件</h2>
-            <button class="btn-outline" id="manageCategoriesBtn"><i class="fas fa-tags"></i> 管理分类</button>
-        </div>
-        <div id="editSoftwareLoading" style="display:none;" class="edit-loading"><span class="loading-spinner"></span> 加载软件信息...</div>
-        <div id="softwareFormContainer">
-        <div class="form-grid">
-            <div class="form-group"><label>软件名称 <span style="color:red;">*</span></label><input type="text" id="swName" placeholder="例如: Photoshop" oninput="suggestIcon(); refreshIconPreview();"></div>
-            <div class="form-group"><label>分类 <span style="color:red;">*</span></label><select id="swCategory"></select></div>
-            <div class="form-group"><label>版本</label><input type="text" id="swVersion" placeholder="例如: 2024"></div>
-            <div class="form-group">
-                <label>支持系统 <span style="color:red;">*</span></label>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" id="osWindows" checked> <i class="fab fa-windows"></i> Windows</label>
-                    <label><input type="checkbox" id="osMac" checked> <i class="fab fa-apple"></i> Mac</label>
-                    <label><input type="checkbox" id="osAndroid"> <i class="fab fa-android"></i> 安卓</label>
-                    <label><input type="checkbox" id="osiOS"> <i class="fab fa-apple"></i> 苹果</label>
+    <div id="mainContent" style="display:none;">
+        <div class="admin-container">
+            <div class="header">
+                <h1><i class="fas fa-crown"></i> 乐哲 · 中枢</h1>
+                <button class="btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出</button>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="dashboard">📊 仪表盘</button>
+                <button class="tab-btn" data-tab="softwares">📦 软件管理</button>
+                <button class="tab-btn" data-tab="ads">🎬 广告管理</button>
+                <button class="tab-btn" data-tab="users">👥 用户管理</button>
+                <button class="tab-btn" data-tab="messages">💬 留言管理</button>
+            </div>
+
+            <div id="dashboardPanel" class="panel">
+                <h2 style="margin-bottom:24px; color: var(--primary);">📊 系统概览</h2>
+                <div class="stats-grid" id="dashboardStats"></div>
+                <h3 style="margin-top:24px; color: var(--text-secondary);">🆕 最近注册用户</h3>
+                <table class="table"><thead><tr><th>邮箱</th><th>用户名</th><th>注册时间</th></tr></thead><tbody id="recentUsersTbody"></tbody></table>
+            </div>
+
+            <div id="softwaresPanel" class="panel" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="color: var(--primary);">📦 软件矩阵</h2>
+                    <button class="btn-outline" id="manageCategoriesBtn"><i class="fas fa-tags"></i> 分类管理</button>
                 </div>
-            </div>
-            <div class="form-group"><label>下载链接 <span style="color:red;">*</span></label><input type="url" id="swURL" placeholder="https://..."></div>
-            <div class="form-group"><label>添加日期</label><input type="date" id="swAddedDate" readonly></div>
-            <div class="form-group" style="grid-column: span 2;"><label>描述</label><textarea id="swDescription" rows="2" placeholder="简要描述软件功能..."></textarea></div>
-            <div class="form-group" style="grid-column: span 2;">
-                <label>图标</label>
-                <div class="icon-selector-wrapper">
-                    <div class="icon-preview"><div id="iconPreviewContainer"><i id="iconPreview" class="fas fa-cube"></i><img id="iconPreviewImg" src="" style="display:none;"><div id="iconPreviewText" class="icon-text-badge" style="display:none;">PS</div></div><div style="flex:1;"><div class="icon-input-group"><div class="icon-picker-btn" id="openIconPanel"><i class="fas fa-icons"></i> 预设图标</div><input type="text" id="swIconCustom" class="icon-custom-input" placeholder="或输入图标类名 (如: fas fa-image)" oninput="refreshIconPreview()"><label class="upload-btn" for="iconFileInput"><i class="fas fa-cloud-upload-alt"></i> 压缩上传</label><input type="file" id="iconFileInput" class="file-input" accept="image/*"><input type="hidden" id="swIcon" value=""><input type="hidden" id="swIconType" value="text"></div><div class="hint-text">支持 Font Awesome / 图片URL，上传图片会自动压缩为Base64</div></div></div>
-                    <div class="icon-panel" id="iconPanel"><div class="icon-search"><input type="text" id="iconSearchInput" placeholder="搜索图标..."></div><div class="icon-categories" id="iconCategories"></div><div class="icon-grid" id="iconGrid"></div></div>
+                <div class="form-grid">
+                    <div class="form-group"><label>软件名称 *</label><input type="text" id="swName" placeholder="例如: Photoshop" oninput="refreshIconPreview()"></div>
+                    <div class="form-group"><label>分类 *</label><select id="swCategory"></select></div>
+                    <div class="form-group"><label>版本</label><input type="text" id="swVersion" placeholder="2024"></div>
+                    <div class="form-group"><label>支持系统 *</label><div class="checkbox-group"><label><input type="checkbox" id="osWindows" checked> Windows</label><label><input type="checkbox" id="osMac" checked> Mac</label><label><input type="checkbox" id="osAndroid"> 安卓</label><label><input type="checkbox" id="osiOS"> iOS</label></div></div>
+                    <div class="form-group"><label>下载链接 *</label><input type="url" id="swURL" placeholder="https://..."></div>
+                    <div class="form-group"><label>添加日期</label><input type="date" id="swAddedDate" readonly></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>图标</label><div class="icon-preview-box"><div class="icon-preview-display" id="iconPreviewContainer"><i id="iconPreview" class="fas fa-cube"></i><img id="iconPreviewImg" src="" style="display:none; width:100%; height:100%; object-fit:contain;"><span id="iconPreviewText" style="display:none; font-weight:700; color:white;">PS</span></div><div style="flex:1;"><input type="text" id="swIconCustom" placeholder="图标类名或图片URL" style="width:100%; margin-bottom:8px;" oninput="refreshIconPreview()"><div style="display:flex; gap:8px;"><button class="btn-outline" id="openIconPanel" type="button"><i class="fas fa-icons"></i> 预设图标</button><label class="btn-outline" for="iconFileInput" style="cursor:pointer;"><i class="fas fa-upload"></i> 上传图片</label></div></div><input type="file" id="iconFileInput" style="display:none;" accept="image/*"><input type="hidden" id="swIcon" value=""></div><div id="iconSuggestions" style="margin-top:8px; font-size:12px; color:var(--text-muted);"></div></div>
+                    <div class="form-group"><label><input type="checkbox" id="swNoVerify"> 无需验证</label></div>
                 </div>
-                <div class="auto-suggest" id="iconSuggestions"></div>
+                <div style="display:flex; gap:16px; margin-top:24px;"><button class="btn-primary" id="saveSoftwareBtn"><i class="fas fa-save"></i> 保存软件</button><button class="btn-outline" id="cancelEditBtn">取消编辑</button></div>
+                <input type="hidden" id="editingId" value="">
+                <hr style="margin:32px 0; border-color: var(--border);">
+                <div class="software-toolbar"><div class="search-box"><i class="fas fa-search"></i><input type="text" id="softwareSearch" placeholder="搜索软件名称..."></div><select id="softwareCategoryFilter" class="filter-select"><option value="all">所有分类</option></select><div class="pagination" id="softwarePagination"></div></div>
+                <table class="table"><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>系统</th><th>图标</th><th>操作</th></tr></thead><tbody id="softwaresTbody"></tbody></table>
             </div>
-            <div class="form-group"><label><input type="checkbox" id="swNoVerify"> 无需验证（直接跳转）</label></div>
-        </div>
-        <div style="display: flex; gap: 16px;"><button class="btn-primary" id="saveSoftwareBtn"><i class="fas fa-save"></i> 保存软件</button><button class="btn-secondary" id="cancelEditBtn">取消编辑</button></div>
-        <input type="hidden" id="editingId" value="">
-        </div>
-        <h3 style="margin: 32px 0 16px;">📋 现有软件列表</h3>
-        <table class="table" id="softwaresTable"><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>系统</th><th>图标</th><th>操作</th></tr></thead><tbody id="softwaresTbody"><tr class="empty-row"><td colspan="6">加载中...</tbody></table>
-    </div>
 
-    <!-- 广告管理面板 -->
-    <div id="adsPanel" class="panel" style="display:none;">
-        <h2 style="margin-bottom: 20px;"><i class="fas fa-ad"></i> 添加 / 编辑广告</h2>
-        <div class="size-tip"><i class="fas fa-image"></i> 建议图片尺寸：<strong>1200 x 500 像素</strong>，支持自动压缩</div>
-        <div class="form-grid">
-            <div class="form-group"><label>广告标题</label><input type="text" id="adTitle" placeholder="例如: Adobe Creative Cloud"></div>
-            <div class="form-group"><label>展示位置 <span style="color:red;">*</span></label><select id="adPosition"><option value="banner">分类上方横幅</option><option value="sidebar">侧边栏轮播</option></select></div>
-            <div class="form-group"><label>跳转链接 <span style="color:red;">*</span></label><input type="url" id="adLink" placeholder="https://..."></div>
-            <div class="form-group" style="grid-column: span 2;"><label>广告图片 <span style="color:red;">*</span></label><div style="display: flex; gap: 16px; align-items: center;"><input type="text" id="adImageUrl" class="icon-custom-input" placeholder="输入图片 URL 或上传后自动填入" style="flex:1;"><label class="upload-btn" for="adImageFile"><i class="fas fa-cloud-upload-alt"></i> 压缩上传</label><input type="file" id="adImageFile" class="file-input" accept="image/*"></div><div class="hint-text">可直接填写图片URL，或上传后自动压缩为WebP Base64</div></div>
-            <div class="form-group"><label>预览</label><img id="adPreviewImage" class="ad-preview-img" src="" alt="预览" style="display:none;"><div id="adPreviewPlaceholder" style="background:#f1f5f9; border-radius:12px; padding:20px; text-align:center; color:#64748b;">填写图片URL后显示预览</div></div>
-            <div class="form-group"><label><input type="checkbox" id="adEnabled" checked> 启用广告</label></div>
-        </div>
-        <div style="display: flex; gap: 16px;"><button class="btn-primary" id="saveAdBtn"><i class="fas fa-save"></i> 保存广告</button><button class="btn-secondary" id="cancelAdBtn">取消编辑</button></div>
-        <input type="hidden" id="editingAdId" value="">
-        <h3 style="margin: 32px 0 16px;">📋 现有广告列表</h3>
-        <table class="table" id="adsTable"><thead><tr><th>预览</th><th>标题</th><th>位置</th><th>链接</th><th>状态</th><th>操作</th></tr></thead><tbody id="adsTbody"><tr class="empty-row"><td colspan="6">加载中...</tbody></table>
-    </div>
-
-    <!-- 用户管理面板 -->
-    <div id="usersPanel" class="panel" style="display:none;">
-        <h2><i class="fas fa-users"></i> 用户管理</h2>
-        <div class="form-grid" style="margin-top:20px;">
-            <div class="form-group"><label>邮箱</label><input type="email" id="newUserEmail" placeholder="user@example.com"></div>
-            <div class="form-group"><label>用户名</label><input type="text" id="newUsername" placeholder="昵称"></div>
-            <div class="form-group"><label>密码</label><input type="password" id="newUserPassword" placeholder="至少6位"></div>
-            <div class="form-group"><label>角色</label><select id="newUserRole"><option value="user">普通用户</option><option value="admin">管理员</option></select></div>
-        </div>
-        <button class="btn-primary" id="addUserBtn"><i class="fas fa-plus"></i> 添加用户</button>
-        <table class="table" style="margin-top:30px;"><thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>操作</th></tr></thead><tbody id="usersTbody"><tr class="empty-row"><td colspan="4">加载中...</tbody></table>
-    </div>
-
-    <!-- 留言管理面板 -->
-    <div id="messagesPanel" class="panel" style="display:none;">
-        <h2><i class="fas fa-comments"></i> 留言管理</h2>
-        <table class="table"><thead><tr><th>昵称</th><th>留言内容</th><th>时间</th><th>操作</th></tr></thead><tbody id="messagesTbody"><tr class="empty-row"><td colspan="4">加载中...</tbody></table>
-    </div>
-</div>
-</div>
-
-<!-- 分类管理模态框 -->
-<div id="categoryModal" class="modal">
-    <div class="modal-card">
-        <h3><i class="fas fa-tags"></i> 软件分类管理</h3>
-        <div style="margin-bottom: 20px;">
-            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-                <input type="text" id="newCatName" placeholder="新分类名称 (例如: 视频剪辑)" style="flex:1; padding: 10px 16px; border-radius: 40px; border:1px solid #cbd5e1;">
-                <button id="addCategoryBtn" class="btn-primary" style="padding: 10px 20px;">添加</button>
+            <div id="adsPanel" class="panel" style="display:none;">
+                <h2 style="margin-bottom:20px; color: var(--primary);">🎬 广告管理</h2>
+                <div class="form-grid">
+                    <div class="form-group"><label>标题</label><input type="text" id="adTitle"></div>
+                    <div class="form-group"><label>链接 *</label><input type="url" id="adLink"></div>
+                    <div class="form-group"><label>图片URL *</label><input type="text" id="adImageUrl" placeholder="https://..."></div>
+                    <div class="form-group"><label>位置</label><select id="adPosition"><option value="banner">横幅</option><option value="sidebar">侧边栏</option></select></div>
+                    <div class="form-group">
+                        <label>启用</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="adEnabled" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top:20px; display:flex; gap:16px;"><button class="btn-primary" id="saveAdBtn">保存广告</button><button class="btn-outline" id="cancelAdBtn">取消</button></div>
+                <input type="hidden" id="editingAdId" value="">
+                <h3 style="margin-top:36px; color: var(--text-secondary);">现有广告</h3>
+                <div id="adsList"></div>
             </div>
-            <div class="hint-text">分类名称将直接用于软件分类（保存为中文）。</div>
-        </div>
-        <div id="categoriesList" style="max-height: 400px; overflow-y: auto;">
-            <div style="text-align:center; padding:20px;"><span class="loading-spinner"></span> 加载中...</div>
-        </div>
-        <div style="margin-top: 20px; text-align: right;">
-            <button class="btn-secondary" id="closeCategoryModal">关闭</button>
+
+            <div id="usersPanel" class="panel" style="display:none;">
+                <h2 style="color: var(--primary);">👥 用户管理</h2>
+                <div class="form-grid" style="margin-top:20px;">
+                    <div class="form-group"><label>邮箱</label><input type="email" id="newUserEmail"></div>
+                    <div class="form-group"><label>用户名</label><input type="text" id="newUsername"></div>
+                    <div class="form-group"><label>密码</label><input type="password" id="newUserPassword"></div>
+                    <div class="form-group"><label>角色</label><select id="newUserRole"><option value="user">普通</option><option value="vip">VIP</option><option value="admin">管理员</option></select></div>
+                </div>
+                <button class="btn-primary" id="addUserBtn" style="margin-top:16px;">添加用户</button>
+                <div class="software-toolbar" style="margin-top:24px;">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="userSearch" placeholder="搜索邮箱或用户名...">
+                    </div>
+                </div>
+                <table class="table">
+                    <thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>注册时间</th><th>操作</th></tr></thead>
+                    <tbody id="usersTbody"></tbody>
+                </table>
+            </div>
+
+            <div id="messagesPanel" class="panel" style="display:none;">
+                <h2 style="color: var(--primary);">💬 留言管理</h2>
+                <div id="messagesList" style="margin-top:16px;"></div>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script>
-    // ==================== 配置与全局 ====================
-    const CONFIG = { AIRTABLE_TOKEN: 'patQOsg4fMjmbUb7V.70343dbb59364df780d2ed5deb71ad6f53f68e24aea3cae1103fd1c67a27f7ad', AIRTABLE_BASE_ID: 'appM4Ty76lOlslpU9' };
-    const ENCODED_PASSWORD = 'cWJ4MTIxNjQ4MTE='; // qbx12164811
-    let allIcons = [];
-    let currentIconCat = '常用';
-    const iconCategories = { '常用': ['fa-cube','fa-image','fa-paint-brush','fa-video','fa-film','fa-camera','fa-cloud-download-alt','fa-puzzle-piece','fa-drafting-compass','fa-shapes','fa-cubes','fa-file-pdf'], '品牌': ['fa-adobe','fa-apple','fa-windows','fa-linux'], '工具': ['fa-wrench','fa-tools'], '文件': ['fa-file','fa-folder','fa-save','fa-download'] };
-    
-    // 分类缓存（使用 Name 作为唯一标识）
-    let cachedCategoriesList = [];
-    let categoriesLoading = false;
-    
-    // 自动设置当天日期的函数
-    function setDefaultAddedDate() {
-        const dateInput = document.getElementById('swAddedDate');
-        if (dateInput && !dateInput.value) {
-            const today = new Date().toISOString().slice(0,10);
-            dateInput.value = today;
-        }
-    }
-    
-    function showToast(msg, isError = false) { const t = document.createElement('div'); t.className = 'toast'; t.style.background = isError ? '#ef4444' : '#1e293b'; t.innerHTML = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
-    async function airtableRequest(method, path, body = null) { const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`; const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' }; const opts = { method, headers }; if (body) opts.body = JSON.stringify(body); const resp = await fetch(url, opts); if (!resp.ok) { const err = await resp.json().catch(()=>({error:{message:'请求失败'}})); throw new Error(err.error?.message || `HTTP ${resp.status}`); } return resp.json(); }
-    function getSmartAbbreviation(name) { if (!name) return 'SW'; const lower = name.toLowerCase().trim(); const map = { 'photoshop':'PS','illustrator':'AI','premiere pro':'PR','after effects':'AE','lightroom':'LR','indesign':'ID','cinema 4d':'C4D','c4d':'C4D','autocad':'AC','cad':'CAD','3ds max':'3DS','maya':'MA','sketchup':'SU','rhino':'RH','blender':'BL' }; if(map[lower]) return map[lower]; for(let [k,v] of Object.entries(map)) if(lower.includes(k)) return v; if(/[\u4e00-\u9fa5]/.test(name)) return name.match(/[\u4e00-\u9fa5]/)[0]; const words = name.split(/[\s\-_]+/).filter(w=>w.length); if(words.length>=2) return words.map(w=>w.charAt(0).toUpperCase()).slice(0,3).join(''); return name.slice(0,2).toUpperCase(); }
-    function getColorFromName(name) { let hash=0; for(let i=0;i<name.length;i++) hash=name.charCodeAt(i)+((hash<<5)-hash); return `hsl(${Math.abs(hash)%360},70%,55%)`; }
-    function renderIconForTable(record) { const name=record.name||'软件'; const icon=record.icon; if(Array.isArray(icon)&&icon[0]?.url) return `<img src="${icon[0].url}" style="width:32px;height:32px;object-fit:contain;border-radius:8px;" loading="lazy">`; if(typeof icon==='string'&&(icon.startsWith('http')||icon.startsWith('data:'))) return `<img src="${icon}" style="width:32px;height:32px;object-fit:contain;border-radius:8px;" loading="lazy">`; if(typeof icon==='string'&&icon.startsWith('fa-')) return `<i class="fas ${icon}"></i>`; const abbr = icon||getSmartAbbreviation(name); return `<div class="icon-text-badge" style="background: ${getColorFromName(name)};">${abbr}</div>`; }
-    function refreshIconPreview() { const name = document.getElementById('swName').value.trim()||'软件'; const custom = document.getElementById('swIconCustom')?.value.trim()||''; const effective = custom||document.getElementById('swIcon').value; const previewIcon = document.getElementById('iconPreview'); const previewImg = document.getElementById('iconPreviewImg'); const previewText = document.getElementById('iconPreviewText'); previewIcon.style.display='none'; previewImg.style.display='none'; previewText.style.display='none'; if(effective){ if(effective.startsWith('http')||effective.startsWith('data:')){ previewImg.src=effective; previewImg.style.display='block'; } else { previewIcon.className=effective; previewIcon.style.display='flex'; } } else { previewText.textContent=getSmartAbbreviation(name); previewText.style.background=getColorFromName(name); previewText.style.display='flex'; } }
-    window.refreshIconPreview = refreshIconPreview;
-    window.suggestIcon = function() { const name = document.getElementById('swName').value.toLowerCase(); const sug=[]; if(name.includes('photoshop')) sug.push('fa-image'); if(name.includes('illustrator')) sug.push('fa-paint-brush'); if(name.includes('premiere')) sug.push('fa-film'); if(name.includes('after effects')) sug.push('fa-video'); const div=document.getElementById('iconSuggestions'); if(sug.length){ div.innerHTML='💡 推荐: '+[...new Set(sug)].map(s=>`<span onclick="selectPresetIcon('${s}')"><i class="fas ${s}"></i> ${s.replace('fa-','')}</span>`).join(''); } else div.innerHTML=''; };
-    async function compressImage(file, maxWidth=600, maxHeight=600, quality=0.75) { return new Promise((resolve)=>{ const reader=new FileReader(); reader.onload=(e)=>{ const img=new Image(); img.onload=()=>{ let w=img.width, h=img.height; if(w>maxWidth){ h*=maxWidth/w; w=maxWidth; } if(h>maxHeight){ w*=maxHeight/h; h=maxHeight; } const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); resolve(canvas.toDataURL('image/webp',quality)); }; img.src=e.target.result; }; reader.readAsDataURL(file); }); }
-    async function handleImageUpload(file, targetInputId, previewImgId, placeholderId) { if(!file) return; try { const compressed=await compressImage(file,800,800,0.8); document.getElementById(targetInputId).value=compressed; if(previewImgId){ const pimg=document.getElementById(previewImgId); if(pimg){ pimg.src=compressed; pimg.style.display='block'; if(placeholderId) document.getElementById(placeholderId).style.display='none'; } } showToast('图片已压缩为Base64（推荐改用图床URL提升性能）',false); } catch(e){ showToast('压缩失败',true); } }
-    
-    // 图标面板
-    function initIconPanel() { allIcons = [...new Set(Object.values(iconCategories).flat())]; renderIconCategories(); renderIconGrid(currentIconCat); }
-    function renderIconCategories() { const div=document.getElementById('iconCategories'); if(div) div.innerHTML=Object.keys(iconCategories).map(cat=>`<button class="icon-cat ${cat===currentIconCat?'active':''}" onclick="setIconCat('${cat}')">${cat}</button>`).join(''); }
-    window.setIconCat = function(cat) { currentIconCat=cat; renderIconCategories(); renderIconGrid(cat); };
-    function renderIconGrid(cat, filter='') { let icons=iconCategories[cat]||[]; if(filter) icons=icons.filter(i=>i.includes(filter.toLowerCase())); const grid=document.getElementById('iconGrid'); if(grid) grid.innerHTML=icons.map(icon=>`<div class="icon-item" onclick="selectPresetIcon('${icon}')"><i class="fas ${icon}"></i><span>${icon.replace('fa-','')}</span></div>`).join(''); }
-    window.selectPresetIcon = function(icon) { document.getElementById('swIconType').value='icon'; document.getElementById('swIcon').value=icon; document.getElementById('swIconCustom').value=''; refreshIconPreview(); document.getElementById('iconPanel')?.classList.remove('show'); };
-    
-    // ========== 分类管理核心（使用 Name 作为 value） ==========
-    async function loadCategories(forceRefresh = false) {
-        if (!forceRefresh && cachedCategoriesList.length) return cachedCategoriesList;
-        categoriesLoading = true;
-        try {
-            let records = [];
-            try {
-                const data = await airtableRequest('GET', 'Categories?maxRecords=100');
-                records = data.records || [];
-            } catch(err) {
-                if(err.message.includes('404')) {
-                    cachedCategoriesList = [
-                        { name: 'Adobe系列', isDefault: true, id: null, order: 1 },
-                        { name: 'Autodesk系列', isDefault: true, id: null, order: 2 },
-                        { name: 'Cinema 4D', isDefault: true, id: null, order: 3 },
-                        { name: '草图大师', isDefault: true, id: null, order: 4 },
-                        { name: '犀牛软件', isDefault: true, id: null, order: 5 },
-                        { name: '插件工具', isDefault: true, id: null, order: 6 },
-                        { name: '其他', isDefault: true, id: null, order: 7 }
-                    ];
-                    return cachedCategoriesList;
-                } else throw err;
+    <!-- 用户编辑模态框 -->
+    <div id="userEditModal" class="modal">
+        <div class="modal-card">
+            <h3 style="color: var(--primary); margin-bottom:20px;">✏️ 编辑用户</h3>
+            <div class="form-group" style="margin-bottom:16px;">
+                <label>邮箱 (不可修改)</label>
+                <input type="email" id="editUserEmail" disabled style="opacity:0.6;">
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+                <label>用户名</label>
+                <input type="text" id="editUserUsername">
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+                <label>角色</label>
+                <select id="editUserRole">
+                    <option value="user">普通</option>
+                    <option value="vip">VIP</option>
+                    <option value="admin">管理员</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:20px;">
+                <label>新密码 (留空不修改)</label>
+                <input type="password" id="editUserPassword" placeholder="留空则不修改密码">
+            </div>
+            <div style="display:flex; gap:16px;">
+                <button class="btn-primary" id="saveUserEditBtn"><i class="fas fa-save"></i> 保存</button>
+                <button class="btn-outline" id="closeUserEditBtn">取消</button>
+            </div>
+            <input type="hidden" id="editingUserId" value="">
+        </div>
+    </div>
+
+    <div id="categoryModal" class="modal">
+        <div class="modal-card">
+            <h3 style="color: var(--primary); margin-bottom:20px;">🏷️ 分类管理</h3>
+            <div style="display:flex; gap:12px; margin-bottom:20px;">
+                <input type="text" id="newCatName" placeholder="新分类名称" style="flex:1; padding:12px 18px; border-radius:30px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); color:white;">
+                <button class="btn-primary" id="addCategoryBtn">添加</button>
+            </div>
+            <div id="categoriesList" style="max-height: 400px; overflow-y: auto;"></div>
+            <button class="btn-outline" id="closeCategoryModal" style="margin-top:20px; width:100%;">关闭</button>
+        </div>
+    </div>
+
+    <div id="iconPanel" class="modal" style="align-items:flex-start; padding-top:60px;">
+        <div class="modal-card">
+            <h3 style="color: var(--primary); margin-bottom:16px;">选择图标</h3>
+            <input type="text" id="iconSearchInput" placeholder="搜索图标..." style="width:100%; margin-bottom:16px; padding:12px; border-radius:30px; background:rgba(0,0,0,0.4); border:1px solid var(--glass-border); color:white;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;" id="iconCatTabs"></div>
+            <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:8px;" id="iconGrid"></div>
+            <button class="btn-outline" id="closeIconPanel" style="margin-top:20px; width:100%;">关闭</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        (function() {
+            const CONFIG = {
+                AIRTABLE_TOKEN: 'patQOsg4fMjmbUb7V.70343dbb59364df780d2ed5deb71ad6f53f68e24aea3cae1103fd1c67a27f7ad',
+                AIRTABLE_BASE_ID: 'appM4Ty76lOlslpU9'
+            };
+            const ENCODED_PASSWORD = 'cWJ4MTIxNjQ4MTEuLg==';
+
+            let allSoftwares = [];
+            let currentPage = 1;
+            const pageSize = 10;
+            let cachedCategories = [];
+            let allUsers = [];
+            const iconCategories = {
+                '常用': ['fa-cube', 'fa-image', 'fa-paint-brush', 'fa-video', 'fa-film', 'fa-camera', 'fa-download'],
+                '品牌': ['fa-adobe', 'fa-apple', 'fa-windows', 'fa-linux'],
+                '工具': ['fa-wrench', 'fa-tools', 'fa-cog']
+            };
+
+            function showToast(msg, isError = false) {
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.style.background = isError ? '#ef4444' : 'rgba(0,0,0,0.9)';
+                t.textContent = msg;
+                document.body.appendChild(t);
+                setTimeout(() => t.remove(), 3000);
             }
-            cachedCategoriesList = records.map(r => ({
-                name: r.fields.Name || r.fields.name,
-                isDefault: r.fields.IsDefault === true,
-                id: r.id,
-                order: r.fields.Order || 0
-            })).sort((a,b) => a.order - b.order);
-            if(cachedCategoriesList.length === 0) {
-                cachedCategoriesList = [
-                    { name: 'Adobe系列', isDefault: true, id: null },
-                    { name: 'Autodesk系列', isDefault: true, id: null },
-                    { name: 'Cinema 4D', isDefault: true, id: null },
-                    { name: '草图大师', isDefault: true, id: null },
-                    { name: '犀牛软件', isDefault: true, id: null },
-                    { name: '插件工具', isDefault: true, id: null },
-                    { name: '其他', isDefault: true, id: null }
-                ];
+
+            async function airtableRequest(method, path, body = null) {
+                const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`;
+                const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' };
+                const opts = { method, headers };
+                if (body) opts.body = JSON.stringify(body);
+                const resp = await fetch(url, opts);
+                if (!resp.ok) {
+                    const err = await resp.json().catch(() => ({ error: { message: '请求失败' } }));
+                    throw new Error(err.error?.message || `HTTP ${resp.status}`);
+                }
+                return resp.json();
             }
-            return cachedCategoriesList;
-        } catch(e) {
-            console.warn(e);
-            cachedCategoriesList = [
-                { name: 'Adobe系列', isDefault: true }, { name: '其他', isDefault: true }
-            ];
-            return cachedCategoriesList;
-        } finally {
-            categoriesLoading = false;
-        }
-    }
-    
-    async function refreshCategorySelect() {
-        const select = document.getElementById('swCategory');
-        if(!select) return;
-        const cats = await loadCategories();
-        const currentVal = select.value;
-        // 关键修复：使用 cat.name 作为 option 的 value 和显示文本，保证保存中文
-        select.innerHTML = cats.map(cat => `<option value="${cat.name}">${cat.name}</option>`).join('');
-        // 如果当前有值（编辑时），并且存在于新列表中，则选中；否则选中第一个
-        if(currentVal && cats.some(c => c.name === currentVal)) select.value = currentVal;
-        else if(cats.length) select.value = cats[0].name;
-        setDefaultAddedDate();
-    }
-    
-    async function renderCategoryModal() {
-        const container = document.getElementById('categoriesList');
-        container.innerHTML = '<div style="text-align:center; padding:20px;"><span class="loading-spinner"></span> 加载分类...</div>';
-        const cats = await loadCategories(true);
-        container.innerHTML = cats.map(cat => `
-            <div class="category-item">
-                <div><strong>${cat.name}</strong> ${cat.isDefault ? '<span style="background:#eef2ff; padding:2px 8px; border-radius:20px; font-size:11px;">预置</span>' : ''}</div>
-                ${!cat.isDefault ? `<button class="delete-cat-btn" data-name="${cat.name}"><i class="fas fa-trash"></i></button>` : '<span style="opacity:0.5;">不可删除</span>'}
-            </div>
-        `).join('');
-        document.querySelectorAll('.delete-cat-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const name = btn.dataset.name;
-                if(!confirm(`确定删除分类“${name}”吗？\n注意：请先确保没有软件使用此分类。`)) return;
-                const cat = cats.find(c => c.name === name);
-                if(cat && cat.id) {
-                    try {
-                        await airtableRequest('DELETE', `Categories/${cat.id}`);
-                        showToast(`分类“${name}”已删除`);
-                        cachedCategoriesList = [];
-                        await refreshCategorySelect();
-                        renderCategoryModal();
-                        if(document.getElementById('softwaresPanel').style.display !== 'none') loadSoftwares();
-                    } catch(e) { showToast('删除失败：'+e.message, true); }
-                } else { showToast('无法删除', true); }
+
+            function getSmartAbbreviation(name) {
+                if (!name) return 'SW';
+                const map = { 'photoshop': 'PS', 'illustrator': 'AI', 'premiere pro': 'PR', 'after effects': 'AE' };
+                return map[name.toLowerCase()] || name.replace(/[^a-zA-Z]/g, '').slice(0, 2).toUpperCase();
+            }
+
+            function getColorFromName(name) {
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                return `hsl(${Math.abs(hash) % 360}, 70%, 55%)`;
+            }
+
+            window.refreshIconPreview = function() {
+                const custom = document.getElementById('swIconCustom').value.trim();
+                const name = document.getElementById('swName').value.trim() || '软件';
+                const previewIcon = document.getElementById('iconPreview');
+                const previewImg = document.getElementById('iconPreviewImg');
+                const previewText = document.getElementById('iconPreviewText');
+                previewIcon.style.display = 'none';
+                previewImg.style.display = 'none';
+                previewText.style.display = 'none';
+                if (custom.startsWith('http')) {
+                    previewImg.src = custom;
+                    previewImg.style.display = 'block';
+                } else if (custom.startsWith('fa-')) {
+                    previewIcon.className = 'fas ' + custom;
+                    previewIcon.style.display = 'block';
+                } else {
+                    previewText.textContent = getSmartAbbreviation(name);
+                    previewText.style.background = getColorFromName(name);
+                    previewText.style.display = 'block';
+                }
+            };
+
+            async function loadCategories() {
+                if (cachedCategories.length) return cachedCategories;
+                try {
+                    const data = await airtableRequest('GET', 'Categories?maxRecords=100');
+                    cachedCategories = data.records.map(r => r.fields.Name);
+                } catch (e) {
+                    cachedCategories = ['Adobe系列', 'Autodesk系列', 'Cinema 4D', '草图大师', '犀牛软件', '插件工具', '其他'];
+                }
+                return cachedCategories;
+            }
+
+            async function refreshCategorySelects() {
+                const cats = await loadCategories();
+                const select = document.getElementById('swCategory');
+                if (select) select.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+                const filter = document.getElementById('softwareCategoryFilter');
+                if (filter) filter.innerHTML = '<option value="all">所有分类</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+
+            async function renderCategoryModal() {
+                const cats = await loadCategories();
+                const list = document.getElementById('categoriesList');
+                list.innerHTML = cats.map(c => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid var(--border);">
+                        <span>${c}</span>
+                        <button class="btn-outline" style="padding:4px 12px;" onclick="deleteCategory('${c}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                `).join('');
+            }
+            window.deleteCategory = async function(name) {
+                if (!confirm(`确定删除分类“${name}”？`)) return;
+                try {
+                    const data = await airtableRequest('GET', `Categories?filterByFormula={Name}="${name}"`);
+                    if (data.records.length) await airtableRequest('DELETE', `Categories/${data.records[0].id}`);
+                    cachedCategories = cachedCategories.filter(c => c !== name);
+                    await refreshCategorySelects();
+                    renderCategoryModal();
+                    showToast('分类已删除');
+                } catch (e) { showToast('删除失败', true); }
+            };
+            document.getElementById('addCategoryBtn').addEventListener('click', async () => {
+                const name = document.getElementById('newCatName').value.trim();
+                if (!name) return;
+                try {
+                    await airtableRequest('POST', 'Categories', { fields: { Name: name } });
+                    cachedCategories.push(name);
+                    await refreshCategorySelects();
+                    renderCategoryModal();
+                    document.getElementById('newCatName').value = '';
+                    showToast('分类已添加');
+                } catch (e) { showToast('添加失败', true); }
             });
-        });
-    }
-    
-    async function addCategory(name) {
-        if(!name.trim()) return showToast('请输入分类名称', true);
-        const cats = await loadCategories();
-        if(cats.some(c => c.name === name.trim())) return showToast('分类已存在', true);
-        const key = name.trim().toLowerCase().replace(/[\s\(\)\-]+/g, '_').replace(/[^\w\u4e00-\u9fa5]/g, '');
-        try {
-            await airtableRequest('POST', 'Categories', { fields: { Key: key, Name: name.trim(), IsDefault: false } });
-            showToast('分类添加成功');
-            cachedCategoriesList = [];
-            await refreshCategorySelect();
-            await renderCategoryModal();
-            if(document.getElementById('softwaresPanel').style.display !== 'none') loadSoftwares();
-        } catch(e) { showToast('添加失败：'+e.message, true); }
-    }
-    
-    // ========== 各模块数据加载 ==========
-    async function loadSoftwares() {
-        try {
-            const data = await airtableRequest('GET', 'softwares?maxRecords=100');
-            const tbody = document.getElementById('softwaresTbody');
-            if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无软件数据</td></tr>'; return; }
-            tbody.innerHTML = data.records.map(r => {
-                const f = r.fields;
-                // os 字段可能是数组或字符串，统一转为显示文本
-                let osDisplay = '';
-                if (Array.isArray(f.os)) osDisplay = f.os.join(', ');
-                else if (typeof f.os === 'string') osDisplay = f.os;
-                else osDisplay = '';
-                return `<tr>
-                    <td>${f.name||''}</td>
-                    <td>${f.category||''}</td>
-                    <td>${f.version||''}</td>
-                    <td>${osDisplay}</td>
-                    <td>${renderIconForTable(f)}</td>
-                    <td class="action-btns"><button onclick="editSoftware('${r.id}')"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteSoftware('${r.id}')"><i class="fas fa-trash"></i></button></td>
-                </tr>`;
-            }).join('');
-        } catch(e) { document.getElementById('softwaresTbody').innerHTML='<tr class="empty-row"><td colspan="6">加载失败</td></tr>'; showToast('加载软件失败: '+e.message,true); }
-    }
-    
-    async function loadAds() {
-        try {
-            const data = await airtableRequest('GET', 'Ads?maxRecords=50');
-            const tbody = document.getElementById('adsTbody');
-            if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无广告数据</td></tr>'; return; }
-            tbody.innerHTML = data.records.map(r => {
-                const f = r.fields;
-                const img = f.Image||f.image||'';
-                return `<tr>
-                    <td><img src="${img}" style="width:80px;height:40px;object-fit:cover;border-radius:8px;" loading="lazy" onerror="this.style.display='none'"></td>
-                    <td>${f.Title||f.title||''}</td>
-                    <td><span class="position-badge ${f.Position||'sidebar'}">${f.Position||'sidebar'}</span></td>
-                    <td style="max-width:150px;overflow:hidden;">${f.Link||f.link||''}</td>
-                    <td>${f.Enabled!==false?'✅ 启用':'⏸️ 禁用'}</td>
-                    <td class="action-btns"><button onclick="editAd('${r.id}')"><i class="fas fa-edit"></i></button><button class="delete" onclick="deleteAd('${r.id}')"><i class="fas fa-trash"></i></button></td>
-                </tr>`;
-            }).join('');
-        } catch(e) { document.getElementById('adsTbody').innerHTML='<tr class="empty-row"><td colspan="6">加载广告失败</td></tr>'; showToast('加载广告失败',true); }
-    }
-    
-    async function loadUsers() {
-        try {
-            const data = await airtableRequest('GET', 'Users?maxRecords=100');
-            const tbody = document.getElementById('usersTbody');
-            if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="4">暂无用户</td></tr>'; return; }
-            tbody.innerHTML = data.records.map(r => `<tr><td>${r.fields.Email||''}</td><td>${r.fields.Username||''}</td><td>${r.fields.Role||'user'}</td><td><button onclick="deleteUser('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
-        } catch(e) { document.getElementById('usersTbody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</td></tr>'; showToast('加载用户失败',true); }
-    }
-    
-    async function loadMessages() {
-        try {
-            const data = await airtableRequest('GET', 'messages?maxRecords=50');
-            const tbody = document.getElementById('messagesTbody');
-            if(!data.records.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="4">暂无留言</td></tr>'; return; }
-            tbody.innerHTML = data.records.map(r => `<tr><td>${r.fields.Name||'网友'}</td><td>${r.fields.Message||''}</td><td>${r.fields.CreatedAt||''}</td><td><button onclick="deleteMessage('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
-        } catch(e) { document.getElementById('messagesTbody').innerHTML='<tr class="empty-row"><td colspan="4">加载失败</td></tr>'; showToast('加载留言失败',true); }
-    }
-    
-    async function loadDashboard() {
-        try {
-            const [users, sw, msgs] = await Promise.all([airtableRequest('GET','Users'), airtableRequest('GET','softwares'), airtableRequest('GET','messages')]);
-            document.getElementById('statUsers').innerText=users.records.length;
-            document.getElementById('statSoftwares').innerText=sw.records.length;
-            document.getElementById('statMessages').innerText=msgs.records.length;
-            document.getElementById('statVisits').innerText='--';
-            const recent = await airtableRequest('GET','Users?maxRecords=5');
-            document.getElementById('recentUsersTbody').innerHTML = recent.records.map(r => `<tr><td>${r.fields.Email||''}</td><td>${r.fields.Username||''}</td><td>${r.fields.CreatedAt?new Date(r.fields.CreatedAt).toLocaleString('zh-CN'):'未知'}</td></tr>`).join('');
-        } catch(e) { showToast('仪表盘加载失败',true); document.getElementById('statUsers').innerText='0'; document.getElementById('statSoftwares').innerText='0'; document.getElementById('statMessages').innerText='0'; }
-    }
-    
-    // 编辑/删除函数
-    window.editSoftware = async function(id) {
-        const loadingDiv=document.getElementById('editSoftwareLoading');
-        const formDiv=document.getElementById('softwareFormContainer');
-        if(loadingDiv) loadingDiv.style.display='block';
-        if(formDiv) formDiv.style.opacity='0.5';
-        try {
-            await refreshCategorySelect(); // 确保下拉框已加载最新分类
-            const {fields}=await airtableRequest('GET',`softwares/${id}`);
-            document.getElementById('swName').value=fields.name||'';
-            // 关键修复：设置分类下拉框的值（这里 category 应该是中文）
-            document.getElementById('swCategory').value = fields.category || '';
-            document.getElementById('swVersion').value=fields.version||'';
-            // 处理 os 字段
-            let osList = [];
-            if (Array.isArray(fields.os)) osList = fields.os;
-            else if (typeof fields.os === 'string') osList = fields.os.split(',').map(s=>s.trim());
-            else osList = [];
-            document.getElementById('osWindows').checked = osList.includes('Windows');
-            document.getElementById('osMac').checked = osList.includes('Mac');
-            document.getElementById('osAndroid').checked = osList.includes('安卓');
-            document.getElementById('osiOS').checked = osList.includes('苹果');
-            document.getElementById('swURL').value=fields.url||'';
-            document.getElementById('swDescription').value=fields.description||'';
-            if(fields.addedDate) document.getElementById('swAddedDate').value=fields.addedDate;
-            else setDefaultAddedDate();
-            document.getElementById('swNoVerify').checked=!!fields.noVerify;
-            document.getElementById('editingId').value=id;
-            const icon=fields.icon;
-            document.getElementById('swIconCustom').value='';
-            if(Array.isArray(icon)&&icon[0]?.url) document.getElementById('swIcon').value=icon[0].url;
-            else if(typeof icon==='string'&&(icon.startsWith('http')||icon.startsWith('data:'))) document.getElementById('swIcon').value=icon;
-            else if(typeof icon==='string'&&icon.startsWith('fa-')) document.getElementById('swIcon').value=icon;
-            else document.getElementById('swIcon').value='';
-            refreshIconPreview();
-            showToast('加载完成',false);
-        } catch(e){ showToast('加载失败',true); }
-        finally { if(loadingDiv) loadingDiv.style.display='none'; if(formDiv) formDiv.style.opacity='1'; }
-    };
-    window.deleteSoftware = async function(id) { if(!confirm('确定删除？')) return; try{ await airtableRequest('DELETE',`softwares/${id}`); showToast('已删除'); loadSoftwares(); loadDashboard(); } catch(e){ showToast('删除失败',true); } };
-    window.editAd = async function(id) {
-        try {
-            const data=await airtableRequest('GET',`Ads/${id}`);
-            const f=data.fields;
-            document.getElementById('adTitle').value=f.Title||f.title||'';
-            document.getElementById('adLink').value=f.Link||f.link||'';
-            document.getElementById('adImageUrl').value=f.Image||f.image||'';
-            document.getElementById('adPosition').value=f.Position||f.position||'sidebar';
-            document.getElementById('adEnabled').checked=f.Enabled!==undefined?f.Enabled:true;
-            document.getElementById('editingAdId').value=id;
-            const previewImg=document.getElementById('adPreviewImage');
-            if(f.Image||f.image){ previewImg.src=f.Image||f.image; previewImg.style.display='block'; document.getElementById('adPreviewPlaceholder').style.display='none'; }
-            else { previewImg.style.display='none'; document.getElementById('adPreviewPlaceholder').style.display='block'; }
-        } catch(e){ showToast('加载广告失败',true); }
-    };
-    window.deleteAd = async function(id) { if(!confirm('确定删除？')) return; try{ await airtableRequest('DELETE',`Ads/${id}`); showToast('已删除'); loadAds(); } catch(e){ showToast('删除失败',true); } };
-    window.deleteUser = async (id) => { if(confirm('删除用户？')) { try{ await airtableRequest('DELETE',`Users/${id}`); loadUsers(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
-    window.deleteMessage = async (id) => { if(confirm('删除留言？')) { try{ await airtableRequest('DELETE',`messages/${id}`); loadMessages(); loadDashboard(); } catch(e){ showToast('删除失败',true); } } };
-    
-    // 保存软件（分类直接保存下拉框的中文值，os 转为逗号分隔字符串）
-    document.getElementById('saveSoftwareBtn')?.addEventListener('click', async () => {
-        let finalIcon = document.getElementById('swIcon').value;
-        const custom = document.getElementById('swIconCustom').value.trim();
-        if(custom) finalIcon = custom;
-        const osArray = [];
-        if(document.getElementById('osWindows').checked) osArray.push('Windows');
-        if(document.getElementById('osMac').checked) osArray.push('Mac');
-        if(document.getElementById('osAndroid').checked) osArray.push('安卓');
-        if(document.getElementById('osiOS').checked) osArray.push('苹果');
-        if(osArray.length === 0) return showToast('请至少选择一个系统', true);
-        const category = document.getElementById('swCategory').value.trim();
-        if(!category) return showToast('请选择分类', true);
-        // 将系统数组转为逗号分隔的字符串
-        const osString = osArray.join(',');
-        const fields = {
-            name: document.getElementById('swName').value.trim(),
-            category: category,
-            version: document.getElementById('swVersion').value.trim(),
-            os: osString,
-            url: document.getElementById('swURL').value.trim(),
-            description: document.getElementById('swDescription').value.trim(),
-            icon: finalIcon || '',
-            addedDate: document.getElementById('swAddedDate').value || new Date().toISOString().slice(0,10),
-            noVerify: document.getElementById('swNoVerify').checked
-        };
-        if(!fields.icon) fields.icon = getSmartAbbreviation(fields.name);
-        if(!fields.name || !fields.url) return showToast('名称和链接必填', true);
-        const id = document.getElementById('editingId').value;
-        try {
-            if(id) await airtableRequest('PATCH', `softwares/${id}`, { fields });
-            else await airtableRequest('POST', 'softwares', { fields });
-            showToast('保存成功');
-            loadSoftwares();
-            loadDashboard();
-            document.getElementById('cancelEditBtn').click();
-        } catch(e) { showToast('保存失败:'+e.message, true); }
-    });
-    
-    // 取消编辑
-    document.getElementById('cancelEditBtn')?.addEventListener('click',()=>{
-        ['swName','swVersion','swURL','swDescription','swIconCustom','swIcon'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-        document.getElementById('swIconType').value='text';
-        document.getElementById('osWindows').checked=true;
-        document.getElementById('osMac').checked=true;
-        document.getElementById('osAndroid').checked=false;
-        document.getElementById('osiOS').checked=false;
-        document.getElementById('editingId').value='';
-        document.getElementById('swNoVerify').checked=false;
-        document.getElementById('swAddedDate').value='';
-        setDefaultAddedDate();
-        refreshIconPreview();
-    });
-    
-    // 保存广告
-    document.getElementById('saveAdBtn')?.addEventListener('click', async () => {
-        const title = document.getElementById('adTitle').value.trim();
-        const link = document.getElementById('adLink').value.trim();
-        const image = document.getElementById('adImageUrl').value.trim();
-        const position = document.getElementById('adPosition').value;
-        const enabled = document.getElementById('adEnabled').checked;
-        if(!link || !image) return showToast('链接和图片不能为空', true);
-        const fields = { Title: title, Link: link, Image: image, Position: position, Enabled: enabled };
-        const id = document.getElementById('editingAdId').value;
-        try {
-            if(id) await airtableRequest('PATCH', `Ads/${id}`, { fields });
-            else await airtableRequest('POST', 'Ads', { fields });
-            showToast('广告保存成功');
-            loadAds();
-            document.getElementById('cancelAdBtn').click();
-        } catch(e) { showToast('保存失败', true); }
-    });
-    document.getElementById('cancelAdBtn')?.addEventListener('click',()=>{
-        document.getElementById('adTitle').value='';
-        document.getElementById('adLink').value='';
-        document.getElementById('adImageUrl').value='';
-        document.getElementById('adPosition').value='sidebar';
-        document.getElementById('adEnabled').checked=true;
-        document.getElementById('editingAdId').value='';
-        document.getElementById('adPreviewImage').style.display='none';
-        document.getElementById('adPreviewPlaceholder').style.display='block';
-    });
-    
-    // 添加用户
-    document.getElementById('addUserBtn')?.addEventListener('click', async () => {
-        const email = document.getElementById('newUserEmail').value.trim();
-        const username = document.getElementById('newUsername').value.trim();
-        const pwd = document.getElementById('newUserPassword').value.trim();
-        const role = document.getElementById('newUserRole').value;
-        if(!email || !username || !pwd) return showToast('请填写完整', true);
-        try {
-            await airtableRequest('POST', 'Users', { fields: { Email: email, Username: username, Password: CryptoJS.SHA256(pwd).toString(), Role: role } });
-            showToast('用户添加成功');
-            loadUsers();
-            loadDashboard();
-            document.getElementById('newUserEmail').value='';
-            document.getElementById('newUsername').value='';
-            document.getElementById('newUserPassword').value='';
-        } catch(e) { showToast('添加失败', true); }
-    });
-    
-    // 登录逻辑
-    const loginOverlay = document.getElementById('loginOverlay');
-    const mainContent = document.getElementById('mainContent');
-    const loginBtn = document.getElementById('loginBtn');
-    const loginPasswordInput = document.getElementById('loginPasswordInput');
-    const loginError = document.getElementById('loginError');
-    function checkLogin() {
-        if(loginPasswordInput.value === atob(ENCODED_PASSWORD)) {
-            sessionStorage.setItem('admin_logged','true');
-            loginOverlay.style.display='none';
-            mainContent.style.display='block';
-            initIconPanel();
-            loadDashboard();
-            refreshIconPreview();
-            refreshCategorySelect();
-            loadSoftwares();
-            loadAds();
-            loadUsers();
-            loadMessages();
-        } else {
-            loginError.textContent='密码错误';
-        }
-    }
-    loginBtn.addEventListener('click', checkLogin);
-    loginPasswordInput.addEventListener('keypress', e => { if(e.key==='Enter') checkLogin(); });
-    if(sessionStorage.getItem('admin_logged') === 'true') {
-        loginOverlay.style.display='none';
-        mainContent.style.display='block';
-        initIconPanel();
-        loadDashboard();
-        refreshIconPreview();
-        refreshCategorySelect();
-        loadSoftwares();
-        loadAds();
-        loadUsers();
-        loadMessages();
-    } else {
-        loginOverlay.style.display='flex';
-        mainContent.style.display='none';
-    }
-    document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('admin_logged'); window.location.reload(); });
-    
-    // 分类管理按钮事件
-    document.getElementById('manageCategoriesBtn')?.addEventListener('click', async () => {
-        await renderCategoryModal();
-        document.getElementById('categoryModal').classList.add('active');
-    });
-    document.getElementById('closeCategoryModal')?.addEventListener('click', () => {
-        document.getElementById('categoryModal').classList.remove('active');
-    });
-    document.getElementById('addCategoryBtn')?.addEventListener('click', async () => {
-        const name = document.getElementById('newCatName').value.trim();
-        await addCategory(name);
-        document.getElementById('newCatName').value = '';
-    });
-    
-    // Tab 切换
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const tab = btn.dataset.tab;
-            document.getElementById('dashboardPanel').style.display = tab === 'dashboard' ? 'block' : 'none';
-            document.getElementById('softwaresPanel').style.display = tab === 'softwares' ? 'block' : 'none';
-            document.getElementById('adsPanel').style.display = tab === 'ads' ? 'block' : 'none';
-            document.getElementById('usersPanel').style.display = tab === 'users' ? 'block' : 'none';
-            document.getElementById('messagesPanel').style.display = tab === 'messages' ? 'block' : 'none';
-            if(tab === 'dashboard') loadDashboard();
-            if(tab === 'softwares') { refreshCategorySelect(); loadSoftwares(); }
-            if(tab === 'ads') loadAds();
-            if(tab === 'users') loadUsers();
-            if(tab === 'messages') loadMessages();
-        });
-    });
-    
-    // 图标面板事件
-    document.getElementById('openIconPanel')?.addEventListener('click', e => { e.stopPropagation(); document.getElementById('iconPanel')?.classList.toggle('show'); });
-    document.getElementById('iconSearchInput')?.addEventListener('input', e => { const val = e.target.value.toLowerCase(); if(val) document.getElementById('iconGrid').innerHTML = allIcons.filter(i=>i.includes(val)).map(icon=>`<div class="icon-item" onclick="selectPresetIcon('${icon}')"><i class="fas ${icon}"></i><span>${icon.replace('fa-','')}</span></div>`).join(''); else renderIconGrid(currentIconCat); });
-    window.addEventListener('click', () => document.getElementById('iconPanel')?.classList.remove('show'));
-    document.getElementById('iconFileInput')?.addEventListener('change', async e => { if(e.target.files[0]) await handleImageUpload(e.target.files[0], 'swIconCustom', null, null); });
-    document.getElementById('adImageFile')?.addEventListener('change', async e => { if(e.target.files[0]) await handleImageUpload(e.target.files[0], 'adImageUrl', 'adPreviewImage', 'adPreviewPlaceholder'); });
-    
-    // 预加载图标面板
-    initIconPanel();
-</script>
+
+            async function loadSoftwares() {
+                try {
+                    const data = await airtableRequest('GET', 'softwares?maxRecords=200');
+                    allSoftwares = data.records.map(r => ({ id: r.id, ...r.fields }));
+                    renderSoftwareTable();
+                } catch (e) {
+                    document.getElementById('softwaresTbody').innerHTML = '<tr><td colspan="6">加载失败</td></tr>';
+                }
+            }
+
+            function renderSoftwareTable() {
+                const searchTerm = document.getElementById('softwareSearch').value.toLowerCase();
+                const catFilter = document.getElementById('softwareCategoryFilter').value;
+                let filtered = allSoftwares;
+                if (searchTerm) filtered = filtered.filter(s => (s.name || '').toLowerCase().includes(searchTerm));
+                if (catFilter !== 'all') filtered = filtered.filter(s => s.category === catFilter);
+
+                const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+                if (currentPage > totalPages) currentPage = totalPages;
+                const start = (currentPage - 1) * pageSize;
+                const pageItems = filtered.slice(start, start + pageSize);
+
+                const tbody = document.getElementById('softwaresTbody');
+                tbody.innerHTML = pageItems.map(s => {
+                    let osDisplay = Array.isArray(s.os) ? s.os.join(', ') : (s.os || '');
+                    let iconHtml = '';
+                    if (typeof s.icon === 'string' && s.icon.startsWith('fa-')) iconHtml = `<i class="fas ${s.icon}"></i>`;
+                    else if (typeof s.icon === 'string' && (s.icon.startsWith('http') || s.icon.startsWith('data:'))) iconHtml = `<img src="${s.icon}" style="width:32px;height:32px;">`;
+                    else iconHtml = `<span style="background:${getColorFromName(s.name||'')}; color:white; padding:4px 8px; border-radius:8px;">${getSmartAbbreviation(s.name||'')}</span>`;
+                    return `<tr>
+                        <td>${s.name||''}</td><td>${s.category||''}</td><td>${s.version||''}</td><td>${osDisplay}</td>
+                        <td>${iconHtml}</td>
+                        <td>
+                            <button class="btn-edit-advanced" onclick="editSoftware('${s.id}')"><i class="fas fa-edit"></i> 编辑</button>
+                            <button class="btn-delete-advanced" onclick="deleteSoftware('${s.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="6" style="text-align:center;">暂无软件</td></tr>';
+
+                const pagDiv = document.getElementById('softwarePagination');
+                let html = `<button class="page-btn" onclick="changePage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="fas fa-chevron-left"></i></button>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="changePage(${i})">${i}</button>`;
+                }
+                html += `<button class="page-btn" onclick="changePage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}><i class="fas fa-chevron-right"></i></button>`;
+                pagDiv.innerHTML = html;
+            }
+            window.changePage = (page) => { currentPage = page; renderSoftwareTable(); };
+
+            document.getElementById('softwareSearch').addEventListener('input', () => { currentPage = 1; renderSoftwareTable(); });
+            document.getElementById('softwareCategoryFilter').addEventListener('change', () => { currentPage = 1; renderSoftwareTable(); });
+
+            window.editSoftware = async function(id) {
+                const sw = allSoftwares.find(s => s.id === id);
+                if (!sw) return;
+                document.getElementById('editingId').value = id;
+                document.getElementById('swName').value = sw.name || '';
+                document.getElementById('swCategory').value = sw.category || '';
+                document.getElementById('swVersion').value = sw.version || '';
+                document.getElementById('osWindows').checked = (sw.os || '').includes('Windows');
+                document.getElementById('osMac').checked = (sw.os || '').includes('Mac');
+                document.getElementById('osAndroid').checked = (sw.os || '').includes('安卓');
+                document.getElementById('osiOS').checked = (sw.os || '').includes('iOS');
+                document.getElementById('swURL').value = sw.url || '';
+                document.getElementById('swDescription').value = sw.description || '';
+                document.getElementById('swAddedDate').value = sw.addedDate || new Date().toISOString().slice(0,10);
+                document.getElementById('swNoVerify').checked = !!sw.noVerify;
+                document.getElementById('swIconCustom').value = typeof sw.icon === 'string' ? sw.icon : '';
+                refreshIconPreview();
+            };
+            window.deleteSoftware = async function(id) {
+                if (!confirm('确定删除？')) return;
+                await airtableRequest('DELETE', `softwares/${id}`);
+                showToast('已删除');
+                loadSoftwares();
+            };
+
+            document.getElementById('saveSoftwareBtn').addEventListener('click', async () => {
+                const osArr = [];
+                if (document.getElementById('osWindows').checked) osArr.push('Windows');
+                if (document.getElementById('osMac').checked) osArr.push('Mac');
+                if (document.getElementById('osAndroid').checked) osArr.push('安卓');
+                if (document.getElementById('osiOS').checked) osArr.push('iOS');
+                const fields = {
+                    name: document.getElementById('swName').value.trim(),
+                    category: document.getElementById('swCategory').value,
+                    version: document.getElementById('swVersion').value.trim(),
+                    os: osArr.join(', '),
+                    url: document.getElementById('swURL').value.trim(),
+                    description: document.getElementById('swDescription').value.trim(),
+                    icon: document.getElementById('swIconCustom').value.trim() || document.getElementById('swIcon').value,
+                    addedDate: document.getElementById('swAddedDate').value,
+                    noVerify: document.getElementById('swNoVerify').checked
+                };
+                if (!fields.name || !fields.url) return showToast('名称和链接必填', true);
+                const id = document.getElementById('editingId').value;
+                try {
+                    if (id) await airtableRequest('PATCH', `softwares/${id}`, { fields });
+                    else await airtableRequest('POST', 'softwares', { fields });
+                    showToast('保存成功');
+                    document.getElementById('cancelEditBtn').click();
+                    loadSoftwares();
+                } catch (e) { showToast('保存失败', true); }
+            });
+            document.getElementById('cancelEditBtn').addEventListener('click', () => {
+                ['swName','swVersion','swURL','swDescription','swIconCustom'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('editingId').value = '';
+                document.getElementById('swAddedDate').value = new Date().toISOString().slice(0,10);
+                refreshIconPreview();
+            });
+
+            function renderIconGrid(cat, filter = '') {
+                let icons = iconCategories[cat] || [];
+                if (filter) icons = icons.filter(i => i.includes(filter.toLowerCase()));
+                document.getElementById('iconGrid').innerHTML = icons.map(icon => `
+                    <div style="padding:8px; text-align:center; cursor:pointer; border-radius:12px;" onclick="selectIcon('${icon}')">
+                        <i class="fas ${icon}" style="font-size:20px; color:var(--primary);"></i><br><small>${icon.replace('fa-','')}</small>
+                    </div>
+                `).join('');
+            }
+            window.selectIcon = function(icon) {
+                document.getElementById('swIconCustom').value = icon;
+                refreshIconPreview();
+                document.getElementById('iconPanel').classList.remove('active');
+            };
+            document.getElementById('openIconPanel').addEventListener('click', () => {
+                document.getElementById('iconPanel').classList.add('active');
+                renderIconGrid('常用');
+            });
+            document.getElementById('closeIconPanel').addEventListener('click', () => document.getElementById('iconPanel').classList.remove('active'));
+            document.getElementById('iconSearchInput').addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                Object.keys(iconCategories).forEach(cat => {
+                    if (iconCategories[cat].some(i => i.includes(val))) renderIconGrid(cat, val);
+                });
+            });
+
+            async function loadAds() {
+                try {
+                    const data = await airtableRequest('GET', 'Ads?maxRecords=50');
+                    const list = document.getElementById('adsList');
+                    if (!data.records.length) { list.innerHTML = '<p>暂无广告</p>'; return; }
+                    list.innerHTML = data.records.map(r => {
+                        const f = r.fields;
+                        return `<div style="display:flex; gap:16px; align-items:center; padding:12px; border-bottom:1px solid var(--border);">
+                            <img src="${f.Image||''}" style="width:80px;height:40px;object-fit:cover;border-radius:8px;" onerror="this.style.display='none'">
+                            <div style="flex:1"><strong>${f.Title||''}</strong><br><small>${f.Position||'sidebar'}</small></div>
+                            <button class="btn-outline edit-ad-btn" data-id="${r.id}">编辑</button>
+                            <button class="btn-danger delete-ad-btn" data-id="${r.id}">删除</button>
+                        </div>`;
+                    }).join('');
+                    document.querySelectorAll('.edit-ad-btn').forEach(b => b.addEventListener('click', () => editAd(b.dataset.id)));
+                    document.querySelectorAll('.delete-ad-btn').forEach(b => b.addEventListener('click', () => {
+                        if (confirm('删除？')) { airtableRequest('DELETE', `Ads/${b.dataset.id}`).then(() => { loadAds(); showToast('已删除'); }).catch(() => showToast('失败', true)); }
+                    }));
+                } catch (e) { showToast('加载广告失败', true); }
+            }
+            async function editAd(id) {
+                try {
+                    const data = await airtableRequest('GET', `Ads/${id}`);
+                    const f = data.fields;
+                    document.getElementById('adTitle').value = f.Title || '';
+                    document.getElementById('adLink').value = f.Link || '';
+                    document.getElementById('adImageUrl').value = f.Image || '';
+                    document.getElementById('adPosition').value = f.Position || 'sidebar';
+                    document.getElementById('adEnabled').checked = f.Enabled !== false;
+                    document.getElementById('editingAdId').value = id;
+                } catch (e) { showToast('加载失败', true); }
+            }
+            document.getElementById('saveAdBtn').addEventListener('click', async () => {
+                const fields = { Title: document.getElementById('adTitle').value, Link: document.getElementById('adLink').value, Image: document.getElementById('adImageUrl').value, Position: document.getElementById('adPosition').value, Enabled: document.getElementById('adEnabled').checked };
+                if (!fields.Link || !fields.Image) return showToast('链接和图片必填', true);
+                const id = document.getElementById('editingAdId').value;
+                try {
+                    if (id) await airtableRequest('PATCH', `Ads/${id}`, { fields });
+                    else await airtableRequest('POST', 'Ads', { fields });
+                    showToast('保存成功');
+                    document.getElementById('cancelAdBtn').click();
+                    loadAds();
+                } catch (e) { showToast('失败', true); }
+            });
+            document.getElementById('cancelAdBtn').addEventListener('click', () => { document.getElementById('adTitle').value = ''; document.getElementById('adLink').value = ''; document.getElementById('adImageUrl').value = ''; document.getElementById('editingAdId').value = ''; });
+
+            async function loadUsers() {
+                try {
+                    const data = await airtableRequest('GET', 'Users?maxRecords=100');
+                    allUsers = data.records.map(r => ({
+                        id: r.id,
+                        ...r.fields,
+                        createdTime: r.createdTime
+                    }));
+                    renderUsersTable();
+                } catch (e) { document.getElementById('usersTbody').innerHTML = '<tr><td colspan="5">加载失败</td></tr>'; }
+            }
+
+            function renderUsersTable() {
+                const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+                let filtered = allUsers;
+                if (searchTerm) {
+                    filtered = filtered.filter(u =>
+                        (u.Email || '').toLowerCase().includes(searchTerm) ||
+                        (u.Username || '').toLowerCase().includes(searchTerm)
+                    );
+                }
+                const tbody = document.getElementById('usersTbody');
+                tbody.innerHTML = filtered.map(u => {
+                    const createdDate = u.createdTime ? new Date(u.createdTime).toLocaleString('zh-CN') : '未知';
+                    return `<tr>
+                        <td>${u.Email||''}</td>
+                        <td>${u.Username||''}</td>
+                        <td>${u.Role||'user'}</td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <button class="btn-edit-advanced" onclick="openUserEditModal('${u.id}')"><i class="fas fa-edit"></i> 编辑</button>
+                            <button class="btn-delete-advanced" onclick="deleteUser('${u.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="5" style="text-align:center;">暂无用户</td></tr>';
+            }
+            window.deleteUser = async (id) => {
+                if (confirm('删除用户？')) {
+                    try { await airtableRequest('DELETE', `Users/${id}`); loadUsers(); loadDashboard(); } catch (e) { showToast('失败', true); }
+                }
+            };
+            window.openUserEditModal = function(id) {
+                const user = allUsers.find(u => u.id === id);
+                if (!user) return;
+                document.getElementById('editingUserId').value = id;
+                document.getElementById('editUserEmail').value = user.Email || '';
+                document.getElementById('editUserUsername').value = user.Username || '';
+                document.getElementById('editUserRole').value = user.Role || 'user';
+                document.getElementById('editUserPassword').value = '';
+                document.getElementById('userEditModal').classList.add('active');
+            };
+            document.getElementById('closeUserEditBtn').addEventListener('click', () => {
+                document.getElementById('userEditModal').classList.remove('active');
+            });
+            document.getElementById('saveUserEditBtn').addEventListener('click', async () => {
+                const id = document.getElementById('editingUserId').value;
+                const fields = {
+                    Username: document.getElementById('editUserUsername').value.trim(),
+                    Role: document.getElementById('editUserRole').value
+                };
+                const newPwd = document.getElementById('editUserPassword').value.trim();
+                if (newPwd) {
+                    fields.Password = CryptoJS.SHA256(newPwd).toString();
+                }
+                try {
+                    await airtableRequest('PATCH', `Users/${id}`, { fields });
+                    showToast('用户信息已更新');
+                    document.getElementById('userEditModal').classList.remove('active');
+                    loadUsers();
+                } catch (e) { showToast('更新失败', true); }
+            });
+
+            document.getElementById('userSearch').addEventListener('input', renderUsersTable);
+            document.getElementById('addUserBtn').addEventListener('click', async () => {
+                const email = document.getElementById('newUserEmail').value.trim();
+                const username = document.getElementById('newUsername').value.trim();
+                const pwd = document.getElementById('newUserPassword').value.trim();
+                const role = document.getElementById('newUserRole').value;
+                if (!email || !username || !pwd) return showToast('请填写完整', true);
+                try {
+                    await airtableRequest('POST', 'Users', { fields: { Email: email, Username: username, Password: CryptoJS.SHA256(pwd).toString(), Role: role } });
+                    showToast('添加成功');
+                    loadUsers();
+                    loadDashboard();
+                    document.getElementById('newUserEmail').value = '';
+                    document.getElementById('newUsername').value = '';
+                    document.getElementById('newUserPassword').value = '';
+                } catch (e) { showToast('失败', true); }
+            });
+
+            async function loadMessages() {
+                try {
+                    const data = await airtableRequest('GET', 'messages?maxRecords=50');
+                    document.getElementById('messagesList').innerHTML = data.records.length ? data.records.map(r => `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid var(--border);"><span><strong>${r.fields.Name||'网友'}</strong>: ${r.fields.Message||''}</span><button class="btn-danger" onclick="deleteMessage('${r.id}')">删除</button></div>`).join('') : '<p>暂无留言</p>';
+                } catch (e) { showToast('加载失败', true); }
+            }
+            window.deleteMessage = async (id) => { if (confirm('删除留言？')) { try { await airtableRequest('DELETE', `messages/${id}`); loadMessages(); loadDashboard(); } catch (e) { showToast('失败', true); } } };
+
+            async function loadDashboard() {
+                try {
+                    const [users, sw, msgs] = await Promise.all([airtableRequest('GET', 'Users'), airtableRequest('GET', 'softwares'), airtableRequest('GET', 'messages')]);
+                    document.getElementById('dashboardStats').innerHTML = `
+                        <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${users.records.length}</div><div class="stat-label">注册用户</div></div>
+                        <div class="stat-card"><div class="stat-icon" style="background:rgba(0,229,255,0.15);"><i class="fas fa-cubes"></i></div><div class="stat-value">${sw.records.length}</div><div class="stat-label">软件数量</div></div>
+                        <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981;"><i class="fas fa-comments"></i></div><div class="stat-value">${msgs.records.length}</div><div class="stat-label">留言总数</div></div>
+                    `;
+                    const recentUsers = users.records.slice(0, 5);
+                    document.getElementById('recentUsersTbody').innerHTML = recentUsers.map(r => {
+                        const createdDate = r.createdTime ? new Date(r.createdTime).toLocaleString('zh-CN') : '未知';
+                        return `<tr><td>${r.fields.Email}</td><td>${r.fields.Username||''}</td><td>${createdDate}</td></tr>`;
+                    }).join('');
+                } catch (e) { showToast('仪表盘加载失败', true); }
+            }
+
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                if (document.getElementById('loginPasswordInput').value === atob(ENCODED_PASSWORD)) {
+                    sessionStorage.setItem('admin_logged', 'true');
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    initApp();
+                } else {
+                    document.getElementById('loginError').textContent = '密钥错误';
+                }
+            });
+            if (sessionStorage.getItem('admin_logged') === 'true') {
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                initApp();
+            }
+
+            function initApp() {
+                loadDashboard();
+                refreshCategorySelects();
+                loadSoftwares();
+                loadAds();
+                loadUsers();
+                loadMessages();
+                document.getElementById('swAddedDate').value = new Date().toISOString().slice(0,10);
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        const tab = btn.dataset.tab;
+                        ['dashboard','softwares','ads','users','messages'].forEach(p => {
+                            document.getElementById(p+'Panel').style.display = p === tab ? 'block' : 'none';
+                        });
+                        if (tab === 'dashboard') loadDashboard();
+                        if (tab === 'softwares') loadSoftwares();
+                        if (tab === 'ads') loadAds();
+                        if (tab === 'users') loadUsers();
+                        if (tab === 'messages') loadMessages();
+                    });
+                });
+            }
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                sessionStorage.removeItem('admin_logged');
+                window.location.reload();
+            });
+            document.getElementById('manageCategoriesBtn').addEventListener('click', async () => {
+                await renderCategoryModal();
+                document.getElementById('categoryModal').classList.add('active');
+            });
+            document.getElementById('closeCategoryModal').addEventListener('click', () => {
+                document.getElementById('categoryModal').classList.remove('active');
+            });
+        })();
+    </script>
 </body>
 </html>
