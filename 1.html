@@ -21,7 +21,6 @@
         .app-wrapper { opacity: 0; transition: opacity 0.15s ease-in-out; position: relative; z-index: 1; }
         .app-wrapper.loaded { opacity: 1; }
 
-        /* 加载动画覆盖层 */
         .loading-overlay {
             position: fixed;
             inset: 0;
@@ -103,7 +102,6 @@
             font-weight: 400;
         }
 
-        /* 原有样式保持不变 */
         .top-nav { position: sticky; top: 0; z-index: 1000; padding: 0 20px; background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-light); transition: transform 0.3s ease; }
         body.dark-mode .top-nav { background: rgba(30,41,59,0.72); }
         .top-nav.hide { transform: translateY(-100%); }
@@ -288,7 +286,6 @@
     </style>
 </head>
 <body>
-    <!-- 加载动画覆盖层 -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">
@@ -326,7 +323,15 @@
         function fallbackCopy(text) { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('复制成功'); }
         const CONFIG = { AIRTABLE_TOKEN: 'pat9BdIPuJKKqjBps.e414a0e6b637a6b9bd7bcbfc06c847b5b03853657bef403f11ca83086a68e257', AIRTABLE_BASE_ID: 'appM4Ty76lOlslpU9', EMAILJS_SERVICE_ID: 'service_0jwzfc8', EMAILJS_TEMPLATE_RESET: 'template_xcv0pdc' };
         const isLocalFile = window.location.protocol === 'file:';
-        let softwares = [{ id: '1', name: 'Cinema 4D 2025', category: '3D建模', version: '2025', description: '三维建模动画神器，支持GPU渲染', os: ['Windows', 'Mac'], downloads: 3200, addedDate: '2026-05-15', icon: '', url: '#' }, { id: '2', name: 'Adobe Photoshop 2026', category: '图像处理', version: '2026', description: '专业图像处理软件，AI智能修图', os: ['Windows', 'Mac'], downloads: 5100, addedDate: '2026-05-20', icon: '', url: '#' }, { id: '3', name: 'SketchUp Pro 2025', category: '3D建模', version: '2025', description: '草图大师，3D建模快速上手', os: ['Windows', 'Mac'], downloads: 2100, addedDate: '2026-05-10', icon: '', url: '#' }, { id: '4', name: 'Rhino 8', category: '3D建模', version: '8.0', description: '工业设计建模，曲面建模利器', os: ['Windows', 'Mac'], downloads: 1850, addedDate: '2026-05-05', icon: '', url: '#' }, { id: '5', name: 'AutoCAD 2026', category: '工程设计', version: '2026', description: '专业CAD设计软件', os: ['Windows'], downloads: 2750, addedDate: '2026-04-28', icon: '', url: '#' }];
+
+        let softwares = [
+            { id: '1', name: 'Cinema 4D 2025', category: '3D建模', version: '2025', description: '三维建模动画神器，支持GPU渲染', os: ['Windows', 'Mac'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-05-15', icon: '', url: '#' },
+            { id: '2', name: 'Adobe Photoshop 2026', category: '图像处理', version: '2026', description: '专业图像处理软件，AI智能修图', os: ['Windows', 'Mac'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-05-20', icon: '', url: '#' },
+            { id: '3', name: 'SketchUp Pro 2025', category: '3D建模', version: '2025', description: '草图大师，3D建模快速上手', os: ['Windows', 'Mac'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-05-10', icon: '', url: '#' },
+            { id: '4', name: 'Rhino 8', category: '3D建模', version: '8.0', description: '工业设计建模，曲面建模利器', os: ['Windows', 'Mac'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-05-05', icon: '', url: '#' },
+            { id: '5', name: 'AutoCAD 2026', category: '工程设计', version: '2026', description: '专业CAD设计软件', os: ['Windows'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-04-28', icon: '', url: '#' }
+        ];
+
         let bannerAds = [], sidebarAds = [], articles = [], announcements = [];
         let currentUser = null, currentCategory = "all", searchKeyword = "", showAll = false;
         let currentCaptcha = { question: '', answer: 0 };
@@ -337,7 +342,7 @@
         function esc(s) { return String(s || '').replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]); }
         async function airReq(method, path, body = null, retries = 2) { if (isLocalFile) throw new Error('本地模式'); const url = `https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${path}`; const headers = { 'Authorization': `Bearer ${CONFIG.AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' }; const opts = { method, headers }; if (body) opts.body = JSON.stringify(body); for (let i = 0; i <= retries; i++) { try { const r = await fetch(url, opts); if (!r.ok) throw new Error(`HTTP ${r.status}`); return await r.json(); } catch (e) { if (i === retries) throw e; await new Promise(r => setTimeout(r, 600 * (i + 2))); } } }
         function getFieldValue(fields, possibleNames, defaultValue = '') { for (let name of possibleNames) { if (fields[name] !== undefined) return fields[name]; for (let key in fields) { if (key.toLowerCase() === name.toLowerCase()) return fields[key]; } } return defaultValue; }
-        async function fetchSoftwares() { if (isLocalFile) return softwares; try { const data = await airReq('GET', 'softwares?maxRecords=100'); return data.records.map(rec => ({ id: rec.id, name: getFieldValue(rec.fields, ['Name', 'name'], '未命名'), category: getFieldValue(rec.fields, ['Category', 'category'], 'other'), version: getFieldValue(rec.fields, ['Version', 'version'], ''), description: getFieldValue(rec.fields, ['Description', 'description'], ''), icon: getFieldValue(rec.fields, ['Icon', 'icon'], ''), url: getFieldValue(rec.fields, ['URL', 'url'], '#'), addedDate: getFieldValue(rec.fields, ['AddedDate', 'addedDate'], new Date().toISOString().split('T')[0]), downloads: Number(getFieldValue(rec.fields, ['Downloads', 'downloads'], 100)), os: (() => { const v = getFieldValue(rec.fields, ['OS', 'os'], []); if (Array.isArray(v)) return v; if (typeof v === 'string') return v.split(',').map(s => s.trim()).filter(s => s); return ['Windows', 'Mac']; })() })); } catch (e) { return softwares; } }
+        async function fetchSoftwares() { if (isLocalFile) return softwares; try { const data = await airReq('GET', 'softwares?maxRecords=100'); return data.records.map(rec => ({ id: rec.id, name: getFieldValue(rec.fields, ['Name', 'name'], '未命名'), category: getFieldValue(rec.fields, ['Category', 'category'], 'other'), version: getFieldValue(rec.fields, ['Version', 'version'], ''), description: getFieldValue(rec.fields, ['Description', 'description'], ''), icon: getFieldValue(rec.fields, ['Icon', 'icon'], ''), url: getFieldValue(rec.fields, ['URL', 'url'], '#'), addedDate: getFieldValue(rec.fields, ['AddedDate', 'addedDate'], new Date().toISOString().split('T')[0]), downloads: Math.floor(Math.random() * 4000) + 1000, os: (() => { const v = getFieldValue(rec.fields, ['OS', 'os'], []); if (Array.isArray(v)) return v; if (typeof v === 'string') return v.split(',').map(s => s.trim()).filter(s => s); return ['Windows', 'Mac']; })() })); } catch (e) { return softwares; } }
         async function fetchArticles() { if (isLocalFile) return []; try { const data = await airReq('GET', 'Articles?maxRecords=100'); return data.records.map(rec => ({ id: rec.id, title: rec.fields.Title || '', cover: rec.fields.Cover || '', excerpt: rec.fields.Excerpt || '', content: rec.fields.Content || '', tags: rec.fields.Tags || '', createdAt: rec.fields.CreatedAt || new Date().toISOString() })); } catch (e) { return []; } }
         async function fetchAds() { if (isLocalFile) return [{ image: "https://picsum.photos/800/400?random=1", link: "#", title: "广告", position: "banner", enabled: true }]; try { const data = await airReq('GET', 'Ads?maxRecords=50'); return data.records.map(r => { const f = r.fields; let img = getFieldValue(f, ['Image', 'image'], ''); if (Array.isArray(img) && img[0] && img[0].url) img = img[0].url; return { image: img, link: getFieldValue(f, ['Link', 'link'], '#'), title: getFieldValue(f, ['Title', 'title'], ''), position: getFieldValue(f, ['Position', 'position'], 'sidebar').toLowerCase(), enabled: getFieldValue(f, ['Enabled', 'enabled'], true) !== false }; }).filter(a => a.enabled && a.image); } catch (e) { return []; } }
         function renderCarousel(slidesEl, dotsEl, ads) { if (!ads.length) return; slidesEl.innerHTML = ads.map((ad, idx) => `<div class="carousel-slide"><a href="${esc(ad.link)}" target="_blank" style="display:block;width:100%;height:100%;"><img src="${esc(ad.image)}" loading="lazy" alt="${esc(ad.title)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.querySelector('.loading-placeholder').style.display='flex';"><div class="loading-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8ecf3,#d1d5db);"><i class="fas fa-image"></i> 加载中...</div></a></div>`).join(''); if (ads.length <= 1) { dotsEl.style.display = 'none'; return; } dotsEl.style.display = 'flex'; dotsEl.innerHTML = ads.map((_, i) => `<div class="carousel-dot ${i===0?'active':''}" data-index="${i}"></div>`).join(''); let cur = 0; const upd = (idx) => { cur = idx; slidesEl.style.transform = `translateX(-${idx*100}%)`; dotsEl.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === idx)); }; dotsEl.querySelectorAll('.carousel-dot').forEach(d => d.addEventListener('click', () => upd(parseInt(d.dataset.index)))); let interval = setInterval(() => { upd((cur + 1) % ads.length); }, 4000); const container = slidesEl.closest('.carousel-container'); container.addEventListener('mouseenter', () => clearInterval(interval)); container.addEventListener('mouseleave', () => { interval = setInterval(() => upd((cur + 1) % ads.length), 4000); }); return upd; }
@@ -387,7 +392,6 @@
         function openAuth(tab = 'login') { const modal = document.getElementById('authModal'); document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none'; document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none'; document.getElementById('forgotForm').style.display = tab === 'forgot' ? 'block' : 'none'; document.getElementById('authModalTitle').innerText = tab === 'register' ? '注册' : (tab === 'forgot' ? '找回密码' : '登录'); modal.classList.add('active'); if (tab === 'login') refreshCaptcha('login'); else if (tab === 'register') refreshCaptcha('reg'); else refreshCaptcha('forgot'); }
         function refreshCaptcha(type) { let q = Math.floor(Math.random() * 10) + 1, b = Math.floor(Math.random() * 10) + 1, op = Math.random() > 0.5 ? '+' : '-', ans = op === '+' ? q + b : q - b; if (ans < 0) return refreshCaptcha(type); currentCaptcha = { question: `${q} ${op} ${b} = ?`, answer: ans }; document.getElementById(`${type}CaptchaQuestion`).innerText = currentCaptcha.question; document.getElementById(`${type}CaptchaInput`).value = ''; }
         async function loadAll() {
-            // 显示加载动画（如果存在）
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.style.display = 'flex';
             
@@ -415,10 +419,9 @@
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
                 overlay.classList.add('hide');
-                // 动画结束后彻底移除元素（可选）
                 setTimeout(() => {
                     if (overlay.parentNode) overlay.style.display = 'none';
-                }, 400); // 与CSS过渡时间一致
+                }, 400);
             }
         }
         function renderCats() { const cats = [...new Set(softwares.map(s => s.category))]; const container = document.getElementById('categoryTabs'); if (!container) return; const isMobile = window.innerWidth <= 768; const visibleLimit = isMobile ? 4 : 5; const hasMore = cats.length > visibleLimit; let html = `<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all"><i class="fas fa-th-large"></i> 全部</button>`; const visibleCats = cats.slice(0, visibleLimit); for (let cat of visibleCats) { const icon = cat === '3D建模' ? 'fa-cube' : (cat === '图像处理' ? 'fa-palette' : (cat === '视频剪辑' ? 'fa-video' : (cat === '工程设计' ? 'fa-drafting-compass' : 'fa-tag'))); html += `<button class="cat-chip ${currentCategory===cat?'active':''}" data-cat="${cat}"><i class="fas ${icon}"></i> ${cat}</button>`; } if (hasMore) { html += `<button class="more-cats-btn" id="moreCatsBtn"><i class="fas fa-chevron-down"></i> 更多分类</button>`; container.innerHTML = html; let menu = document.querySelector('.cat-more-menu'); if (!menu) { menu = document.createElement('div'); menu.className = 'cat-more-menu'; container.appendChild(menu); } const moreBtn = document.getElementById('moreCatsBtn'); const hiddenCats = cats.slice(visibleLimit); menu.innerHTML = hiddenCats.map(cat => { const icon = cat === '3D建模' ? 'fa-cube' : (cat === '图像处理' ? 'fa-palette' : (cat === '视频剪辑' ? 'fa-video' : (cat === '工程设计' ? 'fa-drafting-compass' : 'fa-tag'))); return `<div class="cat-chip-more ${currentCategory===cat?'active':''}" data-cat="${cat}"><i class="fas ${icon}"></i> ${cat}</div>`; }).join(''); menu.querySelectorAll('.cat-chip-more').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); currentCategory = el.dataset.cat; showAll = false; renderCats(); renderGrid(); menu.classList.remove('show'); }); }); moreBtn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); }); document.addEventListener('click', (e) => { if (menu && !menu.contains(e.target) && e.target !== moreBtn) menu.classList.remove('show'); }); } else { container.innerHTML = html; const oldMenu = container.querySelector('.cat-more-menu'); if (oldMenu) oldMenu.remove(); } container.querySelectorAll('.cat-chip').forEach(btn => { btn.addEventListener('click', () => { currentCategory = btn.dataset.cat; showAll = false; renderCats(); renderGrid(); }); }); }
@@ -460,7 +463,22 @@
         document.getElementById('pwaInstallBtn')?.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') showToast('感谢安装！', 'success'); deferredPrompt = null; } document.getElementById('pwaInstallBanner').classList.remove('show'); });
         document.getElementById('pwaCloseBtn')?.addEventListener('click', () => document.getElementById('pwaInstallBanner').classList.remove('show'));
         const darkModeToggle = document.getElementById('darkModeToggle'); if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode'); darkModeToggle?.addEventListener('click', () => { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled'); darkModeToggle.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; });
-        let lastScrollY = 0, scrollTimer2; window.addEventListener('scroll', () => { const nav = document.getElementById('topNav'); if (scrollTimer2) clearTimeout(scrollTimer2); scrollTimer2 = setTimeout(() => { const currentY = window.scrollY; if (currentY > lastScrollY && currentY > 100) nav?.classList.add('hide'); else if (currentY < lastScrollY) nav?.classList.remove('hide'); lastScrollY = currentY; document.getElementById('backToTop')?.classList.toggle('show', currentY > 300); }, 50); });
+        let lastScrollY = 0, scrollTimer2;
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('topNav');
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+            if (scrollTimer2) clearTimeout(scrollTimer2);
+            scrollTimer2 = setTimeout(() => {
+                const currentY = window.scrollY;
+                if (currentY > lastScrollY && currentY > 100) nav?.classList.add('hide');
+                else if (currentY < lastScrollY) nav?.classList.remove('hide');
+                lastScrollY = currentY;
+                document.getElementById('backToTop')?.classList.toggle('show', currentY > 300);
+            }, 50);
+        });
         document.getElementById('backToTop')?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
         const hamburger = document.getElementById('hamburgerBtn'), navLinks = document.getElementById('navLinks'); hamburger?.addEventListener('click', (e) => { e.stopPropagation(); hamburger.classList.toggle('active'); navLinks?.classList.toggle('show'); }); document.addEventListener('click', (e) => { if (!navLinks?.contains(e.target) && !hamburger?.contains(e.target)) { navLinks?.classList.remove('show'); hamburger?.classList.remove('active'); } });
         let autoScrollInterval = null, scrollDirection = 1, currentScrollPos = 0;
@@ -469,12 +487,10 @@
         document.addEventListener('DOMContentLoaded', () => { const h = document.getElementById('hotScroll'); if (h) { h.addEventListener('mouseenter', stopAutoScroll); h.addEventListener('mouseleave', startAutoScroll); h.addEventListener('scroll', () => { currentScrollPos = h.scrollLeft; }); } });
         if (localStorage.getItem('lezhe_user')) { try { currentUser = JSON.parse(localStorage.getItem('lezhe_user')); } catch (e) {} } updateUserUI(); renderCalendar(); refreshCaptcha('login');
         if (!sessionStorage.getItem('has_loaded_before')) {
-            // 首次访问显示加载动画
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.style.display = 'flex';
             sessionStorage.setItem('has_loaded_before', 'true');
         } else {
-            // 非首次，直接隐藏动画并显示界面
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.style.display = 'none';
             document.getElementById('appWrapper').classList.add('loaded');
