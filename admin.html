@@ -655,6 +655,7 @@
                     <div class="form-group"><label>支持系统 *</label><div class="checkbox-group"><label><input type="checkbox" id="osWindows" checked> Windows</label><label><input type="checkbox" id="osMac" checked> Mac</label><label><input type="checkbox" id="osAndroid"> 安卓</label><label><input type="checkbox" id="osiOS"> iOS</label></div></div>
                     <div class="form-group"><label>下载链接 *</label><input type="url" id="swURL" placeholder="https://..."></div>
                     <div class="form-group"><label>添加日期</label><input type="date" id="swAddedDate" readonly></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>软件描述</label><textarea id="swDescription" rows="2" placeholder="简要介绍..."></textarea></div>
                     <div class="form-group" style="grid-column: span 2;"><label>图标</label><div class="icon-preview-box"><div class="icon-preview-display" id="iconPreviewContainer"><i id="iconPreview" class="fas fa-cube"></i><img id="iconPreviewImg" src="" style="display:none; width:100%; height:100%; object-fit:contain;"><span id="iconPreviewText" style="display:none; font-weight:700; color:white;">PS</span></div><div style="flex:1;"><input type="text" id="swIconCustom" placeholder="图标类名或图片URL" style="width:100%; margin-bottom:8px;" oninput="refreshIconPreview()"><div style="display:flex; gap:8px;"><button class="btn-outline" id="openIconPanel" type="button"><i class="fas fa-icons"></i> 预设图标</button><label class="btn-outline" for="iconFileInput" style="cursor:pointer;"><i class="fas fa-upload"></i> 上传图片</label></div></div><input type="file" id="iconFileInput" style="display:none;" accept="image/*"><input type="hidden" id="swIcon" value=""></div><div id="iconSuggestions" style="margin-top:8px; font-size:12px; color:var(--text-muted);"></div></div>
                     <div class="form-group"><label><input type="checkbox" id="swNoVerify"> 无需验证</label></div>
                 </div>
@@ -836,7 +837,7 @@
                 previewIcon.style.display = 'none';
                 previewImg.style.display = 'none';
                 previewText.style.display = 'none';
-                if (custom.startsWith('http')) {
+                if (custom.startsWith('http') || custom.startsWith('data:')) {
                     previewImg.src = custom;
                     previewImg.style.display = 'block';
                 } else if (custom.startsWith('fa-')) {
@@ -848,6 +849,18 @@
                     previewText.style.display = 'block';
                 }
             };
+
+            // 图标本地上传处理
+            document.getElementById('iconFileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    document.getElementById('swIconCustom').value = ev.target.result;
+                    refreshIconPreview();
+                };
+                reader.readAsDataURL(file);
+            });
 
             async function loadCategories() {
                 if (cachedCategories.length) return cachedCategories;
@@ -966,6 +979,7 @@
                 document.getElementById('osAndroid').checked = (sw.os || '').includes('安卓');
                 document.getElementById('osiOS').checked = (sw.os || '').includes('iOS');
                 document.getElementById('swURL').value = sw.url || '';
+                document.getElementById('swDescription').value = sw.description || '';
                 document.getElementById('swAddedDate').value = sw.addedDate || new Date().toISOString().slice(0,10);
                 document.getElementById('swNoVerify').checked = !!sw.noVerify;
                 document.getElementById('swIconCustom').value = typeof sw.icon === 'string' ? sw.icon : '';
@@ -990,6 +1004,7 @@
                     version: document.getElementById('swVersion').value.trim(),
                     os: osArr.join(', '),
                     url: document.getElementById('swURL').value.trim(),
+                    description: document.getElementById('swDescription').value.trim(),
                     icon: document.getElementById('swIconCustom').value.trim() || document.getElementById('swIcon').value,
                     addedDate: document.getElementById('swAddedDate').value,
                     noVerify: document.getElementById('swNoVerify').checked
@@ -1011,7 +1026,7 @@
                 }
             });
             document.getElementById('cancelEditBtn').addEventListener('click', () => {
-                ['swName','swVersion','swURL','swIconCustom'].forEach(id => document.getElementById(id).value = '');
+                ['swName','swVersion','swURL','swDescription','swIconCustom'].forEach(id => document.getElementById(id).value = '');
                 document.getElementById('editingId').value = '';
                 document.getElementById('swAddedDate').value = new Date().toISOString().slice(0,10);
                 refreshIconPreview();
