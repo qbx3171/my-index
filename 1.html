@@ -20,6 +20,90 @@
         body.dark-mode { --bg: #0f172a; --surface: #1e293b; --border: #334155; --border-light: #334155; --text: #f1f5f9; --text-secondary: #cbd5e1; --text-muted: #94a3b8; }
         .app-wrapper { opacity: 0; transition: opacity 0.15s ease-in-out; position: relative; z-index: 1; }
         .app-wrapper.loaded { opacity: 1; }
+
+        /* 加载动画覆盖层 */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+            opacity: 1;
+            visibility: visible;
+        }
+        body.dark-mode .loading-overlay {
+            background: var(--bg);
+        }
+        .loading-overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .loading-spinner {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, var(--primary) 0deg, transparent 120deg, var(--primary-light) 260deg, var(--primary) 360deg);
+            animation: spinRotate 1.4s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(79, 110, 246, 0.2);
+        }
+        .loading-spinner::after {
+            content: '';
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: block;
+        }
+        body.dark-mode .loading-spinner::after {
+            background: var(--bg);
+        }
+        @keyframes spinRotate {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .loading-text .dot-pulse {
+            display: inline-flex;
+            gap: 4px;
+        }
+        .loading-text .dot-pulse span {
+            width: 5px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: dotPulse 1.4s infinite ease-in-out both;
+        }
+        .loading-text .dot-pulse span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-text .dot-pulse span:nth-child(2) { animation-delay: -0.16s; }
+        .loading-text .dot-pulse span:nth-child(3) { animation-delay: 0s; }
+        @keyframes dotPulse {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        .loading-subtitle {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* 原有样式保持不变 */
         .top-nav { position: sticky; top: 0; z-index: 1000; padding: 0 20px; background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-light); transition: transform 0.3s ease; }
         body.dark-mode .top-nav { background: rgba(30,41,59,0.72); }
         .top-nav.hide { transform: translateY(-100%); }
@@ -204,6 +288,18 @@
     </style>
 </head>
 <body>
+    <!-- 加载动画覆盖层 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">
+            精彩内容加载中
+            <span class="dot-pulse">
+                <span></span><span></span><span></span>
+            </span>
+        </div>
+        <div class="loading-subtitle">乐哲软件 · 创意工具库</div>
+    </div>
+
     <div class="app-wrapper" id="appWrapper">
         <div class="top-nav" id="topNav"><div class="nav-inner"><div class="logo-area"><span class="logo">乐哲软件</span></div><button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button><div class="nav-links" id="navLinks"><a href="https://www.lezhesoft.cn/">首页</a><a href="https://www.lezhesoft.cn/service.html">服务项目</a><a href="#" data-nav="download" class="active">软件下载</a><a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></div><div class="user-area" id="userArea"></div><button class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></button></div></div>
         <div class="main"><div class="content-wrapper"><div class="main-content"><div class="carousel-container" id="categoryBannerContainer"><div class="carousel-slides" id="categoryBannerSlides"></div><div class="carousel-dots" id="categoryBannerDots"></div></div><div class="daily-section" id="dailySection" style="display: none;"><div class="daily-header"><h3><i class="fas fa-star" style="color: #f59e0b;"></i> 今日推荐</h3><span style="font-size: 0.7rem; color: var(--text-muted);">每日更新，精选好软</span></div><div class="daily-card" id="dailyCard"><div class="daily-card-content"><div class="daily-icon" id="dailyIcon"><i class="fas fa-gem"></i></div><div class="daily-info"><div class="daily-name" id="dailyName">加载中...</div><div class="daily-desc" id="dailyDesc"></div><div class="daily-meta"><span id="dailyVersion"></span><span id="dailyOs"></span><span id="dailyDownloads"><i class="fas fa-download"></i> 0</span></div></div><button class="daily-download-btn" id="dailyDownloadBtn"><i class="fas fa-download"></i> 立即下载</button></div></div></div>
@@ -290,8 +386,41 @@
         async function refreshUserList() { const container = document.getElementById('adminUserList'); container.innerHTML = '<div style="text-align:center;padding:40px;">加载中...</div>'; try { const users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(u => ({ id: u.email, fields: u, createdTime: u.createdAt })) : await (async () => { const data = await airReq('GET', 'Users?maxRecords=100'); return data.records.map(r => ({ id: r.id, fields: r.fields, createdTime: r.createdTime })); })(); const term = document.getElementById('adminSearchInput')?.value.toLowerCase() || ''; const dateFilter = document.getElementById('adminDateFilter')?.value || ''; let filtered = users.filter(u => !term || (u.fields.Email || '').toLowerCase().includes(term) || (u.fields.Username || '').toLowerCase().includes(term)); if (dateFilter) filtered = filtered.filter(u => { const regDate = u.createdTime || u.fields.CreatedAt; return regDate ? new Date(regDate).toISOString().split('T')[0] === dateFilter : false; }); container.innerHTML = filtered.map(u => { const role = u.fields.Role || 'user'; const isVip = role === 'vip' || role === 'admin'; const avatarIcon = role === 'admin' ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>'); return `<div class="admin-user-card"><div class="admin-user-info"><div class="admin-user-avatar">${avatarIcon}</div><div><div class="admin-user-email">${esc(u.fields.Email)}</div><div class="admin-user-name">${esc(u.fields.Username||'')}</div></div><div class="admin-user-role ${isVip?'vip':''}">${isVip?(role==='admin'?'管理员':'VIP'):'普通'}</div></div><div><button class="admin-action-btn upgrade-vip" data-id="${u.id}" data-role="${role}">${isVip&&role!=='admin'?'降级':'升级VIP'}</button><button class="admin-action-btn add-points" data-email="${u.fields.Email}" style="background:var(--success);">增加积分</button><button class="admin-action-btn reset-download" data-email="${u.fields.Email}" style="background:var(--warning);">重置次数</button></div></div>`; }).join(''); container.querySelectorAll('.upgrade-vip').forEach(btn => { btn.addEventListener('click', async () => { const userId = btn.dataset.id, currentRole = btn.dataset.role; if (currentRole === 'admin') { showToast('管理员不可降级', 'error'); return; } const newRole = currentRole === 'vip' ? 'user' : 'vip'; await updateUserRole(userId, newRole); await refreshUserList(); if (currentUser && currentUser.id === userId) { currentUser.role = newRole; localStorage.setItem('lezhe_user', JSON.stringify(currentUser)); updateUserUI(); } showToast(`已${newRole==='vip'?'升级VIP':'降级'}`, `success`); }); }); container.querySelectorAll('.add-points').forEach(btn => { btn.addEventListener('click', async () => { const email = btn.dataset.email; const points = prompt('请输入要增加/减少的积分（正数增加，负数减少）', '10'); if (points !== null && !isNaN(parseInt(points))) { await addPoints(email, parseInt(points)); showToast(`已调整积分 ${parseInt(points)} 分`, 'success'); await refreshUserList(); if (currentUser && currentUser.email === email) { currentUser.points = (currentUser.points || 0) + parseInt(points); localStorage.setItem('lezhe_user', JSON.stringify(currentUser)); updateUserUI(); } } }); }); container.querySelectorAll('.reset-download').forEach(btn => { btn.addEventListener('click', () => { const email = btn.dataset.email; saveUserDownloadData(email, 0, 0); showToast('已重置下载次数', 'success'); if (currentUser && currentUser.email === email) updateUserUI(); }); }); } catch (e) { container.innerHTML = '<div style="text-align:center;padding:40px;">加载失败</div>'; } }
         function openAuth(tab = 'login') { const modal = document.getElementById('authModal'); document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none'; document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none'; document.getElementById('forgotForm').style.display = tab === 'forgot' ? 'block' : 'none'; document.getElementById('authModalTitle').innerText = tab === 'register' ? '注册' : (tab === 'forgot' ? '找回密码' : '登录'); modal.classList.add('active'); if (tab === 'login') refreshCaptcha('login'); else if (tab === 'register') refreshCaptcha('reg'); else refreshCaptcha('forgot'); }
         function refreshCaptcha(type) { let q = Math.floor(Math.random() * 10) + 1, b = Math.floor(Math.random() * 10) + 1, op = Math.random() > 0.5 ? '+' : '-', ans = op === '+' ? q + b : q - b; if (ans < 0) return refreshCaptcha(type); currentCaptcha = { question: `${q} ${op} ${b} = ?`, answer: ans }; document.getElementById(`${type}CaptchaQuestion`).innerText = currentCaptcha.question; document.getElementById(`${type}CaptchaInput`).value = ''; }
-        async function loadAll() { document.getElementById('appWrapper').classList.add('loaded'); softwares = await fetchSoftwares(); const adData = await fetchAds(); bannerAds = adData.filter(a => a.position === 'banner'); sidebarAds = adData.filter(a => a.position === 'sidebar'); if (bannerAds.length) renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds); if (sidebarAds.length) renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds); articles = await fetchArticles(); announcements = isLocalFile ? [{ id: '1', title: '欢迎使用乐哲软件', content: '感谢大家的支持！更多优质软件持续更新中', createdAt: new Date().toISOString() }] : []; renderCats(); renderGrid(); renderHot(); renderRank(); renderArtsList(); renderHistory(); renderCalendar(); showAnnouncementBar(); setDailyRecommend(); hideLoadingOverlay(); }
-        function hideLoadingOverlay() { const overlay = document.getElementById('loadingOverlay'); if (overlay && overlay.style.display !== 'none') { requestAnimationFrame(() => { overlay.classList.add('hide'); setTimeout(() => { overlay.style.display = 'none'; }, 200); }); } }
+        async function loadAll() {
+            // 显示加载动画（如果存在）
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.style.display = 'flex';
+            
+            document.getElementById('appWrapper').classList.add('loaded');
+            softwares = await fetchSoftwares();
+            const adData = await fetchAds();
+            bannerAds = adData.filter(a => a.position === 'banner');
+            sidebarAds = adData.filter(a => a.position === 'sidebar');
+            if (bannerAds.length) renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds);
+            if (sidebarAds.length) renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds);
+            articles = await fetchArticles();
+            announcements = isLocalFile ? [{ id: '1', title: '欢迎使用乐哲软件', content: '感谢大家的支持！更多优质软件持续更新中', createdAt: new Date().toISOString() }] : [];
+            renderCats();
+            renderGrid();
+            renderHot();
+            renderRank();
+            renderArtsList();
+            renderHistory();
+            renderCalendar();
+            showAnnouncementBar();
+            setDailyRecommend();
+            hideLoadingOverlay();
+        }
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.add('hide');
+                // 动画结束后彻底移除元素（可选）
+                setTimeout(() => {
+                    if (overlay.parentNode) overlay.style.display = 'none';
+                }, 400); // 与CSS过渡时间一致
+            }
+        }
         function renderCats() { const cats = [...new Set(softwares.map(s => s.category))]; const container = document.getElementById('categoryTabs'); if (!container) return; const isMobile = window.innerWidth <= 768; const visibleLimit = isMobile ? 4 : 5; const hasMore = cats.length > visibleLimit; let html = `<button class="cat-chip ${currentCategory==='all'?'active':''}" data-cat="all"><i class="fas fa-th-large"></i> 全部</button>`; const visibleCats = cats.slice(0, visibleLimit); for (let cat of visibleCats) { const icon = cat === '3D建模' ? 'fa-cube' : (cat === '图像处理' ? 'fa-palette' : (cat === '视频剪辑' ? 'fa-video' : (cat === '工程设计' ? 'fa-drafting-compass' : 'fa-tag'))); html += `<button class="cat-chip ${currentCategory===cat?'active':''}" data-cat="${cat}"><i class="fas ${icon}"></i> ${cat}</button>`; } if (hasMore) { html += `<button class="more-cats-btn" id="moreCatsBtn"><i class="fas fa-chevron-down"></i> 更多分类</button>`; container.innerHTML = html; let menu = document.querySelector('.cat-more-menu'); if (!menu) { menu = document.createElement('div'); menu.className = 'cat-more-menu'; container.appendChild(menu); } const moreBtn = document.getElementById('moreCatsBtn'); const hiddenCats = cats.slice(visibleLimit); menu.innerHTML = hiddenCats.map(cat => { const icon = cat === '3D建模' ? 'fa-cube' : (cat === '图像处理' ? 'fa-palette' : (cat === '视频剪辑' ? 'fa-video' : (cat === '工程设计' ? 'fa-drafting-compass' : 'fa-tag'))); return `<div class="cat-chip-more ${currentCategory===cat?'active':''}" data-cat="${cat}"><i class="fas ${icon}"></i> ${cat}</div>`; }).join(''); menu.querySelectorAll('.cat-chip-more').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); currentCategory = el.dataset.cat; showAll = false; renderCats(); renderGrid(); menu.classList.remove('show'); }); }); moreBtn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('show'); }); document.addEventListener('click', (e) => { if (menu && !menu.contains(e.target) && e.target !== moreBtn) menu.classList.remove('show'); }); } else { container.innerHTML = html; const oldMenu = container.querySelector('.cat-more-menu'); if (oldMenu) oldMenu.remove(); } container.querySelectorAll('.cat-chip').forEach(btn => { btn.addEventListener('click', () => { currentCategory = btn.dataset.cat; showAll = false; renderCats(); renderGrid(); }); }); }
         window._loadMore = () => { showAll = true; renderGrid(); }; document.getElementById('loadMoreBtn') && document.getElementById('loadMoreBtn').addEventListener('click', window._loadMore);
         document.getElementById('searchInput')?.addEventListener('input', e => { searchKeyword = e.target.value; renderGrid(); }); document.getElementById('searchBtn')?.addEventListener('click', () => { searchKeyword = document.getElementById('searchInput').value; renderGrid(); });
@@ -338,7 +467,18 @@
         function startAutoScroll() { const s = document.getElementById('hotScroll'); if (!s || !s.children.length) return; if (autoScrollInterval) clearInterval(autoScrollInterval); autoScrollInterval = setInterval(() => { if (!s || s.children.length === 0) return; const max = s.scrollWidth - s.clientWidth; if (max <= 0) return; const step = 182; let pos = currentScrollPos + step * scrollDirection; if (pos >= max) { pos = max; scrollDirection = -1; } else if (pos <= 0) { pos = 0; scrollDirection = 1; } currentScrollPos = pos; s.scrollTo({ left: currentScrollPos, behavior: 'smooth' }); }, 2000); }
         function stopAutoScroll() { if (autoScrollInterval) clearInterval(autoScrollInterval); autoScrollInterval = null; }
         document.addEventListener('DOMContentLoaded', () => { const h = document.getElementById('hotScroll'); if (h) { h.addEventListener('mouseenter', stopAutoScroll); h.addEventListener('mouseleave', startAutoScroll); h.addEventListener('scroll', () => { currentScrollPos = h.scrollLeft; }); } });
-        if (localStorage.getItem('lezhe_user')) { try { currentUser = JSON.parse(localStorage.getItem('lezhe_user')); } catch (e) {} } updateUserUI(); renderCalendar(); refreshCaptcha('login'); if (!sessionStorage.getItem('has_loaded_before')) { const overlay = document.getElementById('loadingOverlay'); if (overlay) overlay.style.display = 'flex'; sessionStorage.setItem('has_loaded_before', 'true'); } else { const overlay = document.getElementById('loadingOverlay'); if (overlay) overlay.style.display = 'none'; document.getElementById('appWrapper').classList.add('loaded'); }
+        if (localStorage.getItem('lezhe_user')) { try { currentUser = JSON.parse(localStorage.getItem('lezhe_user')); } catch (e) {} } updateUserUI(); renderCalendar(); refreshCaptcha('login');
+        if (!sessionStorage.getItem('has_loaded_before')) {
+            // 首次访问显示加载动画
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.style.display = 'flex';
+            sessionStorage.setItem('has_loaded_before', 'true');
+        } else {
+            // 非首次，直接隐藏动画并显示界面
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) overlay.style.display = 'none';
+            document.getElementById('appWrapper').classList.add('loaded');
+        }
         loadAll();
     </script>
 </body>
