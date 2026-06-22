@@ -638,9 +638,11 @@
 
             <div id="dashboardPanel" class="panel">
                 <h2 style="margin-bottom:24px; color: var(--primary);">📊 系统概览</h2>
-                <div class="stats-grid" id="dashboardStats"></div>
+                <div class="stats-grid" id="dashboardStats">
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-spinner fa-pulse"></i></div><div class="stat-value">—</div><div class="stat-label">加载中…</div></div>
+                </div>
                 <h3 style="margin-top:24px; color: var(--text-secondary);">🆕 最近注册用户</h3>
-                <table class="table"><thead><tr><th>邮箱</th><th>用户名</th><th>下载次数</th><th>注册时间</th></tr></thead><tbody id="recentUsersTbody"></tbody></table>
+                <table class="table"><thead><tr><th>邮箱</th><th>用户名</th><th>下载次数</th><th>注册时间</th></tr></thead><tbody id="recentUsersTbody"><tr><td colspan="4" style="text-align:center;">加载中…</td></tr></tbody></table>
             </div>
 
             <div id="softwaresPanel" class="panel" style="display:none;">
@@ -655,7 +657,6 @@
                     <div class="form-group"><label>支持系统 *</label><div class="checkbox-group"><label><input type="checkbox" id="osWindows" checked> Windows</label><label><input type="checkbox" id="osMac" checked> Mac</label><label><input type="checkbox" id="osAndroid"> 安卓</label><label><input type="checkbox" id="osiOS"> iOS</label></div></div>
                     <div class="form-group"><label>下载链接 *</label><input type="url" id="swURL" placeholder="https://..."></div>
                     <div class="form-group"><label>添加日期</label><input type="date" id="swAddedDate" readonly></div>
-                    <div class="form-group" style="grid-column: span 2;"><label>软件描述</label><textarea id="swDescription" rows="2" placeholder="简要介绍..."></textarea></div>
                     <div class="form-group" style="grid-column: span 2;"><label>图标</label><div class="icon-preview-box"><div class="icon-preview-display" id="iconPreviewContainer"><i id="iconPreview" class="fas fa-cube"></i><img id="iconPreviewImg" src="" style="display:none; width:100%; height:100%; object-fit:contain;"><span id="iconPreviewText" style="display:none; font-weight:700; color:white;">PS</span></div><div style="flex:1;"><input type="text" id="swIconCustom" placeholder="图标类名或图片URL" style="width:100%; margin-bottom:8px;" oninput="refreshIconPreview()"><div style="display:flex; gap:8px;"><button class="btn-outline" id="openIconPanel" type="button"><i class="fas fa-icons"></i> 预设图标</button><label class="btn-outline" for="iconFileInput" style="cursor:pointer;"><i class="fas fa-upload"></i> 上传图片</label></div></div><input type="file" id="iconFileInput" style="display:none;" accept="image/*"><input type="hidden" id="swIcon" value=""></div><div id="iconSuggestions" style="margin-top:8px; font-size:12px; color:var(--text-muted);"></div></div>
                     <div class="form-group"><label><input type="checkbox" id="swNoVerify"> 无需验证</label></div>
                 </div>
@@ -702,6 +703,12 @@
                         <i class="fas fa-search"></i>
                         <input type="text" id="userSearch" placeholder="搜索邮箱或用户名...">
                     </div>
+                    <select id="userDateFilter" class="filter-select">
+                        <option value="all">全部时间</option>
+                        <option value="today">今天</option>
+                        <option value="7days">最近7天</option>
+                        <option value="30days">最近30天</option>
+                    </select>
                 </div>
                 <table class="table">
                     <thead><tr><th>邮箱</th><th>用户名</th><th>角色</th><th>下载次数</th><th>注册时间</th><th>操作</th></tr></thead>
@@ -837,7 +844,7 @@
                 previewIcon.style.display = 'none';
                 previewImg.style.display = 'none';
                 previewText.style.display = 'none';
-                if (custom.startsWith('http') || custom.startsWith('data:')) {
+                if (custom.startsWith('http')) {
                     previewImg.src = custom;
                     previewImg.style.display = 'block';
                 } else if (custom.startsWith('fa-')) {
@@ -849,18 +856,6 @@
                     previewText.style.display = 'block';
                 }
             };
-
-            // 图标本地上传处理
-            document.getElementById('iconFileInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    document.getElementById('swIconCustom').value = ev.target.result;
-                    refreshIconPreview();
-                };
-                reader.readAsDataURL(file);
-            });
 
             async function loadCategories() {
                 if (cachedCategories.length) return cachedCategories;
@@ -979,7 +974,6 @@
                 document.getElementById('osAndroid').checked = (sw.os || '').includes('安卓');
                 document.getElementById('osiOS').checked = (sw.os || '').includes('iOS');
                 document.getElementById('swURL').value = sw.url || '';
-                document.getElementById('swDescription').value = sw.description || '';
                 document.getElementById('swAddedDate').value = sw.addedDate || new Date().toISOString().slice(0,10);
                 document.getElementById('swNoVerify').checked = !!sw.noVerify;
                 document.getElementById('swIconCustom').value = typeof sw.icon === 'string' ? sw.icon : '';
@@ -1004,7 +998,6 @@
                     version: document.getElementById('swVersion').value.trim(),
                     os: osArr.join(', '),
                     url: document.getElementById('swURL').value.trim(),
-                    description: document.getElementById('swDescription').value.trim(),
                     icon: document.getElementById('swIconCustom').value.trim() || document.getElementById('swIcon').value,
                     addedDate: document.getElementById('swAddedDate').value,
                     noVerify: document.getElementById('swNoVerify').checked
@@ -1026,7 +1019,7 @@
                 }
             });
             document.getElementById('cancelEditBtn').addEventListener('click', () => {
-                ['swName','swVersion','swURL','swDescription','swIconCustom'].forEach(id => document.getElementById(id).value = '');
+                ['swName','swVersion','swURL','swIconCustom'].forEach(id => document.getElementById(id).value = '');
                 document.getElementById('editingId').value = '';
                 document.getElementById('swAddedDate').value = new Date().toISOString().slice(0,10);
                 refreshIconPreview();
@@ -1118,6 +1111,7 @@
 
             function renderUsersTable() {
                 const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+                const dateFilterValue = document.getElementById('userDateFilter').value;
                 let filtered = allUsers;
                 if (searchTerm) {
                     filtered = filtered.filter(u =>
@@ -1125,6 +1119,30 @@
                         (u.Username || '').toLowerCase().includes(searchTerm)
                     );
                 }
+                // 日期筛选：根据下拉选项计算日期范围
+                if (dateFilterValue !== 'all') {
+                    const now = new Date();
+                    let startDate;
+                    if (dateFilterValue === 'today') {
+                        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    } else if (dateFilterValue === '7days') {
+                        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    } else if (dateFilterValue === '30days') {
+                        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    }
+                    if (startDate) {
+                        filtered = filtered.filter(u => {
+                            const created = u.createdTime ? new Date(u.createdTime) : null;
+                            return created && created >= startDate;
+                        });
+                    }
+                }
+                // 默认按注册时间降序排列，新注册在前
+                filtered.sort((a, b) => {
+                    const dateA = a.createdTime ? new Date(a.createdTime) : new Date(0);
+                    const dateB = b.createdTime ? new Date(b.createdTime) : new Date(0);
+                    return dateB - dateA;
+                });
                 const tbody = document.getElementById('usersTbody');
                 tbody.innerHTML = filtered.map(u => {
                     const createdDate = u.createdTime ? new Date(u.createdTime).toLocaleString('zh-CN') : '未知';
@@ -1183,6 +1201,7 @@
             });
 
             document.getElementById('userSearch').addEventListener('input', renderUsersTable);
+            document.getElementById('userDateFilter').addEventListener('change', renderUsersTable);
             document.getElementById('addUserBtn').addEventListener('click', async () => {
                 const email = document.getElementById('newUserEmail').value.trim();
                 const username = document.getElementById('newUsername').value.trim();
@@ -1211,22 +1230,31 @@
             window.deleteMessage = async (id) => { if (confirm('删除留言？')) { try { await airtableRequest('DELETE', `messages/${id}`); loadMessages(); loadDashboard(); } catch (e) { showToast('失败', true); } } };
 
             async function loadDashboard() {
+                const statsGrid = document.getElementById('dashboardStats');
+                const recentTbody = document.getElementById('recentUsersTbody');
+                statsGrid.innerHTML = '<div class="stat-card"><div class="stat-icon"><i class="fas fa-spinner fa-pulse"></i></div><div class="stat-value">—</div><div class="stat-label">加载中…</div></div>';
+                recentTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">加载中…</td></tr>';
                 try {
                     const [users, sw, msgs] = await Promise.all([airtableRequest('GET', 'Users'), airtableRequest('GET', 'softwares'), airtableRequest('GET', 'messages')]);
                     const totalDownloads = users.records.reduce((sum, r) => { const d = r.fields.Downloads; return sum + (typeof d === 'number' ? d : 0); }, 0);
-                    document.getElementById('dashboardStats').innerHTML = `
+                    statsGrid.innerHTML = `
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${users.records.length}</div><div class="stat-label">注册用户</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(0,229,255,0.15);"><i class="fas fa-cubes"></i></div><div class="stat-value">${sw.records.length}</div><div class="stat-label">软件数量</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981;"><i class="fas fa-comments"></i></div><div class="stat-value">${msgs.records.length}</div><div class="stat-label">留言总数</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;"><i class="fas fa-download"></i></div><div class="stat-value">${totalDownloads}</div><div class="stat-label">总下载次数</div></div>
                     `;
-                    const recentUsers = users.records.slice(0, 5);
-                    document.getElementById('recentUsersTbody').innerHTML = recentUsers.map(r => {
+                    // 按创建时间降序排序，取前5个作为最近注册用户
+                    const sortedUsers = [...users.records].sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
+                    const recentUsers = sortedUsers.slice(0, 5);
+                    recentTbody.innerHTML = recentUsers.map(r => {
                         const createdDate = r.createdTime ? new Date(r.createdTime).toLocaleString('zh-CN') : '未知';
                         const downloads = r.fields.Downloads !== undefined && r.fields.Downloads !== null ? r.fields.Downloads : 0;
                         return `<tr><td>${r.fields.Email}</td><td>${r.fields.Username||''}</td><td style="font-weight:600; color:var(--primary);">${downloads}</td><td>${createdDate}</td></tr>`;
                     }).join('');
-                } catch (e) { showToast('仪表盘加载失败', true); }
+                } catch (e) {
+                    statsGrid.innerHTML = '<div class="stat-card"><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="stat-value">!</div><div class="stat-label">加载失败</div></div>';
+                    recentTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">加载失败</td></tr>';
+                }
             }
 
             document.getElementById('loginBtn').addEventListener('click', () => {
