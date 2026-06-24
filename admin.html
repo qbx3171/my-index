@@ -292,6 +292,25 @@
                 return undefined;
             }
 
+            // ====================  自适应日期字段查找  ====================
+            function findDateField(obj) {
+                if (!obj) return null;
+                // 优先尝试常见字段名
+                const candidates = ['CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime', 'created_at', 'Created At', 'created at', 'DateCreated', 'dateCreated'];
+                for (let name of candidates) {
+                    if (obj[name] !== undefined && obj[name] !== null) return obj[name];
+                }
+                // 如果还没有，遍历所有键，查找包含 'created' 或 'date' 的键（忽略大小写）
+                for (let key in obj) {
+                    const lowerKey = key.toLowerCase();
+                    if (lowerKey.includes('created') || lowerKey.includes('date') || lowerKey.includes('time')) {
+                        const val = obj[key];
+                        if (val !== undefined && val !== null) return val;
+                    }
+                }
+                return null;
+            }
+
             // ====================  软件管理  ====================
             async function loadSoftwares(){
                 try{
@@ -511,8 +530,8 @@
                 try{
                     const data=await baserowReq('GET', TABLES.users, null, null, 'max_limit=100');
                     allUsers=data.results.map(r=>{
-                        const createdAt = getFieldSafe(r, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
-                        return {...r, createdTime: createdAt || new Date().toISOString()};
+                        const dateVal = findDateField(r);
+                        return {...r, createdTime: dateVal || new Date().toISOString()};
                     });
                     renderUsersTable();
                 }catch(e){document.getElementById('usersTbody').innerHTML='<tr><td colspan="6">加载失败</td></tr>';}
@@ -618,14 +637,14 @@
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981;"><i class="fas fa-comments"></i></div><div class="stat-value">${msgs.results.length}</div><div class="stat-label">留言总数</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;"><i class="fas fa-download"></i></div><div class="stat-value">${totalDl}</div><div class="stat-label">总下载</div></div>
                     `;
-                    // 最近注册用户：与用户管理表格使用相同的日期提取逻辑
+                    // 最近注册用户：使用自适应日期查找
                     const sorted = [...users.results].sort((a,b) => {
-                        const da = getFieldSafe(a, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
-                        const db = getFieldSafe(b, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
+                        const da = findDateField(a);
+                        const db = findDateField(b);
                         return new Date(db || 0) - new Date(da || 0);
                     });
                     recent.innerHTML=sorted.slice(0,5).map(r=>{
-                        const dateVal = getFieldSafe(r, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
+                        const dateVal = findDateField(r);
                         let dateStr = '未知';
                         if (dateVal) {
                             const d = new Date(dateVal);
