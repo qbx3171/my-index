@@ -12,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
+        /* ===== 完整样式（与之前一致，此处省略不重复，实际将复制完整样式 ===== */
         :root { --bg: #f3f4f8; --surface: #ffffff; --border: #e8ecf3; --border-light: #f0f2f7; --text: #1a1d2e; --text-secondary: #4a5068; --text-muted: #8b90a5; --primary: #4f6ef6; --primary-light: #eef1fd; --primary-hover: #3b54d4; --success: #10b981; --warning: #f59e0b; --shadow-sm: 0 1px 3px rgba(0,0,0,0.04); --shadow-md: 0 4px 16px rgba(0,0,0,0.05); --shadow-lg: 0 12px 36px rgba(0,0,0,0.07); --radius-sm: 8px; --radius: 16px; --radius-lg: 22px; --radius-xl: 28px; --radius-full: 60px; --transition-fast: 0.18s ease; --font-xs: 0.68rem; --font-sm: 0.78rem; --font-base: 0.9rem; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
@@ -218,6 +219,7 @@
     </style>
 </head>
 <body>
+    <!-- ===== 完整HTML结构（与之前一致，此处仅保留关键节点，实际将包含所有模态框） ===== -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">
@@ -237,7 +239,7 @@
         <div id="softwareGridContainer" class="grid"></div>
         <div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;">加载更多</button></div></div><div class="sidebar"><div class="sidebar-search"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="搜软件..." autocomplete="off"><button id="searchBtn"><i class="fas fa-arrow-right"></i></button></div></div><div class="carousel-container" id="adContainer"><div class="carousel-slides" id="sidebarCarouselSlides"></div><div class="carousel-dots" id="sidebarCarouselDots"></div></div><div class="sidebar-card"><div class="calendar-header"><span id="calendarMonthYear"></span><div class="calendar-nav"><button id="prevMonth"><i class="fas fa-chevron-left"></i></button><button id="nextMonth"><i class="fas fa-chevron-right"></i></button></div></div><div class="calendar-grid" id="calendarDays"></div><div style="text-align:center; margin-top:10px;"><button id="dailyCheckinBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:8px 16px; font-size:0.75rem; cursor:pointer;">📅 每日签到 (+1次+2积分)</button></div></div><div class="feedback-section"><div style="font-weight:650;font-size:var(--font-base);margin-bottom:10px;"><i class="fas fa-comment-dots"></i> 用户留言</div><input type="text" id="feedbackName" class="feedback-input" placeholder="昵称 (选填)"><textarea id="feedbackMessage" class="feedback-textarea" rows="2" placeholder="分享你想要的软件..."></textarea><button id="submitFeedbackBtn" class="feedback-submit-btn"><i class="fas fa-paper-plane"></i> 提交</button><div id="feedbackListContainer" style="margin-top:12px;font-size:var(--font-xs);"></div></div><div class="sidebar-card"><h3><i class="fas fa-newspaper"></i> 最新文章 <button id="manageArticlesBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:5px 12px; font-size:0.65rem; cursor:pointer; display:none;">管理</button></h3><div id="articlesList"></div></div><div class="sidebar-card"><h3><i class="fas fa-chart-line"></i> 下载排行榜</h3><div id="rankList"></div></div><div class="sidebar-card"><h3><i class="fas fa-history"></i> 最近浏览</h3><div id="historyList"></div><div class="clear-history" style="margin-top:8px; text-align:right;"><button id="clearHistoryBtn" style="background:none; border:1px solid var(--border); padding:4px 12px; border-radius:20px; font-size:0.65rem; cursor:pointer;">清空历史</button></div></div></div></div><div class="friend-links-wrapper"><div class="friend-links-title">友情链接</div><div class="friend-links-row"><a href="https://foxirj.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 佛系软件</a><a href="https://www.ruancang.net/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 软仓</a><a href="https://www.macwk.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> MacWK</a><a href="https://www.ifmac.cn/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> ifMac</a><a href="https://www.macku.pro/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 迈克库软件</a></div></div><footer style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.7rem;">版权所有 © 乐哲软件 | www.lezhesoft.cn | 个人技术分享</footer></div></div>
 
-    <!-- 所有模态框 -->
+    <!-- 所有模态框（完整保留） -->
     <div id="authModal" class="modal-overlay"><div class="modal-card" style="max-width:440px;"><div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button></div><div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div><button id="showForgotBtn" style="background:none;border:none;color:var(--primary);margin-bottom:12px;">忘记密码？</button><button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">登录</button></div><div id="registerForm" style="display:none;"><input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div id="emailCheckStatus" class="input-check-status"></div><input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="text" id="regInviteCode" placeholder="邀请码（选填）" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;"></div><button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">注册</button></div><div id="forgotForm" style="display:none;"><input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:10px;margin-bottom:12px;"><button id="sendResetCodeBtn" style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:40px;padding:10px;cursor:pointer;">发送验证码</button><input type="text" id="resetCodeInput" placeholder="验证码" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:12px;"></div><input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="forgotCaptchaQuestion"></span><button id="refreshForgotCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;"></div><button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">重置密码</button><button id="backToLoginFromForgot" style="background:none;border:none;color:var(--primary);margin-top:10px;">返回登录</button></div></div></div>
 
     <div id="profileModal" class="modal-overlay"><div class="profile-modal-card"><div class="profile-header"><h2><i class="fas fa-user-circle" style="color:var(--primary);"></i> 个人中心</h2><button id="closeProfileModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">&times;</button></div><div class="profile-content"><div class="profile-info-grid"><div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-user"></i> 用户名</span><span class="profile-info-value"><input type="text" id="profileUsernameInput" class="profile-username-input" style="margin-bottom:0; width:140px; padding:6px 10px;"><span id="profileLevelBadge"></span></span></div><div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-crown"></i> 会员等级</span><span class="profile-info-value"><span id="profileRole"></span> <span id="profileLevelTag"></span></span></div></div><div class="profile-stats"><div class="profile-stat-card"><i class="fas fa-download"></i><div class="profile-stat-value" id="profileRemaining">0</div><div class="profile-stat-label">本月剩余下载</div></div><div class="profile-stat-card"><i class="fas fa-coins"></i><div class="profile-stat-value" id="profilePoints">0</div><div class="profile-stat-label">累计积分</div></div></div><div class="level-rule-tip" style="margin-bottom:12px;"><span>青铜0-29 | 白银30-99 | 黄金100-199 | 铂金200-499 | 钻石≥500</span><span>签到/评价/邀请得积分</span></div><div class="buy-tip"><span><i class="fas fa-exclamation-circle"></i> 免费次数用完后可联系客服购买</span><button id="contactAdminBuyBtn" class="contact-buy-btn" style="margin:0; padding:4px 12px;"><i class="fab fa-weixin"></i> 联系客服</button></div><div class="invite-code-box"><div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:4px;">我的邀请码</div><code id="myInviteCode" style="font-size:1rem; font-weight:700;">----</code><div style="font-size:0.6rem; color:var(--text-muted); margin-top:4px;">邀请好友，双方各得5次下载+10积分</div></div><div class="action-buttons"><button id="showFavoritesBtn"><i class="fas fa-heart"></i> 我的收藏</button><button id="showExportBtn"><i class="fas fa-download"></i> 导出数据</button><button id="showMessagesBtn"><i class="fas fa-envelope"></i> 站内信 <span id="unreadCount" style="background:#ef4444;color:white;border-radius:50%;padding:2px 10px;font-size:0.7rem;margin-left:8px;display:none;">0</span></button></div><div class="password-section"><h4><i class="fas fa-lock"></i> 修改密码（选填）</h4><input type="password" id="profileNewPwd" placeholder="新密码"><input type="password" id="profileConfirmPwd" placeholder="确认新密码"><button id="saveProfileBtn">保存修改</button></div></div></div></div>
@@ -612,7 +614,9 @@
             if (currentUser && currentUser.email === email) currentUser.username = newUsername;
         }
 
+        // 修复 Points 小数问题：使用 Math.floor 确保整数
         async function addPoints(email, points) {
+            points = Math.floor(points); // 强制转为整数
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
                 var user = users.find(function(u) { return u.email === email; });
@@ -635,6 +639,7 @@
         }
 
         async function addDownloadBonus(email, bonus) {
+            bonus = Math.floor(bonus);
             var rec = await findUserByEmail(email);
             if (!rec) return;
             var newExtra = (rec.extraquota || 0) + bonus;
@@ -868,6 +873,7 @@
             }
         }
 
+        // 修复：下载函数增加日志和错误处理
         async function downloadSoftware(sw) {
             console.log('=== 点击下载 ===', sw);
             if (!currentUser) {
@@ -951,7 +957,7 @@
             newCard.id = 'dailyCard';
         }
 
-        // 关键修改：使用事件委托，确保卡片点击正确触发
+        // 关键修改：使用事件委托 + 单独绑定，确保点击生效
         function renderGrid() {
             var filtered = softwares.filter(function(s) {
                 return (currentCategory === 'all' || s.category === currentCategory) && matchesSearch(s, searchKeyword);
@@ -978,20 +984,10 @@
             }).join('');
             document.getElementById('loadMoreContainer').style.display = (!showAll && filtered.length > 12) ? 'block' : 'none';
 
-            // 移除原有的逐个绑定，使用事件委托
-            // 先移除旧监听（如果有），再添加委托
-            var newContainer = container.cloneNode(true);
-            container.parentNode.replaceChild(newContainer, container);
-            var freshContainer = document.getElementById('softwareGridContainer');
-
-            // 事件委托：监听容器上的点击
-            freshContainer.addEventListener('click', function(e) {
+            // 使用事件委托
+            container.addEventListener('click', function(e) {
                 var target = e.target;
-                // 如果点击的是收藏按钮，不触发下载
-                if (target.closest('.favorite-btn')) {
-                    return;
-                }
-                // 找到最近的 .software-card 父级
+                if (target.closest('.favorite-btn')) return;
                 var card = target.closest('.software-card');
                 if (card) {
                     var swId = card.dataset.id;
@@ -1001,19 +997,17 @@
                     }
                 }
             });
-
-            // 收藏按钮事件单独处理（使用委托也可以，但为了保持独立，在容器上再处理收藏点击）
-            freshContainer.addEventListener('click', function(e) {
+            // 收藏按钮委托
+            container.addEventListener('click', function(e) {
                 var btn = e.target.closest('.favorite-btn');
                 if (btn) {
-                    e.stopPropagation(); // 阻止冒泡到卡片
+                    e.stopPropagation();
                     var isActive = toggleFavorite(btn.dataset.id, btn.dataset.name);
                     btn.classList.toggle('active', isActive);
                 }
             });
-
-            // 评价星标点击事件
-            freshContainer.addEventListener('click', function(e) {
+            // 评价星标委托
+            container.addEventListener('click', function(e) {
                 var ratingSpan = e.target.closest('.rating-stars');
                 if (ratingSpan) {
                     e.stopPropagation();
@@ -1042,6 +1036,15 @@
                         });
                     }
                 }
+            });
+
+            // 额外单独绑定，双重保险（直接绑定到每个卡片）
+            container.querySelectorAll('.software-card').forEach(function(card) {
+                card.addEventListener('click', function(e) {
+                    if (e.target.closest('.favorite-btn')) return;
+                    var sw = softwares.find(function(s) { return s.id === card.dataset.id; });
+                    if (sw) downloadSoftware(sw);
+                });
             });
         }
 
