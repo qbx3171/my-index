@@ -286,9 +286,16 @@
         let allUsersList = [];
         function showToast(m, t = 'success') { const d = document.createElement('div'); d.className = 'toast-message ' + t; d.innerHTML = m; document.body.appendChild(d); setTimeout(() => d.remove(), 3000); }
         function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]; }); }
+        // ================== 修复点 1：baserowReq 自动添加 user_field_names ==================
         async function baserowReq(method, tableId, body = null, rowId = null, queryParams = '') {
             let url = CONFIG.BASEROW_API_URL + tableId + '/';
             if (rowId) url += rowId + '/';
+            // 自动添加 user_field_names=true，确保返回用户定义的列名
+            if (queryParams && !queryParams.includes('user_field_names=true')) {
+                queryParams += (queryParams ? '&' : '') + 'user_field_names=true';
+            } else if (!queryParams) {
+                queryParams = 'user_field_names=true';
+            }
             if (queryParams) url += '?' + queryParams;
             const headers = {
                 'Authorization': 'Token ' + CONFIG.BASEROW_TOKEN,
@@ -304,12 +311,14 @@
             if (method === 'DELETE') return { success: true };
             return await res.json();
         }
+        // ================== 修复点 2：fetchSoftwares 去掉 order_by ==================
         async function fetchSoftwares() {
             if (isLocalFile) {
                 return softwares.length ? softwares : [];
             }
             try {
-                const data = await baserowReq('GET', CONFIG.TABLES.softwares, null, null, 'max_limit=100&order_by=-id');
+                // 去掉 order_by=-id，仅保留 max_limit
+                const data = await baserowReq('GET', CONFIG.TABLES.softwares, null, null, 'max_limit=100');
                 return data.results.map(function(row) {
                     var iconVal = row.Icon || row.icon || '';
                     var iconUrl = '';
@@ -345,6 +354,7 @@
                 return softwares.length ? softwares : [];
             }
         }
+        // 其余函数保持不变（fetchArticles, fetchAds 等均正常）
         async function fetchArticles() {
             if (isLocalFile) return [];
             try {
