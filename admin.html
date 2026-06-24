@@ -284,12 +284,21 @@
                 if (typeof iconField === 'string') return iconField;
                 return '';
             }
-            // 兼容大小写获取字段值
+            // 兼容大小写获取字段值，支持多个候选名
             function getFieldSafe(obj, ...names) {
                 for (let name of names) {
                     if (obj && obj[name] !== undefined && obj[name] !== null) return obj[name];
                 }
                 return undefined;
+            }
+            // 安全获取日期字符串
+            function getDateSafe(obj) {
+                const dateVal = getFieldSafe(obj, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
+                if (dateVal) {
+                    const d = new Date(dateVal);
+                    if (!isNaN(d.getTime())) return d.toLocaleString('zh-CN');
+                }
+                return '未知';
             }
 
             // ====================  软件管理  ====================
@@ -511,8 +520,7 @@
                 try{
                     const data=await baserowReq('GET', TABLES.users, null, null, 'max_limit=100');
                     allUsers=data.results.map(r=>{
-                        // 兼容大小写获取创建时间
-                        const createdAt = getFieldSafe(r, 'CreatedAt', 'createdAt', 'Created', 'created');
+                        const createdAt = getFieldSafe(r, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
                         return {...r, createdTime: createdAt || new Date().toISOString()};
                     });
                     renderUsersTable();
@@ -533,11 +541,9 @@
                 }
                 filtered.sort((a,b)=>(b.createdTime?new Date(b.createdTime):0)-(a.createdTime?new Date(a.createdTime):0));
                 document.getElementById('usersTbody').innerHTML=filtered.map(u=>{
-                    const date=u.createdTime?new Date(u.createdTime).toLocaleString('zh-CN'):'未知';
-                    // 兼容大小写获取下载次数
-                    const dl = getFieldSafe(u, 'Downloads', 'downloads', 'Download', 'download');
-                    const displayDl = (dl !== undefined && dl !== null) ? dl : 0;
-                    return`<tr><td>${u.Email||''}</td><td>${u.Username||''}</td><td>${u.Role||'user'}</td><td>${displayDl}</td><td>${date}</td><td><button class="btn-edit-advanced" onclick="openUserEditModal('${u.id}')">编辑</button><button class="btn-delete-advanced" onclick="deleteUser('${u.id}')">删除</button></td></tr>`;
+                    const date = u.createdTime ? new Date(u.createdTime).toLocaleString('zh-CN') : '未知';
+                    const dl = Number(getFieldSafe(u, 'Downloads', 'downloads', 'Download', 'download')) || 0;
+                    return`<tr><td>${u.Email||''}</td><td>${u.Username||''}</td><td>${u.Role||'user'}</td><td>${dl}</td><td>${date}</td><td><button class="btn-edit-advanced" onclick="openUserEditModal('${u.id}')">编辑</button><button class="btn-delete-advanced" onclick="deleteUser('${u.id}')">删除</button></td></tr>`;
                 }).join('')||'<tr><td colspan="6">暂无用户</td></tr>';
             }
             window.deleteUser=async(id)=>{if(confirm('删除用户？')){try{await baserowReq('DELETE', TABLES.users, null, id);loadUsers();loadDashboard();}catch(e){showToast('失败',true);}}};
@@ -548,8 +554,7 @@
                 document.getElementById('editUserEmail').value=u.Email||'';
                 document.getElementById('editUserUsername').value=u.Username||'';
                 document.getElementById('editUserRole').value=u.Role||'user';
-                const dl = getFieldSafe(u, 'Downloads', 'downloads', 'Download', 'download');
-                document.getElementById('editUserDownloads').value=(dl !== undefined && dl !== null) ? dl : 0;
+                document.getElementById('editUserDownloads').value=Number(getFieldSafe(u, 'Downloads', 'downloads', 'Download', 'download')) || 0;
                 document.getElementById('editUserPassword').value='';
                 document.getElementById('userEditModal').classList.add('active');
             };
@@ -613,8 +618,8 @@
                     ]);
                     let totalDl = 0;
                     users.results.forEach(r => {
-                        const dl = getFieldSafe(r, 'Downloads', 'downloads', 'Download', 'download');
-                        if (dl !== undefined && dl !== null) totalDl += dl;
+                        const dl = Number(getFieldSafe(r, 'Downloads', 'downloads', 'Download', 'download')) || 0;
+                        totalDl += dl;
                     });
                     stats.innerHTML=`
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${users.results.length}</div><div class="stat-label">注册用户</div></div>
@@ -624,15 +629,14 @@
                     `;
                     // 最近注册用户（按创建时间排序）
                     const sorted = [...users.results].sort((a,b) => {
-                        const da = getFieldSafe(a, 'CreatedAt', 'createdAt', 'Created', 'created');
-                        const db = getFieldSafe(b, 'CreatedAt', 'createdAt', 'Created', 'created');
+                        const da = getFieldSafe(a, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
+                        const db = getFieldSafe(b, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
                         return new Date(db || 0) - new Date(da || 0);
                     });
                     recent.innerHTML=sorted.slice(0,5).map(r=>{
-                        const date = getFieldSafe(r, 'CreatedAt', 'createdAt', 'Created', 'created');
-                        const dateStr = date ? new Date(date).toLocaleString('zh-CN') : '未知';
-                        const dl = getFieldSafe(r, 'Downloads', 'downloads', 'Download', 'download');
-                        return `<tr><td>${r.Email||''}</td><td>${r.Username||''}</td><td>${(dl !== undefined && dl !== null) ? dl : 0}</td><td>${dateStr}</td></tr>`;
+                        const dateStr = getDateSafe(r);
+                        const dl = Number(getFieldSafe(r, 'Downloads', 'downloads', 'Download', 'download')) || 0;
+                        return `<tr><td>${r.Email||''}</td><td>${r.Username||''}</td><td>${dl}</td><td>${dateStr}</td></tr>`;
                     }).join('');
                 }catch(e){
                     stats.innerHTML='<div class="stat-card"><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="stat-value">!</div><div class="stat-label">加载失败</div></div>';
