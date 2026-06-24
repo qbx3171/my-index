@@ -291,15 +291,6 @@
                 }
                 return undefined;
             }
-            // 安全获取日期字符串
-            function getDateSafe(obj) {
-                const dateVal = getFieldSafe(obj, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
-                if (dateVal) {
-                    const d = new Date(dateVal);
-                    if (!isNaN(d.getTime())) return d.toLocaleString('zh-CN');
-                }
-                return '未知';
-            }
 
             // ====================  软件管理  ====================
             async function loadSoftwares(){
@@ -627,14 +618,19 @@
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981;"><i class="fas fa-comments"></i></div><div class="stat-value">${msgs.results.length}</div><div class="stat-label">留言总数</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;"><i class="fas fa-download"></i></div><div class="stat-value">${totalDl}</div><div class="stat-label">总下载</div></div>
                     `;
-                    // 最近注册用户（按创建时间排序）
+                    // 最近注册用户：与用户管理表格使用相同的日期提取逻辑
                     const sorted = [...users.results].sort((a,b) => {
                         const da = getFieldSafe(a, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
                         const db = getFieldSafe(b, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
                         return new Date(db || 0) - new Date(da || 0);
                     });
                     recent.innerHTML=sorted.slice(0,5).map(r=>{
-                        const dateStr = getDateSafe(r);
+                        const dateVal = getFieldSafe(r, 'CreatedAt', 'createdAt', 'Created', 'created', 'created_time', 'CreatedTime');
+                        let dateStr = '未知';
+                        if (dateVal) {
+                            const d = new Date(dateVal);
+                            if (!isNaN(d.getTime())) dateStr = d.toLocaleString('zh-CN');
+                        }
                         const dl = Number(getFieldSafe(r, 'Downloads', 'downloads', 'Download', 'download')) || 0;
                         return `<tr><td>${r.Email||''}</td><td>${r.Username||''}</td><td>${dl}</td><td>${dateStr}</td></tr>`;
                     }).join('');
