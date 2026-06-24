@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ========== 完整样式（与原始一致） ========== */
+        /* ==================== 完整样式 ==================== */
         :root { --bg: #f3f4f8; --surface: #ffffff; --border: #e8ecf3; --border-light: #f0f2f7; --text: #1a1d2e; --text-secondary: #4a5068; --text-muted: #8b90a5; --primary: #4f6ef6; --primary-light: #eef1fd; --primary-hover: #3b54d4; --success: #10b981; --warning: #f59e0b; --shadow-sm: 0 1px 3px rgba(0,0,0,0.04); --shadow-md: 0 4px 16px rgba(0,0,0,0.05); --shadow-lg: 0 12px 36px rgba(0,0,0,0.07); --radius-sm: 8px; --radius: 16px; --radius-lg: 22px; --radius-xl: 28px; --radius-full: 60px; --transition-fast: 0.18s ease; --font-xs: 0.68rem; --font-sm: 0.78rem; --font-base: 0.9rem; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
@@ -260,6 +260,7 @@
             TABLES: {
                 softwares: 1043399,
                 users: 1043401,
+                signRecords: 1043402,
                 articles: 1043406,
                 ads: 1043405,
                 messages: 1043400
@@ -285,8 +286,10 @@
         let deferredPrompt = null;
         let dailySoftware = null;
         let allUsersList = [];
+
         function showToast(m, t = 'success') { const d = document.createElement('div'); d.className = 'toast-message ' + t; d.innerHTML = m; document.body.appendChild(d); setTimeout(() => d.remove(), 3000); }
         function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]; }); }
+
         async function baserowReq(method, tableId, body = null, rowId = null, queryParams = '') {
             let url = CONFIG.BASEROW_API_URL + tableId + '/';
             if (rowId) url += rowId + '/';
@@ -310,6 +313,7 @@
             if (method === 'DELETE') return { success: true };
             return await res.json();
         }
+
         async function fetchSoftwares() {
             if (isLocalFile) {
                 return softwares.length ? softwares : [];
@@ -351,6 +355,7 @@
                 return softwares.length ? softwares : [];
             }
         }
+
         async function fetchArticles() {
             if (isLocalFile) return [];
             try {
@@ -377,6 +382,7 @@
                 return [];
             }
         }
+
         async function fetchAds() {
             if (isLocalFile) {
                 return [{ image: "https://picsum.photos/800/400?random=1", link: "#", title: "广告", position: "banner", enabled: true }];
@@ -403,6 +409,7 @@
                 return [];
             }
         }
+
         function renderCarousel(slidesEl, dotsEl, ads) {
             if (!ads || !ads.length) return;
             slidesEl.innerHTML = ads.map(function(ad, idx) {
@@ -442,6 +449,7 @@
             });
             return upd;
         }
+
         async function findUserByEmail(email) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -454,6 +462,7 @@
                 return null;
             }
         }
+
         async function findUserByInviteCode(code) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -466,6 +475,7 @@
                 return null;
             }
         }
+
         async function registerUser(email, password, username, inviteCode) {
             inviteCode = inviteCode || '';
             if (isLocalFile) {
@@ -507,6 +517,7 @@
                 }
             }
         }
+
         async function loginUser(email, password) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -517,6 +528,9 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) throw new Error('邮箱未注册');
+            if (!rec.password) {
+                throw new Error('用户数据异常，请重新注册或联系管理员');
+            }
             if (rec.password !== CryptoJS.SHA256(password).toString()) throw new Error('密码错误');
             return {
                 id: rec.id,
@@ -530,6 +544,7 @@
                 createdAt: rec.createdAt || new Date().toISOString()
             };
         }
+
         async function updatePassword(email, newPass) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -542,6 +557,7 @@
             if (!rec) throw new Error('用户不存在');
             await baserowReq('PATCH', CONFIG.TABLES.users, { password: CryptoJS.SHA256(newPass).toString() }, rec.id);
         }
+
         async function updateUserRole(userId, newRole) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -552,6 +568,7 @@
             }
             await baserowReq('PATCH', CONFIG.TABLES.users, { role: newRole }, userId);
         }
+
         async function updateUsername(email, newUsername) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -566,6 +583,7 @@
             await baserowReq('PATCH', CONFIG.TABLES.users, { username: newUsername }, rec.id);
             if (currentUser && currentUser.email === email) currentUser.username = newUsername;
         }
+
         async function addPoints(email, points) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -587,12 +605,48 @@
                 updateUserUI();
             }
         }
+
         async function addDownloadBonus(email, bonus) {
             var rec = await findUserByEmail(email);
             if (!rec) return;
             var newExtra = (rec.extraquota || 0) + bonus;
             await baserowReq('PATCH', CONFIG.TABLES.users, { extraquota: newExtra }, rec.id);
         }
+
+        async function performCheckin() {
+            if (!currentUser) {
+                showToast('请先登录', 'error');
+                return;
+            }
+            const today = new Date().toISOString().split('T')[0];
+            const signKey = 'signin_' + currentUser.email + '_' + today;
+            if (localStorage.getItem(signKey) === 'true') {
+                showToast('今日已签到', 'warning');
+                return;
+            }
+            try {
+                await addPoints(currentUser.email, 2);
+                await addDownloadBonus(currentUser.email, 1);
+                await baserowReq('POST', CONFIG.TABLES.signRecords, {
+                    email: currentUser.email,
+                    sign_date: today
+                });
+                localStorage.setItem(signKey, 'true');
+                const updated = await findUserByEmail(currentUser.email);
+                if (updated) {
+                    currentUser.points = updated.points || 0;
+                    currentUser.extraQuota = updated.extraquota || 0;
+                    localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
+                }
+                updateUserUI();
+                renderCalendar();
+                showToast('签到成功！获得 1 次下载 + 2 积分', 'success');
+            } catch (e) {
+                console.error('签到失败:', e);
+                showToast('签到失败: ' + e.message, 'error');
+            }
+        }
+
         function getUserLevel(points) {
             if (points >= 500) return { level: 5, name: '钻石会员', badge: 'level-5' };
             if (points >= 200) return { level: 4, name: '铂金会员', badge: 'level-4' };
@@ -600,6 +654,7 @@
             if (points >= 30) return { level: 2, name: '白银会员', badge: 'level-2' };
             return { level: 1, name: '青铜会员', badge: 'level-1' };
         }
+
         function getCurrentMonthKey() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1); }
         function getUserDownloadData(email) {
             var key = 'download_' + email;
@@ -672,6 +727,7 @@
             }
             return true;
         }
+
         function getStdAbbr(n) {
             if (!n) return 'SW';
             var l = n.toLowerCase();
@@ -700,6 +756,7 @@
             var kw = keyword.toLowerCase().trim();
             return software.name.toLowerCase().includes(kw);
         }
+
         function addHistory(sw) {
             var h = JSON.parse(localStorage.getItem('browseHistory') || '[]');
             h = h.filter(function(i) { return i.name !== sw.name; });
@@ -720,6 +777,7 @@
                 });
             });
         }
+
         function toggleFavorite(softwareId, softwareName) {
             if (!currentUser) { showToast('请先登录', 'error'); return false; }
             var favs = JSON.parse(localStorage.getItem('favorites_' + currentUser.email) || '[]');
@@ -763,6 +821,7 @@
                 }
             });
         }
+
         async function submitRating(softwareId, softwareName, rating, comment) {
             if (!currentUser) { showToast('请先登录', 'error'); return false; }
             try {
@@ -779,6 +838,7 @@
                 return false;
             }
         }
+
         async function downloadSoftware(sw) {
             if (!currentUser) { showToast('请先登录', 'error'); openAuth('login'); return; }
             if (!sw.url || sw.url === '#') { showToast('下载链接暂不可用', 'warning'); return; }
@@ -789,6 +849,7 @@
             window.open(sw.url, '_blank');
             showToast('下载成功！剩余' + (getRemainingCount(currentUser) === Infinity ? '∞' : getRemainingCount(currentUser)) + '次', 'success');
         }
+
         function setDailyRecommend() {
             var today = new Date().toDateString();
             var cached = localStorage.getItem('daily_recommend');
@@ -845,6 +906,7 @@
             });
             newCard.id = 'dailyCard';
         }
+
         function renderGrid() {
             var filtered = softwares.filter(function(s) {
                 return (currentCategory === 'all' || s.category === currentCategory) && matchesSearch(s, searchKeyword);
@@ -914,6 +976,7 @@
                 });
             });
         }
+
         function renderHot() {
             if (!softwares.length) return;
             var hotItems = softwares.slice().sort(function(a, b) { return (b.downloads || 0) - (a.downloads || 0); }).slice(0, 8);
@@ -929,6 +992,7 @@
             });
             setTimeout(startAutoScroll, 100);
         }
+
         function renderRank() {
             var sorted = softwares.slice().sort(function(a, b) { return (b.downloads || 0) - (a.downloads || 0); });
             document.getElementById('rankList').innerHTML = sorted.slice(0, 5).map(function(sw, i) {
@@ -941,6 +1005,7 @@
                 });
             });
         }
+
         function renderArtsList() {
             var container = document.getElementById('articlesList');
             if (!articles.length) {
@@ -962,6 +1027,7 @@
                 });
             });
         }
+
         var currentDate = new Date();
         function renderCalendar() {
             var y = currentDate.getFullYear(), m = currentDate.getMonth();
@@ -999,20 +1065,7 @@
                 }
             }
         }
-        async function performCheckin() {
-            if (!currentUser) { showToast('请先登录', 'error'); return; }
-            var y = currentDate.getFullYear(), m = currentDate.getMonth(), d = new Date().getDate();
-            var signKey = 'signin_' + currentUser.email + '_' + y + '-' + (m + 1);
-            var signed = JSON.parse(localStorage.getItem(signKey) || '[]');
-            if (signed.includes(d)) { showToast('今日已签到', 'warning'); return; }
-            signed.push(d);
-            localStorage.setItem(signKey, JSON.stringify(signed));
-            await addDownloadBonus(currentUser.email, 1);
-            await addPoints(currentUser.email, 2);
-            showToast('签到成功！获得1次下载+2积分', 'success');
-            updateUserUI();
-            renderCalendar();
-        }
+
         function renderAnnouncements() {
             var container = document.getElementById('announcementList');
             if (!announcements.length) {
@@ -1023,6 +1076,7 @@
                 return '<div style="padding:12px;border-bottom:1px solid var(--border-light);"><div style="font-weight:600;">' + esc(a.title) + '</div><div style="font-size:0.7rem;color:var(--text-muted);margin:4px 0;">' + new Date(a.createdAt).toLocaleString() + '</div><div style="font-size:0.85rem;">' + esc(a.content) + '</div></div>';
             }).join('');
         }
+
         function showAnnouncementBar() {
             if (!announcements.length) return;
             var lastClose = localStorage.getItem('announcement_closed');
@@ -1041,6 +1095,7 @@
             });
             document.body.insertBefore(bar, document.body.firstChild);
         }
+
         function sendMessageToUser(email, title, content) {
             var messages = JSON.parse(localStorage.getItem('messages_' + email) || '[]');
             messages.unshift({ title: title, content: content, time: Date.now(), read: false });
@@ -1088,6 +1143,7 @@
                 });
             });
         }
+
         async function loadUserCheckboxList() {
             var container = document.getElementById('userCheckboxList');
             if (!container) return;
@@ -1107,6 +1163,7 @@
                 container.innerHTML = '<div style="padding:20px;text-align:center;">加载用户列表失败</div>';
             }
         }
+
         async function syncDownloadsFromServer() {
             if (!currentUser || isLocalFile) {
                 showToast('离线模式或未登录，无法同步', 'error');
@@ -1129,6 +1186,7 @@
                 showToast('同步失败: ' + e.message, 'error');
             }
         }
+
         function updateUserUI() {
             var area = document.getElementById('userArea');
             if (!area) return;
@@ -1177,6 +1235,7 @@
                 document.getElementById('manageArticlesBtn').style.display = 'none';
             }
         }
+
         async function refreshUserList() {
             var container = document.getElementById('adminUserList');
             container.innerHTML = '<div style="text-align:center;padding:40px;">加载中...</div>';
@@ -1253,6 +1312,7 @@
                 container.innerHTML = '<div style="text-align:center;padding:40px;">加载失败</div>';
             }
         }
+
         function openAuth(tab) {
             tab = tab || 'login';
             var modal = document.getElementById('authModal');
@@ -1265,6 +1325,7 @@
             else if (tab === 'register') refreshCaptcha('reg');
             else refreshCaptcha('forgot');
         }
+
         function refreshCaptcha(type) {
             var q = Math.floor(Math.random() * 10) + 1;
             var b = Math.floor(Math.random() * 10) + 1;
@@ -1275,6 +1336,7 @@
             document.getElementById(type + 'CaptchaQuestion').innerText = currentCaptcha.question;
             document.getElementById(type + 'CaptchaInput').value = '';
         }
+
         async function loadAll() {
             var overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.style.display = 'flex';
@@ -1298,6 +1360,7 @@
             setDailyRecommend();
             hideLoadingOverlay();
         }
+
         function hideLoadingOverlay() {
             var overlay = document.getElementById('loadingOverlay');
             if (overlay) {
@@ -1307,6 +1370,7 @@
                 }, 400);
             }
         }
+
         function renderCats() {
             var cats = softwares.map(function(s) { return s.category; }).filter(function(v, i, a) { return a.indexOf(v) === i; });
             var container = document.getElementById('categoryTabs');
@@ -1367,6 +1431,7 @@
                 });
             });
         }
+
         window._loadMore = function() { showAll = true; renderGrid(); };
         document.getElementById('loadMoreBtn') && document.getElementById('loadMoreBtn').addEventListener('click', window._loadMore);
         document.getElementById('searchInput').addEventListener('input', function(e) { searchKeyword = e.target.value; renderGrid(); });
@@ -1414,6 +1479,7 @@
             await refreshArticleList();
             document.getElementById('articleManageModal').classList.add('active');
         });
+
         async function refreshArticleList() {
             var container = document.getElementById('articleAdminList');
             container.innerHTML = '<div style="text-align:center;padding:40px;">加载中...</div>';
@@ -1453,6 +1519,7 @@
                 });
             });
         }
+
         document.getElementById('addNewArticleBtn').addEventListener('click', function() {
             editingArticleId = null;
             document.getElementById('articleTitle').value = '';
