@@ -727,19 +727,20 @@
             return data.count < total;
         }
 
+        // ======================== 优化后的 recordDownload（直接使用 user.id） ========================
         async function recordDownload(user) {
             if (!user) return false;
             if (user.role === 'vip' || user.role === 'admin') return true;
             var data = getUserDownloadData(user.email);
             var used = data.count + 1;
             saveUserDownloadData(user.email, used, data.extra);
-            if (!isLocalFile) {
+            // 直接使用 user.id（登录时已保存）更新 Baserow，不再查询用户表
+            if (!isLocalFile && user.id) {
                 try {
-                    var rec = await findUserByEmail(user.email);
-                    if (rec) {
-                        await baserowReq('PATCH', CONFIG.TABLES.users, { downloads: used }, rec.id);
-                    }
-                } catch (e) {}
+                    await baserowReq('PATCH', CONFIG.TABLES.users, { downloads: used }, user.id);
+                } catch (e) {
+                    console.warn('更新服务器下载次数失败:', e);
+                }
             }
             if (currentUser && currentUser.email === user.email) {
                 currentUser.downloads = used;
