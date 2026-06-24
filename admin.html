@@ -278,12 +278,18 @@
             function extractIconValue(iconField) {
                 if (!iconField) return '';
                 if (Array.isArray(iconField) && iconField.length > 0) {
-                    // 可能是附件数组，取第一个的 url
                     if (iconField[0] && iconField[0].url) return iconField[0].url;
                     if (typeof iconField[0] === 'string') return iconField[0];
                 }
                 if (typeof iconField === 'string') return iconField;
                 return '';
+            }
+            // 兼容大小写获取字段值
+            function getFieldSafe(obj, ...names) {
+                for (let name of names) {
+                    if (obj && obj[name] !== undefined && obj[name] !== null) return obj[name];
+                }
+                return undefined;
             }
 
             // ====================  软件管理  ====================
@@ -325,10 +331,8 @@
             document.getElementById('softwareSearch').addEventListener('input',()=>{currentPage=1;renderSoftwareTable();});
             document.getElementById('softwareCategoryFilter').addEventListener('change',()=>{currentPage=1;renderSoftwareTable();});
 
-            // ***** 修复：增强 editSoftware 函数，添加错误处理和加载检查 *****
             window.editSoftware = async function(id){
                 try {
-                    // 如果软件数据尚未加载，先加载
                     if (!allSoftwares || allSoftwares.length === 0) {
                         await loadSoftwares();
                     }
@@ -337,7 +341,6 @@
                         showToast('未找到该软件，请刷新后重试', true);
                         return;
                     }
-                    // 确保分类下拉已填充
                     if (document.getElementById('swCategory').options.length === 0) {
                         await refreshCategorySelects();
                     }
@@ -354,11 +357,9 @@
                     document.getElementById('swDescription').value = sw.description || '';
                     document.getElementById('swAddedDate').value = sw.addedDate || new Date().toISOString().slice(0,10);
                     document.getElementById('swNoVerify').checked = !!sw.noVerify;
-                    // 处理图标字段
                     const iconVal = extractIconValue(sw.icon);
                     document.getElementById('swIconCustom').value = iconVal;
                     refreshIconPreview();
-                    // 滚动到表单区域
                     document.getElementById('softwaresPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 } catch (e) {
                     console.error('编辑软件出错:', e);
@@ -409,7 +410,7 @@
                 refreshIconPreview();
             });
 
-            // 图标相关（保持不变）
+            // 图标相关
             window.refreshIconPreview=function(){
                 const custom=document.getElementById('swIconCustom').value.trim();
                 const name=document.getElementById('swName').value.trim()||'软件';
@@ -509,7 +510,11 @@
             async function loadUsers(){
                 try{
                     const data=await baserowReq('GET', TABLES.users, null, null, 'max_limit=100');
-                    allUsers=data.results.map(r=>({...r, createdTime:r.CreatedAt||r.createdAt||new Date().toISOString()}));
+                    allUsers=data.results.map(r=>{
+                        // 兼容大小写获取创建时间
+                        const createdAt = getFieldSafe(r, 'CreatedAt', 'createdAt', 'Created', 'created');
+                        return {...r, createdTime: createdAt || new Date().toISOString()};
+                    });
                     renderUsersTable();
                 }catch(e){document.getElementById('usersTbody').innerHTML='<tr><td colspan="6">加载失败</td></tr>';}
             }
@@ -529,8 +534,10 @@
                 filtered.sort((a,b)=>(b.createdTime?new Date(b.createdTime):0)-(a.createdTime?new Date(a.createdTime):0));
                 document.getElementById('usersTbody').innerHTML=filtered.map(u=>{
                     const date=u.createdTime?new Date(u.createdTime).toLocaleString('zh-CN'):'未知';
-                    const dl=u.Downloads!==undefined?u.Downloads:0;
-                    return`<tr><td>${u.Email||''}</td><td>${u.Username||''}</td><td>${u.Role||'user'}</td><td>${dl}</td><td>${date}</td><td><button class="btn-edit-advanced" onclick="openUserEditModal('${u.id}')">编辑</button><button class="btn-delete-advanced" onclick="deleteUser('${u.id}')">删除</button></td></tr>`;
+                    // 兼容大小写获取下载次数
+                    const dl = getFieldSafe(u, 'Downloads', 'downloads', 'Download', 'download');
+                    const displayDl = (dl !== undefined && dl !== null) ? dl : 0;
+                    return`<tr><td>${u.Email||''}</td><td>${u.Username||''}</td><td>${u.Role||'user'}</td><td>${displayDl}</td><td>${date}</td><td><button class="btn-edit-advanced" onclick="openUserEditModal('${u.id}')">编辑</button><button class="btn-delete-advanced" onclick="deleteUser('${u.id}')">删除</button></td></tr>`;
                 }).join('')||'<tr><td colspan="6">暂无用户</td></tr>';
             }
             window.deleteUser=async(id)=>{if(confirm('删除用户？')){try{await baserowReq('DELETE', TABLES.users, null, id);loadUsers();loadDashboard();}catch(e){showToast('失败',true);}}};
@@ -541,7 +548,8 @@
                 document.getElementById('editUserEmail').value=u.Email||'';
                 document.getElementById('editUserUsername').value=u.Username||'';
                 document.getElementById('editUserRole').value=u.Role||'user';
-                document.getElementById('editUserDownloads').value=u.Downloads||0;
+                const dl = getFieldSafe(u, 'Downloads', 'downloads', 'Download', 'download');
+                document.getElementById('editUserDownloads').value=(dl !== undefined && dl !== null) ? dl : 0;
                 document.getElementById('editUserPassword').value='';
                 document.getElementById('userEditModal').classList.add('active');
             };
@@ -603,15 +611,29 @@
                         baserowReqWithTimeout('GET', TABLES.softwares),
                         baserowReqWithTimeout('GET', TABLES.messages)
                     ]);
-                    const totalDl=users.results.reduce((s,r)=>s+(typeof r.Downloads==='number'?r.Downloads:0),0);
+                    let totalDl = 0;
+                    users.results.forEach(r => {
+                        const dl = getFieldSafe(r, 'Downloads', 'downloads', 'Download', 'download');
+                        if (dl !== undefined && dl !== null) totalDl += dl;
+                    });
                     stats.innerHTML=`
                         <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value">${users.results.length}</div><div class="stat-label">注册用户</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(0,229,255,0.15);"><i class="fas fa-cubes"></i></div><div class="stat-value">${sw.results.length}</div><div class="stat-label">软件数量</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#10b981;"><i class="fas fa-comments"></i></div><div class="stat-value">${msgs.results.length}</div><div class="stat-label">留言总数</div></div>
                         <div class="stat-card"><div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;"><i class="fas fa-download"></i></div><div class="stat-value">${totalDl}</div><div class="stat-label">总下载</div></div>
                     `;
-                    const sorted=[...users.results].sort((a,b)=>new Date(b.CreatedAt||b.createdAt)-new Date(a.CreatedAt||a.createdAt));
-                    recent.innerHTML=sorted.slice(0,5).map(r=>`<tr><td>${r.Email}</td><td>${r.Username||''}</td><td>${r.Downloads||0}</td><td>${r.CreatedAt?new Date(r.CreatedAt).toLocaleString('zh-CN'):'未知'}</td></tr>`).join('');
+                    // 最近注册用户（按创建时间排序）
+                    const sorted = [...users.results].sort((a,b) => {
+                        const da = getFieldSafe(a, 'CreatedAt', 'createdAt', 'Created', 'created');
+                        const db = getFieldSafe(b, 'CreatedAt', 'createdAt', 'Created', 'created');
+                        return new Date(db || 0) - new Date(da || 0);
+                    });
+                    recent.innerHTML=sorted.slice(0,5).map(r=>{
+                        const date = getFieldSafe(r, 'CreatedAt', 'createdAt', 'Created', 'created');
+                        const dateStr = date ? new Date(date).toLocaleString('zh-CN') : '未知';
+                        const dl = getFieldSafe(r, 'Downloads', 'downloads', 'Download', 'download');
+                        return `<tr><td>${r.Email||''}</td><td>${r.Username||''}</td><td>${(dl !== undefined && dl !== null) ? dl : 0}</td><td>${dateStr}</td></tr>`;
+                    }).join('');
                 }catch(e){
                     stats.innerHTML='<div class="stat-card"><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div><div class="stat-value">!</div><div class="stat-label">加载失败</div></div>';
                     recent.innerHTML='<tr><td colspan="4">加载失败</td></tr>';
