@@ -12,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
+        /* ========== 完整样式（与原始一致） ========== */
         :root { --bg: #f3f4f8; --surface: #ffffff; --border: #e8ecf3; --border-light: #f0f2f7; --text: #1a1d2e; --text-secondary: #4a5068; --text-muted: #8b90a5; --primary: #4f6ef6; --primary-light: #eef1fd; --primary-hover: #3b54d4; --success: #10b981; --warning: #f59e0b; --shadow-sm: 0 1px 3px rgba(0,0,0,0.04); --shadow-md: 0 4px 16px rgba(0,0,0,0.05); --shadow-lg: 0 12px 36px rgba(0,0,0,0.07); --radius-sm: 8px; --radius: 16px; --radius-lg: 22px; --radius-xl: 28px; --radius-full: 60px; --transition-fast: 0.18s ease; --font-xs: 0.68rem; --font-sm: 0.78rem; --font-base: 0.9rem; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
@@ -286,11 +287,9 @@
         let allUsersList = [];
         function showToast(m, t = 'success') { const d = document.createElement('div'); d.className = 'toast-message ' + t; d.innerHTML = m; document.body.appendChild(d); setTimeout(() => d.remove(), 3000); }
         function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]; }); }
-        // ================== 修复点 1：baserowReq 自动添加 user_field_names ==================
         async function baserowReq(method, tableId, body = null, rowId = null, queryParams = '') {
             let url = CONFIG.BASEROW_API_URL + tableId + '/';
             if (rowId) url += rowId + '/';
-            // 自动添加 user_field_names=true，确保返回用户定义的列名
             if (queryParams && !queryParams.includes('user_field_names=true')) {
                 queryParams += (queryParams ? '&' : '') + 'user_field_names=true';
             } else if (!queryParams) {
@@ -311,13 +310,11 @@
             if (method === 'DELETE') return { success: true };
             return await res.json();
         }
-        // ================== 修复点 2：fetchSoftwares 去掉 order_by ==================
         async function fetchSoftwares() {
             if (isLocalFile) {
                 return softwares.length ? softwares : [];
             }
             try {
-                // 去掉 order_by=-id，仅保留 max_limit
                 const data = await baserowReq('GET', CONFIG.TABLES.softwares, null, null, 'max_limit=100');
                 return data.results.map(function(row) {
                     var iconVal = row.Icon || row.icon || '';
@@ -354,7 +351,6 @@
                 return softwares.length ? softwares : [];
             }
         }
-        // 其余函数保持不变（fetchArticles, fetchAds 等均正常）
         async function fetchArticles() {
             if (isLocalFile) return [];
             try {
@@ -452,7 +448,7 @@
                 return users.find(function(u) { return u.email === email; }) || null;
             }
             try {
-                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'filter__Email__iexact=' + encodeURIComponent(email));
+                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'filter__email__iexact=' + encodeURIComponent(email));
                 return data.results.length ? data.results[0] : null;
             } catch (e) {
                 return null;
@@ -464,7 +460,7 @@
                 return users.find(function(u) { return u.inviteCode === code; }) || null;
             }
             try {
-                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'filter__InviteCode__iexact=' + encodeURIComponent(code));
+                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'filter__invitecode__iexact=' + encodeURIComponent(code));
                 return data.results.length ? data.results[0] : null;
             } catch (e) {
                 return null;
@@ -493,20 +489,20 @@
             var hash2 = CryptoJS.SHA256(password).toString();
             var userCode2 = Math.random().toString(36).substring(2, 10).toUpperCase();
             await baserowReq('POST', CONFIG.TABLES.users, {
-                Email: email,
-                Password: hash2,
-                Username: username,
-                Role: email === 'admin@lezhe.com' ? 'admin' : 'user',
-                InviteCode: userCode2,
-                Points: 0,
-                Downloads: 0,
-                ExtraQuota: 0
+                email: email,
+                password: hash2,
+                username: username,
+                role: email === 'admin@lezhe.com' ? 'admin' : 'user',
+                invitecode: userCode2,
+                points: 0,
+                downloads: 0,
+                extraquota: 0
             });
             if (inviteCode) {
                 var inviter2 = await findUserByInviteCode(inviteCode);
                 if (inviter2) {
-                    await addPoints(inviter2.Email, 10);
-                    await addDownloadBonus(inviter2.Email, 5);
+                    await addPoints(inviter2.email, 10);
+                    await addDownloadBonus(inviter2.email, 5);
                     showToast('邀请成功！双方各获得5次下载+10积分', 'success');
                 }
             }
@@ -521,17 +517,17 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) throw new Error('邮箱未注册');
-            if (rec.Password !== CryptoJS.SHA256(password).toString()) throw new Error('密码错误');
+            if (rec.password !== CryptoJS.SHA256(password).toString()) throw new Error('密码错误');
             return {
                 id: rec.id,
-                email: rec.Email,
-                username: rec.Username || email.split('@')[0],
-                role: rec.Role || 'user',
-                inviteCode: rec.InviteCode || '',
-                points: rec.Points || 0,
-                downloads: rec.Downloads || 0,
-                extraQuota: rec.ExtraQuota || 0,
-                createdAt: rec.CreatedAt || new Date().toISOString()
+                email: rec.email,
+                username: rec.username || email.split('@')[0],
+                role: rec.role || 'user',
+                inviteCode: rec.invitecode || '',
+                points: rec.points || 0,
+                downloads: rec.downloads || 0,
+                extraQuota: rec.extraquota || 0,
+                createdAt: rec.createdAt || new Date().toISOString()
             };
         }
         async function updatePassword(email, newPass) {
@@ -544,7 +540,7 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) throw new Error('用户不存在');
-            await baserowReq('PATCH', CONFIG.TABLES.users, { Password: CryptoJS.SHA256(newPass).toString() }, rec.id);
+            await baserowReq('PATCH', CONFIG.TABLES.users, { password: CryptoJS.SHA256(newPass).toString() }, rec.id);
         }
         async function updateUserRole(userId, newRole) {
             if (isLocalFile) {
@@ -554,7 +550,7 @@
                 localStorage.setItem('lezhe_users', JSON.stringify(users));
                 return;
             }
-            await baserowReq('PATCH', CONFIG.TABLES.users, { Role: newRole }, userId);
+            await baserowReq('PATCH', CONFIG.TABLES.users, { role: newRole }, userId);
         }
         async function updateUsername(email, newUsername) {
             if (isLocalFile) {
@@ -567,7 +563,7 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) throw new Error('用户不存在');
-            await baserowReq('PATCH', CONFIG.TABLES.users, { Username: newUsername }, rec.id);
+            await baserowReq('PATCH', CONFIG.TABLES.users, { username: newUsername }, rec.id);
             if (currentUser && currentUser.email === email) currentUser.username = newUsername;
         }
         async function addPoints(email, points) {
@@ -583,8 +579,8 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) return;
-            var newPoints = (rec.Points || 0) + points;
-            await baserowReq('PATCH', CONFIG.TABLES.users, { Points: newPoints }, rec.id);
+            var newPoints = (rec.points || 0) + points;
+            await baserowReq('PATCH', CONFIG.TABLES.users, { points: newPoints }, rec.id);
             if (currentUser && currentUser.email === email) {
                 currentUser.points = newPoints;
                 localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
@@ -594,8 +590,8 @@
         async function addDownloadBonus(email, bonus) {
             var rec = await findUserByEmail(email);
             if (!rec) return;
-            var newExtra = (rec.ExtraQuota || 0) + bonus;
-            await baserowReq('PATCH', CONFIG.TABLES.users, { ExtraQuota: newExtra }, rec.id);
+            var newExtra = (rec.extraquota || 0) + bonus;
+            await baserowReq('PATCH', CONFIG.TABLES.users, { extraquota: newExtra }, rec.id);
         }
         function getUserLevel(points) {
             if (points >= 500) return { level: 5, name: '钻石会员', badge: 'level-5' };
@@ -665,7 +661,7 @@
                 try {
                     var rec = await findUserByEmail(user.email);
                     if (rec) {
-                        await baserowReq('PATCH', CONFIG.TABLES.users, { Downloads: used }, rec.id);
+                        await baserowReq('PATCH', CONFIG.TABLES.users, { downloads: used }, rec.id);
                     }
                 } catch (e) {}
             }
@@ -1099,7 +1095,7 @@
                 var users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(function(u) { return { id: u.email, email: u.email, username: u.username, role: u.role || 'user' }; }) : await (function() {
                     return baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=100').then(function(data) {
                         return data.results.map(function(r) {
-                            return { id: r.id, email: r.Email, username: r.Username || r.Email.split('@')[0], role: r.Role || 'user' };
+                            return { id: r.id, email: r.email, username: r.username || r.email.split('@')[0], role: r.role || 'user' };
                         });
                     });
                 })();
@@ -1119,9 +1115,9 @@
             try {
                 var rec = await findUserByEmail(currentUser.email);
                 if (rec) {
-                    currentUser.downloads = rec.Downloads || 0;
-                    currentUser.extraQuota = rec.ExtraQuota || 0;
-                    currentUser.points = rec.Points || 0;
+                    currentUser.downloads = rec.downloads || 0;
+                    currentUser.extraQuota = rec.extraquota || 0;
+                    currentUser.points = rec.points || 0;
                     localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
                     updateUserUI();
                     showToast('已同步：剩余 ' + getRemainingCount(currentUser) + ' 次', 'success');
@@ -1190,28 +1186,28 @@
                 }) : await (function() {
                     return baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=100').then(function(data) {
                         return data.results.map(function(r) {
-                            return { id: r.id, fields: r, createdTime: r.CreatedAt || new Date().toISOString() };
+                            return { id: r.id, fields: r, createdTime: r.createdAt || new Date().toISOString() };
                         });
                     });
                 })();
                 var term = (document.getElementById('adminSearchInput') ? document.getElementById('adminSearchInput').value : '').toLowerCase();
                 var dateFilter = document.getElementById('adminDateFilter') ? document.getElementById('adminDateFilter').value : '';
                 var filtered = users.filter(function(u) {
-                    var email = u.fields.Email || '';
-                    var username = u.fields.Username || '';
+                    var email = u.fields.email || '';
+                    var username = u.fields.username || '';
                     return !term || email.toLowerCase().includes(term) || username.toLowerCase().includes(term);
                 });
                 if (dateFilter) {
                     filtered = filtered.filter(function(u) {
-                        var regDate = u.createdTime || u.fields.CreatedAt;
+                        var regDate = u.createdTime || u.fields.createdAt;
                         return regDate ? new Date(regDate).toISOString().split('T')[0] === dateFilter : false;
                     });
                 }
                 container.innerHTML = filtered.map(function(u) {
-                    var role = u.fields.Role || 'user';
+                    var role = u.fields.role || 'user';
                     var isVip = role === 'vip' || role === 'admin';
                     var avatarIcon = role === 'admin' ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
-                    return '<div class="admin-user-card"><div class="admin-user-info"><div class="admin-user-avatar">' + avatarIcon + '</div><div><div class="admin-user-email">' + esc(u.fields.Email) + '</div><div class="admin-user-name">' + esc(u.fields.Username || '') + '</div></div><div class="admin-user-role ' + (isVip ? 'vip' : '') + '">' + (isVip ? (role === 'admin' ? '管理员' : 'VIP') : '普通') + '</div></div><div><button class="admin-action-btn upgrade-vip" data-id="' + u.id + '" data-role="' + role + '">' + (isVip && role !== 'admin' ? '降级' : '升级VIP') + '</button><button class="admin-action-btn add-points" data-email="' + esc(u.fields.Email) + '" style="background:var(--success);">增加积分</button><button class="admin-action-btn reset-download" data-email="' + esc(u.fields.Email) + '" style="background:var(--warning);">重置次数</button></div></div>';
+                    return '<div class="admin-user-card"><div class="admin-user-info"><div class="admin-user-avatar">' + avatarIcon + '</div><div><div class="admin-user-email">' + esc(u.fields.email) + '</div><div class="admin-user-name">' + esc(u.fields.username || '') + '</div></div><div class="admin-user-role ' + (isVip ? 'vip' : '') + '">' + (isVip ? (role === 'admin' ? '管理员' : 'VIP') : '普通') + '</div></div><div><button class="admin-action-btn upgrade-vip" data-id="' + u.id + '" data-role="' + role + '">' + (isVip && role !== 'admin' ? '降级' : '升级VIP') + '</button><button class="admin-action-btn add-points" data-email="' + esc(u.fields.email) + '" style="background:var(--success);">增加积分</button><button class="admin-action-btn reset-download" data-email="' + esc(u.fields.email) + '" style="background:var(--warning);">重置次数</button></div></div>';
                 }).join('');
                 container.querySelectorAll('.upgrade-vip').forEach(function(btn) {
                     btn.addEventListener('click', async function() {
