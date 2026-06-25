@@ -297,7 +297,6 @@
             for (let name of names) {
                 if (obj && obj[name] !== undefined && obj[name] !== null) return obj[name];
             }
-            // 如果都没找到，尝试遍历对象键，忽略大小写匹配（用于特定字段）
             if (obj && typeof obj === 'object') {
                 const lowerKeys = names.map(n => n.toLowerCase());
                 for (let key in obj) {
@@ -472,7 +471,8 @@
             return upd;
         }
 
-        // ========================  用户相关（兼容大小写） ========================
+        // ========================  用户相关（前端匹配，完全兼容大小写） ========================
+        // 关键修复：不再使用 Baserow 过滤，而是获取全部用户后在前端匹配
         async function findUserByEmail(email) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
@@ -486,6 +486,7 @@
                 });
                 return found || null;
             } catch (e) {
+                console.error('findUserByEmail error:', e);
                 return null;
             }
         }
@@ -591,7 +592,6 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) throw new Error('用户不存在');
-            // 更新时使用小写字段名（假设表列名是小写）
             await baserowReq('PATCH', CONFIG.TABLES.users, { password: CryptoJS.SHA256(newPass).toString() }, rec.id);
         }
 
