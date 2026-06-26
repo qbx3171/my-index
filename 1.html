@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* ========== 完整样式（与之前一致） ========== */
+        /* ========== 完整样式 ========== */
         :root { --bg: #f3f4f8; --surface: #ffffff; --border: #e8ecf3; --border-light: #f0f2f7; --text: #1a1d2e; --text-secondary: #4a5068; --text-muted: #8b90a5; --primary: #4f6ef6; --primary-light: #eef1fd; --primary-hover: #3b54d4; --success: #10b981; --warning: #f59e0b; --shadow-sm: 0 1px 3px rgba(0,0,0,0.04); --shadow-md: 0 4px 16px rgba(0,0,0,0.05); --shadow-lg: 0 12px 36px rgba(0,0,0,0.07); --radius-sm: 8px; --radius: 16px; --radius-lg: 22px; --radius-xl: 28px; --radius-full: 60px; --transition-fast: 0.18s ease; --font-xs: 0.68rem; --font-sm: 0.78rem; --font-base: 0.9rem; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
@@ -105,7 +105,8 @@
         @media (min-width:901px) { .grid { grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); } }
         .software-card { border-radius: var(--radius-xl); padding: 18px 16px; cursor: pointer; background: var(--surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; will-change: transform; position: relative; overflow: hidden; }
         .software-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
-        .favorite-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #ccc; transition: all 0.3s; z-index: 3; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .software-card .card-click-area { width: 100%; height: 100%; display: block; }
+        .favorite-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #ccc; transition: all 0.3s; z-index: 5; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         body.dark-mode .favorite-btn { background: rgba(30,41,59,0.9); }
         .favorite-btn.active { color: #f43f5e; }
         .favorite-btn:hover { transform: scale(1.1); }
@@ -121,7 +122,7 @@
         .description { color: var(--text-muted); font-size: var(--font-xs); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .os-tags { display: flex; gap: 5px; margin: 6px 0 8px; flex-wrap: wrap; }
         .os-badge { background: var(--bg); padding: 3px 9px; border-radius: 20px; font-size: 0.6rem; color: var(--text-secondary); border: 1px solid var(--border-light); display: flex; align-items: center; gap: 3px; }
-        .rating-stars { display: inline-flex; gap: 3px; margin-top: 6px; cursor: pointer; }
+        .rating-stars { display: inline-flex; gap: 3px; margin-top: 6px; cursor: pointer; z-index: 3; position: relative; }
         .star { cursor: pointer; color: #ddd; font-size: 0.9rem; transition: color 0.2s; }
         .star.active, .star-rating.active { color: #fbbf24; }
         .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 10px; margin-top: 4px; }
@@ -163,8 +164,39 @@
         @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
         .dark-mode-toggle { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; color: var(--text-secondary); }
         .dark-mode-toggle:hover { background: var(--primary-light); color: var(--primary); }
-        .level-rule-tip { font-size: 0.7rem; color: var(--text-muted); background: var(--bg); padding: 6px 10px; border-radius: 14px; margin-top: 6px; line-height: 1.4; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: space-between; }
         @media (max-width: 480px) { .modal-card { width: 96%; border-radius: 24px; max-height: 90vh; } }
+        /* 下载按钮样式 */
+        .download-link-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .download-link-btn:hover {
+            transform: scale(1.05);
+            background: var(--primary-hover);
+        }
+        .card-download-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 6px;
+        }
+        /* 修复卡片点击穿透 */
+        .software-card .clickable-content {
+            cursor: pointer;
+        }
+        .software-card .no-click {
+            cursor: default;
+            position: relative;
+            z-index: 2;
+        }
     </style>
 </head>
 <body>
@@ -191,7 +223,7 @@
                     <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a>
                 </div>
                 <div class="user-area">
-                    <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-download"></i> 点击卡片直接下载</span>
+                    <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-download"></i> 点击卡片下载</span>
                 </div>
                 <button class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></button>
             </div>
@@ -263,7 +295,7 @@
                         <div class="carousel-dots" id="sidebarCarouselDots"></div>
                     </div>
 
-                    <!-- 日历签到（简化版，无登录要求） -->
+                    <!-- 日历 -->
                     <div class="sidebar-card">
                         <div class="calendar-header">
                             <span id="calendarMonthYear"></span>
@@ -274,7 +306,7 @@
                         </div>
                         <div class="calendar-grid" id="calendarDays"></div>
                         <div style="text-align:center; margin-top:10px;font-size:0.7rem;color:var(--text-muted);">
-                            <i class="fas fa-info-circle"></i> 签到功能已简化
+                            <i class="fas fa-info-circle"></i> 每日精选推荐
                         </div>
                     </div>
 
@@ -370,7 +402,10 @@
             { id: '2', name: 'Adobe Photoshop 2026', category: '图像处理', version: '2026', description: '专业图像处理软件，AI智能修图', os: ['Windows', 'Mac'], downloads: 2800, addedDate: '2026-05-20', icon: '', url: '#' },
             { id: '3', name: 'SketchUp Pro 2025', category: '3D建模', version: '2025', description: '草图大师，3D建模快速上手', os: ['Windows', 'Mac'], downloads: 1900, addedDate: '2026-05-10', icon: '', url: '#' },
             { id: '4', name: 'Rhino 8', category: '3D建模', version: '8.0', description: '工业设计建模，曲面建模利器', os: ['Windows', 'Mac'], downloads: 1600, addedDate: '2026-05-05', icon: '', url: '#' },
-            { id: '5', name: 'AutoCAD 2026', category: '工程设计', version: '2026', description: '专业CAD设计软件', os: ['Windows'], downloads: 2100, addedDate: '2026-04-28', icon: '', url: '#' }
+            { id: '5', name: 'AutoCAD 2026', category: '工程设计', version: '2026', description: '专业CAD设计软件', os: ['Windows'], downloads: 2100, addedDate: '2026-04-28', icon: '', url: '#' },
+            { id: '6', name: 'Adobe Premiere Pro 2026', category: '视频剪辑', version: '2026', description: '专业视频编辑软件', os: ['Windows', 'Mac'], downloads: 1500, addedDate: '2026-05-25', icon: '', url: '#' },
+            { id: '7', name: 'Adobe After Effects 2026', category: '视频剪辑', version: '2026', description: '专业动态图形和视觉效果', os: ['Windows', 'Mac'], downloads: 1200, addedDate: '2026-05-22', icon: '', url: '#' },
+            { id: '8', name: 'Adobe Illustrator 2026', category: '图像处理', version: '2026', description: '专业矢量图形设计', os: ['Windows', 'Mac'], downloads: 1800, addedDate: '2026-05-18', icon: '', url: '#' }
         ];
 
         let bannerAds = [], sidebarAds = [], articles = [], announcements = [];
@@ -573,15 +608,24 @@
 
         // ========================  下载功能 ========================
         function downloadSoftware(sw) {
+            if (!sw) {
+                showToast('软件信息不存在', 'error');
+                return;
+            }
             if (!sw.url || sw.url === '#' || sw.url === '') {
-                showToast('下载链接暂不可用', 'warning');
+                showToast('下载链接暂不可用，请稍后再试', 'warning');
                 return;
             }
             addHistory(sw);
             showToast('正在打开下载链接...', 'success');
-            window.open(sw.url, '_blank');
+            // 延迟一下让 toast 显示
+            setTimeout(function() {
+                window.open(sw.url, '_blank');
+            }, 300);
         }
 
+        // 全局暴露下载函数
+        window.downloadSoftware = downloadSoftware;
         window.downloadSoftwareById = function(id) {
             var sw = softwares.find(function(s) { return s.id == id; });
             if (sw) downloadSoftware(sw);
@@ -665,7 +709,7 @@
                     createdAt: new Date().toISOString()
                 });
                 localStorage.setItem('lezhe_ratings', JSON.stringify(allRatings));
-                showToast('评价成功！', 'success');
+                showToast('评价成功！感谢反馈', 'success');
                 return true;
             } catch (err) {
                 console.warn(err);
@@ -697,30 +741,61 @@
                     else if (o === 'Mac') icon = '<i class="fab fa-apple"></i>';
                     return '<span class="os-badge">' + icon + ' ' + o + '</span>';
                 }).join('');
-                return '<div class="software-card" data-id="' + sw.id + '" onclick="window.downloadSoftwareById(\'' + sw.id + '\')">' +
+                return '<div class="software-card" data-id="' + sw.id + '">' +
                     '<button class="favorite-btn ' + (isFav ? 'active' : '') + '" data-id="' + sw.id + '" data-name="' + esc(sw.name) + '"><i class="fas fa-heart"></i></button>' +
                     (isNew ? '<span class="new-badge">✦新</span>' : (isHot ? '<span class="hot-badge">♨热</span>' : '')) +
-                    '<div class="card-header"><div class="card-icon">' + renderIconHtml(sw.icon, sw.name) + '</div><div class="software-name">' + esc(sw.name) + '</div></div>' +
+                    '<div class="card-header">' +
+                        '<div class="card-icon">' + renderIconHtml(sw.icon, sw.name) + '</div>' +
+                        '<div class="software-name">' + esc(sw.name) + '</div>' +
+                    '</div>' +
                     '<div class="version">' + esc(sw.version) + '</div>' +
                     '<div class="description">' + esc(sw.description) + '</div>' +
                     '<div class="os-tags">' + osTags + '</div>' +
                     '<div class="rating-stars" id="rating-' + sw.id + '"><span style="font-size:0.65rem;color:var(--text-muted);"><i class="far fa-star"></i> 评价</span></div>' +
-                    '<div class="card-footer"><span class="added-date">' + esc(sw.addedDate) + '</span><span class="download-count"><i class="fas fa-download"></i> ' + (sw.downloads || 0) + '</span></div>' +
+                    '<div class="card-footer">' +
+                        '<span class="added-date">' + esc(sw.addedDate) + '</span>' +
+                        '<span class="download-count"><i class="fas fa-download"></i> ' + (sw.downloads || 0) + '</span>' +
+                    '</div>' +
+                    '<div class="card-download-area">' +
+                        '<button class="download-link-btn" data-id="' + sw.id + '"><i class="fas fa-download"></i> 下载</button>' +
+                    '</div>' +
                     '</div>';
             }).join('');
             document.getElementById('loadMoreContainer').style.display = (!showAll && filtered.length > 12) ? 'block' : 'none';
 
-            container.addEventListener('click', function(e) {
-                var btn = e.target.closest('.favorite-btn');
-                if (btn) {
+            // 事件绑定：收藏按钮
+            container.querySelectorAll('.favorite-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     var isActive = toggleFavorite(btn.dataset.id, btn.dataset.name);
                     btn.classList.toggle('active', isActive);
-                }
+                });
             });
-            container.addEventListener('click', function(e) {
-                var ratingSpan = e.target.closest('.rating-stars');
-                if (ratingSpan) {
+
+            // 事件绑定：下载按钮
+            container.querySelectorAll('.download-link-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var sw = softwares.find(function(s) { return s.id == btn.dataset.id; });
+                    if (sw) downloadSoftware(sw);
+                });
+            });
+
+            // 事件绑定：卡片点击（点击卡片主体触发下载）
+            container.querySelectorAll('.software-card').forEach(function(card) {
+                card.addEventListener('click', function(e) {
+                    // 如果点击的是收藏按钮或下载按钮，不触发
+                    if (e.target.closest('.favorite-btn') || e.target.closest('.download-link-btn')) {
+                        return;
+                    }
+                    var sw = softwares.find(function(s) { return s.id == card.dataset.id; });
+                    if (sw) downloadSoftware(sw);
+                });
+            });
+
+            // 事件绑定：评价星星
+            container.querySelectorAll('.rating-stars').forEach(function(ratingSpan) {
+                ratingSpan.addEventListener('click', function(e) {
                     e.stopPropagation();
                     var card = ratingSpan.closest('.software-card');
                     var sw = softwares.find(function(s) { return s.id === card.dataset.id; });
@@ -746,7 +821,7 @@
                             };
                         });
                     }
-                }
+                });
             });
         }
 
@@ -755,7 +830,11 @@
             var hotItems = softwares.slice().sort(function(a, b) { return (b.downloads || 0) - (a.downloads || 0); }).slice(0, 8);
             var hotScroll = document.getElementById('hotScroll');
             hotScroll.innerHTML = hotItems.map(function(sw) {
-                return '<div class="hot-card" data-id="' + sw.id + '"><div class="hot-icon">' + renderIconHtml(sw.icon, sw.name) + '</div><div class="hot-name">' + esc(sw.name) + '</div><div class="hot-meta"><span>' + (sw.os || []).join(' · ') + '</span><span class="hot-downloads"><i class="fas fa-download"></i> ' + (sw.downloads || 0) + '</span></div></div>';
+                return '<div class="hot-card" data-id="' + sw.id + '">' +
+                    '<div class="hot-icon">' + renderIconHtml(sw.icon, sw.name) + '</div>' +
+                    '<div class="hot-name">' + esc(sw.name) + '</div>' +
+                    '<div class="hot-meta"><span>' + (sw.os || []).join(' · ') + '</span><span class="hot-downloads"><i class="fas fa-download"></i> ' + (sw.downloads || 0) + '</span></div>' +
+                    '</div>';
             }).join('');
             hotScroll.querySelectorAll('.hot-card').forEach(function(c) {
                 c.addEventListener('click', function() {
@@ -798,7 +877,7 @@
             });
         }
 
-        // 日历（简化版）
+        // 日历
         var currentDate = new Date();
         function renderCalendar() {
             var y = currentDate.getFullYear(), m = currentDate.getMonth();
