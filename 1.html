@@ -471,15 +471,17 @@
             return upd;
         }
 
-        // ========================  用户相关（前端匹配，完全兼容大小写） ========================
-        // 关键修复：不再使用 Baserow 过滤，而是获取全部用户后在前端匹配
+        // ========================  用户相关（核心修复：findUserByEmail 使用 search 参数） ========================
+        // 关键修复：不再依赖 max_limit=100 截断，改用 search 在所有字段中搜索目标邮箱，并扩大 max_limit 到 1000
         async function findUserByEmail(email) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
                 return users.find(function(u) { return u.email === email; }) || null;
             }
             try {
-                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=100');
+                // 使用 search 参数在所有字段中搜索，并设置较大的 max_limit 确保新用户不被遗漏
+                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'search=' + encodeURIComponent(email) + '&max_limit=1000');
+                // 前端精确过滤，确保 email 完全匹配（兼容大小写）
                 var found = data.results.find(function(row) {
                     var rowEmail = getFieldSafe(row, 'email', 'Email', 'EMAIL');
                     return rowEmail && rowEmail.toLowerCase() === email.toLowerCase();
@@ -497,7 +499,7 @@
                 return users.find(function(u) { return u.inviteCode === code; }) || null;
             }
             try {
-                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=100');
+                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=1000');
                 var found = data.results.find(function(row) {
                     var rowCode = getFieldSafe(row, 'invitecode', 'InviteCode', 'INVITECODE');
                     return rowCode && rowCode.toUpperCase() === code.toUpperCase();
@@ -749,7 +751,6 @@
             return data.count < total;
         }
 
-        // ========================  优化后的 recordDownload（直接使用 user.id） ========================
         async function recordDownload(user) {
             if (!user) return false;
             if (user.role === 'vip' || user.role === 'admin') return true;
@@ -771,7 +772,6 @@
             return true;
         }
 
-        // ========================  下载点击  ========================
         async function downloadSoftware(sw) {
             console.log('=== 点击下载 ===', sw);
             if (!currentUser) {
@@ -1155,7 +1155,7 @@
             if (!container) return;
             try {
                 var users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]') : await (function() {
-                    return baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=100').then(function(data) {
+                    return baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=1000').then(function(data) {
                         return data.results.map(function(r) {
                             return {
                                 id: r.id,
@@ -1254,7 +1254,7 @@
                 var users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(function(u) {
                     return { id: u.email, fields: u, createdTime: u.createdAt };
                 }) : await (function() {
-                    return baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=100').then(function(data) {
+                    return baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=1000').then(function(data) {
                         return data.results.map(function(r) {
                             return { id: r.id, fields: r, createdTime: getFieldSafe(r, 'createdAt', 'CreatedAt') || new Date().toISOString() };
                         });
