@@ -9,10 +9,8 @@
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        /* ========== 完整样式 ========== */
+        /* ========== 完整样式（与之前一致） ========== */
         :root { --bg: #f3f4f8; --surface: #ffffff; --border: #e8ecf3; --border-light: #f0f2f7; --text: #1a1d2e; --text-secondary: #4a5068; --text-muted: #8b90a5; --primary: #4f6ef6; --primary-light: #eef1fd; --primary-hover: #3b54d4; --success: #10b981; --warning: #f59e0b; --shadow-sm: 0 1px 3px rgba(0,0,0,0.04); --shadow-md: 0 4px 16px rgba(0,0,0,0.05); --shadow-lg: 0 12px 36px rgba(0,0,0,0.07); --radius-sm: 8px; --radius: 16px; --radius-lg: 22px; --radius-xl: 28px; --radius-full: 60px; --transition-fast: 0.18s ease; --font-xs: 0.68rem; --font-sm: 0.78rem; --font-base: 0.9rem; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
@@ -50,17 +48,7 @@
         .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
         @media (max-width:768px) { .nav-inner { justify-content: space-between; } .hamburger { display: flex; } .nav-links { display: none; width: 100%; flex-direction: column; gap: 2px; padding: 12px 0; background: var(--surface); border-radius: var(--radius-lg); margin-top: 10px; box-shadow: var(--shadow-md); border: 1px solid var(--border-light); position: absolute; top: 100%; left: 0; z-index: 1000; } .nav-links.show { display: flex; } .user-area { margin-left: 0; } }
         .user-area { flex-shrink: 0; position: relative; }
-        .auth-btn { background: linear-gradient(135deg, #4f6ef6, #3b54d4); color: #fff; border: none; padding: 10px 20px; border-radius: var(--radius-full); font-weight: 600; font-size: var(--font-sm); cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 2px 10px rgba(79,110,246,0.15); transition: 0.2s; }
-        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(79,110,246,0.3); }
-        .user-name-btn { background: var(--surface); padding: 9px 18px; border-radius: var(--radius-full); display: flex; align-items: center; gap: 7px; cursor: pointer; border: 1px solid var(--border); font-weight: 500; font-size: var(--font-sm); }
         .download-badge { background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 0.6rem; margin-left: 8px; }
-        .vip-badge { background: linear-gradient(135deg, #d4af37, #f5b041); color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 0.6rem; margin-left: 8px; }
-        .level-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; margin-left: 6px; }
-        .level-1 { background: #e5e7eb; color: #6b7280; } .level-2 { background: #dbeafe; color: #3b82f6; } .level-3 { background: #dcfce7; color: #22c55e; } .level-4 { background: #fed7aa; color: #ea580c; } .level-5 { background: #fef08a; color: #ca8a04; }
-        .dropdown-content { display: none; position: absolute; right: 0; top: 48px; background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 20px 40px rgba(0,0,0,0.2); padding: 6px; min-width: 160px; z-index: 200; border: 1px solid var(--border); }
-        .dropdown-content.show { display: block; }
-        .dropdown-content button { display: block; width: 100%; padding: 10px 14px; background: transparent; border: none; text-align: left; border-radius: var(--radius-sm); cursor: pointer; font-size: var(--font-sm); color: var(--text); }
-        .dropdown-content button:hover { background: var(--bg); color: var(--primary); }
         .main { max-width: 1300px; margin: 0 auto; padding: 20px 20px 50px; }
         @media (max-width:768px) { .main { padding: 12px 10px 40px; } }
         .content-wrapper { display: flex; gap: 22px; margin-top: 2px; }
@@ -151,7 +139,6 @@
         .calendar-day-name { font-size: 0.5rem; color: var(--text-muted); font-weight: 500; padding: 3px 0; }
         .calendar-day { padding: 6px 0; font-size: 0.6rem; border-radius: 50%; color: var(--text-secondary); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto; cursor: default; }
         .calendar-day.today { background: var(--primary); color: #fff; font-weight: 600; cursor: pointer; }
-        .calendar-day.signed { background: var(--success); color: #fff; font-weight: 700; }
         .rank-item, .history-item { display: flex; align-items: center; gap: 10px; padding: 9px 6px; border-bottom: 1px solid var(--border-light); cursor: pointer; font-size: var(--font-sm); }
         .rank-index { width: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.6rem; background: var(--bg); color: var(--text-muted); flex-shrink: 0; }
         .rank-index.top1 { background: #fef3c7; color: #b45309; } .rank-index.top2 { background: #e2e8f0; color: #475569; } .rank-index.top3 { background: #fde8d0; color: #9a3412; }
@@ -174,48 +161,10 @@
         .announcement-bar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 16px; text-align: center; font-size: 0.85rem; position: relative; cursor: pointer; animation: slideDown 0.5s ease; z-index: 1001; }
         .announcement-bar .close-announcement { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: white; cursor: pointer; opacity: 0.8; }
         @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-        .pwa-install-banner { position: fixed; bottom: 80px; left: 16px; right: 16px; background: var(--surface); border-radius: var(--radius-lg); padding: 12px 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--primary); display: none; align-items: center; justify-content: space-between; z-index: 1000; animation: slideUp 0.3s ease; }
-        .pwa-install-banner.show { display: flex; }
-        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .admin-user-card { background: var(--surface); border-radius: var(--radius-xl); padding: 16px; margin-bottom: 12px; border: 1px solid var(--border-light); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-        .admin-user-info { display: flex; align-items: center; gap: 14px; flex: 2; min-width: 180px; }
-        .admin-user-avatar { width: 44px; height: 44px; background: var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem; }
-        .admin-action-btn { background: var(--primary); color: white; border: none; border-radius: 40px; padding: 8px 18px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.2s; min-height: 36px; }
-        .admin-action-btn:hover { transform: translateY(-2px); background: var(--primary-hover); }
         .dark-mode-toggle { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s; color: var(--text-secondary); }
         .dark-mode-toggle:hover { background: var(--primary-light); color: var(--primary); }
-        .user-checkbox-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid var(--border-light); cursor: pointer; }
-        .user-checkbox-item:hover { background: var(--primary-light); }
-        .user-checkbox-item input { width: 18px; height: 18px; cursor: pointer; }
-        .user-checkbox-item label { flex: 1; cursor: pointer; font-size: 0.85rem; }
         .level-rule-tip { font-size: 0.7rem; color: var(--text-muted); background: var(--bg); padding: 6px 10px; border-radius: 14px; margin-top: 6px; line-height: 1.4; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: space-between; }
-        .contact-buy-btn { background: var(--warning); color: #fff; border: none; border-radius: 24px; padding: 5px 12px; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin-left: 8px; }
-        .contact-buy-btn:hover { opacity: 0.9; transform: scale(1.02); }
-        .profile-modal-card { max-width: 500px; width: 92%; background: var(--surface); border-radius: 32px; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; padding: 0; max-height: 85vh; margin: 0 auto; }
-        .profile-modal-card::-webkit-scrollbar { display: none; }
-        .profile-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 12px 20px; border-bottom: 1px solid var(--border-light); }
-        .profile-header h2 { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .profile-content { padding: 16px 20px 24px 20px; }
-        .profile-info-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-        .profile-info-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; gap: 8px; }
-        .profile-info-label { font-weight: 500; color: var(--text-secondary); font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
-        .profile-info-value { font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-        .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
-        .profile-stat-card { background: linear-gradient(135deg, rgba(79,110,246,0.08), rgba(79,110,246,0.02)); border-radius: 20px; padding: 14px 10px; text-align: center; border: 1px solid rgba(79,110,246,0.1); }
-        .profile-stat-card i { font-size: 1.5rem; color: var(--primary); margin-bottom: 6px; }
-        .profile-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--text); }
-        .profile-stat-label { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
-        .invite-code-box { background: linear-gradient(135deg, var(--primary-light), var(--surface)); border: 1px solid var(--primary); border-radius: 16px; padding: 12px; text-align: center; margin: 16px 0; }
-        .invite-code-box code { font-size: 1rem; font-weight: 700; letter-spacing: 1px; color: var(--primary); }
-        .action-buttons { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
-        .action-buttons button { width: 100%; padding: 12px; border-radius: 40px; font-weight: 600; transition: all 0.2s; cursor: pointer; border: none; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; }
-        .action-buttons button:hover { transform: translateY(-2px); background: var(--primary); color: white; }
-        .password-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-light); }
-        .password-section h4 { font-size: 0.85rem; margin-bottom: 12px; color: var(--text-secondary); }
-        .password-section input, .profile-username-input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 20px; background: var(--bg); margin-bottom: 10px; font-size: 0.85rem; }
-        .password-section button { width: 100%; padding: 12px; border-radius: 40px; font-weight: 600; background: var(--primary); color: white; border: none; cursor: pointer; }
-        .buy-tip { background: var(--primary-light); border-radius: 16px; padding: 10px 14px; margin: 12px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 0.75rem; }
-        @media (max-width: 480px) { .profile-modal-card { width: 96%; border-radius: 24px; max-height: 90vh; } .profile-header { padding: 16px 16px 10px 16px; } .profile-header h2 { font-size: 1.1rem; } .profile-content { padding: 12px 16px 20px 16px; } .profile-stats { gap: 8px; } .profile-stat-card { padding: 10px 6px; } .profile-stat-value { font-size: 1.2rem; } .profile-stat-label { font-size: 0.6rem; } .action-buttons button { padding: 10px; font-size: 0.8rem; } .password-section input, .profile-username-input { padding: 10px; font-size: 0.8rem; } .password-section button { padding: 10px; } .invite-code-box code { font-size: 0.9rem; } }
+        @media (max-width: 480px) { .modal-card { width: 96%; border-radius: 24px; max-height: 90vh; } }
     </style>
 </head>
 <body>
@@ -231,68 +180,218 @@
     </div>
 
     <div class="app-wrapper" id="appWrapper">
-        <div class="top-nav" id="topNav"><div class="nav-inner"><div class="logo-area"><span class="logo">乐哲软件</span></div><button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button><div class="nav-links" id="navLinks"><a href="https://www.lezhesoft.cn/">首页</a><a href="https://www.lezhesoft.cn/service.html">服务项目</a><a href="#" data-nav="download" class="active">软件下载</a><a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></div><div class="user-area" id="userArea"></div><button class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></button></div></div>
-        <div class="main"><div class="content-wrapper"><div class="main-content"><div class="carousel-container" id="categoryBannerContainer"><div class="carousel-slides" id="categoryBannerSlides"></div><div class="carousel-dots" id="categoryBannerDots"></div></div><div class="daily-section" id="dailySection" style="display: none;"><div class="daily-header"><h3><i class="fas fa-star" style="color: #f59e0b;"></i> 今日推荐</h3><span style="font-size: 0.7rem; color: var(--text-muted);">每日更新，精选好软</span></div><div class="daily-card" id="dailyCard"><div class="daily-card-content"><div class="daily-icon" id="dailyIcon"><i class="fas fa-gem"></i></div><div class="daily-info"><div class="daily-name" id="dailyName">加载中...</div><div class="daily-desc" id="dailyDesc"></div><div class="daily-meta"><span id="dailyVersion"></span><span id="dailyOs"></span><span id="dailyDownloads"><i class="fas fa-download"></i> 0</span></div></div><button class="daily-download-btn" id="dailyDownloadBtn"><i class="fas fa-download"></i> 立即下载</button></div></div></div>
-        <div class="hot-section"><div class="hot-header"><h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3><span style="font-size: 0.7rem; color: var(--text-muted);">本周热门下载</span></div><div class="hot-scroll" id="hotScroll"></div></div>
-        <div class="category-row" id="categoryTabs"></div>
-        <div id="softwareGridContainer" class="grid"></div>
-        <div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;"><button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;">加载更多</button></div></div><div class="sidebar"><div class="sidebar-search"><div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="搜软件..." autocomplete="off"><button id="searchBtn"><i class="fas fa-arrow-right"></i></button></div></div><div class="carousel-container" id="adContainer"><div class="carousel-slides" id="sidebarCarouselSlides"></div><div class="carousel-dots" id="sidebarCarouselDots"></div></div><div class="sidebar-card"><div class="calendar-header"><span id="calendarMonthYear"></span><div class="calendar-nav"><button id="prevMonth"><i class="fas fa-chevron-left"></i></button><button id="nextMonth"><i class="fas fa-chevron-right"></i></button></div></div><div class="calendar-grid" id="calendarDays"></div><div style="text-align:center; margin-top:10px;"><button id="dailyCheckinBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:8px 16px; font-size:0.75rem; cursor:pointer;">📅 每日签到 (+1次+2积分)</button></div></div><div class="feedback-section"><div style="font-weight:650;font-size:var(--font-base);margin-bottom:10px;"><i class="fas fa-comment-dots"></i> 用户留言</div><input type="text" id="feedbackName" class="feedback-input" placeholder="昵称 (选填)"><textarea id="feedbackMessage" class="feedback-textarea" rows="2" placeholder="分享你想要的软件..."></textarea><button id="submitFeedbackBtn" class="feedback-submit-btn"><i class="fas fa-paper-plane"></i> 提交</button><div id="feedbackListContainer" style="margin-top:12px;font-size:var(--font-xs);"></div></div><div class="sidebar-card"><h3><i class="fas fa-newspaper"></i> 最新文章 <button id="manageArticlesBtn" style="background:var(--primary); color:#fff; border:none; border-radius:20px; padding:5px 12px; font-size:0.65rem; cursor:pointer; display:none;">管理</button></h3><div id="articlesList"></div></div><div class="sidebar-card"><h3><i class="fas fa-chart-line"></i> 下载排行榜</h3><div id="rankList"></div></div><div class="sidebar-card"><h3><i class="fas fa-history"></i> 最近浏览</h3><div id="historyList"></div><div class="clear-history" style="margin-top:8px; text-align:right;"><button id="clearHistoryBtn" style="background:none; border:1px solid var(--border); padding:4px 12px; border-radius:20px; font-size:0.65rem; cursor:pointer;">清空历史</button></div></div></div></div><div class="friend-links-wrapper"><div class="friend-links-title">友情链接</div><div class="friend-links-row"><a href="https://foxirj.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 佛系软件</a><a href="https://www.ruancang.net/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 软仓</a><a href="https://www.macwk.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> MacWK</a><a href="https://www.ifmac.cn/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> ifMac</a><a href="https://www.macku.pro/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 迈克库软件</a></div></div><footer style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.7rem;">版权所有 © 乐哲软件 | www.lezhesoft.cn | 个人技术分享</footer></div></div>
-    <div id="authModal" class="modal-overlay"><div class="modal-card" style="max-width:440px;"><div style="display:flex;justify-content:space-between;margin-bottom:18px;"><span id="authModalTitle" style="font-weight:700;">登录</span><button id="closeAuthModal" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button></div><div style="display:flex;gap:14px;margin-bottom:20px;border-bottom:1px solid var(--border-light);padding-bottom:4px;"><button class="auth-tab active" data-tab="login" style="background:none;border:none;font-weight:600;color:var(--primary);padding:8px 2px;">登录</button><button class="auth-tab" data-tab="register" style="background:none;border:none;font-weight:600;color:var(--text-muted);padding:8px 2px;">注册</button></div><div id="loginForm"><input type="email" id="loginEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><input type="password" id="loginPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="loginCaptchaQuestion"></span><button id="refreshLoginCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="loginCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg);"></div><button id="showForgotBtn" style="background:none;border:none;color:var(--primary);margin-bottom:12px;">忘记密码？</button><button id="loginBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">登录</button></div><div id="registerForm" style="display:none;"><input type="text" id="regUsername" placeholder="用户名" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="email" id="regEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div id="emailCheckStatus" class="input-check-status"></div><input type="password" id="regPassword" placeholder="密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="password" id="regConfirm" placeholder="确认密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="text" id="regInviteCode" placeholder="邀请码（选填）" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="regCaptchaQuestion"></span><button id="refreshRegCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="regCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;"></div><button id="registerBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">注册</button></div><div id="forgotForm" style="display:none;"><input type="email" id="forgotEmail" placeholder="邮箱" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:10px;margin-bottom:12px;"><button id="sendResetCodeBtn" style="flex:1;background:var(--primary);color:#fff;border:none;border-radius:40px;padding:10px;cursor:pointer;">发送验证码</button><input type="text" id="resetCodeInput" placeholder="验证码" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:12px;"></div><input type="password" id="newPassword" placeholder="新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><input type="password" id="confirmNewPassword" placeholder="确认新密码" style="width:100%;padding:12px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;"><div style="display:flex;gap:8px;align-items:center;margin:10px 0;"><span id="forgotCaptchaQuestion"></span><button id="refreshForgotCaptcha" style="background:none;border:none;color:var(--primary);"><i class="fas fa-sync"></i></button><input type="text" id="forgotCaptchaInput" placeholder="验证码" style="flex:1;padding:12px;border:1px solid var(--border);border-radius:12px;"></div><button id="resetPasswordBtn" style="width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:30px;">重置密码</button><button id="backToLoginFromForgot" style="background:none;border:none;color:var(--primary);margin-top:10px;">返回登录</button></div></div></div>
-    <div id="profileModal" class="modal-overlay"><div class="profile-modal-card"><div class="profile-header"><h2><i class="fas fa-user-circle" style="color:var(--primary);"></i> 个人中心</h2><button id="closeProfileModal" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">&times;</button></div><div class="profile-content"><div class="profile-info-grid"><div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-user"></i> 用户名</span><span class="profile-info-value"><input type="text" id="profileUsernameInput" class="profile-username-input" style="margin-bottom:0; width:140px; padding:6px 10px;"><span id="profileLevelBadge"></span></span></div><div class="profile-info-item"><span class="profile-info-label"><i class="fas fa-crown"></i> 会员等级</span><span class="profile-info-value"><span id="profileRole"></span> <span id="profileLevelTag"></span></span></div></div><div class="profile-stats"><div class="profile-stat-card"><i class="fas fa-download"></i><div class="profile-stat-value" id="profileRemaining">0</div><div class="profile-stat-label">本月剩余下载</div></div><div class="profile-stat-card"><i class="fas fa-coins"></i><div class="profile-stat-value" id="profilePoints">0</div><div class="profile-stat-label">累计积分</div></div></div><div class="level-rule-tip" style="margin-bottom:12px;"><span>青铜0-29 | 白银30-99 | 黄金100-199 | 铂金200-499 | 钻石≥500</span><span>签到/评价/邀请得积分</span></div><div class="buy-tip"><span><i class="fas fa-exclamation-circle"></i> 免费次数用完后可联系客服购买</span><button id="contactAdminBuyBtn" class="contact-buy-btn" style="margin:0; padding:4px 12px;"><i class="fab fa-weixin"></i> 联系客服</button></div><div class="invite-code-box"><div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:4px;">我的邀请码</div><code id="myInviteCode" style="font-size:1rem; font-weight:700;">----</code><div style="font-size:0.6rem; color:var(--text-muted); margin-top:4px;">邀请好友，双方各得5次下载+10积分</div></div><div class="action-buttons"><button id="showFavoritesBtn"><i class="fas fa-heart"></i> 我的收藏</button><button id="showExportBtn"><i class="fas fa-download"></i> 导出数据</button><button id="showMessagesBtn"><i class="fas fa-envelope"></i> 站内信 <span id="unreadCount" style="background:#ef4444;color:white;border-radius:50%;padding:2px 10px;font-size:0.7rem;margin-left:8px;display:none;">0</span></button></div><div class="password-section"><h4><i class="fas fa-lock"></i> 修改密码（选填）</h4><input type="password" id="profileNewPwd" placeholder="新密码"><input type="password" id="profileConfirmPwd" placeholder="确认新密码"><button id="saveProfileBtn">保存修改</button></div></div></div></div>
-    <div id="adminModal" class="modal-overlay"><div class="modal-card" style="max-width: 900px;"><div style="display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;"><h3><i class="fas fa-users"></i> 管理后台</h3><div><button id="sendMessageTabBtn" style="background:var(--primary-light);color:var(--primary);border:none;border-radius:30px;padding:8px 20px;cursor:pointer;margin-right:8px;"><i class="fas fa-envelope"></i> 发送站内信</button><button id="userManageTabBtn" style="background:var(--primary);color:#fff;border:none;border-radius:30px;padding:8px 20px;cursor:pointer;">用户管理</button><button id="closeAdminModal" style="background:none;border:none;font-size:20px;margin-left:8px;cursor:pointer;">&times;</button></div></div><div id="userManagePanel"><div class="admin-search-bar" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="adminSearchInput" placeholder="搜索用户..." style="flex:1;padding:10px;border-radius:30px;border:1px solid var(--border);background:var(--bg);"><input type="date" id="adminDateFilter" style="padding:10px;border-radius:30px;border:1px solid var(--border);background:var(--bg);"><button id="refreshUserListBtn" style="background:var(--primary);color:#fff;border:none;border-radius:30px;padding:10px 20px;cursor:pointer;">刷新</button></div><div id="adminUserList" style="max-height:55vh;overflow-y:auto;"></div></div><div id="sendMessagePanel" style="display:none;"><div style="margin-bottom:16px;"><label style="display:block;margin-bottom:6px;font-weight:600;">选择接收用户</label><select id="messageRecipient" style="width:100%;padding:12px;border-radius:16px;border:1px solid var(--border);background:var(--bg);"><option value="all">全部用户</option><option value="vip">仅VIP用户</option><option value="normal">仅普通用户</option><option value="custom">选择特定用户</option></select></div><div id="selectedUsersContainer" style="margin-top:10px;display:none;"><label style="display:block;margin-bottom:6px;font-weight:600;">选择特定用户（可多选）</label><div id="userCheckboxList" style="max-height:200px;overflow-y:auto;padding:10px;border:1px solid var(--border);border-radius:16px;background:var(--bg);"></div></div><div style="margin-bottom:16px;"><label style="display:block;margin-bottom:6px;font-weight:600;">消息标题</label><input type="text" id="messageTitle" placeholder="例如：新软件上线通知" style="width:100%;padding:12px;border-radius:16px;border:1px solid var(--border);background:var(--bg);"></div><div style="margin-bottom:16px;"><label style="display:block;margin-bottom:6px;font-weight:600;">消息内容</label><textarea id="messageContent" rows="4" placeholder="输入站内信内容..." style="width:100%;padding:12px;border-radius:16px;border:1px solid var(--border);background:var(--bg);"></textarea></div><button id="sendMessageBtn" style="background:var(--primary);color:#fff;border:none;border-radius:30px;padding:12px 24px;cursor:pointer;width:100%;font-weight:600;"><i class="fas fa-paper-plane"></i> 发送站内信</button></div></div></div>
-    <div id="insufficientModal" class="modal-overlay"><div class="modal-card" style="max-width:420px;text-align:center;"><div style="display:flex;justify-content:flex-end;"><button id="closeInsufficientModal" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button></div><i class="fas fa-exclamation-triangle" style="font-size:2.5rem;color:var(--primary);margin-bottom:8px;"></i><h3>下载次数不足</h3><p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">您本月的免费下载次数已用完</p><div style="background:rgba(255,255,255,0.5);border-radius:20px;padding:14px;margin-bottom:12px;"><div style="margin-bottom:8px;"><span><i class="fab fa-weixin" style="color:#07c160;"></i> 客服微信：Win_Mac_123</span><button onclick="window.copyText('Win_Mac_123')" style="background:var(--primary);color:#fff;border:none;border-radius:20px;padding:4px 12px;margin-left:8px;cursor:pointer;">复制</button></div><div><button id="copyInviteCodeInsufficient" style="background:#6c5ce7;color:#fff;border:none;border-radius:20px;padding:8px 16px;cursor:pointer;width:100%;"><i class="fas fa-gift"></i> 复制邀请码赚次数</button></div></div></div></div>
-    <div id="articleManageModal" class="modal-overlay"><div class="modal-card" style="max-width:900px;"><div style="display:flex;justify-content:space-between;margin-bottom:20px;"><h3><i class="fas fa-newspaper"></i> 文章管理</h3><div><button id="refreshArticleListBtn" style="background:var(--bg);border:1px solid var(--border);border-radius:30px;padding:8px 16px;cursor:pointer;">刷新</button><button id="addNewArticleBtn" style="background:var(--success);color:#fff;border:none;border-radius:30px;padding:8px 18px;margin-left:8px;cursor:pointer;">新增</button><button id="closeArticleModal" style="background:none;border:none;font-size:20px;margin-left:8px;cursor:pointer;">&times;</button></div></div><div id="articleAdminList" style="max-height:55vh;overflow-y:auto;"></div><div id="articleFormContainer" style="display:none;margin-top:24px;padding:20px;background:var(--bg);border-radius:20px;"><h4>编辑文章</h4><input type="text" id="articleTitle" placeholder="标题" style="width:100%;padding:12px;margin-bottom:10px;border-radius:12px;border:1px solid var(--border);"><input type="text" id="articleCover" placeholder="封面图URL" style="width:100%;padding:12px;margin-bottom:10px;border-radius:12px;border:1px solid var(--border);"><textarea id="articleExcerpt" rows="2" placeholder="摘要" style="width:100%;padding:12px;margin-bottom:10px;border-radius:12px;border:1px solid var(--border);"></textarea><textarea id="articleContent" rows="5" placeholder="正文" style="width:100%;padding:12px;margin-bottom:10px;border-radius:12px;border:1px solid var(--border);"></textarea><input type="text" id="articleTags" placeholder="标签" style="width:100%;padding:12px;margin-bottom:10px;border-radius:12px;border:1px solid var(--border);"><button id="saveArticleBtn" style="background:var(--success);color:#fff;border:none;border-radius:30px;padding:10px 24px;cursor:pointer;">保存</button><button id="cancelArticleBtn" style="background:#94a3b8;color:#fff;border:none;border-radius:30px;padding:10px 24px;margin-left:8px;cursor:pointer;">取消</button></div></div></div>
-    <div id="articleDetailModal" class="modal-overlay"><div class="modal-card" style="max-width:600px;"><button id="closeDetailModal" style="float:right;background:none;border:none;font-size:18px;cursor:pointer;">&times;</button><h3 id="articleDetailTitle"></h3><img id="articleDetailCover" style="width:100%;max-height:250px;object-fit:cover;border-radius:12px;margin:10px 0;"><div id="articleDetailContent" style="line-height:1.7;"></div></div></div>
-    <div id="announcementModal" class="modal-overlay"><div class="modal-card" style="max-width:500px;"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3><i class="fas fa-bullhorn"></i> 系统公告</h3><button id="closeAnnouncementModal" style="background:none;border:none;font-size:20px;cursor:pointer;">&times;</button></div><div id="announcementList"></div></div></div>
-    <div id="favoritesModal" class="modal-overlay"><div class="modal-card" style="max-width:700px;"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3><i class="fas fa-heart"></i> 我的收藏</h3><button id="closeFavoritesModal" style="background:none;border:none;font-size:20px;cursor:pointer;">&times;</button></div><div id="favoritesList"></div></div></div>
-    <div id="ratingModal" class="modal-overlay"><div class="modal-card" style="max-width:400px;"><h3 style="margin-bottom:16px;">评价软件</h3><div id="ratingSoftwareName" style="font-weight:600;margin-bottom:12px;"></div><div class="rating-stars" id="ratingStarsInput"><i class="far fa-star" data-rating="1"></i><i class="far fa-star" data-rating="2"></i><i class="far fa-star" data-rating="3"></i><i class="far fa-star" data-rating="4"></i><i class="far fa-star" data-rating="5"></i></div><textarea id="ratingComment" placeholder="写下你的评价..." style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);margin:12px 0;min-height:80px;"></textarea><button id="submitRatingBtn" class="admin-action-btn" style="width:100%;">提交评价 (+5积分)</button><input type="hidden" id="ratingSoftwareId"></div></div>
-    <div id="messageModal" class="modal-overlay"><div class="modal-card" style="max-width:500px;"><div style="display:flex;justify-content:space-between;margin-bottom:16px;"><h3><i class="fas fa-envelope"></i> 站内信</h3><button id="closeMessageModal" style="background:none;border:none;font-size:20px;cursor:pointer;">&times;</button></div><div id="messageList"></div></div></div>
-    <div id="exportModal" class="modal-overlay"><div class="modal-card" style="max-width:400px;"><h3 style="margin-bottom:16px;">导出我的数据</h3><button id="exportHistoryBtn" class="admin-action-btn" style="width:100%;margin-bottom:10px;">导出浏览历史</button><button id="exportFavoritesBtn" class="admin-action-btn" style="width:100%;margin-bottom:10px;">导出收藏列表</button><button id="exportAllDataBtn" class="admin-action-btn" style="width:100%;">导出全部数据</button><button id="closeExportModal" style="background:none;border:none;color:var(--text-muted);margin-top:12px;cursor:pointer;">关闭</button></div></div>
-    <div id="pwaInstallBanner" class="pwa-install-banner"><div><i class="fas fa-download" style="color:var(--primary);"></i><span style="margin-left:8px;">安装乐哲软件APP，更快访问！</span></div><button id="pwaInstallBtn" style="background:var(--primary);color:#fff;border:none;padding:6px 16px;border-radius:20px;cursor:pointer;">安装</button><button id="pwaCloseBtn" style="background:none;border:none;font-size:18px;cursor:pointer;">&times;</button></div>
+        <div class="top-nav" id="topNav">
+            <div class="nav-inner">
+                <div class="logo-area"><span class="logo">乐哲软件</span></div>
+                <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
+                <div class="nav-links" id="navLinks">
+                    <a href="https://www.lezhesoft.cn/">首页</a>
+                    <a href="https://www.lezhesoft.cn/service.html">服务项目</a>
+                    <a href="#" data-nav="download" class="active">软件下载</a>
+                    <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a>
+                </div>
+                <div class="user-area">
+                    <span style="font-size:0.8rem;color:var(--text-muted);"><i class="fas fa-download"></i> 点击卡片直接下载</span>
+                </div>
+                <button class="dark-mode-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></button>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="content-wrapper">
+                <div class="main-content">
+                    <!-- 轮播图 -->
+                    <div class="carousel-container" id="categoryBannerContainer">
+                        <div class="carousel-slides" id="categoryBannerSlides"></div>
+                        <div class="carousel-dots" id="categoryBannerDots"></div>
+                    </div>
+
+                    <!-- 今日推荐 -->
+                    <div class="daily-section" id="dailySection" style="display: none;">
+                        <div class="daily-header">
+                            <h3><i class="fas fa-star" style="color: #f59e0b;"></i> 今日推荐</h3>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">每日更新，精选好软</span>
+                        </div>
+                        <div class="daily-card" id="dailyCard">
+                            <div class="daily-card-content">
+                                <div class="daily-icon" id="dailyIcon"><i class="fas fa-gem"></i></div>
+                                <div class="daily-info">
+                                    <div class="daily-name" id="dailyName">加载中...</div>
+                                    <div class="daily-desc" id="dailyDesc"></div>
+                                    <div class="daily-meta">
+                                        <span id="dailyVersion"></span>
+                                        <span id="dailyOs"></span>
+                                        <span id="dailyDownloads"><i class="fas fa-download"></i> 0</span>
+                                    </div>
+                                </div>
+                                <button class="daily-download-btn" id="dailyDownloadBtn"><i class="fas fa-download"></i> 立即下载</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 热门推荐 -->
+                    <div class="hot-section">
+                        <div class="hot-header">
+                            <h3><i class="fas fa-fire" style="color:#f59e0b;"></i> 热门推荐</h3>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">本周热门下载</span>
+                        </div>
+                        <div class="hot-scroll" id="hotScroll"></div>
+                    </div>
+
+                    <!-- 分类 -->
+                    <div class="category-row" id="categoryTabs"></div>
+
+                    <!-- 软件列表 -->
+                    <div id="softwareGridContainer" class="grid"></div>
+                    <div id="loadMoreContainer" style="text-align:center; margin-top:28px; display:none;">
+                        <button id="loadMoreBtn" style="background:var(--surface); border:1px solid var(--border); padding:12px 30px; border-radius:30px; color:var(--primary); cursor:pointer; font-weight:600;">加载更多</button>
+                    </div>
+                </div>
+
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="sidebar-search">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="搜软件..." autocomplete="off">
+                            <button id="searchBtn"><i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="carousel-container" id="adContainer">
+                        <div class="carousel-slides" id="sidebarCarouselSlides"></div>
+                        <div class="carousel-dots" id="sidebarCarouselDots"></div>
+                    </div>
+
+                    <!-- 日历签到（简化版，无登录要求） -->
+                    <div class="sidebar-card">
+                        <div class="calendar-header">
+                            <span id="calendarMonthYear"></span>
+                            <div class="calendar-nav">
+                                <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                                <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="calendar-grid" id="calendarDays"></div>
+                        <div style="text-align:center; margin-top:10px;font-size:0.7rem;color:var(--text-muted);">
+                            <i class="fas fa-info-circle"></i> 签到功能已简化
+                        </div>
+                    </div>
+
+                    <!-- 用户留言 -->
+                    <div class="feedback-section">
+                        <div style="font-weight:650;font-size:var(--font-base);margin-bottom:10px;">
+                            <i class="fas fa-comment-dots"></i> 用户留言
+                        </div>
+                        <input type="text" id="feedbackName" class="feedback-input" placeholder="昵称 (选填)">
+                        <textarea id="feedbackMessage" class="feedback-textarea" rows="2" placeholder="分享你想要的软件..."></textarea>
+                        <button id="submitFeedbackBtn" class="feedback-submit-btn"><i class="fas fa-paper-plane"></i> 提交</button>
+                        <div id="feedbackListContainer" style="margin-top:12px;font-size:var(--font-xs);"></div>
+                    </div>
+
+                    <!-- 最新文章 -->
+                    <div class="sidebar-card">
+                        <h3><i class="fas fa-newspaper"></i> 最新文章</h3>
+                        <div id="articlesList"></div>
+                    </div>
+
+                    <!-- 下载排行榜 -->
+                    <div class="sidebar-card">
+                        <h3><i class="fas fa-chart-line"></i> 下载排行榜</h3>
+                        <div id="rankList"></div>
+                    </div>
+
+                    <!-- 最近浏览 -->
+                    <div class="sidebar-card">
+                        <h3><i class="fas fa-history"></i> 最近浏览</h3>
+                        <div id="historyList"></div>
+                        <div class="clear-history" style="margin-top:8px; text-align:right;">
+                            <button id="clearHistoryBtn" style="background:none; border:1px solid var(--border); padding:4px 12px; border-radius:20px; font-size:0.65rem; cursor:pointer;">清空历史</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 友情链接 -->
+            <div class="friend-links-wrapper">
+                <div class="friend-links-title">友情链接</div>
+                <div class="friend-links-row">
+                    <a href="https://foxirj.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 佛系软件</a>
+                    <a href="https://www.ruancang.net/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 软仓</a>
+                    <a href="https://www.macwk.com/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> MacWK</a>
+                    <a href="https://www.ifmac.cn/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> ifMac</a>
+                    <a href="https://www.macku.pro/" target="_blank" class="friend-link-pill"><i class="fas fa-external-link-alt"></i> 迈克库软件</a>
+                </div>
+            </div>
+
+            <footer style="text-align:center; color:var(--text-muted); padding:16px; font-size:0.7rem;">
+                版权所有 © 乐哲软件 | www.lezhesoft.cn | 个人技术分享
+            </footer>
+        </div>
+    </div>
+
+    <!-- 评价弹窗 -->
+    <div id="ratingModal" class="modal-overlay">
+        <div class="modal-card" style="max-width:400px;">
+            <h3 style="margin-bottom:16px;">评价软件</h3>
+            <div id="ratingSoftwareName" style="font-weight:600;margin-bottom:12px;"></div>
+            <div class="rating-stars" id="ratingStarsInput">
+                <i class="far fa-star" data-rating="1"></i>
+                <i class="far fa-star" data-rating="2"></i>
+                <i class="far fa-star" data-rating="3"></i>
+                <i class="far fa-star" data-rating="4"></i>
+                <i class="far fa-star" data-rating="5"></i>
+            </div>
+            <textarea id="ratingComment" placeholder="写下你的评价..." style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);margin:12px 0;min-height:80px;"></textarea>
+            <button id="submitRatingBtn" style="background:var(--primary);color:#fff;border:none;border-radius:40px;padding:10px 24px;width:100%;cursor:pointer;">提交评价</button>
+            <input type="hidden" id="ratingSoftwareId">
+        </div>
+    </div>
+
     <div class="back-to-top" id="backToTop"><i class="fas fa-arrow-up"></i></div>
 
     <script>
-        emailjs.init('9VF7tzRthx9_nkchu');
-        window.copyText = function(text) { if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => showToast('复制成功')).catch(() => fallbackCopy(text)); else fallbackCopy(text); };
-        function fallbackCopy(text) { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('复制成功'); }
-
-        // ========================  BASEROW 配置  ========================
+        // ========================  BASEROW 配置 ========================
         const CONFIG = {
             BASEROW_API_URL: 'https://api.baserow.io/api/database/rows/table/',
             BASEROW_TOKEN: 'DoIOL148LlknGaVGVQU9Rp61s4aiNo3r',
             TABLES: {
                 softwares: 1043399,
-                users: 1043401,
-                signRecords: 1043402,
                 articles: 1043406,
                 ads: 1043405,
                 messages: 1043400
-            },
-            EMAILJS_SERVICE_ID: 'service_0jwzfc8',
-            EMAILJS_TEMPLATE_RESET: 'template_xcv0pdc'
+            }
         };
         const isLocalFile = window.location.protocol === 'file:';
 
         // 本地备用数据
         let softwares = [
-            { id: '1', name: 'Cinema 4D 2025', category: '3D建模', version: '2025', description: '三维建模动画神器，支持GPU渲染', os: ['Windows', 'Mac'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-05-15', icon: '', url: '#' },
-            { id: '2', name: 'Adobe Photoshop 2026', category: '图像处理', version: '2026', description: '专业图像处理软件，AI智能修图', os: ['Windows', 'Mac'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-05-20', icon: '', url: '#' },
-            { id: '3', name: 'SketchUp Pro 2025', category: '3D建模', version: '2025', description: '草图大师，3D建模快速上手', os: ['Windows', 'Mac'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-05-10', icon: '', url: '#' },
-            { id: '4', name: 'Rhino 8', category: '3D建模', version: '8.0', description: '工业设计建模，曲面建模利器', os: ['Windows', 'Mac'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-05-05', icon: '', url: '#' },
-            { id: '5', name: 'AutoCAD 2026', category: '工程设计', version: '2026', description: '专业CAD设计软件', os: ['Windows'], downloads: Math.floor(Math.random() * 4000) + 1000, addedDate: '2026-04-28', icon: '', url: '#' }
+            { id: '1', name: 'Cinema 4D 2025', category: '3D建模', version: '2025', description: '三维建模动画神器，支持GPU渲染', os: ['Windows', 'Mac'], downloads: 3200, addedDate: '2026-05-15', icon: '', url: '#' },
+            { id: '2', name: 'Adobe Photoshop 2026', category: '图像处理', version: '2026', description: '专业图像处理软件，AI智能修图', os: ['Windows', 'Mac'], downloads: 2800, addedDate: '2026-05-20', icon: '', url: '#' },
+            { id: '3', name: 'SketchUp Pro 2025', category: '3D建模', version: '2025', description: '草图大师，3D建模快速上手', os: ['Windows', 'Mac'], downloads: 1900, addedDate: '2026-05-10', icon: '', url: '#' },
+            { id: '4', name: 'Rhino 8', category: '3D建模', version: '8.0', description: '工业设计建模，曲面建模利器', os: ['Windows', 'Mac'], downloads: 1600, addedDate: '2026-05-05', icon: '', url: '#' },
+            { id: '5', name: 'AutoCAD 2026', category: '工程设计', version: '2026', description: '专业CAD设计软件', os: ['Windows'], downloads: 2100, addedDate: '2026-04-28', icon: '', url: '#' }
         ];
 
         let bannerAds = [], sidebarAds = [], articles = [], announcements = [];
-        let currentUser = null, currentCategory = "all", searchKeyword = "", showAll = false;
-        let currentCaptcha = { question: '', answer: 0 };
-        let editingArticleId = null, resetCode = '', resetEmail = '', resetCodeExpire = 0;
-        let deferredPrompt = null, dailySoftware = null, allUsersList = [];
+        let currentCategory = "all", searchKeyword = "", showAll = false;
+        let dailySoftware = null;
 
         // 工具函数
-        function showToast(m, t = 'success') { const d = document.createElement('div'); d.className = 'toast-message ' + t; d.innerHTML = m; document.body.appendChild(d); setTimeout(() => d.remove(), 3000); }
-        function esc(s) { return String(s || '').replace(/[&<>]/g, function(m) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]; }); }
+        function showToast(m, t = 'success') {
+            const d = document.createElement('div');
+            d.className = 'toast-message ' + t;
+            d.innerHTML = m;
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 3000);
+        }
+        function esc(s) {
+            return String(s || '').replace(/[&<>]/g, function(m) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m];
+            });
+        }
 
-        // ========================  字段安全读取（兼容大小写） ========================
+        // ========================  字段安全读取 ========================
         function getFieldSafe(obj, ...names) {
             for (let name of names) {
                 if (obj && obj[name] !== undefined && obj[name] !== null) return obj[name];
@@ -309,7 +408,7 @@
             return undefined;
         }
 
-        // ========================  Baserow API 请求  ========================
+        // ========================  Baserow API ========================
         async function baserowReq(method, tableId, body = null, rowId = null, queryParams = '') {
             let url = CONFIG.BASEROW_API_URL + tableId + '/';
             if (rowId) url += rowId + '/';
@@ -334,7 +433,7 @@
             return await res.json();
         }
 
-        // ========================  数据获取  ========================
+        // ========================  数据获取 ========================
         async function fetchSoftwares() {
             if (isLocalFile) {
                 return softwares.length ? softwares : [];
@@ -431,6 +530,7 @@
             }
         }
 
+        // ========================  轮播图 ========================
         function renderCarousel(slidesEl, dotsEl, ads) {
             if (!ads || !ads.length) return;
             slidesEl.innerHTML = ads.map(function(ad, idx) {
@@ -471,347 +571,15 @@
             return upd;
         }
 
-        // ========================  用户相关（全部改为大写字段，并分页获取全部用户） ========================
-        // 通用函数：分页获取所有用户（避免 max_limit=100 限制）
-        async function getAllUsers() {
-            if (isLocalFile) {
-                return JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-            }
-            let allUsers = [];
-            let offset = 0;
-            const limit = 100;
-            let hasMore = true;
-            while (hasMore) {
-                const data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=' + limit + '&offset=' + offset);
-                allUsers = allUsers.concat(data.results);
-                if (data.results.length < limit) {
-                    hasMore = false;
-                } else {
-                    offset += limit;
-                }
-            }
-            return allUsers;
-        }
-
-        async function findUserByEmail(email) {
-            if (isLocalFile) {
-                var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                return users.find(function(u) { return u.email === email; }) || null;
-            }
-            try {
-                const allUsers = await getAllUsers();
-                const found = allUsers.find(function(row) {
-                    var rowEmail = getFieldSafe(row, 'email', 'Email', 'EMAIL');
-                    return rowEmail && rowEmail.toLowerCase() === email.toLowerCase();
-                });
-                return found || null;
-            } catch (e) {
-                console.error('findUserByEmail error:', e);
-                return null;
-            }
-        }
-
-        async function findUserByInviteCode(code) {
-            if (isLocalFile) {
-                var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                return users.find(function(u) { return u.inviteCode === code; }) || null;
-            }
-            try {
-                const allUsers = await getAllUsers();
-                const found = allUsers.find(function(row) {
-                    var rowCode = getFieldSafe(row, 'invitecode', 'InviteCode', 'INVITECODE');
-                    return rowCode && rowCode.toUpperCase() === code.toUpperCase();
-                });
-                return found || null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        async function registerUser(email, password, username, inviteCode) {
-            inviteCode = inviteCode || '';
-            if (isLocalFile) {
-                if (await findUserByEmail(email)) throw new Error('邮箱已注册');
-                var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                var hash = CryptoJS.SHA256(password).toString();
-                var userCode = Math.random().toString(36).substring(2, 10).toUpperCase();
-                var newUser = { email: email, password: hash, username: username, role: email === 'admin@lezhe.com' ? 'admin' : 'user', inviteCode: userCode, points: 0, createdAt: new Date().toISOString() };
-                if (inviteCode) {
-                    var inviter = users.find(function(u) { return u.inviteCode === inviteCode; });
-                    if (inviter) {
-                        inviter.points = (inviter.points || 0) + 10;
-                        await addDownloadBonus(inviter.email, 5);
-                        showToast('邀请成功！双方各获得5次下载+10积分', 'success');
-                    }
-                }
-                users.push(newUser);
-                localStorage.setItem('lezhe_users', JSON.stringify(users));
-                return;
-            }
-            var hash2 = CryptoJS.SHA256(password).toString();
-            var userCode2 = Math.random().toString(36).substring(2, 10).toUpperCase();
-            await baserowReq('POST', CONFIG.TABLES.users, {
-                EMAIL: email,
-                PASSWORD: hash2,
-                USERNAME: username,
-                ROLE: email === 'admin@lezhe.com' ? 'admin' : 'user',
-                INVITECODE: userCode2,
-                POINTS: 0,
-                DOWNLOADS: 0,
-                EXTRAQUOTA: 0
-            });
-            if (inviteCode) {
-                var inviter2 = await findUserByInviteCode(inviteCode);
-                if (inviter2) {
-                    var inviterEmail = getFieldSafe(inviter2, 'email', 'Email', 'EMAIL');
-                    if (inviterEmail) {
-                        await addPoints(inviterEmail, 10);
-                        await addDownloadBonus(inviterEmail, 5);
-                        showToast('邀请成功！双方各获得5次下载+10积分', 'success');
-                    }
-                }
-            }
-        }
-
-        async function loginUser(email, password) {
-            if (isLocalFile) {
-                var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                var user = users.find(function(u) { return u.email === email; });
-                if (!user) throw new Error('邮箱未注册');
-                if (user.password !== CryptoJS.SHA256(password).toString()) throw new Error('密码错误');
-                return { id: user.email, email: user.email, username: user.username, role: user.role || 'user', inviteCode: user.inviteCode, points: user.points || 0, downloads: user.downloads || 0, extraQuota: 0, createdAt: user.createdAt };
-            }
-            var rec = await findUserByEmail(email);
-            if (!rec) throw new Error('邮箱未注册');
-            var pwdField = getFieldSafe(rec, 'password', 'Password', 'PASSWORD');
-            if (!pwdField) {
-                console.warn('用户记录中没有密码字段:', rec);
-                throw new Error('用户数据异常，请重新注册或联系管理员');
-            }
-            if (pwdField !== CryptoJS.SHA256(password).toString()) throw new Error('密码错误');
-            return {
-                id: rec.id,
-                email: getFieldSafe(rec, 'email', 'Email', 'EMAIL'),
-                username: getFieldSafe(rec, 'username', 'Username', 'USERNAME') || email.split('@')[0],
-                role: getFieldSafe(rec, 'role', 'Role', 'ROLE') || 'user',
-                inviteCode: getFieldSafe(rec, 'invitecode', 'InviteCode', 'INVITECODE') || '',
-                points: Number(getFieldSafe(rec, 'points', 'Points', 'POINTS')) || 0,
-                downloads: Number(getFieldSafe(rec, 'downloads', 'Downloads', 'DOWNLOADS')) || 0,
-                extraQuota: Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota', 'EXTRAQUOTA')) || 0,
-                createdAt: getFieldSafe(rec, 'createdAt', 'CreatedAt', 'CREATEDAT') || new Date().toISOString()
-            };
-        }
-
-        async function updatePassword(email, newPass) {
-            if (isLocalFile) {
-                var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                var user = users.find(function(u) { return u.email === email; });
-                if (user) user.password = CryptoJS.SHA256(newPass).toString();
-                localStorage.setItem('lezhe_users', JSON.stringify(users));
-                return;
-            }
-            var rec = await findUserByEmail(email);
-            if (!rec) throw new Error('用户不存在');
-            await baserowReq('PATCH', CONFIG.TABLES.users, { PASSWORD: CryptoJS.SHA256(newPass).toString() }, rec.id);
-        }
-
-        async function updateUserRole(userId, newRole) {
-            if (isLocalFile) {
-                var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                var user = users.find(function(u) { return u.email === userId; });
-                if (user) user.role = newRole;
-                localStorage.setItem('lezhe_users', JSON.stringify(users));
-                return;
-            }
-            await baserowReq('PATCH', CONFIG.TABLES.users, { ROLE: newRole }, userId);
-        }
-
-        async function updateUsername(email, newUsername) {
-            if (isLocalFile) {
-                var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                var user = users.find(function(u) { return u.email === email; });
-                if (user) user.username = newUsername;
-                localStorage.setItem('lezhe_users', JSON.stringify(users));
-                if (currentUser && currentUser.email === email) currentUser.username = newUsername;
-                return;
-            }
-            var rec = await findUserByEmail(email);
-            if (!rec) throw new Error('用户不存在');
-            await baserowReq('PATCH', CONFIG.TABLES.users, { USERNAME: newUsername }, rec.id);
-            if (currentUser && currentUser.email === email) currentUser.username = newUsername;
-        }
-
-        async function addPoints(email, points) {
-            points = Math.floor(points);
-            if (isLocalFile) {
-                var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-                var user = users.find(function(u) { return u.email === email; });
-                if (user) {
-                    user.points = (user.points || 0) + points;
-                    localStorage.setItem('lezhe_users', JSON.stringify(users));
-                    if (currentUser && currentUser.email === email) currentUser.points = user.points;
-                }
-                return;
-            }
-            var rec = await findUserByEmail(email);
-            if (!rec) return;
-            var currentPoints = Number(getFieldSafe(rec, 'points', 'Points', 'POINTS')) || 0;
-            var newPoints = currentPoints + points;
-            await baserowReq('PATCH', CONFIG.TABLES.users, { POINTS: newPoints }, rec.id);
-            if (currentUser && currentUser.email === email) {
-                currentUser.points = newPoints;
-                localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                updateUserUI();
-            }
-        }
-
-        async function addDownloadBonus(email, bonus) {
-            bonus = Math.floor(bonus);
-            var rec = await findUserByEmail(email);
-            if (!rec) return;
-            var currentExtra = Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota', 'EXTRAQUOTA')) || 0;
-            var newExtra = currentExtra + bonus;
-            await baserowReq('PATCH', CONFIG.TABLES.users, { EXTRAQUOTA: newExtra }, rec.id);
-        }
-
-        // ========================  签到  ========================
-        async function performCheckin() {
-            if (!currentUser) { showToast('请先登录', 'error'); return; }
-            var today = new Date().toISOString().split('T')[0];
-            var signKey = 'signin_' + currentUser.email + '_' + today;
-            if (localStorage.getItem(signKey) === 'true') { showToast('今日已签到', 'warning'); return; }
-            try {
-                await addPoints(currentUser.email, 2);
-                await addDownloadBonus(currentUser.email, 1);
-                await baserowReq('POST', CONFIG.TABLES.signRecords, {
-                    EMAIL: currentUser.email,
-                    SIGN_DATE: today
-                });
-                localStorage.setItem(signKey, 'true');
-                var updated = await findUserByEmail(currentUser.email);
-                if (updated) {
-                    currentUser.points = Number(getFieldSafe(updated, 'points', 'Points', 'POINTS')) || 0;
-                    currentUser.extraQuota = Number(getFieldSafe(updated, 'extraquota', 'ExtraQuota', 'EXTRAQUOTA')) || 0;
-                    localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                }
-                updateUserUI();
-                renderCalendar();
-                showToast('签到成功！获得1次下载+2积分', 'success');
-            } catch (e) {
-                console.error('签到失败:', e);
-                showToast('签到失败: ' + e.message, 'error');
-            }
-        }
-
-        // ========================  下载统计与剩余次数  ========================
-        function getUserLevel(points) {
-            if (points >= 500) return { level: 5, name: '钻石会员', badge: 'level-5' };
-            if (points >= 200) return { level: 4, name: '铂金会员', badge: 'level-4' };
-            if (points >= 100) return { level: 3, name: '黄金会员', badge: 'level-3' };
-            if (points >= 30) return { level: 2, name: '白银会员', badge: 'level-2' };
-            return { level: 1, name: '青铜会员', badge: 'level-1' };
-        }
-
-        function getCurrentMonthKey() {
-            var d = new Date();
-            return d.getFullYear() + '-' + (d.getMonth() + 1);
-        }
-
-        function getUserDownloadData(email) {
-            var key = 'download_' + email;
-            var stored = localStorage.getItem(key);
-            if (!stored) {
-                var baseQuota = 3;
-                var newData = { month: getCurrentMonthKey(), count: 0, extra: 0, baseQuota: baseQuota };
-                localStorage.setItem(key, JSON.stringify(newData));
-                return newData;
-            }
-            try {
-                var parsed = JSON.parse(stored);
-                if (parsed.month !== getCurrentMonthKey()) {
-                    var newData2 = { month: getCurrentMonthKey(), count: 0, extra: parsed.extra || 0, baseQuota: parsed.baseQuota || 3 };
-                    localStorage.setItem(key, JSON.stringify(newData2));
-                    return newData2;
-                }
-                if (parsed.baseQuota === undefined) {
-                    parsed.baseQuota = 3;
-                    localStorage.setItem(key, JSON.stringify(parsed));
-                }
-                return parsed;
-            } catch (e) {
-                var newData3 = { month: getCurrentMonthKey(), count: 0, extra: 0, baseQuota: 3 };
-                localStorage.setItem(key, JSON.stringify(newData3));
-                return newData3;
-            }
-        }
-
-        function saveUserDownloadData(email, count, extra, baseQuota) {
-            var data = getUserDownloadData(email);
-            data.count = count;
-            if (extra !== undefined) data.extra = extra;
-            if (baseQuota !== undefined) data.baseQuota = baseQuota;
-            localStorage.setItem('download_' + email, JSON.stringify(data));
-        }
-
-        function getRemainingCount(user) {
-            if (!user) return 0;
-            if (user.role === 'vip' || user.role === 'admin') return Infinity;
-            var data = getUserDownloadData(user.email);
-            var total = (data.baseQuota || 2) + (data.extra || 0);
-            return Math.max(0, total - data.count);
-        }
-
-        function canDownload(user) {
-            if (!user) return false;
-            if (user.role === 'vip' || user.role === 'admin') return true;
-            var data = getUserDownloadData(user.email);
-            var total = (data.baseQuota || 2) + (data.extra || 0);
-            return data.count < total;
-        }
-
-        async function recordDownload(user) {
-            if (!user) return false;
-            if (user.role === 'vip' || user.role === 'admin') return true;
-            var data = getUserDownloadData(user.email);
-            var used = data.count + 1;
-            saveUserDownloadData(user.email, used, data.extra);
-            if (!isLocalFile && user.id) {
-                try {
-                    await baserowReq('PATCH', CONFIG.TABLES.users, { DOWNLOADS: used }, user.id);
-                } catch (e) {
-                    console.warn('更新服务器下载次数失败:', e);
-                }
-            }
-            if (currentUser && currentUser.email === user.email) {
-                currentUser.downloads = used;
-                localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                updateUserUI();
-            }
-            return true;
-        }
-
-        async function downloadSoftware(sw) {
-            console.log('=== 点击下载 ===', sw);
-            if (!currentUser) {
-                showToast('请先登录', 'error');
-                openAuth('login');
-                return;
-            }
+        // ========================  下载功能 ========================
+        function downloadSoftware(sw) {
             if (!sw.url || sw.url === '#' || sw.url === '') {
                 showToast('下载链接暂不可用', 'warning');
                 return;
             }
-            var remaining = getRemainingCount(currentUser);
-            if (remaining <= 0 && currentUser.role !== 'vip' && currentUser.role !== 'admin') {
-                document.getElementById('insufficientModal').classList.add('active');
-                return;
-            }
-            await recordDownload(currentUser);
-            updateUserUI();
             addHistory(sw);
-            console.log('打开链接:', sw.url);
+            showToast('正在打开下载链接...', 'success');
             window.open(sw.url, '_blank');
-            showToast('下载成功！剩余 ' + (getRemainingCount(currentUser) === Infinity ? '∞' : getRemainingCount(currentUser)) + ' 次', 'success');
         }
 
         window.downloadSoftwareById = function(id) {
@@ -820,7 +588,7 @@
             else console.warn('软件未找到:', id);
         };
 
-        // ========================  其他功能  ========================
+        // ========================  其他功能 ========================
         function getStdAbbr(n) {
             if (!n) return 'SW';
             var l = n.toLowerCase();
@@ -845,6 +613,8 @@
             var kw = keyword.toLowerCase().trim();
             return software.name.toLowerCase().includes(kw);
         }
+
+        // 浏览历史
         function addHistory(sw) {
             var h = JSON.parse(localStorage.getItem('browseHistory') || '[]');
             h = h.filter(function(i) { return i.name !== sw.name; });
@@ -857,7 +627,9 @@
             var h = JSON.parse(localStorage.getItem('browseHistory') || '[]');
             var container = document.getElementById('historyList');
             if (!container) return;
-            container.innerHTML = h.length ? h.map(function(i) { return '<div class="history-item" data-id="' + i.id + '">' + esc(i.name) + '</div>'; }).join('') : '<div style="color:var(--text-muted);">暂无</div>';
+            container.innerHTML = h.length ? h.map(function(i) {
+                return '<div class="history-item" data-id="' + i.id + '">' + esc(i.name) + '</div>';
+            }).join('') : '<div style="color:var(--text-muted);">暂无</div>';
             container.querySelectorAll('.history-item').forEach(function(el) {
                 el.addEventListener('click', function() {
                     var sw = softwares.find(function(s) { return s.id === el.dataset.id; });
@@ -865,9 +637,10 @@
                 });
             });
         }
+
+        // 收藏（本地存储）
         function toggleFavorite(softwareId, softwareName) {
-            if (!currentUser) { showToast('请先登录', 'error'); return false; }
-            var favs = JSON.parse(localStorage.getItem('favorites_' + currentUser.email) || '[]');
+            var favs = JSON.parse(localStorage.getItem('favorites') || '[]');
             var idx = favs.findIndex(function(f) { return f.id === softwareId; });
             if (idx > -1) {
                 favs.splice(idx, 1);
@@ -876,47 +649,23 @@
                 favs.unshift({ id: softwareId, name: softwareName, time: Date.now() });
                 showToast('已添加到收藏', 'success');
             }
-            localStorage.setItem('favorites_' + currentUser.email, JSON.stringify(favs));
-            renderFavoritesList();
+            localStorage.setItem('favorites', JSON.stringify(favs));
             return idx === -1;
         }
-        function renderFavoritesList() {
-            var favs = JSON.parse(localStorage.getItem('favorites_' + (currentUser ? currentUser.email : '')) || '[]');
-            var container = document.getElementById('favoritesList');
-            if (!container) return;
-            if (!favs.length) {
-                container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">暂无收藏</div>';
-                return;
-            }
-            container.innerHTML = favs.map(function(f) {
-                var sw = softwares.find(function(s) { return s.id === f.id; });
-                return '<div class="software-card" style="margin-bottom:12px;" data-id="' + f.id + '"><div style="display:flex;justify-content:space-between;"><div class="software-name">' + esc(f.name) + '</div><button class="favorite-remove" data-id="' + f.id + '" style="background:none;border:none;color:#f43f5e;cursor:pointer;"><i class="fas fa-trash"></i></button></div><div class="description">' + (sw ? esc(sw.description) : '加载中...') + '</div><div class="added-date">收藏于 ' + new Date(f.time).toLocaleString() + '</div></div>';
-            }).join('');
-            container.querySelectorAll('[data-id]').forEach(function(el) {
-                if (el.classList.contains('software-card')) {
-                    el.addEventListener('click', function() {
-                        var sw = softwares.find(function(s) { return s.id === el.dataset.id; });
-                        if (sw) downloadSoftware(sw);
-                    });
-                }
-                if (el.classList.contains('favorite-remove')) {
-                    el.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        toggleFavorite(el.dataset.id);
-                        renderFavoritesList();
-                    });
-                }
-            });
-        }
-        async function submitRating(softwareId, softwareName, rating, comment) {
-            if (!currentUser) { showToast('请先登录', 'error'); return false; }
+
+        // 评价
+        function submitRating(softwareId, softwareName, rating, comment) {
             try {
                 var allRatings = JSON.parse(localStorage.getItem('lezhe_ratings') || '{}');
                 if (!allRatings[softwareId]) allRatings[softwareId] = [];
-                allRatings[softwareId].push({ userId: currentUser.email, username: currentUser.username, rating: rating, comment: comment, createdAt: new Date().toISOString() });
+                allRatings[softwareId].push({
+                    username: '访客',
+                    rating: rating,
+                    comment: comment,
+                    createdAt: new Date().toISOString()
+                });
                 localStorage.setItem('lezhe_ratings', JSON.stringify(allRatings));
-                await addPoints(currentUser.email, 5);
-                showToast('评价成功！+5积分', 'success');
+                showToast('评价成功！', 'success');
                 return true;
             } catch (err) {
                 console.warn(err);
@@ -925,7 +674,7 @@
             }
         }
 
-        // ========================  渲染函数  ========================
+        // ========================  渲染函数 ========================
         function renderGrid() {
             var filtered = softwares.filter(function(s) {
                 return (currentCategory === 'all' || s.category === currentCategory) && matchesSearch(s, searchKeyword);
@@ -937,7 +686,7 @@
                 document.getElementById('loadMoreContainer').style.display = 'none';
                 return;
             }
-            var favs = currentUser ? JSON.parse(localStorage.getItem('favorites_' + currentUser.email) || '[]') : [];
+            var favs = JSON.parse(localStorage.getItem('favorites') || '[]');
             container.innerHTML = items.map(function(sw) {
                 var isFav = favs.some(function(f) { return f.id === sw.id; });
                 var isNew = (new Date() - new Date(sw.addedDate || '2024-01-01')) < 7 * 86400000;
@@ -1043,15 +792,13 @@
                 el.addEventListener('click', function() {
                     var a = articles.find(function(art) { return art.id === el.dataset.id; });
                     if (a) {
-                        document.getElementById('articleDetailTitle').innerText = a.title;
-                        document.getElementById('articleDetailCover').src = a.cover || '';
-                        document.getElementById('articleDetailContent').innerHTML = a.content || '暂无正文';
-                        document.getElementById('articleDetailModal').classList.add('active');
+                        showToast('📄 ' + a.title, 'success');
                     }
                 });
             });
         }
 
+        // 日历（简化版）
         var currentDate = new Date();
         function renderCalendar() {
             var y = currentDate.getFullYear(), m = currentDate.getMonth();
@@ -1060,8 +807,6 @@
             var mn = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
             document.getElementById('calendarMonthYear').innerText = y + '年 ' + mn[m];
             var el = document.getElementById('calendarDays');
-            var signKey = currentUser ? 'signin_' + currentUser.email + '_' + y + '-' + (m + 1) : null;
-            var signedDays = signKey ? JSON.parse(localStorage.getItem(signKey) || '[]') : [];
             var h = '<div class="calendar-day-name">一</div><div class="calendar-day-name">二</div><div class="calendar-day-name">三</div><div class="calendar-day-name">四</div><div class="calendar-day-name">五</div><div class="calendar-day-name">六</div><div class="calendar-day-name">日</div>';
             var d = 1;
             for (var i = 0; i < 6; i++) {
@@ -1072,291 +817,14 @@
                         h += '<div class="calendar-day"></div>';
                     } else {
                         var isToday = (d === new Date().getDate() && m === new Date().getMonth() && y === new Date().getFullYear());
-                        var isSigned = signedDays.includes(d);
                         var cls = 'calendar-day';
                         if (isToday) cls += ' today';
-                        if (isSigned) cls += ' signed';
                         h += '<div class="' + cls + '" data-day="' + d + '">' + d + '</div>';
                         d++;
                     }
                 }
             }
             el.innerHTML = h;
-            if (currentUser) {
-                var todayDiv = el.querySelector('.calendar-day.today');
-                if (todayDiv && !todayDiv.classList.contains('signed')) {
-                    todayDiv.addEventListener('click', function() { performCheckin(); });
-                }
-            }
-        }
-
-        function renderAnnouncements() {
-            var container = document.getElementById('announcementList');
-            if (!announcements.length) {
-                container.innerHTML = '<div style="padding:20px;text-align:center;">暂无公告</div>';
-                return;
-            }
-            container.innerHTML = announcements.map(function(a) {
-                return '<div style="padding:12px;border-bottom:1px solid var(--border-light);"><div style="font-weight:600;">' + esc(a.title) + '</div><div style="font-size:0.7rem;color:var(--text-muted);margin:4px 0;">' + new Date(a.createdAt).toLocaleString() + '</div><div style="font-size:0.85rem;">' + esc(a.content) + '</div></div>';
-            }).join('');
-        }
-
-        function showAnnouncementBar() {
-            if (!announcements.length) return;
-            var lastClose = localStorage.getItem('announcement_closed');
-            if (lastClose && Date.now() - parseInt(lastClose) < 86400000) return;
-            var bar = document.createElement('div');
-            bar.className = 'announcement-bar';
-            bar.innerHTML = '<span>📢 ' + announcements[0].title + '：' + announcements[0].content.substring(0, 50) + '...</span><button class="close-announcement"><i class="fas fa-times"></i></button>';
-            bar.querySelector('.close-announcement').addEventListener('click', function() {
-                bar.remove();
-                localStorage.setItem('announcement_closed', Date.now().toString());
-            });
-            bar.addEventListener('click', function(e) {
-                if (e.target.closest('.close-announcement')) return;
-                document.getElementById('announcementModal').classList.add('active');
-                renderAnnouncements();
-            });
-            document.body.insertBefore(bar, document.body.firstChild);
-        }
-
-        function sendMessageToUser(email, title, content) {
-            var messages = JSON.parse(localStorage.getItem('messages_' + email) || '[]');
-            messages.unshift({ title: title, content: content, time: Date.now(), read: false });
-            if (messages.length > 50) messages.pop();
-            localStorage.setItem('messages_' + email, JSON.stringify(messages));
-        }
-        function sendMessageToAll(title, content, filter) {
-            filter = filter || 'all';
-            var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
-            var targetUsers = users;
-            if (filter === 'vip') targetUsers = users.filter(function(u) { return u.role === 'vip'; });
-            if (filter === 'normal') targetUsers = users.filter(function(u) { return u.role !== 'vip' && u.role !== 'admin'; });
-            targetUsers.forEach(function(user) { sendMessageToUser(user.email, title, content); });
-            showToast('已发送给 ' + targetUsers.length + ' 位用户', 'success');
-        }
-        function sendMessageToSelectedUsers(emails, title, content) {
-            emails.forEach(function(email) { sendMessageToUser(email, title, content); });
-            showToast('已发送给 ' + emails.length + ' 位用户', 'success');
-        }
-        function renderUserMessages() {
-            var msgs = JSON.parse(localStorage.getItem('messages_' + (currentUser ? currentUser.email : '')) || '[]');
-            var container = document.getElementById('messageList');
-            if (!container) return;
-            if (!msgs.length) {
-                container.innerHTML = '<div style="padding:20px;text-align:center;">暂无站内信</div>';
-                return;
-            }
-            container.innerHTML = msgs.map(function(m, idx) {
-                return '<div style="padding:12px;border-bottom:1px solid var(--border-light);' + (m.read ? 'opacity:0.7;' : 'font-weight:600;') + '" data-idx="' + idx + '"><div style="display:flex;justify-content:space-between;"><span>' + esc(m.title) + '</span><span style="font-size:0.6rem;color:var(--text-muted);">' + new Date(m.time).toLocaleString() + '</span></div><div style="font-size:0.8rem;margin-top:4px;">' + esc(m.content) + '</div></div>';
-            }).join('');
-            var unread = msgs.filter(function(m) { return !m.read; }).length;
-            var unreadSpan = document.getElementById('unreadCount');
-            if (unreadSpan) {
-                unreadSpan.innerText = unread;
-                unreadSpan.style.display = unread ? 'inline-block' : 'none';
-            }
-            container.querySelectorAll('[data-idx]').forEach(function(el) {
-                el.addEventListener('click', function() {
-                    var idx = parseInt(el.dataset.idx);
-                    if (!msgs[idx].read) {
-                        msgs[idx].read = true;
-                        localStorage.setItem('messages_' + currentUser.email, JSON.stringify(msgs));
-                        renderUserMessages();
-                    }
-                });
-            });
-        }
-
-        async function loadUserCheckboxList() {
-            var container = document.getElementById('userCheckboxList');
-            if (!container) return;
-            try {
-                var users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]') : await getAllUsers();
-                allUsersList = users;
-                container.innerHTML = users.map(function(u) {
-                    var email = getFieldSafe(u, 'email', 'Email', 'EMAIL');
-                    var username = getFieldSafe(u, 'username', 'Username', 'USERNAME') || (email || '').split('@')[0];
-                    var role = getFieldSafe(u, 'role', 'Role', 'ROLE') || 'user';
-                    return '<div class="user-checkbox-item"><input type="checkbox" value="' + esc(email) + '" id="user_' + u.id + '"><label for="user_' + u.id + '">' + esc(email) + ' (' + (role === 'admin' ? '管理员' : (role === 'vip' ? 'VIP' : '普通')) + ')</label></div>';
-                }).join('');
-            } catch (e) {
-                container.innerHTML = '<div style="padding:20px;text-align:center;">加载用户列表失败</div>';
-            }
-        }
-
-        async function syncDownloadsFromServer() {
-            if (!currentUser || isLocalFile) {
-                showToast('离线模式或未登录，无法同步', 'error');
-                return;
-            }
-            try {
-                var rec = await findUserByEmail(currentUser.email);
-                if (rec) {
-                    currentUser.downloads = Number(getFieldSafe(rec, 'downloads', 'Downloads', 'DOWNLOADS')) || 0;
-                    currentUser.extraQuota = Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota', 'EXTRAQUOTA')) || 0;
-                    currentUser.points = Number(getFieldSafe(rec, 'points', 'Points', 'POINTS')) || 0;
-                    localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                    updateUserUI();
-                    showToast('已同步：剩余 ' + getRemainingCount(currentUser) + ' 次', 'success');
-                } else {
-                    showToast('未找到用户记录', 'error');
-                }
-            } catch (e) {
-                console.error(e);
-                showToast('同步失败: ' + e.message, 'error');
-            }
-        }
-
-        function updateUserUI() {
-            var area = document.getElementById('userArea');
-            if (!area) return;
-            if (currentUser) {
-                var remaining = getRemainingCount(currentUser);
-                var remainingText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : remaining;
-                var level = getUserLevel(currentUser.points || 0);
-                area.innerHTML = '<div style="position:relative; display:flex; align-items:center; gap:8px;"><button class="user-name-btn" id="userMenuBtn"><i class="fas fa-user-circle"></i> ' + esc(currentUser.username) + ' <span class="download-badge">' + remainingText + '</span> ' + ((currentUser.role === 'vip' || currentUser.role === 'admin') ? '<span class="vip-badge">VIP</span>' : '') + '<span class="level-badge ' + level.badge + '">' + level.name + '</span><i class="fas fa-chevron-down"></i></button><button class="refresh-btn" id="refreshDownloadsBtn" title="刷新下载次数" style="background:none;border:none;color:var(--primary);cursor:pointer;font-size:1.1rem;"><i class="fas fa-sync-alt"></i></button><div class="dropdown-content" id="userDropdown"><button id="profileBtn">个人中心</button>' + (currentUser.role === 'admin' ? '<button id="adminBtn">管理后台</button>' : '') + '<button id="logoutBtn">退出登录</button></div></div>';
-                document.getElementById('refreshDownloadsBtn').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    syncDownloadsFromServer();
-                });
-                document.getElementById('userMenuBtn').addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    document.getElementById('userDropdown').classList.toggle('show');
-                });
-                document.getElementById('logoutBtn').addEventListener('click', function() {
-                    currentUser = null;
-                    localStorage.removeItem('lezhe_user');
-                    updateUserUI();
-                    showToast('已退出登录');
-                    renderCalendar();
-                });
-                document.getElementById('profileBtn').addEventListener('click', function() {
-                    syncDownloadsFromServer();
-                    document.getElementById('profileUsernameInput').value = currentUser.username;
-                    document.getElementById('profileRole').innerHTML = (currentUser.role === 'vip' || currentUser.role === 'admin') ? 'VIP会员' : '普通会员';
-                    document.getElementById('profileRemaining').innerText = (currentUser.role === 'vip' || currentUser.role === 'admin') ? '∞' : getRemainingCount(currentUser);
-                    document.getElementById('profilePoints').innerText = currentUser.points || 0;
-                    var lvl = getUserLevel(currentUser.points || 0);
-                    document.getElementById('profileLevelBadge').innerHTML = '<span class="level-badge ' + lvl.badge + '" style="margin-left:8px;">' + lvl.name + '</span>';
-                    document.getElementById('myInviteCode').innerText = currentUser.inviteCode || '暂无';
-                    document.getElementById('profileModal').classList.add('active');
-                    renderUserMessages();
-                });
-                if (currentUser.role === 'admin') {
-                    document.getElementById('adminBtn').addEventListener('click', function() {
-                        document.getElementById('adminModal').classList.add('active');
-                        refreshUserList();
-                    });
-                    document.getElementById('manageArticlesBtn').style.display = 'block';
-                }
-            } else {
-                area.innerHTML = '<button class="auth-btn" id="showAuthBtn"><i class="fas fa-user-lock"></i> 登录 / 注册</button>';
-                document.getElementById('showAuthBtn').addEventListener('click', function() { openAuth('login'); });
-                document.getElementById('manageArticlesBtn').style.display = 'none';
-            }
-        }
-
-        async function refreshUserList() {
-            var container = document.getElementById('adminUserList');
-            container.innerHTML = '<div style="text-align:center;padding:40px;">加载中...</div>';
-            try {
-                var users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(function(u) {
-                    return { id: u.email, fields: u, createdTime: u.createdAt };
-                }) : await (async function() {
-                    const all = await getAllUsers();
-                    return all.map(function(r) {
-                        return { id: r.id, fields: r, createdTime: getFieldSafe(r, 'createdAt', 'CreatedAt', 'CREATEDAT') || new Date().toISOString() };
-                    });
-                })();
-                var term = (document.getElementById('adminSearchInput') ? document.getElementById('adminSearchInput').value : '').toLowerCase();
-                var dateFilter = document.getElementById('adminDateFilter') ? document.getElementById('adminDateFilter').value : '';
-                var filtered = users.filter(function(u) {
-                    var email = getFieldSafe(u.fields, 'email', 'Email', 'EMAIL') || '';
-                    var username = getFieldSafe(u.fields, 'username', 'Username', 'USERNAME') || '';
-                    return !term || email.toLowerCase().includes(term) || username.toLowerCase().includes(term);
-                });
-                if (dateFilter) {
-                    filtered = filtered.filter(function(u) {
-                        var regDate = u.createdTime || getFieldSafe(u.fields, 'createdAt', 'CreatedAt', 'CREATEDAT');
-                        return regDate ? new Date(regDate).toISOString().split('T')[0] === dateFilter : false;
-                    });
-                }
-                container.innerHTML = filtered.map(function(u) {
-                    var role = getFieldSafe(u.fields, 'role', 'Role', 'ROLE') || 'user';
-                    var isVip = role === 'vip' || role === 'admin';
-                    var avatarIcon = role === 'admin' ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
-                    var email = getFieldSafe(u.fields, 'email', 'Email', 'EMAIL') || '';
-                    var username = getFieldSafe(u.fields, 'username', 'Username', 'USERNAME') || '';
-                    return '<div class="admin-user-card"><div class="admin-user-info"><div class="admin-user-avatar">' + avatarIcon + '</div><div><div class="admin-user-email">' + esc(email) + '</div><div class="admin-user-name">' + esc(username) + '</div></div><div class="admin-user-role ' + (isVip ? 'vip' : '') + '">' + (isVip ? (role === 'admin' ? '管理员' : 'VIP') : '普通') + '</div></div><div><button class="admin-action-btn upgrade-vip" data-id="' + u.id + '" data-role="' + role + '">' + (isVip && role !== 'admin' ? '降级' : '升级VIP') + '</button><button class="admin-action-btn add-points" data-email="' + esc(email) + '" style="background:var(--success);">增加积分</button><button class="admin-action-btn reset-download" data-email="' + esc(email) + '" style="background:var(--warning);">重置次数</button></div></div>';
-                }).join('');
-                container.querySelectorAll('.upgrade-vip').forEach(function(btn) {
-                    btn.addEventListener('click', async function() {
-                        var userId = btn.dataset.id;
-                        var currentRole = btn.dataset.role;
-                        if (currentRole === 'admin') { showToast('管理员不可降级', 'error'); return; }
-                        var newRole = currentRole === 'vip' ? 'user' : 'vip';
-                        await updateUserRole(userId, newRole);
-                        await refreshUserList();
-                        if (currentUser && currentUser.id === userId) {
-                            currentUser.role = newRole;
-                            localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                            updateUserUI();
-                        }
-                        showToast('已' + (newRole === 'vip' ? '升级VIP' : '降级'), 'success');
-                    });
-                });
-                container.querySelectorAll('.add-points').forEach(function(btn) {
-                    btn.addEventListener('click', async function() {
-                        var email = btn.dataset.email;
-                        var points = prompt('请输入要增加/减少的积分（正数增加，负数减少）', '10');
-                        if (points !== null && !isNaN(parseInt(points))) {
-                            await addPoints(email, parseInt(points));
-                            showToast('已调整积分 ' + parseInt(points) + ' 分', 'success');
-                            await refreshUserList();
-                            if (currentUser && currentUser.email === email) {
-                                currentUser.points = (currentUser.points || 0) + parseInt(points);
-                                localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                                updateUserUI();
-                            }
-                        }
-                    });
-                });
-                container.querySelectorAll('.reset-download').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        var email = btn.dataset.email;
-                        saveUserDownloadData(email, 0, 0);
-                        showToast('已重置下载次数', 'success');
-                        if (currentUser && currentUser.email === email) updateUserUI();
-                    });
-                });
-            } catch (e) {
-                container.innerHTML = '<div style="text-align:center;padding:40px;">加载失败</div>';
-            }
-        }
-
-        function openAuth(tab) {
-            tab = tab || 'login';
-            var modal = document.getElementById('authModal');
-            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
-            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
-            document.getElementById('forgotForm').style.display = tab === 'forgot' ? 'block' : 'none';
-            document.getElementById('authModalTitle').innerText = tab === 'register' ? '注册' : (tab === 'forgot' ? '找回密码' : '登录');
-            modal.classList.add('active');
-            if (tab === 'login') refreshCaptcha('login');
-            else if (tab === 'register') refreshCaptcha('reg');
-            else refreshCaptcha('forgot');
-        }
-
-        function refreshCaptcha(type) {
-            var q = Math.floor(Math.random() * 10) + 1;
-            var b = Math.floor(Math.random() * 10) + 1;
-            var op = Math.random() > 0.5 ? '+' : '-';
-            var ans = op === '+' ? q + b : q - b;
-            if (ans < 0) return refreshCaptcha(type);
-            currentCaptcha = { question: q + ' ' + op + ' ' + b + ' = ?', answer: ans };
-            document.getElementById(type + 'CaptchaQuestion').innerText = currentCaptcha.question;
-            document.getElementById(type + 'CaptchaInput').value = '';
         }
 
         function renderCats() {
@@ -1439,6 +907,7 @@
                 renderDailyRecommend();
             }
         }
+
         function renderDailyRecommend() {
             var section = document.getElementById('dailySection');
             if (!section || !dailySoftware) return;
@@ -1477,7 +946,7 @@
             newCard.id = 'dailyCard';
         }
 
-        // ========================  初始化加载  ========================
+        // ========================  初始化 ========================
         async function loadAll() {
             var overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.style.display = 'flex';
@@ -1489,7 +958,6 @@
             if (bannerAds.length) renderCarousel(document.getElementById('categoryBannerSlides'), document.getElementById('categoryBannerDots'), bannerAds);
             if (sidebarAds.length) renderCarousel(document.getElementById('sidebarCarouselSlides'), document.getElementById('sidebarCarouselDots'), sidebarAds);
             articles = await fetchArticles();
-            announcements = isLocalFile ? [{ id: '1', title: '欢迎使用乐哲软件', content: '感谢大家的支持！更多优质软件持续更新中', createdAt: new Date().toISOString() }] : [];
             renderCats();
             renderGrid();
             renderHot();
@@ -1497,9 +965,7 @@
             renderArtsList();
             renderHistory();
             renderCalendar();
-            showAnnouncementBar();
             setDailyRecommend();
-            updateUserUI();
             hideLoadingOverlay();
         }
 
@@ -1513,15 +979,16 @@
             }
         }
 
-        // ========================  事件绑定  ========================
+        // ========================  事件绑定 ========================
         window._loadMore = function() { showAll = true; renderGrid(); };
         document.getElementById('loadMoreBtn') && document.getElementById('loadMoreBtn').addEventListener('click', window._loadMore);
         document.getElementById('searchInput').addEventListener('input', function(e) { searchKeyword = e.target.value; renderGrid(); });
         document.getElementById('searchBtn').addEventListener('click', function() { searchKeyword = document.getElementById('searchInput').value; renderGrid(); });
         document.getElementById('clearHistoryBtn').addEventListener('click', function() { localStorage.removeItem('browseHistory'); renderHistory(); });
+
         document.getElementById('submitFeedbackBtn').addEventListener('click', async function() {
             var msg = document.getElementById('feedbackMessage').value.trim();
-            if (!msg) return;
+            if (!msg) { showToast('请输入留言内容', 'error'); return; }
             if (isLocalFile) {
                 var list = JSON.parse(localStorage.getItem('feedback_list') || '[]');
                 list.unshift({ name: document.getElementById('feedbackName').value || '网友', message: msg });
@@ -1530,336 +997,30 @@
             } else {
                 await baserowReq('POST', CONFIG.TABLES.messages, { Name: document.getElementById('feedbackName').value || '网友', Message: msg });
             }
-            showToast('留言成功');
+            showToast('留言成功，感谢反馈！', 'success');
             document.getElementById('feedbackMessage').value = '';
             var container2 = document.getElementById('feedbackListContainer');
-            if (container2) container2.innerHTML = '<div>留言已提交</div>';
-        });
-        document.getElementById('copyInviteCodeInsufficient').addEventListener('click', function() {
-            if (currentUser && currentUser.inviteCode) window.copyText(currentUser.inviteCode);
-            else showToast('请先登录', 'error');
-        });
-        document.getElementById('saveProfileBtn').addEventListener('click', async function() {
-            var newPwd = document.getElementById('profileNewPwd').value;
-            var confirm = document.getElementById('profileConfirmPwd').value;
-            var newUsername = document.getElementById('profileUsernameInput').value.trim();
-            if (newPwd && newPwd !== confirm) return showToast('两次密码不一致', 'error');
-            if (newUsername && newUsername !== currentUser.username) {
-                await updateUsername(currentUser.email, newUsername);
-                currentUser.username = newUsername;
-                localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                updateUserUI();
-                showToast('用户名已更新', 'success');
-            }
-            if (newPwd) {
-                await updatePassword(currentUser.email, newPwd);
-                showToast('密码修改成功', 'success');
-            }
-            document.getElementById('profileModal').classList.remove('active');
-        });
-        document.getElementById('manageArticlesBtn').addEventListener('click', async function() {
-            await refreshArticleList();
-            document.getElementById('articleManageModal').classList.add('active');
+            if (container2) container2.innerHTML = '<div style="color:var(--text-muted);font-size:0.7rem;">留言已提交，我们会尽快处理</div>';
         });
 
-        async function refreshArticleList() {
-            var container = document.getElementById('articleAdminList');
-            container.innerHTML = '<div style="text-align:center;padding:40px;">加载中...</div>';
-            articles = await fetchArticles();
-            if (!articles.length) {
-                container.innerHTML = '<div style="text-align:center;padding:40px;">暂无文章</div>';
-                return;
-            }
-            container.innerHTML = articles.map(function(a) {
-                return '<div class="admin-user-card" style="flex-direction:column;align-items:stretch;"><div><strong>' + esc(a.title) + '</strong><div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">' + new Date(a.createdAt).toLocaleString() + '</div></div><div><button class="edit-article" data-id="' + a.id + '" style="background:#fef3c7;color:#b45309;border:none;border-radius:20px;padding:6px 12px;margin-right:8px;cursor:pointer;">编辑</button><button class="delete-article" data-id="' + a.id + '" style="background:#fee2e2;color:#b91c1c;border:none;border-radius:20px;padding:6px 12px;cursor:pointer;">删除</button></div></div>';
-            }).join('');
-            container.querySelectorAll('.edit-article').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    var a = articles.find(function(art) { return art.id === btn.dataset.id; });
-                    if (a) {
-                        editingArticleId = a.id;
-                        document.getElementById('articleTitle').value = a.title;
-                        document.getElementById('articleCover').value = a.cover || '';
-                        document.getElementById('articleExcerpt').value = a.excerpt || '';
-                        document.getElementById('articleContent').value = a.content || '';
-                        document.getElementById('articleTags').value = a.tags || '';
-                        document.getElementById('articleFormContainer').style.display = 'block';
-                    }
-                });
-            });
-            container.querySelectorAll('.delete-article').forEach(function(btn) {
-                btn.addEventListener('click', async function() {
-                    if (confirm('确定删除？')) {
-                        try {
-                            await baserowReq('DELETE', CONFIG.TABLES.articles, null, btn.dataset.id);
-                            showToast('删除成功');
-                            await refreshArticleList();
-                        } catch (e) {
-                            showToast('删除失败', 'error');
-                        }
-                    }
-                });
-            });
-        }
-
-        document.getElementById('addNewArticleBtn').addEventListener('click', function() {
-            editingArticleId = null;
-            document.getElementById('articleTitle').value = '';
-            document.getElementById('articleCover').value = '';
-            document.getElementById('articleExcerpt').value = '';
-            document.getElementById('articleContent').value = '';
-            document.getElementById('articleTags').value = '';
-            document.getElementById('articleFormContainer').style.display = 'block';
-        });
-        document.getElementById('saveArticleBtn').addEventListener('click', async function() {
-            var title = document.getElementById('articleTitle').value.trim();
-            if (!title) return showToast('标题不能为空', 'error');
-            var data = {
-                Title: title,
-                Cover: document.getElementById('articleCover').value,
-                Excerpt: document.getElementById('articleExcerpt').value,
-                Content: document.getElementById('articleContent').value,
-                Tags: document.getElementById('articleTags').value
-            };
-            try {
-                if (editingArticleId) {
-                    await baserowReq('PATCH', CONFIG.TABLES.articles, data, editingArticleId);
-                    showToast('更新成功');
-                } else {
-                    await baserowReq('POST', CONFIG.TABLES.articles, data);
-                    showToast('创建成功');
-                }
-                document.getElementById('articleFormContainer').style.display = 'none';
-                await refreshArticleList();
-                await renderArtsList();
-            } catch (e) {
-                showToast('保存失败', 'error');
-            }
-        });
-        document.getElementById('cancelArticleBtn').addEventListener('click', function() {
-            document.getElementById('articleFormContainer').style.display = 'none';
-            editingArticleId = null;
-        });
-        document.getElementById('closeArticleModal').addEventListener('click', function() { document.getElementById('articleManageModal').classList.remove('active'); });
-        document.getElementById('refreshArticleListBtn').addEventListener('click', refreshArticleList);
-        document.getElementById('closeAdminModal').addEventListener('click', function() { document.getElementById('adminModal').classList.remove('active'); });
-        document.getElementById('refreshUserListBtn').addEventListener('click', refreshUserList);
-        document.getElementById('closeInsufficientModal').addEventListener('click', function() { document.getElementById('insufficientModal').classList.remove('active'); });
-        document.getElementById('closeProfileModal').addEventListener('click', function() { document.getElementById('profileModal').classList.remove('active'); });
-        document.getElementById('closeAuthModal').addEventListener('click', function() { document.getElementById('authModal').classList.remove('active'); });
-        document.getElementById('showForgotBtn').addEventListener('click', function() { openAuth('forgot'); });
-        document.getElementById('backToLoginFromForgot').addEventListener('click', function() { openAuth('login'); });
-        document.querySelectorAll('.auth-tab').forEach(function(t) {
-            t.addEventListener('click', function() { openAuth(t.dataset.tab); });
-        });
-        document.getElementById('refreshLoginCaptcha').addEventListener('click', function() { refreshCaptcha('login'); });
-        document.getElementById('refreshRegCaptcha').addEventListener('click', function() { refreshCaptcha('reg'); });
-        document.getElementById('refreshForgotCaptcha').addEventListener('click', function() { refreshCaptcha('forgot'); });
-        document.getElementById('registerBtn').addEventListener('click', async function() {
-            var username = document.getElementById('regUsername').value.trim();
-            var email = document.getElementById('regEmail').value.trim();
-            var pwd = document.getElementById('regPassword').value;
-            var confirm = document.getElementById('regConfirm').value;
-            var inviteCode = document.getElementById('regInviteCode').value.trim();
-            var cap = document.getElementById('regCaptchaInput').value.trim();
-            if (!username || !email || pwd.length < 6 || pwd !== confirm) return showToast('请完整填写信息', 'error');
-            if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error');
-            try {
-                await registerUser(email, pwd, username, inviteCode);
-                showToast('注册成功！请登录', 'success');
-                openAuth('login');
-                document.getElementById('loginEmail').value = email;
-            } catch (e) {
-                showToast(e.message || '注册失败', 'error');
-            }
-        });
-        document.getElementById('loginBtn').addEventListener('click', async function() {
-            var email = document.getElementById('loginEmail').value.trim();
-            var pwd = document.getElementById('loginPassword').value;
-            var cap = document.getElementById('loginCaptchaInput').value.trim();
-            if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error');
-            try {
-                currentUser = await loginUser(email, pwd);
-                localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
-                await syncDownloadsFromServer();
-                updateUserUI();
-                document.getElementById('authModal').classList.remove('active');
-                showToast('登录成功');
-                renderCalendar();
-            } catch (e) {
-                console.error('登录错误:', e);
-                showToast(e.message, 'error');
-            }
-        });
-        var countdown = 0;
-        var sendBtn = document.getElementById('sendResetCodeBtn');
-        sendBtn.addEventListener('click', async function() {
-            if (countdown > 0) return showToast('请等待' + countdown + '秒', 'warning');
-            var email = document.getElementById('forgotEmail').value.trim();
-            if (!email) return showToast('请输入邮箱', 'error');
-            sendBtn.disabled = true;
-            try {
-                var code = Math.floor(100000 + Math.random() * 900000).toString();
-                resetCode = code;
-                resetEmail = email;
-                resetCodeExpire = Date.now() + 5 * 60 * 1000;
-                await emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_RESET, { to_email: email, code: code, expire: '5分钟' });
-                showToast('验证码已发送至邮箱', 'success');
-                countdown = 60;
-                var timer = setInterval(function() {
-                    countdown--;
-                    if (countdown <= 0) {
-                        clearInterval(timer);
-                        sendBtn.disabled = false;
-                        sendBtn.textContent = '发送验证码';
-                    } else {
-                        sendBtn.textContent = countdown + '秒后重发';
-                    }
-                }, 1000);
-            } catch (e) {
-                showToast('发送失败：' + (e.message || '请检查 EmailJS 配置'), 'error');
-                sendBtn.disabled = false;
-                sendBtn.textContent = '发送验证码';
-            }
-        });
-        document.getElementById('resetPasswordBtn').addEventListener('click', async function() {
-            var email = document.getElementById('forgotEmail').value.trim();
-            var code = document.getElementById('resetCodeInput').value.trim();
-            var newPwd = document.getElementById('newPassword').value;
-            var confirm = document.getElementById('confirmNewPassword').value;
-            var cap = document.getElementById('forgotCaptchaInput').value.trim();
-            if (!email || newPwd !== confirm || newPwd.length < 6) return showToast('信息错误', 'error');
-            if (!cap || parseInt(cap) !== currentCaptcha.answer) return showToast('验证码错误', 'error');
-            if (email !== resetEmail || !code || code !== resetCode || Date.now() > resetCodeExpire) return showToast('验证码错误或已过期', 'error');
-            try {
-                await updatePassword(email, newPwd);
-                showToast('密码重置成功', 'success');
-                openAuth('login');
-                resetCode = '';
-            } catch (e) {
-                showToast(e.message, 'error');
-            }
-        });
-        document.getElementById('prevMonth').addEventListener('click', function() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
-        document.getElementById('nextMonth').addEventListener('click', function() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
-        document.getElementById('dailyCheckinBtn').addEventListener('click', performCheckin);
-        document.getElementById('closeAnnouncementModal').addEventListener('click', function() { document.getElementById('announcementModal').classList.remove('active'); });
-        document.getElementById('closeFavoritesModal').addEventListener('click', function() { document.getElementById('favoritesModal').classList.remove('active'); });
-        document.getElementById('closeMessageModal').addEventListener('click', function() { document.getElementById('messageModal').classList.remove('active'); });
-        document.getElementById('submitRatingBtn').addEventListener('click', async function() {
+        document.getElementById('submitRatingBtn').addEventListener('click', function() {
             var id = document.getElementById('ratingSoftwareId').value;
             var name = document.getElementById('ratingSoftwareName').innerText;
             var rating = window.selectedRating || 0;
             var comment = document.getElementById('ratingComment').value;
-            if (rating < 1 || rating > 5) return showToast('请选择评分', 'error');
-            await submitRating(id, name, rating, comment);
+            if (rating < 1 || rating > 5) { showToast('请选择评分', 'error'); return; }
+            submitRating(id, name, rating, comment);
             document.getElementById('ratingModal').classList.remove('active');
             document.getElementById('ratingComment').value = '';
             window.selectedRating = 0;
             var stars = document.querySelectorAll('#ratingStarsInput i');
             stars.forEach(function(s) { s.className = 'far fa-star'; s.style.color = ''; });
         });
-        document.getElementById('showFavoritesBtn').addEventListener('click', function() {
-            renderFavoritesList();
-            document.getElementById('favoritesModal').classList.add('active');
-        });
-        document.getElementById('showMessagesBtn').addEventListener('click', function() {
-            renderUserMessages();
-            document.getElementById('messageModal').classList.add('active');
-        });
-        document.getElementById('showExportBtn').addEventListener('click', function() { document.getElementById('exportModal').classList.add('active'); });
-        document.getElementById('exportHistoryBtn').addEventListener('click', function() {
-            var h = JSON.parse(localStorage.getItem('browseHistory') || '[]');
-            var data = JSON.stringify(h, null, 2);
-            var blob = new Blob([data], { type: 'application/json' });
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'history_' + (currentUser ? currentUser.email : '') + '.json';
-            a.click();
-            showToast('导出成功');
-        });
-        document.getElementById('exportFavoritesBtn').addEventListener('click', function() {
-            var f = JSON.parse(localStorage.getItem('favorites_' + (currentUser ? currentUser.email : '')) || '[]');
-            var data = JSON.stringify(f, null, 2);
-            var blob = new Blob([data], { type: 'application/json' });
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'favorites_' + (currentUser ? currentUser.email : '') + '.json';
-            a.click();
-            showToast('导出成功');
-        });
-        document.getElementById('exportAllDataBtn').addEventListener('click', function() {
-            var data = {
-                history: JSON.parse(localStorage.getItem('browseHistory') || '[]'),
-                favorites: JSON.parse(localStorage.getItem('favorites_' + (currentUser ? currentUser.email : '')) || '[]'),
-                user: currentUser
-            };
-            var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'alldata_' + (currentUser ? currentUser.email : '') + '.json';
-            a.click();
-            showToast('导出成功');
-        });
-        document.getElementById('closeExportModal').addEventListener('click', function() { document.getElementById('exportModal').classList.remove('active'); });
-        document.getElementById('sendMessageTabBtn').addEventListener('click', function() {
-            document.getElementById('userManagePanel').style.display = 'none';
-            document.getElementById('sendMessagePanel').style.display = 'block';
-            document.getElementById('sendMessageTabBtn').style.background = 'var(--primary)';
-            document.getElementById('sendMessageTabBtn').style.color = '#fff';
-            document.getElementById('userManageTabBtn').style.background = 'var(--primary-light)';
-            document.getElementById('userManageTabBtn').style.color = 'var(--primary)';
-            loadUserCheckboxList();
-        });
-        document.getElementById('userManageTabBtn').addEventListener('click', function() {
-            document.getElementById('userManagePanel').style.display = 'block';
-            document.getElementById('sendMessagePanel').style.display = 'none';
-            document.getElementById('userManageTabBtn').style.background = 'var(--primary)';
-            document.getElementById('userManageTabBtn').style.color = '#fff';
-            document.getElementById('sendMessageTabBtn').style.background = 'var(--primary-light)';
-            document.getElementById('sendMessageTabBtn').style.color = 'var(--primary)';
-            refreshUserList();
-        });
-        document.getElementById('messageRecipient').addEventListener('change', function(e) {
-            var container = document.getElementById('selectedUsersContainer');
-            container.style.display = e.target.value === 'custom' ? 'block' : 'none';
-        });
-        document.getElementById('sendMessageBtn').addEventListener('click', function() {
-            var title = document.getElementById('messageTitle').value.trim();
-            var content = document.getElementById('messageContent').value.trim();
-            if (!title || !content) { showToast('请填写标题和内容', 'error'); return; }
-            var recipient = document.getElementById('messageRecipient').value;
-            if (recipient === 'custom') {
-                var selected = Array.from(document.querySelectorAll('#userCheckboxList input:checked')).map(function(cb) { return cb.value; });
-                if (!selected.length) { showToast('请至少选择一位用户', 'error'); return; }
-                sendMessageToSelectedUsers(selected, title, content);
-            } else {
-                sendMessageToAll(title, content, recipient);
-            }
-            document.getElementById('messageTitle').value = '';
-            document.getElementById('messageContent').value = '';
-            if (currentUser && currentUser.email) renderUserMessages();
-        });
-        document.getElementById('contactAdminBuyBtn').addEventListener('click', function() {
-            window.copyText('Win_Mac_123');
-            showToast('客服微信已复制，添加时请备注“购买下载次数”', 'success');
-        });
-        window.addEventListener('beforeinstallprompt', function(e) {
-            e.preventDefault();
-            deferredPrompt = e;
-            var banner = document.getElementById('pwaInstallBanner');
-            if (banner) banner.classList.add('show');
-        });
-        document.getElementById('pwaInstallBtn').addEventListener('click', async function() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                var outcome = await deferredPrompt.userChoice;
-                if (outcome.outcome === 'accepted') showToast('感谢安装！', 'success');
-                deferredPrompt = null;
-            }
-            document.getElementById('pwaInstallBanner').classList.remove('show');
-        });
-        document.getElementById('pwaCloseBtn').addEventListener('click', function() { document.getElementById('pwaInstallBanner').classList.remove('show'); });
+
+        document.getElementById('prevMonth').addEventListener('click', function() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+        document.getElementById('nextMonth').addEventListener('click', function() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+
+        // 暗色模式
         var darkModeToggle = document.getElementById('darkModeToggle');
         if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode');
         darkModeToggle.addEventListener('click', function() {
@@ -1867,13 +1028,11 @@
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
             darkModeToggle.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
         });
+
+        // 返回顶部
         var lastScrollY = 0, scrollTimer2;
         window.addEventListener('scroll', function() {
             var nav = document.getElementById('topNav');
-            var dropdown = document.getElementById('userDropdown');
-            if (dropdown && dropdown.classList.contains('show')) {
-                dropdown.classList.remove('show');
-            }
             if (scrollTimer2) clearTimeout(scrollTimer2);
             scrollTimer2 = setTimeout(function() {
                 var currentY = window.scrollY;
@@ -1888,6 +1047,8 @@
             }, 50);
         });
         document.getElementById('backToTop').addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+        // 汉堡菜单
         var hamburger = document.getElementById('hamburgerBtn');
         var navLinks = document.getElementById('navLinks');
         hamburger.addEventListener('click', function(e) {
@@ -1901,6 +1062,8 @@
                 hamburger.classList.remove('active');
             }
         });
+
+        // 热门滚动自动播放
         var autoScrollInterval = null, scrollDirection = 1, currentScrollPos = 0;
         function startAutoScroll() {
             var s = document.getElementById('hotScroll');
@@ -1932,12 +1095,8 @@
                 h.addEventListener('scroll', function() { currentScrollPos = h.scrollLeft; });
             }
         });
-        if (localStorage.getItem('lezhe_user')) {
-            try { currentUser = JSON.parse(localStorage.getItem('lezhe_user')); } catch (e) {}
-        }
-        updateUserUI();
-        renderCalendar();
-        refreshCaptcha('login');
+
+        // 加载
         if (!sessionStorage.getItem('has_loaded_before')) {
             var overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.style.display = 'flex';
