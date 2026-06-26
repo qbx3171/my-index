@@ -471,18 +471,36 @@
             return upd;
         }
 
-        // ========================  用户相关（核心修复：findUserByEmail 使用 search 参数） ========================
-        // 关键修复：不再依赖 max_limit=100 截断，改用 search 在所有字段中搜索目标邮箱，并扩大 max_limit 到 1000
+        // ========================  用户相关（全部改为大写字段，并分页获取全部用户） ========================
+        // 通用函数：分页获取所有用户（避免 max_limit=100 限制）
+        async function getAllUsers() {
+            if (isLocalFile) {
+                return JSON.parse(localStorage.getItem('lezhe_users') || '[]');
+            }
+            let allUsers = [];
+            let offset = 0;
+            const limit = 100;
+            let hasMore = true;
+            while (hasMore) {
+                const data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=' + limit + '&offset=' + offset);
+                allUsers = allUsers.concat(data.results);
+                if (data.results.length < limit) {
+                    hasMore = false;
+                } else {
+                    offset += limit;
+                }
+            }
+            return allUsers;
+        }
+
         async function findUserByEmail(email) {
             if (isLocalFile) {
                 var users = JSON.parse(localStorage.getItem('lezhe_users') || '[]');
                 return users.find(function(u) { return u.email === email; }) || null;
             }
             try {
-                // 使用 search 参数在所有字段中搜索，并设置较大的 max_limit 确保新用户不被遗漏
-                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'search=' + encodeURIComponent(email) + '&max_limit=1000');
-                // 前端精确过滤，确保 email 完全匹配（兼容大小写）
-                var found = data.results.find(function(row) {
+                const allUsers = await getAllUsers();
+                const found = allUsers.find(function(row) {
                     var rowEmail = getFieldSafe(row, 'email', 'Email', 'EMAIL');
                     return rowEmail && rowEmail.toLowerCase() === email.toLowerCase();
                 });
@@ -499,8 +517,8 @@
                 return users.find(function(u) { return u.inviteCode === code; }) || null;
             }
             try {
-                var data = await baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=1000');
-                var found = data.results.find(function(row) {
+                const allUsers = await getAllUsers();
+                const found = allUsers.find(function(row) {
                     var rowCode = getFieldSafe(row, 'invitecode', 'InviteCode', 'INVITECODE');
                     return rowCode && rowCode.toUpperCase() === code.toUpperCase();
                 });
@@ -533,19 +551,19 @@
             var hash2 = CryptoJS.SHA256(password).toString();
             var userCode2 = Math.random().toString(36).substring(2, 10).toUpperCase();
             await baserowReq('POST', CONFIG.TABLES.users, {
-                email: email,
-                password: hash2,
-                username: username,
-                role: email === 'admin@lezhe.com' ? 'admin' : 'user',
-                invitecode: userCode2,
-                points: 0,
-                downloads: 0,
-                extraquota: 0
+                EMAIL: email,
+                PASSWORD: hash2,
+                USERNAME: username,
+                ROLE: email === 'admin@lezhe.com' ? 'admin' : 'user',
+                INVITECODE: userCode2,
+                POINTS: 0,
+                DOWNLOADS: 0,
+                EXTRAQUOTA: 0
             });
             if (inviteCode) {
                 var inviter2 = await findUserByInviteCode(inviteCode);
                 if (inviter2) {
-                    var inviterEmail = getFieldSafe(inviter2, 'email', 'Email');
+                    var inviterEmail = getFieldSafe(inviter2, 'email', 'Email', 'EMAIL');
                     if (inviterEmail) {
                         await addPoints(inviterEmail, 10);
                         await addDownloadBonus(inviterEmail, 5);
@@ -573,14 +591,14 @@
             if (pwdField !== CryptoJS.SHA256(password).toString()) throw new Error('密码错误');
             return {
                 id: rec.id,
-                email: getFieldSafe(rec, 'email', 'Email'),
-                username: getFieldSafe(rec, 'username', 'Username') || email.split('@')[0],
-                role: getFieldSafe(rec, 'role', 'Role') || 'user',
-                inviteCode: getFieldSafe(rec, 'invitecode', 'InviteCode') || '',
-                points: Number(getFieldSafe(rec, 'points', 'Points')) || 0,
-                downloads: Number(getFieldSafe(rec, 'downloads', 'Downloads')) || 0,
-                extraQuota: Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota')) || 0,
-                createdAt: getFieldSafe(rec, 'createdAt', 'CreatedAt') || new Date().toISOString()
+                email: getFieldSafe(rec, 'email', 'Email', 'EMAIL'),
+                username: getFieldSafe(rec, 'username', 'Username', 'USERNAME') || email.split('@')[0],
+                role: getFieldSafe(rec, 'role', 'Role', 'ROLE') || 'user',
+                inviteCode: getFieldSafe(rec, 'invitecode', 'InviteCode', 'INVITECODE') || '',
+                points: Number(getFieldSafe(rec, 'points', 'Points', 'POINTS')) || 0,
+                downloads: Number(getFieldSafe(rec, 'downloads', 'Downloads', 'DOWNLOADS')) || 0,
+                extraQuota: Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota', 'EXTRAQUOTA')) || 0,
+                createdAt: getFieldSafe(rec, 'createdAt', 'CreatedAt', 'CREATEDAT') || new Date().toISOString()
             };
         }
 
@@ -594,7 +612,7 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) throw new Error('用户不存在');
-            await baserowReq('PATCH', CONFIG.TABLES.users, { password: CryptoJS.SHA256(newPass).toString() }, rec.id);
+            await baserowReq('PATCH', CONFIG.TABLES.users, { PASSWORD: CryptoJS.SHA256(newPass).toString() }, rec.id);
         }
 
         async function updateUserRole(userId, newRole) {
@@ -605,7 +623,7 @@
                 localStorage.setItem('lezhe_users', JSON.stringify(users));
                 return;
             }
-            await baserowReq('PATCH', CONFIG.TABLES.users, { role: newRole }, userId);
+            await baserowReq('PATCH', CONFIG.TABLES.users, { ROLE: newRole }, userId);
         }
 
         async function updateUsername(email, newUsername) {
@@ -619,7 +637,7 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) throw new Error('用户不存在');
-            await baserowReq('PATCH', CONFIG.TABLES.users, { username: newUsername }, rec.id);
+            await baserowReq('PATCH', CONFIG.TABLES.users, { USERNAME: newUsername }, rec.id);
             if (currentUser && currentUser.email === email) currentUser.username = newUsername;
         }
 
@@ -637,9 +655,9 @@
             }
             var rec = await findUserByEmail(email);
             if (!rec) return;
-            var currentPoints = Number(getFieldSafe(rec, 'points', 'Points')) || 0;
+            var currentPoints = Number(getFieldSafe(rec, 'points', 'Points', 'POINTS')) || 0;
             var newPoints = currentPoints + points;
-            await baserowReq('PATCH', CONFIG.TABLES.users, { points: newPoints }, rec.id);
+            await baserowReq('PATCH', CONFIG.TABLES.users, { POINTS: newPoints }, rec.id);
             if (currentUser && currentUser.email === email) {
                 currentUser.points = newPoints;
                 localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
@@ -651,9 +669,9 @@
             bonus = Math.floor(bonus);
             var rec = await findUserByEmail(email);
             if (!rec) return;
-            var currentExtra = Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota')) || 0;
+            var currentExtra = Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota', 'EXTRAQUOTA')) || 0;
             var newExtra = currentExtra + bonus;
-            await baserowReq('PATCH', CONFIG.TABLES.users, { extraquota: newExtra }, rec.id);
+            await baserowReq('PATCH', CONFIG.TABLES.users, { EXTRAQUOTA: newExtra }, rec.id);
         }
 
         // ========================  签到  ========================
@@ -666,14 +684,14 @@
                 await addPoints(currentUser.email, 2);
                 await addDownloadBonus(currentUser.email, 1);
                 await baserowReq('POST', CONFIG.TABLES.signRecords, {
-                    email: currentUser.email,
-                    sign_date: today
+                    EMAIL: currentUser.email,
+                    SIGN_DATE: today
                 });
                 localStorage.setItem(signKey, 'true');
                 var updated = await findUserByEmail(currentUser.email);
                 if (updated) {
-                    currentUser.points = Number(getFieldSafe(updated, 'points', 'Points')) || 0;
-                    currentUser.extraQuota = Number(getFieldSafe(updated, 'extraquota', 'ExtraQuota')) || 0;
+                    currentUser.points = Number(getFieldSafe(updated, 'points', 'Points', 'POINTS')) || 0;
+                    currentUser.extraQuota = Number(getFieldSafe(updated, 'extraquota', 'ExtraQuota', 'EXTRAQUOTA')) || 0;
                     localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
                 }
                 updateUserUI();
@@ -759,7 +777,7 @@
             saveUserDownloadData(user.email, used, data.extra);
             if (!isLocalFile && user.id) {
                 try {
-                    await baserowReq('PATCH', CONFIG.TABLES.users, { downloads: used }, user.id);
+                    await baserowReq('PATCH', CONFIG.TABLES.users, { DOWNLOADS: used }, user.id);
                 } catch (e) {
                     console.warn('更新服务器下载次数失败:', e);
                 }
@@ -1154,21 +1172,13 @@
             var container = document.getElementById('userCheckboxList');
             if (!container) return;
             try {
-                var users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]') : await (function() {
-                    return baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=1000').then(function(data) {
-                        return data.results.map(function(r) {
-                            return {
-                                id: r.id,
-                                email: getFieldSafe(r, 'email', 'Email'),
-                                username: getFieldSafe(r, 'username', 'Username') || (getFieldSafe(r, 'email', 'Email') || '').split('@')[0],
-                                role: getFieldSafe(r, 'role', 'Role') || 'user'
-                            };
-                        });
-                    });
-                })();
+                var users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]') : await getAllUsers();
                 allUsersList = users;
                 container.innerHTML = users.map(function(u) {
-                    return '<div class="user-checkbox-item"><input type="checkbox" value="' + esc(u.email) + '" id="user_' + u.id + '"><label for="user_' + u.id + '">' + esc(u.email) + ' (' + (u.role || '普通') + ')</label></div>';
+                    var email = getFieldSafe(u, 'email', 'Email', 'EMAIL');
+                    var username = getFieldSafe(u, 'username', 'Username', 'USERNAME') || (email || '').split('@')[0];
+                    var role = getFieldSafe(u, 'role', 'Role', 'ROLE') || 'user';
+                    return '<div class="user-checkbox-item"><input type="checkbox" value="' + esc(email) + '" id="user_' + u.id + '"><label for="user_' + u.id + '">' + esc(email) + ' (' + (role === 'admin' ? '管理员' : (role === 'vip' ? 'VIP' : '普通')) + ')</label></div>';
                 }).join('');
             } catch (e) {
                 container.innerHTML = '<div style="padding:20px;text-align:center;">加载用户列表失败</div>';
@@ -1183,9 +1193,9 @@
             try {
                 var rec = await findUserByEmail(currentUser.email);
                 if (rec) {
-                    currentUser.downloads = Number(getFieldSafe(rec, 'downloads', 'Downloads')) || 0;
-                    currentUser.extraQuota = Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota')) || 0;
-                    currentUser.points = Number(getFieldSafe(rec, 'points', 'Points')) || 0;
+                    currentUser.downloads = Number(getFieldSafe(rec, 'downloads', 'Downloads', 'DOWNLOADS')) || 0;
+                    currentUser.extraQuota = Number(getFieldSafe(rec, 'extraquota', 'ExtraQuota', 'EXTRAQUOTA')) || 0;
+                    currentUser.points = Number(getFieldSafe(rec, 'points', 'Points', 'POINTS')) || 0;
                     localStorage.setItem('lezhe_user', JSON.stringify(currentUser));
                     updateUserUI();
                     showToast('已同步：剩余 ' + getRemainingCount(currentUser) + ' 次', 'success');
@@ -1253,32 +1263,31 @@
             try {
                 var users = isLocalFile ? JSON.parse(localStorage.getItem('lezhe_users') || '[]').map(function(u) {
                     return { id: u.email, fields: u, createdTime: u.createdAt };
-                }) : await (function() {
-                    return baserowReq('GET', CONFIG.TABLES.users, null, null, 'max_limit=1000').then(function(data) {
-                        return data.results.map(function(r) {
-                            return { id: r.id, fields: r, createdTime: getFieldSafe(r, 'createdAt', 'CreatedAt') || new Date().toISOString() };
-                        });
+                }) : await (async function() {
+                    const all = await getAllUsers();
+                    return all.map(function(r) {
+                        return { id: r.id, fields: r, createdTime: getFieldSafe(r, 'createdAt', 'CreatedAt', 'CREATEDAT') || new Date().toISOString() };
                     });
                 })();
                 var term = (document.getElementById('adminSearchInput') ? document.getElementById('adminSearchInput').value : '').toLowerCase();
                 var dateFilter = document.getElementById('adminDateFilter') ? document.getElementById('adminDateFilter').value : '';
                 var filtered = users.filter(function(u) {
-                    var email = getFieldSafe(u.fields, 'email', 'Email') || '';
-                    var username = getFieldSafe(u.fields, 'username', 'Username') || '';
+                    var email = getFieldSafe(u.fields, 'email', 'Email', 'EMAIL') || '';
+                    var username = getFieldSafe(u.fields, 'username', 'Username', 'USERNAME') || '';
                     return !term || email.toLowerCase().includes(term) || username.toLowerCase().includes(term);
                 });
                 if (dateFilter) {
                     filtered = filtered.filter(function(u) {
-                        var regDate = u.createdTime || getFieldSafe(u.fields, 'createdAt', 'CreatedAt');
+                        var regDate = u.createdTime || getFieldSafe(u.fields, 'createdAt', 'CreatedAt', 'CREATEDAT');
                         return regDate ? new Date(regDate).toISOString().split('T')[0] === dateFilter : false;
                     });
                 }
                 container.innerHTML = filtered.map(function(u) {
-                    var role = getFieldSafe(u.fields, 'role', 'Role') || 'user';
+                    var role = getFieldSafe(u.fields, 'role', 'Role', 'ROLE') || 'user';
                     var isVip = role === 'vip' || role === 'admin';
                     var avatarIcon = role === 'admin' ? '<i class="fas fa-crown"></i>' : (isVip ? '<i class="fas fa-gem"></i>' : '<i class="fas fa-user"></i>');
-                    var email = getFieldSafe(u.fields, 'email', 'Email') || '';
-                    var username = getFieldSafe(u.fields, 'username', 'Username') || '';
+                    var email = getFieldSafe(u.fields, 'email', 'Email', 'EMAIL') || '';
+                    var username = getFieldSafe(u.fields, 'username', 'Username', 'USERNAME') || '';
                     return '<div class="admin-user-card"><div class="admin-user-info"><div class="admin-user-avatar">' + avatarIcon + '</div><div><div class="admin-user-email">' + esc(email) + '</div><div class="admin-user-name">' + esc(username) + '</div></div><div class="admin-user-role ' + (isVip ? 'vip' : '') + '">' + (isVip ? (role === 'admin' ? '管理员' : 'VIP') : '普通') + '</div></div><div><button class="admin-action-btn upgrade-vip" data-id="' + u.id + '" data-role="' + role + '">' + (isVip && role !== 'admin' ? '降级' : '升级VIP') + '</button><button class="admin-action-btn add-points" data-email="' + esc(email) + '" style="background:var(--success);">增加积分</button><button class="admin-action-btn reset-download" data-email="' + esc(email) + '" style="background:var(--warning);">重置次数</button></div></div>';
                 }).join('');
                 container.querySelectorAll('.upgrade-vip').forEach(function(btn) {
