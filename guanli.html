@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro · 账户管理系统</title>
-    <!-- Font Awesome 6 (免费图标库) -->
+    <title>Pro Max · 账户管理系统</title>
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -16,7 +16,7 @@
 
         body {
             background: #f0f3f8;
-            padding: 24px;
+            padding: 20px;
             min-height: 100vh;
             display: flex;
             align-items: flex-start;
@@ -24,18 +24,107 @@
         }
 
         .app-container {
-            max-width: 1440px;
+            max-width: 1500px;
             width: 100%;
             background: #ffffff;
             border-radius: 32px;
             box-shadow: 0 30px 60px -20px rgba(0, 20, 40, 0.25), 0 8px 20px rgba(0,0,0,0.04);
             overflow: hidden;
-            transition: all 0.2s;
         }
+
+        /* 登录页面样式 */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0b1a33 0%, #1a3a6b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        .login-box {
+            background: white;
+            max-width: 420px;
+            width: 100%;
+            border-radius: 32px;
+            padding: 40px 36px 36px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        .login-box .logo {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .login-box .logo i {
+            font-size: 48px;
+            color: #2a6df4;
+            background: #eef4ff;
+            padding: 16px;
+            border-radius: 20px;
+        }
+        .login-box .logo h2 {
+            margin-top: 12px;
+            font-size: 22px;
+            font-weight: 650;
+            color: #0b1a33;
+        }
+        .login-box .logo p {
+            color: #5b6e8e;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .login-box .form-group {
+            margin-bottom: 18px;
+        }
+        .login-box .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 13px;
+            color: #1f3a6b;
+            margin-bottom: 5px;
+        }
+        .login-box .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #dce5f0;
+            border-radius: 40px;
+            font-size: 14px;
+            background: #f9fcff;
+            outline: none;
+            transition: 0.15s;
+        }
+        .login-box .form-group input:focus {
+            border-color: #2a6df4;
+            box-shadow: 0 0 0 3px rgba(42,109,244,0.1);
+            background: white;
+        }
+        .login-box .login-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            background: #1a3a6b;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .login-box .login-btn:hover { background: #0e2a50; transform: scale(1.01); }
+        .login-box .error-msg {
+            color: #b22234;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+        .login-box .error-msg.show { display: block; }
 
         /* 头部 */
         .app-header {
-            padding: 28px 32px 20px 32px;
+            padding: 24px 32px 18px 32px;
             border-bottom: 1px solid #eef2f6;
             display: flex;
             flex-wrap: wrap;
@@ -53,45 +142,40 @@
             align-items: center;
             gap: 12px;
         }
-
-        .header-left h1 i {
-            color: #2a6df4;
-            font-size: 28px;
-        }
-
+        .header-left h1 i { color: #2a6df4; font-size: 28px; }
         .header-left .sub {
-            font-size: 14px;
+            font-size: 13px;
             color: #5b6e8e;
             margin-top: 6px;
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 16px;
             flex-wrap: wrap;
         }
-
         .header-left .sub .badge-stat {
             background: #eef3fc;
-            padding: 4px 14px;
+            padding: 3px 14px;
             border-radius: 40px;
             font-weight: 500;
-            font-size: 13px;
+            font-size: 12px;
             color: #1f3a6b;
         }
 
         .header-right {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 9px 20px;
             border-radius: 40px;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
             border: none;
             background: transparent;
             color: #1e2f4a;
@@ -100,231 +184,237 @@
             background: #f0f4fe;
             border: 1px solid #dce5f0;
         }
-
-        .btn i { font-size: 15px; }
-
+        .btn i { font-size: 14px; }
         .btn-primary {
             background: #1a3a6b;
             color: white;
             border: 1px solid #1a3a6b;
             box-shadow: 0 4px 8px -2px rgba(26,58,107,0.15);
         }
-        .btn-primary:hover { background: #0e2a50; border-color: #0e2a50; transform: scale(1.01); }
-
+        .btn-primary:hover { background: #0e2a50; border-color: #0e2a50; }
         .btn-success {
             background: #0f7b4a;
             color: white;
             border: 1px solid #0f7b4a;
         }
         .btn-success:hover { background: #0b653b; }
-
         .btn-danger {
             background: #b22234;
             color: white;
             border: 1px solid #b22234;
         }
         .btn-danger:hover { background: #941b1d; }
-
+        .btn-warning {
+            background: #d48c2c;
+            color: white;
+            border: 1px solid #d48c2c;
+        }
+        .btn-warning:hover { background: #b87822; }
         .btn-outline {
             background: transparent;
             border: 1px solid #d0daea;
             color: #2c3f60;
         }
         .btn-outline:hover { background: #eaf0f8; }
-
-        .btn-sm { padding: 6px 14px; font-size: 13px; gap: 6px; }
+        .btn-sm { padding: 5px 14px; font-size: 12px; gap: 5px; }
+        .btn-xs { padding: 3px 10px; font-size: 11px; gap: 4px; border-radius: 30px; }
 
         /* 统计卡片 */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-            padding: 20px 32px 10px 32px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            padding: 16px 32px 12px 32px;
             background: #fafcff;
             border-bottom: 1px solid #eef2f6;
         }
-
         .stat-card {
             background: white;
-            border-radius: 20px;
-            padding: 14px 18px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            border-radius: 18px;
+            padding: 12px 16px;
             border: 1px solid #eaf0f6;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
-
         .stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 14px;
             background: #eef4ff;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #1a3a6b;
-            font-size: 20px;
+            font-size: 18px;
         }
-
-        .stat-info h4 { font-size: 13px; font-weight: 500; color: #546a85; }
-        .stat-info .number { font-size: 24px; font-weight: 650; color: #0b1a33; letter-spacing: -0.3px; }
+        .stat-info h4 { font-size: 12px; font-weight: 500; color: #546a85; }
+        .stat-info .number { font-size: 22px; font-weight: 650; color: #0b1a33; letter-spacing: -0.2px; }
 
         /* 工具栏 */
         .toolbar {
-            padding: 18px 32px 10px 32px;
+            padding: 14px 32px 10px 32px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 16px 24px;
+            gap: 12px 20px;
             background: white;
             border-bottom: 1px solid #eef2f6;
         }
-
         .toolbar .search-box {
-            flex: 1 1 260px;
+            flex: 1 1 220px;
             position: relative;
         }
         .toolbar .search-box i {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: #7f91ae;
+            font-size: 13px;
         }
         .toolbar .search-box input {
             width: 100%;
-            padding: 10px 18px 10px 44px;
+            padding: 8px 14px 8px 38px;
             border: 1px solid #dce5f0;
             border-radius: 40px;
-            font-size: 14px;
+            font-size: 13px;
             background: #f8faff;
             outline: none;
             transition: 0.2s;
         }
         .toolbar .search-box input:focus {
             border-color: #2a6df4;
-            box-shadow: 0 0 0 3px rgba(42,109,244,0.12);
+            box-shadow: 0 0 0 3px rgba(42,109,244,0.1);
             background: white;
         }
-
         .filter-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             align-items: center;
         }
         .filter-group select {
-            padding: 9px 18px 9px 18px;
+            padding: 8px 16px;
             border-radius: 40px;
             border: 1px solid #dce5f0;
             background: #f8faff;
-            font-size: 14px;
+            font-size: 13px;
             color: #1e2f4a;
             outline: none;
             cursor: pointer;
         }
         .filter-group select:focus { border-color: #2a6df4; }
-
         .bulk-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
+            flex-wrap: wrap;
             margin-left: auto;
         }
 
         /* 表格 */
         .table-wrapper {
-            padding: 12px 20px 20px 20px;
+            padding: 10px 20px 20px 20px;
             overflow-x: auto;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
-            min-width: 820px;
+            font-size: 13px;
+            min-width: 1000px;
         }
-
         th {
             text-align: left;
-            padding: 16px 12px;
+            padding: 14px 10px;
             background: #f5f9ff;
             color: #1f3a6b;
             font-weight: 600;
             border-bottom: 1px solid #e0e9f2;
             white-space: nowrap;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-
         td {
-            padding: 14px 12px;
+            padding: 12px 10px;
             border-bottom: 1px solid #edf2f8;
             vertical-align: middle;
             background: white;
         }
-
         tr:hover td { background: #fafdff; }
 
         .email-cell {
             font-weight: 500;
             color: #0b1f3b;
             font-family: 'SF Mono', 'Menlo', monospace;
-            font-size: 13px;
+            font-size: 12px;
         }
-
         .password-badge {
             background: #eef3fa;
-            padding: 4px 12px;
+            padding: 3px 12px;
             border-radius: 30px;
             font-family: 'SF Mono', monospace;
             font-size: 12px;
             color: #1f3a6b;
             display: inline-block;
+            cursor: pointer;
+            transition: 0.15s;
         }
+        .password-badge:hover { background: #dce5f0; }
 
         .status-chip {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 14px 4px 12px;
+            gap: 5px;
+            padding: 3px 12px 3px 10px;
             border-radius: 40px;
             font-weight: 500;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.2px;
             background: #eaf1fa;
             color: #1f3a6b;
         }
-
-        .status-chip.in {
-            background: #dcf3e4;
-            color: #0c5e36;
-        }
+        .status-chip.in { background: #dcf3e4; color: #0c5e36; }
         .status-chip.in i { color: #0f7b4a; }
-
-        .status-chip.out {
-            background: #fde8e8;
-            color: #a01e2a;
-        }
+        .status-chip.out { background: #fde8e8; color: #a01e2a; }
         .status-chip.out i { color: #b22234; }
 
         .remark-text {
             color: #546a85;
             font-size: 12px;
-            max-width: 160px;
+            max-width: 180px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             display: inline-block;
+            cursor: default;
         }
+        .remark-edit {
+            background: transparent;
+            border: 1px dashed #d0daea;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 12px;
+            color: #1e2f4a;
+            outline: none;
+            width: 140px;
+            transition: 0.15s;
+        }
+        .remark-edit:focus {
+            border-color: #2a6df4;
+            border-style: solid;
+            background: white;
+        }
+        .remark-edit::placeholder { color: #b0c2d8; }
 
         .action-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 4px;
         }
-
         .action-group .btn-icon {
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 40px;
             border: 1px solid #dce5f0;
             background: transparent;
@@ -334,23 +424,21 @@
             color: #3c5780;
             transition: 0.12s;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
         }
-        .action-group .btn-icon:hover {
-            background: #eaf0f8;
-            border-color: #b6c8e0;
-        }
+        .action-group .btn-icon:hover { background: #eaf0f8; border-color: #b6c8e0; }
         .action-group .btn-icon.danger:hover { background: #fde8e8; color: #b22234; border-color: #f5c2c2; }
         .action-group .btn-icon.success:hover { background: #dcf3e4; color: #0f7b4a; border-color: #a8d5b9; }
+        .action-group .btn-icon.warning:hover { background: #fdf0db; color: #b87822; border-color: #f0d5a0; }
 
         .empty-state {
             text-align: center;
-            padding: 48px 20px;
+            padding: 40px 20px;
             color: #7f91ae;
         }
-        .empty-state i { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+        .empty-state i { font-size: 36px; margin-bottom: 10px; opacity: 0.4; }
 
-        /* 模态框 - 高级 */
+        /* 模态框 */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -363,223 +451,351 @@
             padding: 20px;
             animation: fadeIn 0.15s ease;
         }
-
         .modal-box {
             background: white;
-            max-width: 520px;
+            max-width: 540px;
             width: 100%;
             border-radius: 32px;
-            padding: 32px 32px 28px;
+            padding: 30px 32px 26px;
             box-shadow: 0 40px 80px -20px rgba(0,0,0,0.4);
             animation: slideUp 0.2s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
-
         .modal-box h2 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 650;
             color: #0b1a33;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
-
         .modal-box .modal-desc {
             color: #5b6e8e;
-            font-size: 14px;
-            margin-bottom: 24px;
+            font-size: 13px;
+            margin-bottom: 20px;
             border-bottom: 1px solid #eef2f6;
-            padding-bottom: 16px;
+            padding-bottom: 14px;
         }
-
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
         .form-group label {
             display: block;
             font-weight: 500;
             font-size: 13px;
             color: #1f3a6b;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
-        .form-group input, .form-group select {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 11px 16px;
+            padding: 10px 16px;
             border: 1px solid #dce5f0;
             border-radius: 40px;
-            font-size: 14px;
+            font-size: 13px;
             background: #f9fcff;
             outline: none;
             transition: 0.15s;
         }
-        .form-group input:focus, .form-group select:focus {
+        .form-group textarea {
+            border-radius: 16px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             border-color: #2a6df4;
             box-shadow: 0 0 0 3px rgba(42,109,244,0.1);
             background: white;
         }
-
         .modal-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: flex-end;
-            margin-top: 26px;
+            margin-top: 22px;
         }
+
+        /* 批量改密码专用模态 */
+        .bulk-password-modal .modal-box { max-width: 480px; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 响应式 */
+        /* Toast 通知 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a3a6b;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 40px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            animation: slideUp 0.25s ease;
+            max-width: 400px;
+        }
+        .toast.success { background: #0f7b4a; }
+        .toast.error { background: #b22234; }
+        .toast i { font-size: 18px; }
+
+        /* 用户信息 */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1f3a6b;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .user-info .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #eef4ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2a6df4;
+        }
+
         @media (max-width: 700px) {
-            .app-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .app-header { flex-direction: column; align-items: flex-start; gap: 12px; }
             .header-right { width: 100%; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .toolbar { flex-direction: column; align-items: stretch; }
             .bulk-actions { margin-left: 0; }
+            .login-box { padding: 30px 24px; }
         }
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr; }
-            .modal-box { padding: 24px; }
+            .modal-box { padding: 20px; }
         }
     </style>
 </head>
 <body>
-<div id="app" class="app-container">
-
-    <!-- HEADER -->
-    <header class="app-header">
-        <div class="header-left">
-            <h1>
-                <i class="fas fa-cubes"></i> 账户管理 · Pro
-                <span style="font-size: 14px; font-weight: 400; color: #5b6e8e; margin-left: 6px;">| 出入库系统</span>
-            </h1>
-            <div class="sub">
-                <span><i class="far fa-clock" style="margin-right: 4px;"></i> 实时状态</span>
-                <span class="badge-stat"><i class="fas fa-database"></i> 总计 {{ accounts.length }}</span>
-                <span class="badge-stat" style="background: #dcf3e4; color: #0c5e36;"><i class="fas fa-warehouse"></i> 在库 {{ statusCounts.in }}</span>
-                <span class="badge-stat" style="background: #fde8e8; color: #a01e2a;"><i class="fas fa-truck"></i> 出库 {{ statusCounts.out }}</span>
+<div id="app">
+    <!-- 登录界面 -->
+    <div v-if="!isLoggedIn" class="login-overlay">
+        <div class="login-box">
+            <div class="logo">
+                <i class="fas fa-cubes"></i>
+                <h2>账户管理系统</h2>
+                <p>请输入登录密码以继续</p>
             </div>
-        </div>
-        <div class="header-right">
-            <button class="btn btn-primary" @click="openAddModal"><i class="fas fa-plus-circle"></i> 新增账户</button>
-            <button class="btn btn-outline" @click="resetAllData" style="border-color: #e0e5ed;"><i class="fas fa-undo-alt"></i> 重置</button>
-        </div>
-    </header>
-
-    <!-- STATS -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon"><i class="fas fa-envelope"></i></div>
-            <div class="stat-info"><h4>总账户</h4><div class="number">{{ accounts.length }}</div></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background: #dcf3e4; color: #0f7b4a;"><i class="fas fa-check-circle"></i></div>
-            <div class="stat-info"><h4>在库</h4><div class="number">{{ statusCounts.in }}</div></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background: #fde8e8; color: #b22234;"><i class="fas fa-external-link-alt"></i></div>
-            <div class="stat-info"><h4>出库</h4><div class="number">{{ statusCounts.out }}</div></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background: #eaf0f8; color: #2a6df4;"><i class="fas fa-tag"></i></div>
-            <div class="stat-info"><h4>带备注</h4><div class="number">{{ accounts.filter(a => a.remark && a.remark.length > 0).length }}</div></div>
+            <div class="form-group">
+                <label><i class="fas fa-lock" style="margin-right: 6px;"></i> 登录密码</label>
+                <input type="password" v-model="loginPassword" @keyup.enter="handleLogin" placeholder="请输入密码" autofocus>
+            </div>
+            <button class="login-btn" @click="handleLogin">
+                <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> 登录
+            </button>
+            <div class="error-msg" :class="{ show: loginError }">
+                <i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i> 密码错误，请重试
+            </div>
         </div>
     </div>
 
-    <!-- TOOLBAR -->
-    <div class="toolbar">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="搜索邮箱、备注..." v-model="searchQuery">
-        </div>
-        <div class="filter-group">
-            <select v-model="statusFilter">
-                <option value="all">全部状态</option>
-                <option value="in">在库</option>
-                <option value="out">出库</option>
-            </select>
-            <button class="btn btn-outline btn-sm" @click="resetFilters"><i class="fas fa-times"></i> 重置</button>
-        </div>
-        <div class="bulk-actions">
-            <button class="btn btn-outline btn-sm" @click="bulkCheckIn" :disabled="selectedIds.length === 0"><i class="fas fa-arrow-down"></i> 批量入库</button>
-            <button class="btn btn-outline btn-sm" @click="bulkCheckOut" :disabled="selectedIds.length === 0"><i class="fas fa-arrow-up"></i> 批量出库</button>
-        </div>
-    </div>
+    <!-- 主应用 -->
+    <div v-else class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1>
+                    <i class="fas fa-cubes"></i> 账户管理 · Pro Max
+                    <span style="font-size: 13px; font-weight: 400; color: #5b6e8e; margin-left: 6px;">| 出入库 + 批量操作</span>
+                </h1>
+                <div class="sub">
+                    <span><i class="far fa-clock" style="margin-right: 4px;"></i> 实时</span>
+                    <span class="badge-stat"><i class="fas fa-database"></i> 总计 {{ accounts.length }}</span>
+                    <span class="badge-stat" style="background: #dcf3e4; color: #0c5e36;"><i class="fas fa-warehouse"></i> 在库 {{ statusCounts.in }}</span>
+                    <span class="badge-stat" style="background: #fde8e8; color: #a01e2a;"><i class="fas fa-truck"></i> 出库 {{ statusCounts.out }}</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <span>管理员</span>
+                    <button class="btn btn-outline btn-sm" @click="logout" style="border-color: #e0e5ed;">
+                        <i class="fas fa-sign-out-alt"></i> 退出
+                    </button>
+                </div>
+                <button class="btn btn-primary" @click="openAddModal"><i class="fas fa-plus-circle"></i> 新增</button>
+                <button class="btn btn-warning" @click="openBulkPasswordModal" :disabled="selectedIds.length === 0"><i class="fas fa-key"></i> 批量改密</button>
+                <button class="btn btn-outline" @click="resetAllData"><i class="fas fa-undo-alt"></i> 重置</button>
+            </div>
+        </header>
 
-    <!-- TABLE -->
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 30px;"><input type="checkbox" @change="toggleAllSelect" :checked="allSelected"></th>
-                    <th>邮箱</th>
-                    <th style="min-width: 100px;">密码</th>
-                    <th style="min-width: 100px;">状态</th>
-                    <th>备注</th>
-                    <th style="min-width: 160px;">操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-if="filteredAccounts.length === 0">
-                    <td colspan="6" class="empty-state">
-                        <i class="fas fa-inbox"></i>
-                        <div>没有匹配的账户</div>
-                    </td>
-                </tr>
-                <tr v-for="acc in filteredAccounts" :key="acc.id">
-                    <td><input type="checkbox" v-model="selectedIds" :value="acc.id"></td>
-                    <td class="email-cell"><i class="far fa-envelope" style="margin-right: 8px; color: #5b6e8e;"></i>{{ acc.email }}</td>
-                    <td><span class="password-badge"><i class="fas fa-key" style="margin-right: 5px; opacity: 0.6;"></i>{{ acc.password || '未设置' }}</span></td>
-                    <td>
-                        <span class="status-chip" :class="acc.status">
-                            <i :class="acc.status === 'in' ? 'fas fa-circle' : 'fas fa-circle'"></i>
-                            {{ acc.status === 'in' ? '在库' : '出库' }}
-                        </span>
-                    </td>
-                    <td><span class="remark-text" :title="acc.remark">{{ acc.remark || '—' }}</span></td>
-                    <td>
-                        <div class="action-group">
-                            <button class="btn-icon success" v-if="acc.status === 'out'" @click="checkIn(acc.id)" title="入库"><i class="fas fa-arrow-down"></i></button>
-                            <button class="btn-icon" v-if="acc.status === 'in'" @click="checkOut(acc.id)" title="出库"><i class="fas fa-arrow-up"></i></button>
-                            <button class="btn-icon" @click="editAccount(acc.id)" title="编辑"><i class="fas fa-pen"></i></button>
-                            <button class="btn-icon danger" @click="deleteAccount(acc.id)" title="删除"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                <div class="stat-info"><h4>总账户</h4><div class="number">{{ accounts.length }}</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #dcf3e4; color: #0f7b4a;"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info"><h4>在库</h4><div class="number">{{ statusCounts.in }}</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fde8e8; color: #b22234;"><i class="fas fa-external-link-alt"></i></div>
+                <div class="stat-info"><h4>出库</h4><div class="number">{{ statusCounts.out }}</div></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fdf0db; color: #b87822;"><i class="fas fa-sticky-note"></i></div>
+                <div class="stat-info"><h4>有备注</h4><div class="number">{{ accounts.filter(a => a.remark && a.remark.trim().length > 0).length }}</div></div>
+            </div>
+        </div>
 
-    <!-- MODAL -->
-    <div v-if="modalVisible" class="modal-overlay" @click.self="closeModal">
-        <div class="modal-box">
-            <h2>
-                <i :class="modalMode === 'add' ? 'fas fa-plus-circle' : 'fas fa-edit'" style="color: #2a6df4;"></i>
-                {{ modalMode === 'add' ? '新增账户' : '编辑账户' }}
-            </h2>
-            <div class="modal-desc">{{ modalMode === 'add' ? '添加一个新的临时账户，默认密码 Ps123456' : '修改账户信息或状态' }}</div>
-            <div class="form-group">
-                <label><i class="far fa-envelope" style="margin-right: 6px;"></i> 邮箱 *</label>
-                <input v-model="modalForm.email" placeholder="user@adbacc.com" type="email">
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索邮箱、备注..." v-model="searchQuery">
             </div>
-            <div class="form-group">
-                <label><i class="fas fa-key" style="margin-right: 6px;"></i> 密码</label>
-                <input v-model="modalForm.password" placeholder="留空则使用 Ps123456">
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-sticky-note" style="margin-right: 6px;"></i> 备注 / 验证码地址</label>
-                <input v-model="modalForm.remark" placeholder="例如: https://cha.adbacc.com/">
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-flag" style="margin-right: 6px;"></i> 状态</label>
-                <select v-model="modalForm.status">
+            <div class="filter-group">
+                <select v-model="statusFilter">
+                    <option value="all">全部状态</option>
                     <option value="in">在库</option>
                     <option value="out">出库</option>
                 </select>
+                <button class="btn btn-outline btn-sm" @click="resetFilters"><i class="fas fa-times"></i> 重置</button>
             </div>
-            <div class="modal-actions">
-                <button class="btn btn-outline" @click="closeModal"><i class="fas fa-times"></i> 取消</button>
-                <button class="btn btn-primary" @click="saveAccount"><i class="fas fa-save"></i> 保存</button>
+            <div class="bulk-actions">
+                <button class="btn btn-success btn-sm" @click="bulkCheckIn" :disabled="selectedIds.length === 0"><i class="fas fa-arrow-down"></i> 入库</button>
+                <button class="btn btn-danger btn-sm" @click="bulkCheckOut" :disabled="selectedIds.length === 0"><i class="fas fa-arrow-up"></i> 出库</button>
+                <span style="font-size:12px; color:#7f91ae; margin-left:4px;" v-if="selectedIds.length > 0">已选 {{ selectedIds.length }}</span>
             </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 28px;"><input type="checkbox" @change="toggleAllSelect" :checked="allSelected"></th>
+                        <th style="min-width: 160px;">邮箱</th>
+                        <th style="min-width: 100px;">密码</th>
+                        <th style="min-width: 80px;">状态</th>
+                        <th style="min-width: 180px;">备注 <span style="font-weight:400; color:#7f91ae; font-size:10px;">(单击编辑)</span></th>
+                        <th style="min-width: 170px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="filteredAccounts.length === 0">
+                        <td colspan="6" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <div>没有匹配的账户</div>
+                        </td>
+                    </tr>
+                    <tr v-for="acc in filteredAccounts" :key="acc.id">
+                        <td><input type="checkbox" v-model="selectedIds" :value="acc.id"></td>
+                        <td class="email-cell"><i class="far fa-envelope" style="margin-right: 6px; color: #5b6e8e;"></i>{{ acc.email }}</td>
+                        <td>
+                            <span class="password-badge" @click="copyPassword(acc)" :title="'点击复制: ' + (acc.password || '未设置')">
+                                <i class="fas fa-key" style="margin-right: 4px; opacity: 0.5;"></i>{{ acc.password || '未设置' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-chip" :class="acc.status">
+                                <i :class="acc.status === 'in' ? 'fas fa-circle' : 'fas fa-circle'"></i>
+                                {{ acc.status === 'in' ? '在库' : '出库' }}
+                            </span>
+                        </td>
+                        <td>
+                            <input class="remark-edit" type="text" :value="acc.remark" 
+                                   @change="updateRemark(acc, $event.target.value)"
+                                   @focus="$event.target.select()"
+                                   placeholder="点击添加备注...">
+                        </td>
+                        <td>
+                            <div class="action-group">
+                                <button class="btn-icon success" v-if="acc.status === 'out'" @click="checkIn(acc.id)" title="入库"><i class="fas fa-arrow-down"></i></button>
+                                <button class="btn-icon" v-if="acc.status === 'in'" @click="checkOut(acc.id)" title="出库"><i class="fas fa-arrow-up"></i></button>
+                                <button class="btn-icon warning" @click="openSinglePasswordModal(acc)" title="改密码"><i class="fas fa-key"></i></button>
+                                <button class="btn-icon" @click="editAccount(acc.id)" title="编辑"><i class="fas fa-pen"></i></button>
+                                <button class="btn-icon danger" @click="deleteAccount(acc.id)" title="删除"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 新增/编辑 模态 -->
+        <div v-if="modalVisible" class="modal-overlay" @click.self="closeModal">
+            <div class="modal-box">
+                <h2><i :class="modalMode === 'add' ? 'fas fa-plus-circle' : 'fas fa-edit'" style="color: #2a6df4;"></i> {{ modalMode === 'add' ? '新增账户' : '编辑账户' }}</h2>
+                <div class="modal-desc">{{ modalMode === 'add' ? '添加新的临时账户，默认密码 Ps123456' : '修改账户信息' }}</div>
+                <div class="form-group">
+                    <label><i class="far fa-envelope" style="margin-right: 6px;"></i> 邮箱 *</label>
+                    <input v-model="modalForm.email" placeholder="user@adbacc.com" type="email">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-key" style="margin-right: 6px;"></i> 密码</label>
+                    <input v-model="modalForm.password" placeholder="留空则使用 Ps123456">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-sticky-note" style="margin-right: 6px;"></i> 备注</label>
+                    <textarea v-model="modalForm.remark" placeholder="验证码地址、备注信息..." rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-flag" style="margin-right: 6px;"></i> 状态</label>
+                    <select v-model="modalForm.status">
+                        <option value="in">在库</option>
+                        <option value="out">出库</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" @click="closeModal"><i class="fas fa-times"></i> 取消</button>
+                    <button class="btn btn-primary" @click="saveAccount"><i class="fas fa-save"></i> 保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量改密码 模态 -->
+        <div v-if="bulkPasswordModalVisible" class="modal-overlay" @click.self="closeBulkPasswordModal">
+            <div class="modal-box bulk-password-modal">
+                <h2><i class="fas fa-key" style="color: #d48c2c;"></i> 批量修改密码</h2>
+                <div class="modal-desc">将为选中的 <strong>{{ selectedIds.length }}</strong> 个账户统一修改密码</div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock" style="margin-right: 6px;"></i> 新密码</label>
+                    <input v-model="bulkPassword" placeholder="输入新密码" type="text">
+                </div>
+                <div style="font-size:12px; color:#7f91ae; margin-bottom:12px;">
+                    <i class="fas fa-info-circle"></i> 留空则使用默认密码 <strong>Ps123456</strong>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" @click="closeBulkPasswordModal"><i class="fas fa-times"></i> 取消</button>
+                    <button class="btn btn-warning" @click="applyBulkPassword"><i class="fas fa-save"></i> 确认修改</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 单账户改密码 模态 -->
+        <div v-if="singlePasswordModalVisible" class="modal-overlay" @click.self="closeSinglePasswordModal">
+            <div class="modal-box" style="max-width: 420px;">
+                <h2><i class="fas fa-key" style="color: #d48c2c;"></i> 修改密码</h2>
+                <div class="modal-desc">为 <strong>{{ singlePasswordTarget ? singlePasswordTarget.email : '' }}</strong> 设置新密码</div>
+                <div class="form-group">
+                    <label>新密码</label>
+                    <input v-model="singlePassword" placeholder="输入新密码" type="text" @keyup.enter="applySinglePassword">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" @click="closeSinglePasswordModal"><i class="fas fa-times"></i> 取消</button>
+                    <button class="btn btn-warning" @click="applySinglePassword"><i class="fas fa-save"></i> 修改</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast 通知 -->
+        <div v-if="toastVisible" class="toast" :class="toastType">
+            <i :class="toastIcon"></i>
+            <span>{{ toastMessage }}</span>
         </div>
     </div>
 </div>
@@ -587,6 +803,8 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 <script>
     (function() {
+        const PASSWORD_HASH = btoa('qbx12164811..'); 
+
         // ----- 初始数据 -----
         const INIT_ACCOUNTS = [
             { id: 1, email: 'alt5j@adbacc.com', password: 'Ps123456', status: 'in', remark: '验证码: https://cha.adbacc.com/' },
@@ -608,27 +826,47 @@
             { id: 17, email: 'fjx1o@adbacc.com', password: 'Ps123456', status: 'in', remark: '' }
         ];
 
-        // 给部分账户设置出库示例
+        // 部分出库示例
         const SAMPLE_OUT = [2, 5, 9, 14];
         SAMPLE_OUT.forEach(id => {
             const item = INIT_ACCOUNTS.find(a => a.id === id);
-            if (item) {
-                item.status = 'out';
-                item.remark = (item.remark ? item.remark + ' · ' : '') + '已出库';
-            }
+            if (item) { item.status = 'out'; item.remark = (item.remark ? item.remark + ' · ' : '') + '已出库'; }
         });
 
         new Vue({
             el: '#app',
             data: {
+                // 登录状态
+                isLoggedIn: false,
+                loginPassword: '',
+                loginError: false,
+
+                // 账户数据
                 accounts: [],
                 searchQuery: '',
                 statusFilter: 'all',
                 selectedIds: [],
+                nextId: 100,
+
+                // 新增/编辑
                 modalVisible: false,
                 modalMode: 'add',
                 modalForm: { id: null, email: '', password: '', remark: '', status: 'in' },
-                nextId: 100,
+
+                // 批量改密码
+                bulkPasswordModalVisible: false,
+                bulkPassword: '',
+
+                // 单账户改密码
+                singlePasswordModalVisible: false,
+                singlePasswordTarget: null,
+                singlePassword: '',
+
+                // Toast
+                toastVisible: false,
+                toastMessage: '',
+                toastType: 'success',
+                toastTimer: null,
             },
             computed: {
                 filteredAccounts() {
@@ -655,19 +893,49 @@
                         const filtered = this.filteredAccounts;
                         return filtered.length > 0 && filtered.every(a => this.selectedIds.includes(a.id));
                     },
-                    set(val) {
-                        // handled by toggleAllSelect
-                    }
+                    set() {}
                 }
             },
             methods: {
-                // 重置
+                // ----- 登录相关 -----
+                handleLogin() {
+                    // 验证密码：将输入的密码进行Base64编码后对比
+                    const inputHash = btoa(this.loginPassword);
+                    if (inputHash === PASSWORD_HASH) {
+                        this.isLoggedIn = true;
+                        this.loginError = false;
+                        this.loginPassword = '';
+                        // 登录后初始化数据
+                        this.initializeData();
+                    } else {
+                        this.loginError = true;
+                        this.loginPassword = '';
+                        setTimeout(() => { this.loginError = false; }, 2000);
+                    }
+                },
+                logout() {
+                    this.isLoggedIn = false;
+                    this.loginPassword = '';
+                    this.loginError = false;
+                    // 清空数据
+                    this.accounts = [];
+                    this.selectedIds = [];
+                },
+                initializeData() {
+                    if (this.accounts.length === 0) {
+                        this.accounts = JSON.parse(JSON.stringify(INIT_ACCOUNTS));
+                        this.nextId = this.accounts.reduce((max, a) => Math.max(max, a.id), 0) + 1;
+                    }
+                },
+
+                // ----- 重置 -----
                 resetAllData() {
                     if (confirm('重置为初始数据，所有修改将丢失。确定吗？')) {
                         this.accounts = JSON.parse(JSON.stringify(INIT_ACCOUNTS));
                         this.nextId = this.accounts.reduce((max, a) => Math.max(max, a.id), 0) + 1;
                         this.selectedIds = [];
                         this.resetFilters();
+                        this.showToast('已重置为初始数据', 'success');
                     }
                 },
                 resetFilters() {
@@ -675,14 +943,14 @@
                     this.statusFilter = 'all';
                 },
 
-                // 单个出入库
+                // ----- 出入库（单个）-----
                 checkIn(id) {
                     const acc = this.accounts.find(a => a.id === id);
-                    if (acc) { acc.status = 'in'; this.appendRemark(acc, '入库'); }
+                    if (acc) { acc.status = 'in'; this.appendRemark(acc, '入库'); this.showToast(` ${acc.email} 已入库`, 'success'); }
                 },
                 checkOut(id) {
                     const acc = this.accounts.find(a => a.id === id);
-                    if (acc) { acc.status = 'out'; this.appendRemark(acc, '出库'); }
+                    if (acc) { acc.status = 'out'; this.appendRemark(acc, '出库'); this.showToast(` ${acc.email} 已出库`, 'success'); }
                 },
                 appendRemark(acc, action) {
                     const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
@@ -691,42 +959,79 @@
                     else if (!acc.remark.includes(log.slice(0, 5))) acc.remark = acc.remark + ' · ' + log;
                 },
 
-                // 批量
+                // ----- 批量出入库 -----
                 bulkCheckIn() {
                     if (this.selectedIds.length === 0) return;
+                    let count = 0;
                     this.selectedIds.forEach(id => {
                         const acc = this.accounts.find(a => a.id === id);
-                        if (acc && acc.status === 'out') { acc.status = 'in'; this.appendRemark(acc, '批量入库'); }
+                        if (acc && acc.status === 'out') { acc.status = 'in'; this.appendRemark(acc, '批量入库'); count++; }
                     });
                     this.selectedIds = [];
+                    this.showToast(`批量入库 ${count} 个账户`, 'success');
                 },
                 bulkCheckOut() {
                     if (this.selectedIds.length === 0) return;
+                    let count = 0;
                     this.selectedIds.forEach(id => {
                         const acc = this.accounts.find(a => a.id === id);
-                        if (acc && acc.status === 'in') { acc.status = 'out'; this.appendRemark(acc, '批量出库'); }
+                        if (acc && acc.status === 'in') { acc.status = 'out'; this.appendRemark(acc, '批量出库'); count++; }
                     });
                     this.selectedIds = [];
+                    this.showToast(`批量出库 ${count} 个账户`, 'success');
                 },
 
+                // ----- 全选 -----
                 toggleAllSelect(e) {
-                    const checked = e.target.checked;
-                    if (checked) {
+                    if (e.target.checked) {
                         this.selectedIds = this.filteredAccounts.map(a => a.id);
                     } else {
                         this.selectedIds = [];
                     }
                 },
 
-                // 删除
-                deleteAccount(id) {
-                    if (confirm('确认删除该账户？')) {
-                        this.accounts = this.accounts.filter(a => a.id !== id);
-                        this.selectedIds = this.selectedIds.filter(sid => sid !== id);
+                // ----- 备注（独立编辑）-----
+                updateRemark(acc, val) {
+                    if (acc.remark !== val) {
+                        acc.remark = val.trim();
+                        this.showToast(`备注已更新`, 'success');
                     }
                 },
 
-                // 新增/编辑 模态
+                // ----- 复制密码 -----
+                copyPassword(acc) {
+                    const pwd = acc.password || '';
+                    if (!pwd) { this.showToast('该账户未设置密码', 'error'); return; }
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(pwd).then(() => {
+                            this.showToast(`已复制: ${pwd}`, 'success');
+                        }).catch(() => {
+                            this.fallbackCopy(pwd);
+                        });
+                    } else {
+                        this.fallbackCopy(pwd);
+                    }
+                },
+                fallbackCopy(text) {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try { document.execCommand('copy'); this.showToast(`已复制: ${text}`, 'success'); } catch (e) { this.showToast('复制失败', 'error'); }
+                    document.body.removeChild(ta);
+                },
+
+                // ----- 删除 -----
+                deleteAccount(id) {
+                    if (confirm('确认删除该账户？')) {
+                        const acc = this.accounts.find(a => a.id === id);
+                        this.accounts = this.accounts.filter(a => a.id !== id);
+                        this.selectedIds = this.selectedIds.filter(sid => sid !== id);
+                        if (acc) this.showToast(`已删除 ${acc.email}`, 'success');
+                    }
+                },
+
+                // ----- 新增/编辑 模态 -----
                 openAddModal() {
                     this.modalMode = 'add';
                     this.modalForm = { id: null, email: '', password: '', remark: '', status: 'in' };
@@ -750,14 +1055,13 @@
                     const form = this.modalForm;
                     const email = form.email.trim();
                     if (!email || !email.includes('@') || !email.includes('.')) {
-                        alert('请输入有效的邮箱地址');
+                        this.showToast('请输入有效的邮箱地址', 'error');
                         return;
                     }
-                    // 重复检查
                     const dup = this.accounts.some(a => 
                         a.email.toLowerCase() === email.toLowerCase() && a.id !== form.id
                     );
-                    if (dup) { alert('该邮箱已存在'); return; }
+                    if (dup) { this.showToast('该邮箱已存在', 'error'); return; }
 
                     if (this.modalMode === 'add') {
                         this.accounts.push({
@@ -767,6 +1071,7 @@
                             status: form.status,
                             remark: form.remark.trim() || ''
                         });
+                        this.showToast(`已添加 ${email}`, 'success');
                     } else {
                         const target = this.accounts.find(a => a.id === form.id);
                         if (target) {
@@ -774,14 +1079,58 @@
                             target.password = form.password.trim() || 'Ps123456';
                             target.status = form.status;
                             target.remark = form.remark.trim() || '';
+                            this.showToast(`已更新 ${email}`, 'success');
                         }
                     }
                     this.closeModal();
+                },
+
+                // ----- 单账户改密码 -----
+                openSinglePasswordModal(acc) {
+                    this.singlePasswordTarget = acc;
+                    this.singlePassword = '';
+                    this.singlePasswordModalVisible = true;
+                },
+                closeSinglePasswordModal() { this.singlePasswordModalVisible = false; this.singlePasswordTarget = null; },
+                applySinglePassword() {
+                    if (!this.singlePasswordTarget) return;
+                    const newPwd = this.singlePassword.trim() || 'Ps123456';
+                    this.singlePasswordTarget.password = newPwd;
+                    this.showToast(`密码已更新: ${newPwd}`, 'success');
+                    this.closeSinglePasswordModal();
+                },
+
+                // ----- 批量改密码 -----
+                openBulkPasswordModal() {
+                    if (this.selectedIds.length === 0) { this.showToast('请先选择账户', 'error'); return; }
+                    this.bulkPassword = '';
+                    this.bulkPasswordModalVisible = true;
+                },
+                closeBulkPasswordModal() { this.bulkPasswordModalVisible = false; },
+                applyBulkPassword() {
+                    const newPwd = this.bulkPassword.trim() || 'Ps123456';
+                    let count = 0;
+                    this.selectedIds.forEach(id => {
+                        const acc = this.accounts.find(a => a.id === id);
+                        if (acc) { acc.password = newPwd; count++; }
+                    });
+                    this.selectedIds = [];
+                    this.closeBulkPasswordModal();
+                    this.showToast(`批量修改密码完成，共 ${count} 个账户`, 'success');
+                },
+
+                // ----- Toast 通知 -----
+                showToast(message, type = 'success') {
+                    if (this.toastTimer) clearTimeout(this.toastTimer);
+                    this.toastMessage = message;
+                    this.toastType = type;
+                    this.toastIcon = type === 'success' ? 'fas fa-check-circle' : (type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle');
+                    this.toastVisible = true;
+                    this.toastTimer = setTimeout(() => { this.toastVisible = false; }, 2800);
                 }
             },
             mounted() {
-                this.accounts = JSON.parse(JSON.stringify(INIT_ACCOUNTS));
-                this.nextId = this.accounts.reduce((max, a) => Math.max(max, a.id), 0) + 1;
+                // 页面加载时不自动登录，等待用户输入密码
             }
         });
     })();
