@@ -1,27 +1,28 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>乐哲软件 · 管理后台</title>
+    <title>乐哲软件 · 资源库</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
     <style>
         :root {
-            --bg-primary: #080c14;
-            --bg-secondary: #0f172a;
-            --bg-card: rgba(18, 30, 51, 0.78);
-            --bg-card-solid: #121e33;
-            --border-glow: rgba(0, 200, 255, 0.15);
-            --border-glow-strong: rgba(0, 200, 255, 0.35);
-            --text-primary: #eef5ff;
-            --text-secondary: #8da4c9;
-            --text-dim: #4a6185;
-            --accent-cyan: #00d4ff;
-            --accent-blue: #3b82f6;
-            --accent-purple: #8b5cf6;
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --bg-primary: #eef2f7;
+            --bg-secondary: #f5f8fc;
+            --bg-card: rgba(255, 255, 255, 0.75);
+            --bg-card-solid: #ffffff;
+            --border-glow: rgba(0, 120, 255, 0.15);
+            --border-glow-strong: rgba(0, 120, 255, 0.30);
+            --text-primary: #1a2332;
+            --text-secondary: #4a5b6e;
+            --text-dim: #8a9bb0;
+            --accent-cyan: #0088ff;
+            --accent-blue: #0066cc;
+            --accent-purple: #6c5ce7;
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.06);
             --radius-lg: 20px;
             --radius-md: 12px;
             --radius-sm: 8px;
@@ -37,12 +38,10 @@
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
-            background-image: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
-                              radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
         }
         a { text-decoration: none; color: inherit; }
         button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
-        input, textarea, select { font-family: inherit; border: none; outline: none; background: none; color: var(--text-primary); }
+        input { font-family: inherit; border: none; outline: none; background: none; color: var(--text-primary); }
         .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
         .hidden { display: none !important; }
 
@@ -53,16 +52,14 @@
             background: var(--bg-card); color: var(--text-primary);
             backdrop-filter: blur(8px); border-color: var(--border-glow);
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0,212,255,0.15); border-color: var(--accent-cyan); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,136,255,0.15); border-color: var(--accent-cyan); }
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            color: #080c14; border-color: transparent; font-weight: 700;
+            color: #fff; border-color: transparent; font-weight: 700;
         }
-        .btn-primary:hover { box-shadow: 0 0 40px rgba(0,212,255,0.3); transform: translateY(-2px) scale(1.02); }
+        .btn-primary:hover { box-shadow: 0 4px 24px rgba(0,136,255,0.3); transform: translateY(-2px) scale(1.02); }
         .btn-outline { background: transparent; border-color: var(--border-glow); color: var(--text-secondary); }
-        .btn-outline:hover { background: rgba(0,212,255,0.06); border-color: var(--accent-cyan); color: var(--text-primary); }
-        .btn-danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.2); color: #f87171; }
-        .btn-danger:hover { background: rgba(239,68,68,0.25); border-color: #ef4444; color: #fff; }
+        .btn-outline:hover { background: rgba(0,136,255,0.06); border-color: var(--accent-cyan); color: var(--text-primary); }
         .btn-sm { padding: 6px 18px; font-size: 0.8rem; }
 
         .card {
@@ -70,172 +67,237 @@
             border-radius: var(--radius-lg); border: 1px solid var(--border-glow);
             box-shadow: var(--shadow-card); transition: var(--transition); overflow: hidden;
         }
-        .card:hover { border-color: var(--border-glow-strong); box-shadow: var(--shadow-card), 0 0 30px rgba(0,212,255,0.05); transform: translateY(-4px); }
+        .card:hover { border-color: var(--border-glow-strong); box-shadow: 0 12px 40px rgba(0,0,0,0.08); transform: translateY(-4px); }
 
         .badge {
             display: inline-block; padding: 2px 14px; border-radius: 50px;
             font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-            background: rgba(0,212,255,0.1); color: var(--accent-cyan);
-            border: 1px solid rgba(0,212,255,0.15);
+            background: rgba(0,136,255,0.10); color: var(--accent-cyan);
+            border: 1px solid rgba(0,136,255,0.15);
         }
-        .badge-purple { background: rgba(139,92,246,0.12); color: var(--accent-purple); border-color: rgba(139,92,246,0.2); }
+        .badge-purple { background: rgba(108,92,231,0.10); color: var(--accent-purple); border-color: rgba(108,92,231,0.15); }
 
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
-        .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.6; }
         .empty-state h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text-primary); }
 
-        .login-page {
-            display: none; min-height: 100vh; align-items: center; justify-content: center;
-            background: var(--bg-primary); padding: 20px; position: relative;
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(238,242,247,0.85); backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border-glow); height: var(--header-height);
         }
-        .login-page.active { display: flex; }
-        .login-page .bg-glow {
-            position: absolute; border-radius: 50%; filter: blur(100px);
-            pointer-events: none; opacity: 0.12;
+        .header-inner { display: flex; align-items: center; justify-content: space-between; height: var(--header-height); }
+        .logo {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px;
+            color: var(--text-primary);
         }
-        .login-page .bg-glow:nth-child(1) { width: 400px; height: 400px; top: -100px; right: -100px; background: var(--accent-cyan); }
-        .login-page .bg-glow:nth-child(2) { width: 300px; height: 300px; bottom: -80px; left: -80px; background: var(--accent-purple); }
-        .login-box {
-            width: 100%; max-width: 380px; padding: 36px 32px;
-            background: var(--bg-card-solid); backdrop-filter: blur(32px);
-            border-radius: var(--radius-lg); border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card), 0 0 60px rgba(0,212,255,0.02);
-            position: relative; z-index: 2;
+        .logo .mark {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px; border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #fff; font-size: 1.1rem; font-weight: 800;
+            box-shadow: 0 2px 12px rgba(0,136,255,0.25);
         }
-        .login-box .login-logo {
-            font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2px;
-            background: linear-gradient(135deg, #fff 30%, var(--accent-cyan) 100%);
+        .logo span { font-weight: 300; color: var(--text-secondary); font-size: 0.75rem; margin-left: 4px; letter-spacing: 1px; }
+
+        .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+        .nav-links a {
+            font-size: 0.85rem; font-weight: 500; color: var(--text-secondary);
+            transition: var(--transition); position: relative;
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 0; height: 2px; background: var(--accent-cyan);
+            transition: var(--transition);
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+        .mobile-toggle { display: none; font-size: 1.4rem; color: var(--text-secondary); padding: 4px; }
+
+        .hero { padding: 50px 0 32px; text-align: center; position: relative; }
+        .hero::before {
+            content: '◆'; position: absolute; right: 5%; top: 10%;
+            font-size: 120px; opacity: 0.06; color: var(--accent-cyan);
+            transform: rotate(10deg); font-weight: 100;
+        }
+        .hero h1 {
+            font-size: 3rem; font-weight: 700; letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-cyan) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
         }
-        .login-box .login-sub { text-align: center; color: var(--text-secondary); font-weight: 300; margin-bottom: 24px; font-size: 0.85rem; letter-spacing: 2px; }
-        .login-box .form-group { margin-bottom: 14px; }
-        .login-box label { display: block; font-size: 0.78rem; font-weight: 500; margin-bottom: 4px; color: var(--text-secondary); letter-spacing: 0.5px; }
-        .login-box input {
-            width: 100%; padding: 11px 14px; border-radius: var(--radius-sm);
-            border: 1.5px solid var(--border-glow); background: rgba(0,0,0,0.2);
-            transition: var(--transition); font-size: 0.9rem; color: var(--text-primary);
-        }
-        .login-box input:focus { border-color: var(--accent-cyan); background: rgba(0,0,0,0.4); }
-        .login-box .btn { width: 100%; margin-top: 6px; padding: 13px; font-size: 0.95rem; }
-        .login-box .login-error { color: #f87171; font-size: 0.8rem; text-align: center; margin-top: 10px; min-height: 22px; }
-        .login-box .demo-hint { text-align: center; margin-top: 14px; font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.5px; border-top: 1px solid var(--border-glow); padding-top: 14px; }
-
-        .admin-layout {
-            display: none; min-height: 100vh; background: var(--bg-primary);
-        }
-        .admin-layout.active { display: flex; }
-
-        .admin-sidebar {
-            width: 210px; background: rgba(12,20,35,0.88); backdrop-filter: blur(24px);
-            border-right: 1px solid var(--border-glow); padding: 24px 14px;
-            flex-shrink: 0; height: 100vh; position: sticky; top: 0; overflow-y: auto;
-        }
-        .admin-sidebar .logo-sm {
-            font-size: 1.1rem; font-weight: 700; padding: 0 8px 20px;
-            border-bottom: 1px solid var(--border-glow); margin-bottom: 16px;
-            display: flex; align-items: center; gap: 8px; color: var(--text-primary);
-        }
-        .admin-sidebar .logo-sm .mark {
-            font-size: 1.2rem;
+        .hero h1 .highlight {
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .admin-sidebar .nav-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-            border-radius: var(--radius-sm); font-weight: 500; color: var(--text-secondary);
-            transition: var(--transition); margin-bottom: 4px; cursor: pointer;
-            border: 1px solid transparent;
+        .hero p { font-size: 1rem; color: var(--text-secondary); max-width: 480px; margin: 0 auto 28px; font-weight: 300; }
+        .hero .search-box {
+            display: flex; max-width: 480px; margin: 0 auto;
+            background: var(--bg-card); backdrop-filter: blur(16px);
+            border-radius: 60px; border: 1px solid var(--border-glow);
+            box-shadow: var(--shadow-card); overflow: hidden; transition: var(--transition);
         }
-        .admin-sidebar .nav-item:hover { background: rgba(0,212,255,0.04); border-color: var(--border-glow); color: var(--text-primary); }
-        .admin-sidebar .nav-item.active { background: rgba(0,212,255,0.06); border-color: var(--border-glow-strong); color: var(--text-primary); box-shadow: 0 0 30px rgba(0,212,255,0.03); }
-        .admin-sidebar .nav-item .icon { font-size: 1rem; width: 24px; text-align: center; color: var(--accent-cyan); }
-        .admin-sidebar .logout-btn {
-            margin-top: 28px; border-top: 1px solid var(--border-glow); padding-top: 16px;
-            color: var(--text-dim); font-size: 0.85rem; display: flex; align-items: center; gap: 10px;
-            cursor: pointer; transition: var(--transition);
+        .hero .search-box:focus-within { border-color: var(--accent-cyan); box-shadow: 0 4px 24px rgba(0,136,255,0.08); }
+        .hero .search-box input { flex: 1; padding: 12px 22px; font-size: 0.9rem; background: transparent; color: var(--text-primary); }
+        .hero .search-box input::placeholder { color: var(--text-dim); }
+        .hero .search-box button {
+            padding: 0 24px; background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #fff; font-weight: 700; transition: var(--transition); font-size: 0.9rem;
         }
-        .admin-sidebar .logout-btn:hover { color: #f87171; }
+        .hero .search-box button:hover { filter: brightness(1.05); box-shadow: 0 0 20px rgba(0,136,255,0.2); }
 
-        .admin-main { flex: 1; padding: 28px 36px 60px; overflow-y: auto; max-height: 100vh; }
-        .admin-main .page-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
-        .admin-main .page-sub { color: var(--text-secondary); margin-bottom: 24px; font-weight: 400; font-size: 0.9rem; }
+        .section-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.5px; color: var(--text-primary); }
+        .section-sub { color: var(--text-secondary); font-weight: 400; margin-bottom: 20px; font-size: 0.9rem; }
 
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 14px; margin-bottom: 28px;
+        .categories-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 14px; margin: 24px 0 14px;
         }
-        .stat-card {
-            padding: 18px 20px; background: var(--bg-card); backdrop-filter: blur(8px);
-            border-radius: var(--radius-md); border: 1px solid var(--border-glow);
+        .category-item {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 16px 10px; border-radius: var(--radius-md);
+            background: var(--bg-card); backdrop-filter: blur(8px);
+            border: 1px solid var(--border-glow); transition: var(--transition);
+            cursor: pointer; text-align: center;
+        }
+        .category-item:hover {
+            transform: translateY(-4px); background: rgba(255,255,255,0.85);
+            border-color: var(--accent-cyan); box-shadow: 0 4px 20px rgba(0,136,255,0.08);
+        }
+        .category-item .icon { font-size: 24px; margin-bottom: 4px; }
+        .category-item .name { font-size: 0.8rem; font-weight: 500; color: var(--text-primary); }
+        .category-item .count { font-size: 0.65rem; color: var(--text-dim); margin-top: 2px; }
+        .category-item.active { border-color: var(--accent-cyan); background: rgba(0,136,255,0.06); box-shadow: 0 0 20px rgba(0,136,255,0.05); }
+
+        .software-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 22px; margin-top: 6px;
+        }
+        .software-card {
+            padding: 22px 20px 18px; transition: var(--transition); cursor: default;
+            display: flex; flex-direction: column;
+            background: var(--bg-card); backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg); border: 1px solid var(--border-glow);
             box-shadow: var(--shadow-card);
         }
-        .stat-card .num {
-            font-size: 2rem; font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        .software-card:hover {
+            transform: translateY(-6px); border-color: var(--border-glow-strong);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
         }
-        .stat-card .label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .software-card .card-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 10px; }
+        .software-card .card-icon {
+            width: 48px; height: 48px; border-radius: var(--radius-md);
+            background: rgba(0,136,255,0.06); display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; border: 1px solid rgba(0,136,255,0.08); overflow: hidden; font-size: 26px;
+        }
+        .software-card .card-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .software-card .card-info { flex: 1; min-width: 0; }
+        .software-card .card-info h3 { font-size: 1rem; font-weight: 600; margin-bottom: 2px; letter-spacing: -0.2px; color: var(--text-primary); }
+        .software-card .card-info .meta {
+            font-size: 0.7rem; color: var(--text-secondary);
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .software-card .card-info .meta .version { color: var(--accent-cyan); }
+        .software-card .desc {
+            font-size: 0.82rem; color: var(--text-secondary);
+            margin: 8px 0 12px; line-height: 1.5;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            flex: 1;
+        }
+        .software-card .card-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            border-top: 1px solid var(--border-glow); padding-top: 12px; margin-top: 2px;
+        }
+        .software-card .card-footer .stats {
+            font-size: 0.7rem; color: var(--text-dim); display: flex; gap: 14px;
+        }
+        .software-card .card-footer .stats span { display: flex; align-items: center; gap: 4px; }
+        .software-card .card-footer .btn { padding: 4px 16px; font-size: 0.7rem; font-weight: 600; }
 
-        .table-wrap {
-            background: var(--bg-card); backdrop-filter: blur(8px);
-            border-radius: var(--radius-md); border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card); overflow: hidden; margin-top: 6px;
+        .pagination {
+            display: flex; justify-content: center; align-items: center;
+            gap: 12px; margin-top: 28px; flex-wrap: wrap;
         }
-        .table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-        .table-wrap th {
-            text-align: left; padding: 10px 16px; background: rgba(0,212,255,0.03);
-            font-weight: 600; color: var(--text-secondary); font-size: 0.65rem;
-            letter-spacing: 0.8px; text-transform: uppercase; border-bottom: 1px solid var(--border-glow);
+        .pagination button {
+            padding: 8px 20px; border-radius: 50px;
+            background: var(--bg-card); border: 1px solid var(--border-glow);
+            font-weight: 500; transition: var(--transition);
+            color: var(--text-secondary);
         }
-        .table-wrap td { padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,0.02); color: var(--text-primary); vertical-align: middle; }
-        .table-wrap td .icon-thumb {
-            width: 32px; height: 32px; border-radius: var(--radius-sm); overflow: hidden;
-            display: inline-flex; align-items: center; justify-content: center;
-            background: rgba(0,212,255,0.06); font-size: 18px; border: 1px solid rgba(0,212,255,0.06);
+        .pagination button:hover {
+            border-color: var(--accent-cyan); color: var(--text-primary);
+            background: rgba(0,136,255,0.04);
         }
-        .table-wrap td .icon-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .table-wrap td .actions { display: flex; gap: 6px; }
-        .table-wrap td .actions button {
-            padding: 3px 12px; border-radius: 50px; font-size: 0.65rem;
-            font-weight: 600; transition: var(--transition); border: 1px solid transparent;
+        .pagination button.active {
+            background: var(--accent-cyan); color: #fff; border-color: var(--accent-cyan);
         }
-        .table-wrap td .actions .edit-btn { background: rgba(0,212,255,0.08); color: var(--accent-cyan); border-color: rgba(0,212,255,0.1); }
-        .table-wrap td .actions .edit-btn:hover { background: var(--accent-cyan); color: #080c14; }
-        .table-wrap td .actions .del-btn { background: rgba(239,68,68,0.08); color: #f87171; border-color: rgba(239,68,68,0.1); }
-        .table-wrap td .actions .del-btn:hover { background: #ef4444; color: #fff; }
-        .table-wrap .empty-row td { padding: 36px 18px; text-align: center; color: var(--text-dim); }
+        .pagination button:disabled {
+            opacity: 0.4; cursor: not-allowed;
+        }
+        .pagination .page-info {
+            color: var(--text-secondary); font-size: 0.85rem;
+        }
 
-        .admin-form {
-            background: var(--bg-card); backdrop-filter: blur(8px);
-            border-radius: var(--radius-md); border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card); padding: 24px 28px; margin-top: 6px;
-        }
-        .admin-form .form-group { margin-bottom: 16px; }
-        .admin-form label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 4px; color: var(--text-secondary); }
-        .admin-form label .required { color: #f87171; margin-left: 2px; }
-        .admin-form input, .admin-form textarea, .admin-form select {
-            width: 100%; padding: 9px 14px; border-radius: var(--radius-sm);
-            border: 1.5px solid var(--border-glow); background: rgba(0,0,0,0.25);
-            transition: var(--transition); font-size: 0.88rem; color: var(--text-primary);
-        }
-        .admin-form input:focus, .admin-form textarea:focus, .admin-form select:focus {
-            border-color: var(--accent-cyan); background: rgba(0,0,0,0.4);
-        }
-        .admin-form textarea { min-height: 70px; resize: vertical; }
-        .admin-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .admin-form .form-actions { display: flex; gap: 12px; margin-top: 6px; }
-        .admin-form select option { background: #121e33; }
-        .admin-form .icon-preview {
-            display: inline-flex; align-items: center; gap: 10px; margin-top: 6px;
-            font-size: 0.8rem; color: var(--text-secondary);
-        }
-        .admin-form .icon-preview .preview-box {
-            width: 40px; height: 40px; border-radius: var(--radius-sm);
-            border: 1px solid var(--border-glow); overflow: hidden;
+        .detail-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.30); backdrop-filter: blur(12px);
             display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.2); font-size: 22px;
+            padding: 20px; opacity: 0; visibility: hidden; transition: var(--transition);
         }
-        .admin-form .icon-preview .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .detail-overlay.open { opacity: 1; visibility: visible; }
+        .detail-modal {
+            max-width: 620px; width: 100%; max-height: 90vh; overflow-y: auto;
+            padding: 32px 36px 28px; background: var(--bg-card-solid);
+            backdrop-filter: blur(32px); border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glow-strong);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.12);
+            transform: scale(0.96) translateY(20px); transition: var(--transition);
+        }
+        .detail-overlay.open .detail-modal { transform: scale(1) translateY(0); }
+        .detail-modal .close-btn {
+            float: right; font-size: 1.5rem; color: var(--text-dim);
+            transition: var(--transition); line-height: 1;
+        }
+        .detail-modal .close-btn:hover { color: var(--text-primary); transform: rotate(90deg); }
+        .detail-modal .detail-icon {
+            font-size: 48px; margin-bottom: 6px; width: 64px; height: 64px;
+            border-radius: var(--radius-md); overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,136,255,0.06); border: 1px solid rgba(0,136,255,0.08);
+        }
+        .detail-modal .detail-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .detail-modal h2 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px; margin-top: 6px; color: var(--text-primary); }
+        .detail-modal .detail-meta {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            font-size: 0.8rem; color: var(--text-secondary); margin: 6px 0 14px;
+        }
+        .detail-modal .detail-desc {
+            font-size: 0.9rem; line-height: 1.8; color: var(--text-secondary);
+            margin: 14px 0 22px; white-space: pre-wrap;
+            background: var(--bg-primary); padding: 14px 18px;
+            border-radius: var(--radius-sm); border-left: 3px solid var(--accent-cyan);
+        }
+        .detail-modal .detail-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .detail-modal .detail-actions .btn { flex: 1; min-width: 120px; }
+
+        .footer {
+            padding: 32px 0 24px; border-top: 1px solid var(--border-glow);
+            margin-top: 32px; text-align: center;
+            color: var(--text-dim); font-size: 0.75rem; letter-spacing: 0.5px;
+        }
+        .footer .brand { font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 2px; }
+        .footer .legal {
+            margin-top: 8px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
 
         .toast-container {
             position: fixed; bottom: 28px; right: 28px; z-index: 999;
@@ -250,7 +312,7 @@
             display: flex; align-items: center; gap: 10px;
         }
         .toast.success .icon { color: var(--accent-cyan); }
-        .toast.error .icon { color: #f87171; }
+        .toast.error .icon { color: #e74c3c; }
         .toast .icon { font-size: 1.1rem; }
         @keyframes toastIn { to { transform: translateX(0); } }
         @keyframes toastOut { to { transform: translateX(120%); opacity: 0; } }
@@ -266,613 +328,456 @@
         }
         .divider-cyber .dot { font-size: 0.35rem; color: var(--accent-cyan); }
 
-        @media (max-width: 900px) {
-            .admin-sidebar { width: 60px; padding: 14px 6px; }
-            .admin-sidebar .logo-sm span, .admin-sidebar .nav-item span:not(.icon), .admin-sidebar .logout-btn span { display: none; }
-            .admin-sidebar .logo-sm { justify-content: center; padding: 0 0 14px; font-size: 1.3rem; }
-            .admin-sidebar .nav-item { justify-content: center; padding: 10px; }
-            .admin-sidebar .nav-item .icon { font-size: 1.2rem; width: auto; }
-            .admin-sidebar .logout-btn { justify-content: center; }
-            .admin-main { padding: 20px 16px 40px; }
-            .admin-form .form-row { grid-template-columns: 1fr; }
-        }
         @media (max-width: 768px) {
-            .admin-layout.active { flex-direction: column; }
-            .admin-sidebar {
-                width: 100%; height: auto; position: static; flex-direction: row;
-                padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 4px;
-                border-right: none; border-bottom: 1px solid var(--border-glow);
+            :root { --header-height: 58px; }
+            .nav-links {
+                display: none; position: absolute; top: var(--header-height); left: 0; right: 0;
+                background: rgba(238,242,247,0.96); backdrop-filter: blur(24px);
+                flex-direction: column; padding: 16px 24px; gap: 14px;
+                border-bottom: 1px solid var(--border-glow); box-shadow: var(--shadow-card);
             }
-            .admin-sidebar .logo-sm { display: none; }
-            .admin-sidebar .nav-item { padding: 6px 12px; font-size: 0.75rem; }
-            .admin-sidebar .nav-item .icon { font-size: 0.9rem; width: 20px; }
-            .admin-sidebar .logout-btn { margin-top: 0; border-top: none; padding-top: 0; margin-left: auto; font-size: 0.75rem; }
-            .admin-main { max-height: none; padding: 16px 14px 40px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .table-wrap { overflow-x: auto; }
-            .table-wrap table { font-size: 0.75rem; min-width: 480px; }
+            .nav-links.open { display: flex; }
+            .mobile-toggle { display: block; }
+            .hero h1 { font-size: 2rem; }
+            .hero p { font-size: 0.9rem; }
+            .software-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+            .categories-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; }
+            .category-item { padding: 12px 6px; }
+            .category-item .icon { font-size: 20px; }
+            .hero .search-box input { padding: 10px 16px; font-size: 0.85rem; }
+            .hero .search-box button { padding: 0 16px; font-size: 0.8rem; }
+            .pagination button { padding: 6px 14px; font-size: 0.8rem; }
+        }
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 1.6rem; }
+            .software-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-
     <div class="toast-container" id="toastContainer"></div>
 
-    <div class="login-page active" id="loginPage">
-        <div class="bg-glow"></div>
-        <div class="bg-glow"></div>
-        <div class="login-box">
-            <div class="login-logo">◆ 乐哲软件</div>
-            <div class="login-sub">管理控制台</div>
-            <div class="form-group">
-                <label>用户标识</label>
-                <input type="text" id="loginUser" value="admin" placeholder="用户名" />
+    <header class="header" id="mainHeader">
+        <div class="container header-inner">
+            <a href="#" class="logo" id="logoHome">
+                <span class="mark">◆</span>
+                乐哲软件 <span>LEZHE</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#" class="active" data-page="home">首页</a></li>
+                <li><a href="#" data-page="list">软件库</a></li>
+            </ul>
+            <button class="mobile-toggle" id="mobileToggle">≡</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section id="pageHome">
+                <div class="hero">
+                    <h1>探索 · <span class="highlight">乐哲</span> 软件</h1>
+                    <p>精选高效工具，赋能创作者生态。</p>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="搜索软件名称或描述..." />
+                        <button id="searchBtn">检索</button>
+                    </div>
+                </div>
+                <div class="divider-cyber"><span class="dot">◆</span> 分 类 导 航 <span class="dot">◆</span></div>
+                <div class="categories-grid" id="categoryGridHome"></div>
+                <div style="margin-top:40px;">
+                    <h2 class="section-title">✦ 热门推荐</h2>
+                    <p class="section-sub">社区口碑精选</p>
+                    <div class="software-grid" id="recommendGrid"></div>
+                </div>
+                <div style="margin-top:40px;">
+                    <h2 class="section-title">✦ 最新上架</h2>
+                    <p class="section-sub">持续迭代，保持前沿</p>
+                    <div class="software-grid" id="latestGrid"></div>
+                </div>
+            </section>
+
+            <section id="pageList" class="hidden">
+                <div style="padding:16px 0 6px;">
+                    <h2 class="section-title">✦ 软件库</h2>
+                    <p class="section-sub" id="listSub">全部资源</p>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;" id="filterTags">
+                    <button class="btn btn-sm btn-outline active" data-cat="all">全部</button>
+                </div>
+                <div class="software-grid" id="listGrid"></div>
+                <div class="pagination" id="paginationControls">
+                    <button id="prevPageBtn" disabled>‹ 上一页</button>
+                    <span class="page-info" id="pageInfo">第 1 / 1 页</span>
+                    <button id="nextPageBtn">下一页 ›</button>
+                </div>
+            </section>
+        </div>
+        <footer class="footer">
+            <div class="brand">◆ 乐哲软件</div>
+            <p>LEZHE · 构建数字未来</p>
+            <div class="legal">
+                免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。
             </div>
-            <div class="form-group">
-                <label>安全密钥</label>
-                <input type="password" id="loginPass" placeholder="密码" />
+        </footer>
+    </main>
+
+    <div class="detail-overlay" id="detailOverlay">
+        <div class="detail-modal" id="detailModal">
+            <button class="close-btn" id="detailClose">✕</button>
+            <div class="detail-icon" id="detailIcon">📦</div>
+            <h2 id="detailName">软件名称</h2>
+            <div class="detail-meta" id="detailMeta"></div>
+            <div class="detail-desc" id="detailDesc"></div>
+            <div class="detail-actions">
+                <button class="btn btn-primary" id="detailDownload">⬇ 下载</button>
+                <button class="btn btn-outline" id="detailCloseBtn">关闭</button>
             </div>
-            <button class="btn btn-primary" id="loginBtn">✦ 进入控制台</button>
-            <div class="login-error" id="loginError"></div>
         </div>
     </div>
 
-    <div class="admin-layout" id="adminApp">
-        <aside class="admin-sidebar">
-            <div class="logo-sm"><span class="mark">◆</span> <span>乐哲软件</span></div>
-            <div class="nav-item active" data-tab="dashboard"><span class="icon">◈</span> <span>仪表盘</span></div>
-            <div class="nav-item" data-tab="software"><span class="icon">⊞</span> <span>软件管理</span></div>
-            <div class="nav-item" data-tab="categories"><span class="icon">⌗</span> <span>分类管理</span></div>
-            <div class="nav-item" data-tab="add"><span class="icon">⊕</span> <span>上传软件</span></div>
-            <div class="logout-btn" id="adminLogout"><span class="icon">↺</span> <span>退 出</span></div>
-        </aside>
-        <div class="admin-main" id="adminMain"></div>
-    </div>
-
     <script>
-        var DB = {
-            get: function(key) {
+        const DB = {
+            get(key) {
                 try { return JSON.parse(localStorage.getItem('lezhe_' + key)) || null; } catch { return null; }
             },
-            set: function(key, val) {
+            set(key, val) {
                 localStorage.setItem('lezhe_' + key, JSON.stringify(val));
             },
-            getSoftware: function() {
+            getSoftware() {
                 return this.get('software') || [];
             },
-            setSoftware: function(list) {
-                this.set('software', list);
-            },
-            getCategories: function() {
+            getCategories() {
                 return this.get('categories') || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
-            },
-            setCategories: function(list) {
-                this.set('categories', list);
-            },
-            getUsers: function() {
-                var users = this.get('users');
-                if (!users || users.length === 0) {
-                    var hash = '8b7d8f3e2a1c9f4e6d5b8a7c9d4e2f1a3b5c7d9e1f2a3b4c5d6e7f8a9b0c1d2e';
-                    users = [{ username: 'admin', passwordHash: hash }];
-                    this.set('users', users);
-                }
-                return users;
-            },
-            genId: function() {
-                return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
             }
         };
 
-        function hashPassword(password) {
-            var hash = 0;
-            for (var i = 0; i < password.length; i++) {
-                var char = password.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return hash.toString(16) + 'x' + password.length.toString(16);
-        }
-
-        function verifyPassword(input, storedHash) {
-            var parts = storedHash.split('x');
-            if (parts.length !== 2) return false;
-            var expectedHash = parts[0];
-            var len = parseInt(parts[1], 16);
-            if (input.length !== len) return false;
-            var computedHash = hashPassword(input).split('x')[0];
-            return computedHash === expectedHash;
-        }
-
-        var secretPassword = 'qbx12164811..';
-        var adminHash = hashPassword(secretPassword);
-
-        if (!localStorage.getItem('lezhe_users')) {
-            DB.set('users', [{ username: 'admin', passwordHash: adminHash }]);
-        } else {
-            var existingUsers = DB.getUsers();
-            if (existingUsers.length > 0 && existingUsers[0].passwordHash !== adminHash) {
-                existingUsers[0].passwordHash = adminHash;
-                DB.set('users', existingUsers);
-            }
-        }
-
-        if (!localStorage.getItem('lezhe_software')) {
-            var defaultSoftware = [{
-                id: 's1',
-                name: '乐哲笔记',
-                category: '办公软件',
-                version: '3.2.0',
-                description: '极简写作与知识管理，支持 Markdown 与双向链接。',
-                detail: '乐哲笔记是一款为创作者打造的轻量级笔记应用。沉浸式写作模式、云端同步、双向链接，构建你的数字花园。',
-                icon: '📝',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '14.2 MB',
-                date: '2026-07-12',
-                views: 512,
-                downloads: 128,
-                recommend: true
-            }, {
-                id: 's2',
-                name: '像素工坊',
-                category: '媒体工具',
-                version: '2.8.1',
-                description: '专业数字绘画与插图设计，丰富笔刷引擎。',
-                detail: '像素工坊提供丰富的笔刷引擎和色彩管理，支持多图层与高级混合模式，让创意自由流动。',
-                icon: '🎨',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '48.6 MB',
-                date: '2026-07-10',
-                views: 387,
-                downloads: 211,
-                recommend: true
-            }, {
-                id: 's3',
-                name: 'CodeNest',
-                category: '开发工具',
-                version: '1.9.4',
-                description: '智能代码编辑器，轻量高效，支持多语言。',
-                detail: 'CodeNest 集成语法高亮、智能补全与 Git 版本控制，支持数十种编程语言，开发体验流畅。',
-                icon: '⌨️',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '32.1 MB',
-                date: '2026-07-08',
-                views: 634,
-                downloads: 309,
-                recommend: false
-            }, {
-                id: 's4',
-                name: '光影矩阵',
-                category: '媒体工具',
-                version: '6.0.0',
-                description: 'AI 驱动的图片增强与编辑工具。',
-                detail: '光影矩阵利用深度学习算法实现智能抠图、画质修复与风格迁移，让每一张照片都焕发新生。',
-                icon: '📸',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '78.3 MB',
-                date: '2026-07-05',
-                views: 423,
-                downloads: 187,
-                recommend: true
-            }, {
-                id: 's5',
-                name: '数据罗盘',
-                category: '实用工具',
-                version: '2.1.3',
-                description: '数据可视化与商业智能分析平台。',
-                detail: '数据罗盘支持连接多种数据源，通过拖拽式操作生成交互式图表与仪表盘，洞察数据价值。',
-                icon: '📊',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '22.7 MB',
-                date: '2026-07-02',
-                views: 276,
-                downloads: 94,
-                recommend: false
-            }, {
-                id: 's6',
-                name: '极光浏览器',
-                category: '实用工具',
-                version: '5.0.2',
-                description: '极速、安全、无广告的现代浏览器。',
-                detail: '极光浏览器基于 Chromium 内核深度优化，内置智能拦截、隐私保护与沉浸式阅读模式。',
-                icon: '🌐',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '9.8 MB',
-                date: '2026-06-28',
-                views: 589,
-                downloads: 312,
-                recommend: false
-            }];
-            DB.set('software', defaultSoftware);
-        }
         if (!localStorage.getItem('lezhe_categories')) {
             DB.set('categories', ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具']);
         }
 
-        function toast(msg, type) {
-            type = type || 'success';
-            var c = document.getElementById('toastContainer');
-            var el = document.createElement('div');
-            el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : '✕') + '</span> ' + msg;
+        function toast(msg, type = 'success') {
+            const c = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.innerHTML = `<span class="icon">${type === 'success' ? '◆' : '✕'}</span> ${msg}`;
             c.appendChild(el);
-            setTimeout(function() {
+            setTimeout(() => {
                 el.style.animation = 'toastOut 0.4s ease forwards';
-                setTimeout(function() { el.remove(); }, 500);
+                setTimeout(() => el.remove(), 500);
             }, 2800);
         }
 
         function getIconEmoji(cat) {
-            var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
+            const map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
             return map[cat] || '📦';
         }
 
-        function renderIconThumb(soft) {
+        function renderIcon(soft) {
             if (soft.iconUrl && soft.iconUrl.trim()) {
-                return '<img src="' + soft.iconUrl + '" alt="' + soft.name + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (soft.icon || '📦') + '\'" />';
+                return `<img src="${soft.iconUrl}" alt="${soft.name}" onerror="this.style.display='none';this.parentElement.textContent='${soft.icon || '📦'}" />`;
             }
             return soft.icon || '📦';
         }
 
-        var Render = {
-            renderAdminTable: function(container, list, onEdit, onDelete) {
+        let currentPage = 1;
+        const PAGE_SIZE = 6;
+        let currentFilteredList = [];
+
+        const Render = {
+            renderCategories(container, categories, active, onClick) {
+                if (!container) return;
+                const all = DB.getSoftware();
+                container.innerHTML = categories.map(c => `
+                    <div class="category-item ${c === active ? 'active' : ''}" data-cat="${c}">
+                        <span class="icon">${getIconEmoji(c)}</span>
+                        <span class="name">${c}</span>
+                        <span class="count">${all.filter(s => s.category === c).length}</span>
+                    </div>
+                `).join('');
+                container.querySelectorAll('.category-item').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const cat = el.dataset.cat;
+                        if (onClick) onClick(cat);
+                    });
+                });
+            },
+
+            renderCards(container, list, showCategory = true) {
                 if (!container) return;
                 if (!list || list.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3></div>';
+                    container.innerHTML =
+                        `<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>等待新的资源加入</p></div>`;
                     return;
                 }
-                var html = '<table><thead><tr><th style="width:50px;">图标</th><th>名称</th><th>分类</th><th>版本</th><th>下载</th><th style="width:150px;">操作</th></tr></thead><tbody>';
-                for (var i = 0; i < list.length; i++) {
-                    var s = list[i];
-                    html += '<tr><td><span class="icon-thumb">' + renderIconThumb(s) + '</span></td><td><strong>' + s.name + '</strong></td><td>' + s.category + '</td><td>v' + s.version + '</td><td>' + (s.downloads || 0) + '</td><td><div class="actions"><button class="edit-btn" data-id="' + s.id + '">编辑</button><button class="del-btn" data-id="' + s.id + '">删除</button></div></td></tr>';
-                }
-                html += '</tbody></table>';
-                container.innerHTML = html;
+                container.innerHTML = list.map(s => `
+                    <div class="software-card card" data-id="${s.id}">
+                        <div class="card-top">
+                            <div class="card-icon">${renderIcon(s)}</div>
+                            <div class="card-info">
+                                <h3>${s.name}</h3>
+                                <div class="meta">
+                                    ${showCategory ? `<span>${s.category}</span>` : ''}
+                                    <span class="version">v${s.version}</span>
+                                    <span>${s.size || '—'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="desc">${s.description || ''}</div>
+                        <div class="card-footer">
+                            <div class="stats">
+                                <span>👁 ${s.views || 0}</span>
+                                <span>⬇ ${s.downloads || 0}</span>
+                            </div>
+                            <button class="btn btn-sm btn-primary detail-trigger" data-id="${s.id}">详情</button>
+                        </div>
+                    </div>
+                `).join('');
 
-                var editBtns = container.querySelectorAll('.edit-btn');
-                for (var j = 0; j < editBtns.length; j++) {
-                    editBtns[j].addEventListener('click', function() {
-                        var id = this.dataset.id;
-                        if (onEdit) onEdit(id);
+                container.querySelectorAll('.detail-trigger').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = btn.dataset.id;
+                        const soft = DB.getSoftware().find(s => s.id === id);
+                        if (soft) Detail.open(soft);
                     });
-                }
-                var delBtns = container.querySelectorAll('.del-btn');
-                for (var k = 0; k < delBtns.length; k++) {
-                    delBtns[k].addEventListener('click', function() {
-                        var id = this.dataset.id;
-                        if (confirm('确定要删除此软件吗？')) {
-                            if (onDelete) onDelete(id);
-                        }
+                });
+                container.querySelectorAll('.software-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const id = card.dataset.id;
+                        const soft = DB.getSoftware().find(s => s.id === id);
+                        if (soft) Detail.open(soft);
                     });
-                }
+                });
             }
         };
 
-        var App = {
-            _currentAdminTab: 'dashboard',
-            _editingId: null,
-
-            init: function() {
-                if (sessionStorage.getItem('lezhe_admin')) {
-                    this.showAdmin();
+        const Detail = {
+            open(soft) {
+                const overlay = document.getElementById('detailOverlay');
+                const iconEl = document.getElementById('detailIcon');
+                if (soft.iconUrl && soft.iconUrl.trim()) {
+                    iconEl.innerHTML =
+                        `<img src="${soft.iconUrl}" alt="${soft.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.textContent='${soft.icon || '📦'}" />`;
                 } else {
-                    this.showLogin();
+                    iconEl.textContent = soft.icon || '📦';
                 }
-                document.getElementById('loginBtn').addEventListener('click', function(e) {
-                    e.preventDefault();
-                    App.doLogin();
-                });
-                document.getElementById('loginPass').addEventListener('keyup', function(e) {
-                    if (e.key === 'Enter') App.doLogin();
-                });
-                document.getElementById('adminLogout').addEventListener('click', function() {
-                    sessionStorage.removeItem('lezhe_admin');
-                    App.showLogin();
-                    toast('已退出', 'success');
-                });
-                var items = document.querySelectorAll('.admin-sidebar .nav-item[data-tab]');
-                for (var i = 0; i < items.length; i++) {
-                    items[i].addEventListener('click', function() {
-                        var tab = this.dataset.tab;
-                        var allItems = document.querySelectorAll('.admin-sidebar .nav-item');
-                        for (var j = 0; j < allItems.length; j++) {
-                            allItems[j].classList.remove('active');
-                        }
-                        this.classList.add('active');
-                        App.renderAdminTab(tab);
-                    });
-                }
-            },
-
-            showLogin: function() {
-                document.getElementById('loginPage').classList.add('active');
-                document.getElementById('adminApp').classList.remove('active');
-                document.getElementById('loginError').textContent = '';
-            },
-
-            doLogin: function() {
-                var user = document.getElementById('loginUser').value.trim();
-                var pass = document.getElementById('loginPass').value.trim();
-                var users = DB.getUsers();
-                var found = false;
-                for (var i = 0; i < users.length; i++) {
-                    if (users[i].username === user && verifyPassword(pass, users[i].passwordHash)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) {
-                    sessionStorage.setItem('lezhe_admin', 'true');
-                    document.getElementById('loginError').textContent = '';
-                    this.showAdmin();
-                    toast('欢迎回来，' + user, 'success');
-                } else {
-                    document.getElementById('loginError').textContent = '用户标识或安全密钥错误';
-                }
-            },
-
-            showAdmin: function() {
-                document.getElementById('loginPage').classList.remove('active');
-                document.getElementById('adminApp').classList.add('active');
-                this.renderAdminTab('dashboard');
-            },
-
-            renderAdminTab: function(tab) {
-                this._currentAdminTab = tab;
-                var main = document.getElementById('adminMain');
-                if (tab === 'dashboard') this.renderDashboard(main);
-                else if (tab === 'software') this.renderSoftwareList(main);
-                else if (tab === 'categories') this.renderCategories(main);
-                else if (tab === 'add') this.renderAddForm(main);
-            },
-
-            renderDashboard: function(container) {
-                var all = DB.getSoftware();
-                var cats = DB.getCategories();
-                var total = all.length;
-                var totalDownloads = 0;
-                var totalViews = 0;
-                for (var i = 0; i < all.length; i++) {
-                    totalDownloads += (all[i].downloads || 0);
-                    totalViews += (all[i].views || 0);
-                }
-                var recent = all.slice().sort(function(a, b) {
-                    return (b.date || '').localeCompare(a.date || '');
-                }).slice(0, 5);
-
-                var html = '<h2 class="page-title">◈ 控制台</h2><p class="page-sub">乐哲软件 · 资源总览</p><div class="stats-grid"><div class="stat-card"><div class="num">' + total + '</div><div class="label">软件总数</div></div><div class="stat-card"><div class="num">' + cats.length + '</div><div class="label">分类数</div></div><div class="stat-card"><div class="num">' + totalDownloads + '</div><div class="label">总下载</div></div><div class="stat-card"><div class="num">' + totalViews + '</div><div class="label">总浏览</div></div></div><h3 style="font-weight:600;margin:16px 0 10px;color:var(--text-secondary);font-size:0.95rem;">📋 最近添加</h3><div class="table-wrap"><table><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>日期</th></tr></thead><tbody>';
-                if (recent.length) {
-                    for (var j = 0; j < recent.length; j++) {
-                        var s = recent[j];
-                        html += '<tr><td>' + (s.icon || '📦') + ' ' + s.name + '</td><td>' + s.category + '</td><td>v' + s.version + '</td><td>' + (s.date || '') + '</td></tr>';
-                    }
-                } else {
-                    html += '<tr class="empty-row"><td colspan="4">暂无数据</td></tr>';
-                }
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
-            },
-
-            renderSoftwareList: function(container) {
-                var all = DB.getSoftware();
-                var self = this;
-                container.innerHTML = '<h2 class="page-title">⊞ 软件管理</h2><p class="page-sub">共 ' + all.length + ' 款资源</p><div style="margin-bottom:14px;"><button class="btn btn-sm btn-primary" id="adminAddBtn">⊕ 上传新软件</button></div><div class="table-wrap" id="adminTableWrap"></div>';
-                var wrap = document.getElementById('adminTableWrap');
-                Render.renderAdminTable(wrap, all,
-                    function(id) {
-                        var soft = DB.getSoftware().find(function(s) { return s.id === id; });
-                        if (soft) {
-                            self._editingId = id;
-                            self.renderAdminTab('add');
-                            var form = document.getElementById('adminForm');
-                            if (form) {
-                                form.querySelector('[name="name"]').value = soft.name || '';
-                                form.querySelector('[name="category"]').value = soft.category || '';
-                                form.querySelector('[name="version"]').value = soft.version || '';
-                                form.querySelector('[name="description"]').value = soft.description || '';
-                                form.querySelector('[name="detail"]').value = soft.detail || '';
-                                form.querySelector('[name="icon"]').value = soft.icon || '📦';
-                                form.querySelector('[name="iconUrl"]').value = soft.iconUrl || '';
-                                form.querySelector('[name="downloadUrl"]').value = soft.downloadUrl || '';
-                                form.querySelector('[name="size"]').value = soft.size || '';
-                                form.querySelector('[name="recommend"]').checked = !!soft.recommend;
-                                self._updateIconPreview(form);
-                                document.querySelector('#adminForm .form-actions .btn-primary').textContent = '✎ 更新';
-                                document.querySelector('#adminForm .form-actions .btn-cancel').classList.remove('hidden');
-                            }
-                        }
-                    },
-                    function(id) {
-                        var list = DB.getSoftware();
-                        list = list.filter(function(s) { return s.id !== id; });
-                        DB.setSoftware(list);
-                        toast('已删除', 'success');
-                        self.renderAdminTab('software');
-                    }
-                );
-                document.getElementById('adminAddBtn').addEventListener('click', function() {
-                    self._editingId = null;
-                    self.renderAdminTab('add');
-                    var form = document.getElementById('adminForm');
-                    if (form) {
-                        form.reset();
-                        document.querySelector('#adminForm .form-actions .btn-primary').textContent = '⊕ 上传';
-                        document.querySelector('#adminForm .form-actions .btn-cancel').classList.add('hidden');
-                        self._updateIconPreview(form);
-                    }
-                });
-            },
-
-            renderCategories: function(container) {
-                var cats = DB.getCategories();
-                var self = this;
-                var html = '<h2 class="page-title">⌗ 分类管理</h2><p class="page-sub">管理分类标签</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="newCategoryInput" placeholder="输入新分类名称" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:rgba(0,0,0,0.2);flex:1;min-width:140px;color:var(--text-primary);" /><button class="btn btn-sm btn-primary" id="addCategoryBtn">⊕ 添加</button></div><div class="table-wrap"><table><thead><tr><th>分类名称</th><th>软件数</th><th style="width:80px;">操作</th></tr></thead><tbody>';
-                for (var i = 0; i < cats.length; i++) {
-                    var c = cats[i];
-                    var count = DB.getSoftware().filter(function(s) { return s.category === c; }).length;
-                    html += '<tr><td>' + getIconEmoji(c) + ' ' + c + '</td><td>' + count + '</td><td><button class="del-btn" data-cat="' + c + '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);transition:var(--transition);">删除</button></td></tr>';
-                }
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
-
-                document.getElementById('addCategoryBtn').addEventListener('click', function() {
-                    var input = document.getElementById('newCategoryInput');
-                    var name = input.value.trim();
-                    if (!name) { toast('请输入分类名称', 'error'); return; }
-                    var list = DB.getCategories();
-                    if (list.indexOf(name) !== -1) { toast('分类已存在', 'error'); return; }
-                    list.push(name);
-                    DB.setCategories(list);
-                    input.value = '';
-                    toast('分类已添加', 'success');
-                    self.renderAdminTab('categories');
-                });
-
-                var delBtns = container.querySelectorAll('.del-btn[data-cat]');
-                for (var j = 0; j < delBtns.length; j++) {
-                    delBtns[j].addEventListener('click', function() {
-                        var cat = this.dataset.cat;
-                        var has = DB.getSoftware().some(function(s) { return s.category === cat; });
-                        if (has) {
-                            toast('该分类下还有软件，无法删除', 'error');
-                            return;
-                        }
-                        if (confirm('确定删除分类 "' + cat + '" 吗？')) {
-                            var list = DB.getCategories();
-                            list = list.filter(function(c) { return c !== cat; });
-                            DB.setCategories(list);
-                            toast('分类已删除', 'success');
-                            self.renderAdminTab('categories');
-                        }
-                    });
-                }
-            },
-
-            _updateIconPreview: function(form) {
-                var url = form.querySelector('[name="iconUrl"]').value.trim();
-                var preview = form.querySelector('.preview-box');
-                var emoji = form.querySelector('[name="icon"]').value.trim() || '📦';
-                if (url) {
-                    preview.innerHTML = '<img src="' + url + '" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + emoji + '\'" />';
-                } else {
-                    preview.textContent = emoji;
-                }
-            },
-
-            renderAddForm: function(container) {
-                var isEdit = !!this._editingId;
-                var self = this;
-                var cats = DB.getCategories();
-                var optionsHtml = '';
-                for (var i = 0; i < cats.length; i++) {
-                    optionsHtml += '<option value="' + cats[i] + '">' + cats[i] + '</option>';
-                }
-                var html = '<h2 class="page-title">' + (isEdit ? '✎ 编辑资源' : '⊕ 上传资源') + '</h2><p class="page-sub">' + (isEdit ? '更新软件信息' : '向工坊提交新软件') + '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required>' + optionsHtml + '</select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 (软件包地址) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入软件下载直链或网盘链接</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary">' + (isEdit ? '✎ 更新' : '⊕ 上传') + '</button><button type="button" class="btn btn-outline btn-cancel ' + (isEdit ? '' : 'hidden') + '" id="cancelEditBtn">取消</button></div></form>';
-                container.innerHTML = html;
-
-                var form = document.getElementById('adminForm');
-                var iconUrlInput = form.querySelector('[name="iconUrl"]');
-                var iconEmojiInput = form.querySelector('[name="icon"]');
-                var previewBox = form.querySelector('.preview-box');
-
-                var updatePreview = function() {
-                    var url = iconUrlInput.value.trim();
-                    var emoji = iconEmojiInput.value.trim() || '📦';
-                    if (url) {
-                        previewBox.innerHTML = '<img src="' + url + '" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + emoji + '\'" />';
-                    } else {
-                        previewBox.textContent = emoji;
+                document.getElementById('detailName').textContent = soft.name;
+                document.getElementById('detailMeta').innerHTML = `
+                    <span class="badge">${soft.category}</span>
+                    <span class="badge badge-purple">v${soft.version}</span>
+                    <span>${soft.size || '—'}</span>
+                    <span>📅 ${soft.date || ''}</span>
+                    <span>👁 ${soft.views || 0}</span>
+                    <span>⬇ ${soft.downloads || 0}</span>
+                `;
+                document.getElementById('detailDesc').textContent = soft.detail || soft.description || '';
+                const dlBtn = document.getElementById('detailDownload');
+                dlBtn.textContent = '⬇ 下载';
+                dlBtn.onclick = () => {
+                    const list = DB.getSoftware();
+                    const item = list.find(s => s.id === soft.id);
+                    if (item) {
+                        item.downloads = (item.downloads || 0) + 1;
+                        DB.set('software', list);
+                        toast('开始下载 ' + item.name, 'success');
+                        const meta = document.getElementById('detailMeta');
+                        const spans = meta.querySelectorAll('span');
+                        if (spans.length >= 6) spans[5].textContent = '⬇ ' + item.downloads;
+                        App.refreshAll();
                     }
                 };
-                iconUrlInput.addEventListener('input', updatePreview);
-                iconEmojiInput.addEventListener('input', updatePreview);
-
-                var cancelBtn = document.getElementById('cancelEditBtn');
-                if (cancelBtn) {
-                    cancelBtn.addEventListener('click', function() {
-                        self._editingId = null;
-                        self.renderAdminTab('software');
-                    });
-                }
-
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var data = {
-                        name: form.querySelector('[name="name"]').value.trim(),
-                        category: form.querySelector('[name="category"]').value,
-                        version: form.querySelector('[name="version"]').value.trim(),
-                        icon: form.querySelector('[name="icon"]').value.trim() || '📦',
-                        iconUrl: form.querySelector('[name="iconUrl"]').value.trim(),
-                        downloadUrl: form.querySelector('[name="downloadUrl"]').value.trim(),
-                        size: form.querySelector('[name="size"]').value.trim(),
-                        description: form.querySelector('[name="description"]').value.trim(),
-                        detail: form.querySelector('[name="detail"]').value.trim(),
-                        recommend: form.querySelector('[name="recommend"]').checked
-                    };
-                    if (!data.name || !data.category || !data.version || !data.description) {
-                        toast('请填写完整信息', 'error');
-                        return;
-                    }
-                    var list = DB.getSoftware();
-                    if (self._editingId) {
-                        var idx = -1;
-                        for (var i = 0; i < list.length; i++) {
-                            if (list[i].id === self._editingId) {
-                                idx = i;
-                                break;
-                            }
-                        }
-                        if (idx !== -1) {
-                            var old = list[idx];
-                            list[idx] = { id: old.id, date: old.date, views: old.views, downloads: old.downloads };
-                            for (var key in data) {
-                                if (data.hasOwnProperty(key)) {
-                                    list[idx][key] = data[key];
-                                }
-                            }
-                            DB.setSoftware(list);
-                            toast('已更新: ' + data.name, 'success');
-                            self._editingId = null;
-                            self.renderAdminTab('software');
-                        }
-                    } else {
-                        var newSoft = {
-                            id: DB.genId(),
-                            name: data.name,
-                            category: data.category,
-                            version: data.version,
-                            icon: data.icon,
-                            iconUrl: data.iconUrl,
-                            downloadUrl: data.downloadUrl,
-                            size: data.size,
-                            description: data.description,
-                            detail: data.detail,
-                            recommend: data.recommend,
-                            date: new Date().toISOString().slice(0, 10),
-                            views: 0,
-                            downloads: 0
-                        };
-                        list.push(newSoft);
-                        DB.setSoftware(list);
-                        toast('上传成功: ' + data.name, 'success');
-                        form.reset();
-                        self.renderAdminTab('software');
-                    }
-                });
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            },
+            close() {
+                document.getElementById('detailOverlay').classList.remove('open');
+                document.body.style.overflow = '';
             }
         };
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('detailClose').addEventListener('click', Detail.close);
+        document.getElementById('detailCloseBtn').addEventListener('click', Detail.close);
+        document.getElementById('detailOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) Detail.close();
+        });
+
+        const App = {
+            currentPage: 'home',
+            currentCategory: 'all',
+
+            init() {
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
+                    a.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = a.dataset.page;
+                        if (page === 'home') this.goHome();
+                        else if (page === 'list') this.goList();
+                    });
+                });
+                document.getElementById('searchBtn').addEventListener('click', () => this.doSearch());
+                document.getElementById('searchInput').addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') this.doSearch();
+                });
+                document.getElementById('logoHome').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.goHome();
+                });
+                document.getElementById('mobileToggle').addEventListener('click', () => {
+                    document.getElementById('navLinks').classList.toggle('open');
+                });
+
+                document.getElementById('prevPageBtn').addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        this.renderListPage();
+                    }
+                });
+                document.getElementById('nextPageBtn').addEventListener('click', () => {
+                    const totalPages = Math.ceil(currentFilteredList.length / PAGE_SIZE);
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        this.renderListPage();
+                    }
+                });
+
+                this.refreshAll();
+            },
+
+            goHome() {
+                this.currentPage = 'home';
+                document.getElementById('pageHome').classList.remove('hidden');
+                document.getElementById('pageList').classList.add('hidden');
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
+                document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
+                document.getElementById('navLinks').classList.remove('open');
+                this.refreshHome();
+            },
+
+            goList(cat = 'all') {
+                this.currentPage = 'list';
+                this.currentCategory = cat;
+                document.getElementById('pageHome').classList.add('hidden');
+                document.getElementById('pageList').classList.remove('hidden');
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
+                document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
+                document.getElementById('navLinks').classList.remove('open');
+                currentPage = 1;
+                this.refreshList();
+            },
+
+            doSearch() {
+                const kw = document.getElementById('searchInput').value.trim();
+                if (!kw) { this.goHome(); return; }
+                this.currentPage = 'list';
+                document.getElementById('pageHome').classList.add('hidden');
+                document.getElementById('pageList').classList.remove('hidden');
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
+                document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
+                document.getElementById('navLinks').classList.remove('open');
+                currentPage = 1;
+                this.refreshList(kw);
+            },
+
+            refreshHome() {
+                const all = DB.getSoftware();
+                const cats = DB.getCategories();
+                Render.renderCategories(
+                    document.getElementById('categoryGridHome'),
+                    cats,
+                    null,
+                    (cat) => { this.goList(cat); }
+                );
+                const recommend = all.filter(s => s.recommend).slice(0, 6);
+                Render.renderCards(document.getElementById('recommendGrid'), recommend, true);
+                const latest = [...all].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 6);
+                Render.renderCards(document.getElementById('latestGrid'), latest, true);
+            },
+
+            refreshList(keyword) {
+                const all = DB.getSoftware();
+                let list = [...all];
+                const cats = DB.getCategories();
+
+                const filterContainer = document.getElementById('filterTags');
+                let filterHtml =
+                    `<button class="btn btn-sm btn-outline active" data-cat="all">全部</button>`;
+                cats.forEach(c => {
+                    filterHtml +=
+                        `<button class="btn btn-sm btn-outline" data-cat="${c}">${c}</button>`;
+                });
+                filterContainer.innerHTML = filterHtml;
+                filterContainer.querySelectorAll('button').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filterContainer.querySelectorAll('button').forEach(b => b.classList.remove(
+                            'active'));
+                        btn.classList.add('active');
+                        const cat = btn.dataset.cat;
+                        this.currentCategory = cat;
+                        currentPage = 1;
+                        this.refreshListWithFilters();
+                    });
+                });
+
+                if (keyword) {
+                    const kw = keyword.toLowerCase();
+                    list = list.filter(s =>
+                        s.name.toLowerCase().includes(kw) ||
+                        (s.description || '').toLowerCase().includes(kw) ||
+                        (s.detail || '').toLowerCase().includes(kw)
+                    );
+                    document.getElementById('listSub').textContent = `搜索结果: "${keyword}" (${list.length}项)`;
+                } else {
+                    document.getElementById('listSub').textContent = `全部软件 (${list.length}项)`;
+                }
+
+                if (this.currentCategory !== 'all') {
+                    list = list.filter(s => s.category === this.currentCategory);
+                }
+
+                currentFilteredList = list;
+                this.renderListPage();
+            },
+
+            renderListPage() {
+                const total = currentFilteredList.length;
+                const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+                if (currentPage > totalPages) currentPage = totalPages;
+                const start = (currentPage - 1) * PAGE_SIZE;
+                const end = Math.min(start + PAGE_SIZE, total);
+                const pageItems = currentFilteredList.slice(start, end);
+
+                Render.renderCards(document.getElementById('listGrid'), pageItems, true);
+
+                document.getElementById('pageInfo').textContent = `第 ${currentPage} / ${totalPages} 页`;
+                document.getElementById('prevPageBtn').disabled = (currentPage <= 1);
+                document.getElementById('nextPageBtn').disabled = (currentPage >= totalPages);
+            },
+
+            refreshListWithFilters() {
+                const kw = document.getElementById('searchInput').value.trim();
+                if (kw) { this.refreshList(kw); } else { this.refreshList(null); }
+            },
+
+            refreshAll() {
+                if (this.currentPage === 'home') this.refreshHome();
+                else if (this.currentPage === 'list') this.refreshListWithFilters();
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
             App.init();
+            document.addEventListener('click', (e) => {
+                const nav = document.getElementById('navLinks');
+                if (nav.classList.contains('open') && !e.target.closest('.header')) {
+                    nav.classList.remove('open');
+                }
+            });
         });
 
         window.__APP = App;
         window.__DB = DB;
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
