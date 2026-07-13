@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -576,10 +575,24 @@
                 dlBtn.onclick = () => {
                     const list = DB.getSoftware();
                     const item = list.find(s => s.id === soft.id);
-                    if (item) {
+                    if (!item) return;
+                    // 优先跳转下载链接
+                    if (item.downloadUrl && item.downloadUrl.trim() !== '') {
+                        window.open(item.downloadUrl, '_blank');
+                        // 同时增加下载计数
                         item.downloads = (item.downloads || 0) + 1;
                         DB.set('software', list);
                         toast('开始下载 ' + item.name, 'success');
+                        // 更新弹窗中的下载数
+                        const meta = document.getElementById('detailMeta');
+                        const spans = meta.querySelectorAll('span');
+                        if (spans.length >= 6) spans[5].textContent = '⬇ ' + item.downloads;
+                        App.refreshAll();
+                    } else {
+                        // 无链接则仅计数并提示
+                        item.downloads = (item.downloads || 0) + 1;
+                        DB.set('software', list);
+                        toast('暂无下载链接，已记录下载意向', 'error');
                         const meta = document.getElementById('detailMeta');
                         const spans = meta.querySelectorAll('span');
                         if (spans.length >= 6) spans[5].textContent = '⬇ ' + item.downloads;
@@ -777,7 +790,5 @@
         window.__APP = App;
         window.__DB = DB;
     </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
