@@ -406,6 +406,7 @@
                 detail: '乐哲笔记是一款为创作者打造的轻量级笔记应用。沉浸式写作模式、云端同步、双向链接，构建你的数字花园。',
                 icon: '📝',
                 iconUrl: '',
+                downloadUrl: '',
                 size: '14.2 MB',
                 date: '2026-07-12',
                 views: 512,
@@ -420,6 +421,7 @@
                 detail: '像素工坊提供丰富的笔刷引擎和色彩管理，支持多图层与高级混合模式，让创意自由流动。',
                 icon: '🎨',
                 iconUrl: '',
+                downloadUrl: '',
                 size: '48.6 MB',
                 date: '2026-07-10',
                 views: 387,
@@ -434,6 +436,7 @@
                 detail: 'CodeNest 集成语法高亮、智能补全与 Git 版本控制，支持数十种编程语言，开发体验流畅。',
                 icon: '⌨️',
                 iconUrl: '',
+                downloadUrl: '',
                 size: '32.1 MB',
                 date: '2026-07-08',
                 views: 634,
@@ -448,6 +451,7 @@
                 detail: '光影矩阵利用深度学习算法实现智能抠图、画质修复与风格迁移，让每一张照片都焕发新生。',
                 icon: '📸',
                 iconUrl: '',
+                downloadUrl: '',
                 size: '78.3 MB',
                 date: '2026-07-05',
                 views: 423,
@@ -462,6 +466,7 @@
                 detail: '数据罗盘支持连接多种数据源，通过拖拽式操作生成交互式图表与仪表盘，洞察数据价值。',
                 icon: '📊',
                 iconUrl: '',
+                downloadUrl: '',
                 size: '22.7 MB',
                 date: '2026-07-02',
                 views: 276,
@@ -476,6 +481,7 @@
                 detail: '极光浏览器基于 Chromium 内核深度优化，内置智能拦截、隐私保护与沉浸式阅读模式。',
                 icon: '🌐',
                 iconUrl: '',
+                downloadUrl: '',
                 size: '9.8 MB',
                 date: '2026-06-28',
                 views: 589,
@@ -672,6 +678,7 @@
                                 form.querySelector('[name="detail"]').value = soft.detail || '';
                                 form.querySelector('[name="icon"]').value = soft.icon || '📦';
                                 form.querySelector('[name="iconUrl"]').value = soft.iconUrl || '';
+                                form.querySelector('[name="downloadUrl"]').value = soft.downloadUrl || '';
                                 form.querySelector('[name="size"]').value = soft.size || '';
                                 form.querySelector('[name="recommend"]').checked = !!soft.recommend;
                                 self._updateIconPreview(form);
@@ -765,7 +772,7 @@
                 for (var i = 0; i < cats.length; i++) {
                     optionsHtml += '<option value="' + cats[i] + '">' + cats[i] + '</option>';
                 }
-                var html = '<h2 class="page-title">' + (isEdit ? '✎ 编辑资源' : '⊕ 上传资源') + '</h2><p class="page-sub">' + (isEdit ? '更新软件信息' : '向工坊提交新软件') + '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required>' + optionsHtml + '</select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary">' + (isEdit ? '✎ 更新' : '⊕ 上传') + '</button><button type="button" class="btn btn-outline btn-cancel ' + (isEdit ? '' : 'hidden') + '" id="cancelEditBtn">取消</button></div></form>';
+                var html = '<h2 class="page-title">' + (isEdit ? '✎ 编辑资源' : '⊕ 上传资源') + '</h2><p class="page-sub">' + (isEdit ? '更新软件信息' : '向工坊提交新软件') + '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required>' + optionsHtml + '</select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 (软件包地址) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入软件下载直链或网盘链接</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary">' + (isEdit ? '✎ 更新' : '⊕ 上传') + '</button><button type="button" class="btn btn-outline btn-cancel ' + (isEdit ? '' : 'hidden') + '" id="cancelEditBtn">取消</button></div></form>';
                 container.innerHTML = html;
 
                 var form = document.getElementById('adminForm');
@@ -801,6 +808,7 @@
                         version: form.querySelector('[name="version"]').value.trim(),
                         icon: form.querySelector('[name="icon"]').value.trim() || '📦',
                         iconUrl: form.querySelector('[name="iconUrl"]').value.trim(),
+                        downloadUrl: form.querySelector('[name="downloadUrl"]').value.trim(),
                         size: form.querySelector('[name="size"]').value.trim(),
                         description: form.querySelector('[name="description"]').value.trim(),
                         detail: form.querySelector('[name="detail"]').value.trim(),
@@ -840,6 +848,7 @@
                             version: data.version,
                             icon: data.icon,
                             iconUrl: data.iconUrl,
+                            downloadUrl: data.downloadUrl,
                             size: data.size,
                             description: data.description,
                             detail: data.detail,
@@ -865,6 +874,5 @@
         window.__APP = App;
         window.__DB = DB;
     </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
