@@ -778,10 +778,16 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
-        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ============================================================
+        //  配置 Supabase（已内置您的密钥）
+        // ============================================================
+        var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
+        var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+        var supabaseClient = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ============================================================
+        //  数据层
+        // ============================================================
         var DB = {
             get: function(key) {
                 try { return JSON.parse(localStorage.getItem('lezhe_' + key)) || null; } catch { return null; }
@@ -816,84 +822,87 @@
 
             // Supabase 版本的操作
             async getSoftwareFromCloud() {
-                const { data, error } = await supabase
+                var result = await supabaseClient
                     .from('software')
                     .select('*')
                     .order('created_at', { ascending: false });
-                if (error) {
-                    console.error('获取软件失败:', error);
+                if (result.error) {
+                    console.error('获取软件失败:', result.error);
                     return [];
                 }
-                return data || [];
+                return result.data || [];
             },
 
             async addSoftwareToCloud(soft) {
-                const { data, error } = await supabase
+                var result = await supabaseClient
                     .from('software')
                     .insert(soft)
                     .select();
-                if (error) {
-                    console.error('添加软件失败:', error);
+                if (result.error) {
+                    console.error('添加软件失败:', result.error);
                     return null;
                 }
-                return data ? data[0] : null;
+                return result.data ? result.data[0] : null;
             },
 
             async updateSoftwareInCloud(id, updates) {
-                const { error } = await supabase
+                var result = await supabaseClient
                     .from('software')
                     .update(updates)
                     .eq('id', id);
-                if (error) console.error('更新软件失败:', error);
+                if (result.error) console.error('更新软件失败:', result.error);
             },
 
             async deleteSoftwareFromCloud(id) {
-                const { error } = await supabase
+                var result = await supabaseClient
                     .from('software')
                     .delete()
                     .eq('id', id);
-                if (error) console.error('删除软件失败:', error);
+                if (result.error) console.error('删除软件失败:', result.error);
             },
 
             async getCategoriesFromCloud() {
-                const { data, error } = await supabase
+                var result = await supabaseClient
                     .from('categories')
                     .select('name')
                     .order('name');
-                if (error) {
-                    console.error('获取分类失败:', error);
+                if (result.error) {
+                    console.error('获取分类失败:', result.error);
                     return ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                 }
-                return data.map(item => item.name);
+                return result.data.map(function(item) { return item.name; });
             },
 
             async addCategoryToCloud(name) {
-                const { error } = await supabase
+                var result = await supabaseClient
                     .from('categories')
                     .insert({ name: name });
-                if (error) console.error('添加分类失败:', error);
+                if (result.error) console.error('添加分类失败:', result.error);
             },
 
             async deleteCategoryFromCloud(name) {
-                const { error } = await supabase
+                var result = await supabaseClient
                     .from('categories')
                     .delete()
                     .eq('name', name);
-                if (error) console.error('删除分类失败:', error);
+                if (result.error) console.error('删除分类失败:', result.error);
             },
 
             async verifyUserCloud(username, passwordHash) {
-                const { data, error } = await supabase
+                var result = await supabaseClient
                     .from('users')
                     .select('password_hash')
                     .eq('username', username);
-                if (error || !data || data.length === 0) {
+                if (result.error || !result.data || result.data.length === 0) {
                     return false;
                 }
-                return data[0].password_hash === passwordHash;
+                return result.data[0].password_hash === passwordHash;
             }
         };
 
+        // ============================================================
+        //  密码工具
+        // ============================================================
         function hashPassword(password) {
             var hash = 0;
             for (var i = 0; i < password.length; i++) {
@@ -917,7 +926,7 @@
         var secretPassword = 'qbx12164811..';
         var adminHash = hashPassword(secretPassword);
 
-        // 初始化本地用户（兼容旧版）
+        // 初始化本地用户
         if (!localStorage.getItem('lezhe_users')) {
             DB.set('users', [{ username: 'admin', passwordHash: adminHash }]);
         } else {
@@ -928,11 +937,13 @@
             }
         }
 
-        // 初始化本地分类（兼容旧版，但优先使用云端）
         if (!localStorage.getItem('lezhe_categories')) {
             DB.set('categories', ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具']);
         }
 
+        // ============================================================
+        //  工具函数
+        // ============================================================
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
@@ -958,6 +969,9 @@
             return soft.icon || '📦';
         }
 
+        // ============================================================
+        //  渲染引擎
+        // ============================================================
         var Render = {
             renderAdminTable: function(container, list, onEdit, onDelete) {
                 if (!container) return;
@@ -992,6 +1006,9 @@
             }
         };
 
+        // ============================================================
+        //  应用主控
+        // ============================================================
         var App = {
             _currentAdminTab: 'dashboard',
             _editingId: null,
@@ -1120,7 +1137,6 @@
                                 form.querySelector('[name="downloadUrl"]').value = soft.download_url || '';
                                 form.querySelector('[name="size"]').value = soft.size || '';
                                 form.querySelector('[name="recommend"]').checked = !!soft.recommend;
-                                // 平台选择
                                 var platforms = soft.platforms || [];
                                 var macCheck = form.querySelector('[name="platformMac"]');
                                 var winCheck = form.querySelector('[name="platformWin"]');
@@ -1209,17 +1225,10 @@
             renderAddForm: function(container) {
                 var isEdit = !!this._editingId;
                 var self = this;
-                var html = '<h2 class="page-title">' + (isEdit ? '✎ 编辑资源' : '⊕ 上传资源') + '</h2><p class="page-sub">' + (isEdit ? '更新软件信息' : '向工坊提交新软件') + '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required>';
-                DB.getCategoriesFromCloud().then(function(cats) {
-                    var select = document.querySelector('[name="category"]');
-                    if (select) {
-                        select.innerHTML = cats.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
-                    }
-                });
-                html += '</select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 (软件包地址) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入软件下载直链或网盘链接</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-row"><div class="form-group"><label>支持平台</label><div style="display:flex;gap:20px;padding-top:6px;"><label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="platformMac" value="mac" /> 🍎 Mac</label><label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="platformWin" value="windows" /> 🪟 Windows</label></div></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary">' + (isEdit ? '✎ 更新' : '⊕ 上传') + '</button><button type="button" class="btn btn-outline btn-cancel ' + (isEdit ? '' : 'hidden') + '" id="cancelEditBtn">取消</button></div></form>';
+                var html = '<h2 class="page-title">' + (isEdit ? '✎ 编辑资源' : '⊕ 上传资源') + '</h2><p class="page-sub">' + (isEdit ? '更新软件信息' : '向工坊提交新软件') + '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required></select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 (软件包地址) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入软件下载直链或网盘链接</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-row"><div class="form-group"><label>支持平台</label><div style="display:flex;gap:20px;padding-top:6px;"><label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="platformMac" value="mac" /> 🍎 Mac</label><label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="platformWin" value="windows" /> 🪟 Windows</label></div></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary">' + (isEdit ? '✎ 更新' : '⊕ 上传') + '</button><button type="button" class="btn btn-outline btn-cancel ' + (isEdit ? '' : 'hidden') + '" id="cancelEditBtn">取消</button></div></form>';
                 container.innerHTML = html;
 
-                // 重新绑定分类选择器
+                // 绑定分类选择器
                 var select = container.querySelector('[name="category"]');
                 DB.getCategoriesFromCloud().then(function(cats) {
                     if (select) {
@@ -1292,7 +1301,17 @@
                     } else {
                         var newSoft = {
                             id: DB.genId(),
-                            ...data,
+                            name: data.name,
+                            category: data.category,
+                            version: data.version,
+                            icon: data.icon,
+                            icon_url: data.icon_url,
+                            download_url: data.download_url,
+                            platforms: data.platforms,
+                            size: data.size,
+                            description: data.description,
+                            detail: data.detail,
+                            recommend: data.recommend,
                             date: new Date().toISOString().slice(0, 10),
                             views: 0,
                             downloads: 0
