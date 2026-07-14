@@ -198,6 +198,11 @@
             color: var(--accent-purple);
             border-color: rgba(108, 92, 231, 0.15);
         }
+        .badge-announce {
+            background: rgba(255, 165, 0, 0.12);
+            color: #e8850c;
+            border-color: rgba(255, 165, 0, 0.2);
+        }
 
         .empty-state {
             text-align: center;
@@ -223,7 +228,7 @@
             backdrop-filter: blur(24px);
             border-bottom: 1px solid var(--border-glow);
             height: var(--header-height);
-            box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
         }
         .header-inner {
             display: flex;
@@ -254,12 +259,21 @@
             font-weight: 800;
             box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
         }
-        .logo span {
+        .logo .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        .logo .brand-text .main {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+        .logo .brand-text .sub {
             font-weight: 300;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            margin-left: 4px;
-            letter-spacing: 1px;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
         }
 
         .nav-links {
@@ -314,7 +328,7 @@
         }
 
         .hero {
-            padding: 50px 0 32px;
+            padding: 40px 0 20px;
             text-align: center;
             position: relative;
         }
@@ -331,13 +345,13 @@
             pointer-events: none;
         }
         .hero h1 {
-            font-size: 3rem;
+            font-size: 2.8rem;
             font-weight: 700;
             letter-spacing: -1px;
             background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-cyan) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .hero h1 .highlight {
             background: var(--accent-gradient);
@@ -348,7 +362,7 @@
             font-size: 1rem;
             color: var(--text-secondary);
             max-width: 480px;
-            margin: 0 auto 28px;
+            margin: 0 auto 24px;
             font-weight: 300;
         }
         .hero .search-box {
@@ -392,6 +406,47 @@
             box-shadow: 0 0 20px rgba(0, 136, 255, 0.2);
         }
 
+        .announcement-list {
+            max-width: 680px;
+            margin: 0 auto 12px;
+        }
+        .announcement-item {
+            padding: 6px 16px 6px 20px;
+            border-left: 2px solid var(--border-glow);
+            margin-bottom: 4px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        .announcement-item:hover {
+            background: rgba(0, 136, 255, 0.04);
+            border-left-color: var(--accent-cyan);
+        }
+        .announcement-item .dot {
+            color: var(--accent-cyan);
+            font-size: 0.4rem;
+        }
+        .announcement-item .time {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            flex-shrink: 0;
+        }
+        .announcement-item .text {
+            flex: 1;
+        }
+        .announcement-item .badge-new {
+            font-size: 0.6rem;
+            background: var(--accent-gradient);
+            color: #fff;
+            padding: 0 10px;
+            border-radius: 50px;
+            flex-shrink: 0;
+        }
+
         .section-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -406,13 +461,12 @@
             font-size: 0.9rem;
         }
 
-        /* ===== 分类导航 - 横向滚动容器 ===== */
         .categories-wrapper {
             position: relative;
             display: flex;
             align-items: center;
             gap: 4px;
-            margin: 20px 0 12px;
+            margin: 16px 0 12px;
         }
         .categories-scroll {
             overflow-x: auto;
@@ -474,7 +528,7 @@
             box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
         }
         .category-item.active .count {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .categories-nav-btn {
@@ -813,7 +867,7 @@
         }
 
         .footer {
-            padding: 32px 0 24px;
+            padding: 32px 0 20px;
             border-top: 1px solid var(--border-glow);
             margin-top: 32px;
             text-align: center;
@@ -849,6 +903,26 @@
             margin-right: auto;
             line-height: 1.6;
             opacity: 0.8;
+        }
+        .footer .friend-links {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px 24px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+        .footer .friend-links a {
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .footer .friend-links a:hover {
+            color: var(--accent-cyan);
+            text-decoration: underline;
+        }
+        .footer .friend-links .sep {
+            color: var(--border-glow);
         }
 
         .toast-container {
@@ -955,6 +1029,15 @@
             transform: scale(1.05);
         }
 
+        .zen-divider {
+            text-align: center;
+            padding: 6px 0 2px;
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            letter-spacing: 6px;
+            opacity: 0.5;
+        }
+
         @media (max-width: 768px) {
             :root {
                 --header-height: 58px;
@@ -1037,6 +1120,14 @@
                 height: 28px;
                 font-size: 0.8rem;
             }
+            .announcement-item {
+                font-size: 0.75rem;
+                padding: 4px 12px 4px 16px;
+            }
+            .footer .friend-links {
+                font-size: 0.65rem;
+                gap: 8px 16px;
+            }
         }
         @media (max-width: 480px) {
             .hero h1 {
@@ -1061,6 +1152,10 @@
             .footer .copyright {
                 font-size: 0.7rem;
             }
+            .footer .friend-links {
+                font-size: 0.6rem;
+                gap: 6px 10px;
+            }
         }
         .category-item:active,
         .software-card:active,
@@ -1077,7 +1172,10 @@
         <div class="container header-inner">
             <a href="#" class="logo" id="logoHome">
                 <span class="mark">◆</span>
-                乐哲软件 <span>LEZHE</span>
+                <span class="brand-text">
+                    <span class="main">乐哲软件</span>
+                    <span class="sub">构建数字未来</span>
+                </span>
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#" class="active" data-page="home"><i class="fas fa-home"></i> 首页</a></li>
@@ -1093,13 +1191,17 @@
                 <div class="hero">
                     <h1>探索 · <span class="highlight">乐哲</span> 软件</h1>
                     <p>精选高效工具，赋能创作者生态。</p>
+
+                    <div id="announcementContainer" class="announcement-list"></div>
+
                     <div class="search-box">
                         <input type="text" id="searchInput" placeholder="搜索软件名称或描述..." aria-label="搜索软件" />
                         <button id="searchBtn"><i class="fas fa-search"></i> 检索</button>
                     </div>
                 </div>
+
                 <div class="divider-cyber"><span class="dot">◆</span> 分 类 导 航 <span class="dot">◆</span></div>
-                <!-- 分类导航（带左右按钮） -->
+
                 <div class="categories-wrapper" id="categoriesWrapper">
                     <button class="categories-nav-btn" id="catPrevBtn" aria-label="向左滚动"><i class="fas fa-chevron-left"></i></button>
                     <div class="categories-scroll" id="categoriesScroll">
@@ -1107,7 +1209,8 @@
                     </div>
                     <button class="categories-nav-btn" id="catNextBtn" aria-label="向右滚动"><i class="fas fa-chevron-right"></i></button>
                 </div>
-                <div style="margin-top:40px;">
+
+                <div style="margin-top:36px;">
                     <h2 class="section-title">✦ 热门推荐</h2>
                     <p class="section-sub">社区口碑精选</p>
                     <div class="software-grid" id="recommendGrid"></div>
@@ -1117,6 +1220,8 @@
                     <p class="section-sub">持续迭代，保持前沿</p>
                     <div class="software-grid" id="latestGrid"></div>
                 </div>
+
+                <div class="zen-divider">· · · 静 心 修 行 · 随 缘 分 享 · · ·</div>
             </section>
 
             <section id="pageList" class="hidden">
@@ -1151,6 +1256,18 @@
             <p class="copyright">
                 &copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="mailto:810803788@qq.com">810803788@qq.com</a>
             </p>
+            <div class="friend-links">
+                <span>友情链接：</span>
+                <a href="https://github.com" target="_blank">GitHub</a>
+                <span class="sep">|</span>
+                <a href="https://www.v2ex.com" target="_blank">V2EX</a>
+                <span class="sep">|</span>
+                <a href="https://www.oschina.net" target="_blank">开源中国</a>
+                <span class="sep">|</span>
+                <a href="https://www.csdn.net" target="_blank">CSDN</a>
+                <span class="sep">|</span>
+                <a href="https://www.zhihu.com" target="_blank">知乎</a>
+            </div>
             <div class="legal">
                 免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。
             </div>
@@ -1179,17 +1296,282 @@
         }
         var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ===== 数据缓存 =====
+        var QUOTES = [
+            "生活就像一盒巧克力，你永远不知道下一颗是什么味道。",
+            "不积跬步，无以至千里。",
+            "梦想还是要有的，万一实现了呢？",
+            "世界那么大，我想去看看。",
+            "人生没有白走的路，每一步都算数。",
+            "愿你出走半生，归来仍是少年。",
+            "心有多大，舞台就有多大。",
+            "只要功夫深，铁杵磨成针。",
+            "不忘初心，方得始终。",
+            "长风破浪会有时，直挂云帆济沧海。",
+            "天行健，君子以自强不息。",
+            "地势坤，君子以厚德载物。",
+            "博学之，审问之，慎思之，明辨之，笃行之。",
+            "学而不思则罔，思而不学则殆。",
+            "温故而知新，可以为师矣。",
+            "三人行，必有我师焉。",
+            "择其善者而从之，其不善者而改之。",
+            "士不可以不弘毅，任重而道远。",
+            "岁寒，然后知松柏之后凋也。",
+            "己所不欲，勿施于人。",
+            "道不同，不相为谋。",
+            "君子和而不同，小人同而不和。",
+            "欲速则不达，见小利则大事不成。",
+            "工欲善其事，必先利其器。",
+            "人无远虑，必有近忧。",
+            "当断不断，反受其乱。",
+            "知之为知之，不知为不知，是知也。",
+            "见贤思齐焉，见不贤而内自省也。",
+            "良药苦口利于病，忠言逆耳利于行。",
+            "千里之行，始于足下。",
+            "泰山不让土壤，故能成其大；河海不择细流，故能就其深。",
+            "生于忧患，死于安乐。",
+            "得道多助，失道寡助。",
+            "天时不如地利，地利不如人和。",
+            "富贵不能淫，贫贱不能移，威武不能屈。",
+            "穷则独善其身，达则兼济天下。",
+            "老吾老以及人之老，幼吾幼以及人之幼。",
+            "爱人者，人恒爱之；敬人者，人恒敬之。",
+            "万物并育而不相害，道并行而不相悖。",
+            "君子之交淡如水，小人之交甘若醴。",
+            "独学而无友，则孤陋而寡闻。",
+            "一张一弛，文武之道也。",
+            "为者常成，行者常至。",
+            "明者因时而变，知者随事而制。",
+            "临渊羡鱼，不如退而结网。",
+            "求木之长者，必固其根本；欲流之远者，必浚其泉源。",
+            "大鹏一日同风起，扶摇直上九万里。",
+            "天生我材必有用，千金散尽还复来。",
+            "人生得意须尽欢，莫使金樽空对月。",
+            "长风破浪会有时，直挂云帆济沧海。",
+            "安得广厦千万间，大庇天下寒士俱欢颜。",
+            "无边落木萧萧下，不尽长江滚滚来。",
+            "采菊东篱下，悠然见南山。",
+            "大漠沙如雪，燕山月似钩。",
+            "千山鸟飞绝，万径人踪灭。",
+            "孤舟蓑笠翁，独钓寒江雪。",
+            "海内存知己，天涯若比邻。",
+            "野火烧不尽，春风吹又生。",
+            "远芳侵古道，晴翠接荒城。",
+            "又送王孙去，萋萋满别情。",
+            "明月松间照，清泉石上流。",
+            "竹喧归浣女，莲动下渔舟。",
+            "随意春芳歇，王孙自可留。",
+            "空山新雨后，天气晚来秋。",
+            "晴川历历汉阳树，芳草萋萋鹦鹉洲。",
+            "日暮乡关何处是？烟波江上使人愁。",
+            "昔人已乘黄鹤去，此地空余黄鹤楼。",
+            "黄鹤一去不复返，白云千载空悠悠。",
+            "百川东到海，何时复西归？少壮不努力，老大徒伤悲。",
+            "青青园中葵，朝露待日晞。",
+            "阳春布德泽，万物生光辉。",
+            "常恐秋节至，焜黄华叶衰。",
+            "东临碣石，以观沧海。水何澹澹，山岛竦峙。",
+            "树木丛生，百草丰茂。秋风萧瑟，洪波涌起。",
+            "日月之行，若出其中；星汉灿烂，若出其里。",
+            "幸甚至哉，歌以咏志。",
+            "对酒当歌，人生几何！譬如朝露，去日苦多。",
+            "慨当以慷，忧思难忘。何以解忧？唯有杜康。",
+            "青青子衿，悠悠我心。但为君故，沉吟至今。",
+            "呦呦鹿鸣，食野之苹。我有嘉宾，鼓瑟吹笙。",
+            "明明如月，何时可掇？忧从中来，不可断绝。",
+            "山不厌高，海不厌深。周公吐哺，天下归心。",
+            "老骥伏枥，志在千里。烈士暮年，壮心不已。",
+            "盈缩之期，不但在天。养怡之福，可得永年。",
+            "幸甚至哉，歌以咏志。",
+            "结庐在人境，而无车马喧。问君何能尔？心远地自偏。",
+            "采菊东篱下，悠然见南山。山气日夕佳，飞鸟相与还。",
+            "此中有真意，欲辨已忘言。",
+            "种豆南山下，草盛豆苗稀。晨兴理荒秽，带月荷锄归。",
+            "道狭草木长，夕露沾我衣。衣沾不足惜，但使愿无违。",
+            "关关雎鸠，在河之洲。窈窕淑女，君子好逑。",
+            "参差荇菜，左右流之。窈窕淑女，寤寐求之。",
+            "求之不得，寤寐思服。悠哉悠哉，辗转反侧。",
+            "参差荇菜，左右采之。窈窕淑女，琴瑟友之。",
+            "参差荇菜，左右芼之。窈窕淑女，钟鼓乐之。",
+            "蒹葭苍苍，白露为霜。所谓伊人，在水一方。",
+            "溯洄从之，道阻且长。溯游从之，宛在水中央。",
+            "蒹葭萋萋，白露未晞。所谓伊人，在水之湄。",
+            "溯洄从之，道阻且跻。溯游从之，宛在水中坻。",
+            "蒹葭采采，白露未已。所谓伊人，在水之涘。",
+            "溯洄从之，道阻且右。溯游从之，宛在水中沚。",
+            "静女其姝，俟我于城隅。爱而不见，搔首踟蹰。",
+            "静女其娈，贻我彤管。彤管有炜，说怿女美。",
+            "自牧归荑，洵美且异。匪女之为美，美人之贻。",
+            "上邪！我欲与君相知，长命无绝衰。山无陵，江水为竭，冬雷震震，夏雨雪，天地合，乃敢与君绝！",
+            "江南可采莲，莲叶何田田。鱼戏莲叶间。鱼戏莲叶东，鱼戏莲叶西，鱼戏莲叶南，鱼戏莲叶北。",
+            "敕勒川，阴山下。天似穹庐，笼盖四野。天苍苍，野茫茫，风吹草低见牛羊。",
+            "明月几时有？把酒问青天。不知天上宫阙，今夕是何年。我欲乘风归去，又恐琼楼玉宇，高处不胜寒。起舞弄清影，何似在人间。",
+            "转朱阁，低绮户，照无眠。不应有恨，何事长向别时圆？人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。",
+            "大江东去，浪淘尽，千古风流人物。故垒西边，人道是，三国周郎赤壁。乱石穿空，惊涛拍岸，卷起千堆雪。江山如画，一时多少豪杰。",
+            "遥想公瑾当年，小乔初嫁了，雄姿英发。羽扇纶巾，谈笑间，樯橹灰飞烟灭。故国神游，多情应笑我，早生华发。人生如梦，一尊还酹江月。",
+            "寻常一样窗前月，才有梅花便不同。",
+            "梅须逊雪三分白，雪却输梅一段香。",
+            "忽如一夜春风来，千树万树梨花开。",
+            "山重水复疑无路，柳暗花明又一村。",
+            "沉舟侧畔千帆过，病树前头万木春。",
+            "今日听君歌一曲，暂凭杯酒长精神。",
+            "巴山楚水凄凉地，二十三年弃置身。怀旧空吟闻笛赋，到乡翻似烂柯人。",
+            "烟笼寒水月笼沙，夜泊秦淮近酒家。商女不知亡国恨，隔江犹唱后庭花。",
+            "折戟沉沙铁未销，自将磨洗认前朝。东风不与周郎便，铜雀春深锁二乔。",
+            "远上寒山石径斜，白云生处有人家。停车坐爱枫林晚，霜叶红于二月花。",
+            "千里莺啼绿映红，水村山郭酒旗风。南朝四百八十寺，多少楼台烟雨中。",
+            "江雪：千山鸟飞绝，万径人踪灭。孤舟蓑笠翁，独钓寒江雪。",
+            "寻隐者不遇：松下问童子，言师采药去。只在此山中，云深不知处。",
+            "登鹳雀楼：白日依山尽，黄河入海流。欲穷千里目，更上一层楼。",
+            "春晓：春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。",
+            "静夜思：床前明月光，疑是地上霜。举头望明月，低头思故乡。",
+            "望庐山瀑布：日照香炉生紫烟，遥看瀑布挂前川。飞流直下三千尺，疑是银河落九天。",
+            "绝句：两个黄鹂鸣翠柳，一行白鹭上青天。窗含西岭千秋雪，门泊东吴万里船。",
+            "春夜喜雨：好雨知时节，当春乃发生。随风潜入夜，润物细无声。野径云俱黑，江船火独明。晓看红湿处，花重锦官城。",
+            "登高：风急天高猿啸哀，渚清沙白鸟飞回。无边落木萧萧下，不尽长江滚滚来。万里悲秋常作客，百年多病独登台。艰难苦恨繁霜鬓，潦倒新停浊酒杯。",
+            "闻官军收河南河北：剑外忽传收蓟北，初闻涕泪满衣裳。却看妻子愁何在，漫卷诗书喜欲狂。白日放歌须纵酒，青春作伴好还乡。即从巴峡穿巫峡，便下襄阳向洛阳。",
+            "蜀相：丞相祠堂何处寻，锦官城外柏森森。映阶碧草自春色，隔叶黄鹂空好音。三顾频烦天下计，两朝开济老臣心。出师未捷身先死，长使英雄泪满襟。",
+            "将进酒：君不见黄河之水天上来，奔流到海不复回。君不见高堂明镜悲白发，朝如青丝暮成雪。人生得意须尽欢，莫使金樽空对月。天生我材必有用，千金散尽还复来。烹羊宰牛且为乐，会须一饮三百杯。岑夫子，丹丘生，将进酒，杯莫停。与君歌一曲，请君为我倾耳听。钟鼓馔玉不足贵，但愿长醉不愿醒。古来圣贤皆寂寞，惟有饮者留其名。陈王昔时宴平乐，斗酒十千恣欢谑。主人何为言少钱，径须沽取对君酌。五花马，千金裘，呼儿将出换美酒，与尔同销万古愁。",
+            "行路难：金樽清酒斗十千，玉盘珍羞直万钱。停杯投箸不能食，拔剑四顾心茫然。欲渡黄河冰塞川，将登太行雪满山。闲来垂钓碧溪上，忽复乘舟梦日边。行路难，行路难，多歧路，今安在？长风破浪会有时，直挂云帆济沧海。",
+            "望岳：岱宗夫如何？齐鲁青未了。造化钟神秀，阴阳割昏晓。荡胸生曾云，决眦入归鸟。会当凌绝顶，一览众山小。",
+            "春望：国破山河在，城春草木深。感时花溅泪，恨别鸟惊心。烽火连三月，家书抵万金。白头搔更短，浑欲不胜簪。",
+            "茅屋为秋风所破歌：八月秋高风怒号，卷我屋上三重茅。茅飞渡江洒江郊，高者挂罥长林梢，下者飘转沉塘坳。南村群童欺我老无力，忍能对面为盗贼。公然抱茅入竹去，唇焦口燥呼不得，归来倚杖自叹息。俄顷风定云墨色，秋天漠漠向昏黑。布衾多年冷似铁，娇儿恶卧踏里裂。床头屋漏无干处，雨脚如麻未断绝。自经丧乱少睡眠，长夜沾湿何由彻！安得广厦千万间，大庇天下寒士俱欢颜！风雨不动安如山。呜呼！何时眼前突兀见此屋，吾庐独破受冻死亦足！",
+            "钱塘湖春行：孤山寺北贾亭西，水面初平云脚低。几处早莺争暖树，谁家新燕啄春泥。乱花渐欲迷人眼，浅草才能没马蹄。最爱湖东行不足，绿杨阴里白沙堤。",
+            "泊船瓜洲：京口瓜洲一水间，钟山只隔数重山。春风又绿江南岸，明月何时照我还。",
+            "题西林壁：横看成岭侧成峰，远近高低各不同。不识庐山真面目，只缘身在此山中。",
+            "饮湖上初晴后雨：水光潋滟晴方好，山色空蒙雨亦奇。欲把西湖比西子，淡妆浓抹总相宜。",
+            "惠崇春江晚景：竹外桃花三两枝，春江水暖鸭先知。蒌蒿满地芦芽短，正是河豚欲上时。",
+            "六月二十七日望湖楼醉书：黑云翻墨未遮山，白雨跳珠乱入船。卷地风来忽吹散，望湖楼下水如天。",
+            "绝句：古木阴中系短篷，杖藜扶我过桥东。沾衣欲湿杏花雨，吹面不寒杨柳风。",
+            "游园不值：应怜屐齿印苍苔，小扣柴扉久不开。春色满园关不住，一枝红杏出墙来。",
+            "雪梅：梅雪争春未肯降，骚人阁笔费评章。梅须逊雪三分白，雪却输梅一段香。",
+            "村晚：草满池塘水满陂，山衔落日浸寒漪。牧童归去横牛背，短笛无腔信口吹。",
+            "过零丁洋：辛苦遭逢起一经，干戈寥落四周星。山河破碎风飘絮，身世浮沉雨打萍。惶恐滩头说惶恐，零丁洋里叹零丁。人生自古谁无死，留取丹心照汗青。",
+            "己亥杂诗：浩荡离愁白日斜，吟鞭东指即天涯。落红不是无情物，化作春泥更护花。",
+            "竹石：咬定青山不放松，立根原在破岩中。千磨万击还坚劲，任尔东西南北风。",
+            "墨梅：吾家洗砚池头树，朵朵花开淡墨痕。不要人夸好颜色，只留清气满乾坤。",
+            "石灰吟：千锤万凿出深山，烈火焚烧若等闲。粉骨碎身浑不怕，要留清白在人间。",
+            "朝天子·咏喇叭：喇叭，唢呐，曲儿小腔儿大。官船来往乱如麻，全仗你抬声价。军听了军愁，民听了民怕。哪里去辨甚么真共假？眼见的吹翻了这家，吹伤了那家，只吹的水尽鹅飞罢！",
+            "临江仙·滚滚长江东逝水：滚滚长江东逝水，浪花淘尽英雄。是非成败转头空。青山依旧在，几度夕阳红。白发渔樵江渚上，惯看秋月春风。一壶浊酒喜相逢。古今多少事，都付笑谈中。",
+            "浣溪沙·一曲新词酒一杯：一曲新词酒一杯，去年天气旧亭台。夕阳西下几时回？无可奈何花落去，似曾相识燕归来。小园香径独徘徊。",
+            "蝶恋花·伫倚危楼风细细：伫倚危楼风细细，望极春愁，黯黯生天际。草色烟光残照里，无言谁会凭栏意。拟把疏狂图一醉，对酒当歌，强乐还无味。衣带渐宽终不悔，为伊消得人憔悴。",
+            "雨霖铃·寒蝉凄切：寒蝉凄切，对长亭晚，骤雨初歇。都门帐饮无绪，留恋处，兰舟催发。执手相看泪眼，竟无语凝噎。念去去，千里烟波，暮霭沉沉楚天阔。多情自古伤离别，更那堪，冷落清秋节！今宵酒醒何处？杨柳岸，晓风残月。此去经年，应是良辰好景虚设。便纵有千种风情，更与何人说？",
+            "望海潮·东南形胜：东南形胜，三吴都会，钱塘自古繁华。烟柳画桥，风帘翠幕，参差十万人家。云树绕堤沙，怒涛卷霜雪，天堑无涯。市列珠玑，户盈罗绮，竞豪奢。重湖叠巘清嘉，有三秋桂子，十里荷花。羌管弄晴，菱歌泛夜，嬉嬉钓叟莲娃。千骑拥高牙，乘醉听箫鼓，吟赏烟霞。异日图将好景，归去凤池夸。",
+            "念奴娇·赤壁怀古：大江东去，浪淘尽，千古风流人物。故垒西边，人道是，三国周郎赤壁。乱石穿空，惊涛拍岸，卷起千堆雪。江山如画，一时多少豪杰。遥想公瑾当年，小乔初嫁了，雄姿英发。羽扇纶巾，谈笑间，樯橹灰飞烟灭。故国神游，多情应笑我，早生华发。人生如梦，一尊还酹江月。",
+            "定风波·莫听穿林打叶声：莫听穿林打叶声，何妨吟啸且徐行。竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。",
+            "水调歌头·明月几时有：明月几时有？把酒问青天。不知天上宫阙，今夕是何年。我欲乘风归去，又恐琼楼玉宇，高处不胜寒。起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。不应有恨，何事长向别时圆？人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。",
+            "江城子·乙卯正月二十日夜记梦：十年生死两茫茫，不思量，自难忘。千里孤坟，无处话凄凉。纵使相逢应不识，尘满面，鬓如霜。夜来幽梦忽还乡，小轩窗，正梳妆。相顾无言，惟有泪千行。料得年年肠断处，明月夜，短松冈。",
+            "鹊桥仙·纤云弄巧：纤云弄巧，飞星传恨，银汉迢迢暗度。金风玉露一相逢，便胜却人间无数。柔情似水，佳期如梦，忍顾鹊桥归路。两情若是久长时，又岂在朝朝暮暮。",
+            "青玉案·元夕：东风夜放花千树，更吹落、星如雨。宝马雕车香满路。凤箫声动，玉壶光转，一夜鱼龙舞。蛾儿雪柳黄金缕，笑语盈盈暗香去。众里寻他千百度，蓦然回首，那人却在，灯火阑珊处。",
+            "虞美人·春花秋月何时了：春花秋月何时了？往事知多少。小楼昨夜又东风，故国不堪回首月明中。雕栏玉砌应犹在，只是朱颜改。问君能有几多愁？恰似一江春水向东流。",
+            "相见欢·无言独上西楼：无言独上西楼，月如钩。寂寞梧桐深院锁清秋。剪不断，理还乱，是离愁。别是一般滋味在心头。",
+            "浪淘沙令·帘外雨潺潺：帘外雨潺潺，春意阑珊。罗衾不耐五更寒。梦里不知身是客，一晌贪欢。独自莫凭栏，无限江山，别时容易见时难。流水落花春去也，天上人间。",
+            "破阵子·为陈同甫赋壮词以寄之：醉里挑灯看剑，梦回吹角连营。八百里分麾下炙，五十弦翻塞外声，沙场秋点兵。马作的卢飞快，弓如霹雳弦惊。了却君王天下事，赢得生前身后名。可怜白发生！",
+            "永遇乐·京口北固亭怀古：千古江山，英雄无觅孙仲谋处。舞榭歌台，风流总被雨打风吹去。斜阳草树，寻常巷陌，人道寄奴曾住。想当年，金戈铁马，气吞万里如虎。元嘉草草，封狼居胥，赢得仓皇北顾。四十三年，望中犹记，烽火扬州路。可堪回首，佛狸祠下，一片神鸦社鼓。凭谁问：廉颇老矣，尚能饭否？",
+            "扬州慢·淮左名都：淮左名都，竹西佳处，解鞍少驻初程。过春风十里，尽荠麦青青。自胡马窥江去后，废池乔木，犹厌言兵。渐黄昏，清角吹寒，都在空城。杜郎俊赏，算而今重到须惊。纵豆蔻词工，青楼梦好，难赋深情。二十四桥仍在，波心荡、冷月无声。念桥边红药，年年知为谁生？",
+            "满江红·怒发冲冠：怒发冲冠，凭栏处、潇潇雨歇。抬望眼，仰天长啸，壮怀激烈。三十功名尘与土，八千里路云和月。莫等闲、白了少年头，空悲切。靖康耻，犹未雪。臣子恨，何时灭！驾长车，踏破贺兰山缺。壮志饥餐胡虏肉，笑谈渴饮匈奴血。待从头、收拾旧山河，朝天阙。",
+            "卜算子·咏梅：风雨送春归，飞雪迎春到。已是悬崖百丈冰，犹有花枝俏。俏也不争春，只把春来报。待到山花烂漫时，她在丛中笑。",
+            "沁园春·雪：北国风光，千里冰封，万里雪飘。望长城内外，惟余莽莽；大河上下，顿失滔滔。山舞银蛇，原驰蜡象，欲与天公试比高。须晴日，看红装素裹，分外妖娆。江山如此多娇，引无数英雄竞折腰。惜秦皇汉武，略输文采；唐宗宋祖，稍逊风骚。一代天骄，成吉思汗，只识弯弓射大雕。俱往矣，数风流人物，还看今朝。",
+            "生如夏花之绚烂，死如秋叶之静美。",
+            "黑夜给了我黑色的眼睛，我却用它寻找光明。",
+            "面朝大海，春暖花开。",
+            "从明天起，做一个幸福的人，喂马、劈柴，周游世界。",
+            "陌生人，我也为你祝福，愿你有一个灿烂的前程，愿你有情人终成眷属，愿你在尘世获得幸福，我只愿面朝大海，春暖花开。",
+            "我有一所房子，面朝大海，春暖花开。",
+            "那榆荫下的一潭，不是清泉，是天上虹，揉碎在浮藻间，沉淀着彩虹似的梦。",
+            "寻梦？撑一支长篙，向青草更青处漫溯，满载一船星辉，在星辉斑斓里放歌。",
+            "但我不能放歌，悄悄是别离的笙箫；夏虫也为我沉默，沉默是今晚的康桥。",
+            "悄悄的我走了，正如我悄悄的来；我挥一挥衣袖，不带走一片云彩。",
+            "轻轻地我走了，正如我轻轻地来；我轻轻地招手，作别西天的云彩。",
+            "你站在桥上看风景，看风景的人在楼上看你。明月装饰了你的窗子，你装饰了别人的梦。",
+            "卑鄙是卑鄙者的通行证，高尚是高尚者的墓志铭。",
+            "告诉你吧，世界，我--不--相--信！",
+            "纵使你脚下有一千名挑战者，那就把我算作第一千零一名。",
+            "我不相信天是蓝的，我不相信雷的回声，我不相信梦是假的，我不相信死无报应。",
+            "如果海洋注定要决堤，就让所有的苦水都注入我心中。",
+            "如果陆地注定要上升，就让人类重新选择生存的峰顶。",
+            "新的转机和闪闪星斗，正在缀满没有遮拦的天空，那是五千年的象形文字，那是未来人们凝视的眼睛。",
+            "一切都是命运，一切都是烟云，一切都是没有结局的开始，一切都是稍纵即逝的追寻。",
+            "一切欢乐都没有微笑，一切苦难都没有泪痕，一切语言都是重复，一切交往都是初逢。",
+            "一切爱情都在心里，一切往事都在梦中，一切希望都带着注释，一切信仰都带着呻吟。",
+            "一切爆发都有片刻的宁静，一切死亡都有冗长的回声。",
+            "走吧，落叶吹进深谷，歌声却没有归宿。",
+            "走吧，冰上的月光，已从河床上溢出。",
+            "走吧，眼睛望着同一片天空，心敲击着暮色的鼓。",
+            "走吧，我们没有失去记忆，我们去寻找生命的湖。",
+            "走吧，路呵路，飘满了红罂粟。",
+            "我不去想是否能够成功，既然选择了远方，便只顾风雨兼程。",
+            "我不去想能否赢得爱情，既然钟情于玫瑰，就勇敢地吐露真诚。",
+            "我不去想身后会不会袭来寒风冷雨，既然目标是地平线，留给世界的只能是背影。",
+            "我不去想未来是平坦还是泥泞，只要热爱生命，一切都在意料之中。",
+            "热爱生命，相信未来。",
+            "当蜘蛛网无情地查封了我的炉台，当灰烬的余烟叹息着贫困的悲哀，我依然固执地铺平失望的灰烬，用美丽的雪花写下：相信未来。",
+            "当我的紫葡萄化为深秋的露水，当我的鲜花依偎在别人的情怀，我依然固执地用凝霜的枯藤，在凄凉的大地上写下：相信未来。",
+            "我要用手指那涌向天边的排浪，我要用手掌那托住太阳的大海，摇曳着曙光那枝温暖漂亮的笔杆，用孩子的笔体写下：相信未来。",
+            "我之所以坚定地相信未来，是我相信未来人们的眼睛——她有拨开历史风尘的睫毛，她有看透岁月篇章的瞳孔。",
+            "不管人们对于我们腐烂的皮肉，那些迷途的惆怅、失败的苦痛，是寄予感动的热泪、深切的同情，还是给以轻蔑的微笑、辛辣的嘲讽。",
+            "我坚信人们对于我们的脊骨，那无数次的探索、迷途、失败和成功，一定会给予热情、客观、公正的评定。",
+            "是的，我焦急地等待着他们的评定。朋友，坚定地相信未来吧，相信不屈不挠的努力，相信战胜死亡的年轻，相信未来，热爱生命。",
+            "如果没有明天，今天就是最后一天。",
+            "每一个不曾起舞的日子，都是对生命的辜负。",
+            "那些杀不死我的，必使我更强大。",
+            "一个人知道自己为什么而活，就可以忍受任何一种生活。",
+            "人的一生，总是难免有浮沉。不会永远如旭日东升，也不会永远痛苦潦倒。反复地一浮一沉，对于一个人来说，正是磨炼。",
+            "人生就像一杯茶，不会苦一辈子，但总会苦一阵子。",
+            "生活不是林黛玉，不会因为忧伤而风情万种。",
+            "生活不是等待风暴过去，而是学会在雨中翩翩起舞。",
+            "生活不是缺少美，而是缺少发现美的眼睛。",
+            "走自己的路，让别人说去吧。",
+            "人生如逆旅，我亦是行人。",
+            "世间所有的相遇，都是久别重逢。",
+            "不乱于心，不困于情，不畏将来，不念过往，如此，安好。",
+            "以清净心看世界，以欢喜心过生活，以平常心生情味，以柔软心除挂碍。",
+            "在人生的道路上，每个人都是孤独的旅客。",
+            "生命中最伟大的光辉不在于永不坠落，而是坠落后总能再度升起。",
+            "世界上只有一种真正的英雄主义，那就是在认清生活的真相后依然热爱生活。",
+            "生活明朗，万物可爱，人间值得，未来可期。",
+            "愿时光能缓，愿故人不散；愿你独闯的日子里不觉得孤单。",
+            "愿你眼眸有星辰，心中有山海，从此以梦为马，不负韶华。",
+            "愿所有的美好，都不负归期。",
+            "愿世界温柔待你，愿岁月静好如初。",
+            "愿你一生努力，一生被爱，想要的都拥有，得不到的都释怀。",
+            "愿你不负时光，不惧未来；愿你坚定不移，勇往直前。",
+            "愿你所到之处，遍地阳光；愿你梦的远方，温暖为向。",
+            "愿你遍历山河，觉得人间值得。",
+            "愿你三冬暖，愿你春不寒；愿你天黑有灯，下雨有伞。",
+            "愿你一路上，有良人相伴。",
+            "愿有人陪你颠沛流离，如果没有，愿你成为自己的太阳。",
+            "愿你我既可以朝九晚五，又能够浪迹天涯。",
+            "愿生活不太拥挤，愿笑容不必刻意。",
+            "愿所有的美好，如约而至。",
+            "愿所有的遗憾，都是惊喜的铺垫。",
+            "愿你保持热爱，奔赴山海。",
+            "愿你眼中有光，心中有爱，活成自己想要的模样。",
+            "愿你沉淀又执着，对每件热爱的事物都全力以赴又满载而归。",
+            "愿你做一个美好的自己，然后遇见一个美好的人。",
+            "愿你有梦为马，随处可栖。",
+            "愿时光温柔，愿岁月不扰。",
+            "愿你此生尽兴，赤诚善良。",
+            "愿你的世界，星光满载，初心不改。",
+            "愿你所遇皆温柔，所行皆坦途。",
+            "愿你此生无憾，来生无忧。",
+            "愿所有的等待，都不被辜负。",
+            "愿所有的付出，都有回报。",
+            "愿你活成自己最喜欢的模样。"
+        ];
+
         var cache = {
             software: [],
             categories: [],
-            loaded: false
+            loaded: false,
+            lastFetch: 0
         };
 
-        // ===== 数据层 =====
         var DB = {
-            async loadAll() {
-                if (cache.loaded) return Promise.resolve();
+            async loadAll(force) {
+                force = force || false;
+                if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) {
+                    return Promise.resolve();
+                }
                 try {
                     var [softRes, catRes] = await Promise.all([
                         supabaseClient.from('software').select('*').order('created_at', { ascending: false }),
@@ -1200,26 +1582,22 @@
                     cache.software = softRes.data || [];
                     cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                     cache.loaded = true;
+                    cache.lastFetch = Date.now();
                     return Promise.resolve();
                 } catch (e) {
                     console.error('加载数据失败:', e);
-                    // 降级
                     cache.software = [];
                     cache.categories = ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                     cache.loaded = true;
+                    cache.lastFetch = Date.now();
                     return Promise.resolve();
                 }
             },
-            getSoftware() {
-                return cache.software;
-            },
-            getCategories() {
-                return cache.categories;
-            },
+            getSoftware() { return cache.software; },
+            getCategories() { return cache.categories; },
             async updateSoftware(soft) {
                 try {
                     await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id', soft.id);
-                    // 更新缓存
                     var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
                     if (idx !== -1) {
                         cache.software[idx].views = soft.views;
@@ -1231,7 +1609,6 @@
             }
         };
 
-        // ===== 工具函数 =====
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
@@ -1275,13 +1652,38 @@
             return text.replace(regex, '<mark style="background:rgba(0,136,255,0.2);border-radius:4px;padding:0 2px;">$1</mark>');
         }
 
-        // ===== 分页状态 =====
+        function formatDate(iso) {
+            if (!iso) return '';
+            var d = new Date(iso);
+            var m = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            return m + '/' + day;
+        }
+
+        function getTodaysQuote() {
+            var now = new Date();
+            var start = new Date(now.getFullYear(), 0, 0);
+            var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+            var oneDay = 1000 * 60 * 60 * 24;
+            var dayOfYear = Math.floor(diff / oneDay);
+            var index = dayOfYear % QUOTES.length;
+            return QUOTES[index];
+        }
+
         var currentPage = 1;
         var PAGE_SIZE = 6;
         var currentFilteredList = [];
 
-        // ===== 渲染引擎（只使用缓存数据） =====
         var Render = {
+            renderAnnouncements: function(container) {
+                if (!container) return;
+                var quote = getTodaysQuote();
+                var now = new Date();
+                var dateStr = (now.getMonth()+1) + '/' + now.getDate();
+                var html = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' + dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
+                container.innerHTML = html;
+            },
+
             renderCategories: function(container, active, onClick) {
                 if (!container) return;
                 var categories = DB.getCategories();
@@ -1296,9 +1698,9 @@
                         if (onClick) onClick(cat);
                     });
                 });
-                // 更新滚动按钮状态
                 updateNavButtons();
             },
+
             renderCards: function(container, list, showCategory, keyword) {
                 showCategory = (showCategory !== undefined) ? showCategory : true;
                 if (!container) return;
@@ -1332,7 +1734,6 @@
             }
         };
 
-        // ===== 分类滚动控制 =====
         var scrollContainer = document.getElementById('categoriesScroll');
         var catPrevBtn = document.getElementById('catPrevBtn');
         var catNextBtn = document.getElementById('catNextBtn');
@@ -1356,7 +1757,6 @@
             });
         }
 
-        // ===== 详情弹窗 =====
         var Detail = {
             open: function(soft) {
                 var overlay = document.getElementById('detailOverlay');
@@ -1406,7 +1806,6 @@
             if (e.target === e.currentTarget) Detail.close();
         });
 
-        // ===== 应用主控 =====
         var App = {
             currentPage: 'home',
             currentCategory: 'all',
@@ -1414,12 +1813,16 @@
             searchKeyword: '',
             init: function() {
                 var self = this;
-                // 加载数据
                 DB.loadAll().then(function() {
                     self.refreshAll();
                 });
 
-                // 事件绑定
+                setInterval(function() {
+                    DB.loadAll(true).then(function() {
+                        self.refreshAll();
+                    });
+                }, 600000);
+
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -1508,14 +1911,18 @@
                 var self = this;
                 var all = DB.getSoftware();
                 var cats = DB.getCategories();
+
+                Render.renderAnnouncements(document.getElementById('announcementContainer'));
                 Render.renderCategories(document.getElementById('categoryGridHome'), null, function(cat) { self.goList(cat); });
+
                 var recommend = all.filter(function(s) { return s.recommend; }).slice(0, 6);
                 Render.renderCards(document.getElementById('recommendGrid'), recommend, true);
+
                 var latest = all.slice().sort(function(a, b) {
                     return (b.date || '').localeCompare(a.date || '');
                 }).slice(0, 6);
                 Render.renderCards(document.getElementById('latestGrid'), latest, true);
-                // 确保滚动按钮状态
+
                 setTimeout(updateNavButtons, 100);
             },
             refreshList: function(keyword) {
@@ -1524,7 +1931,6 @@
                 var list = all.slice();
                 var cats = DB.getCategories();
 
-                // 渲染分类筛选按钮
                 var filterContainer = document.getElementById('filterTags');
                 var filterHtml = '<button class="btn btn-sm btn-outline active" data-cat="all">全部</button>';
                 cats.forEach(function(c) {
