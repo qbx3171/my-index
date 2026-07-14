@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    <!-- 使用更可靠的 CDN -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
     <style>
         :root {
@@ -278,15 +279,6 @@
             text-align: center;
             margin-top: 10px;
             min-height: 22px;
-        }
-        .login-box .demo-hint {
-            text-align: center;
-            margin-top: 14px;
-            font-size: 0.65rem;
-            color: var(--text-dim);
-            letter-spacing: 0.5px;
-            border-top: 1px solid var(--border-glow);
-            padding-top: 14px;
         }
 
         .admin-layout {
@@ -635,29 +627,6 @@
             }
         }
 
-        .divider-cyber {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            margin: 10px 0 16px;
-            color: var(--text-dim);
-            font-size: 0.65rem;
-            letter-spacing: 4px;
-            font-weight: 300;
-        }
-        .divider-cyber::before,
-        .divider-cyber::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
-        }
-        .divider-cyber .dot {
-            font-size: 0.35rem;
-            color: var(--accent-cyan);
-        }
-
         @media (max-width: 900px) {
             .admin-sidebar {
                 width: 60px;
@@ -783,120 +752,121 @@
         // ============================================================
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
-        var supabaseClient = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // 创建 Supabase 客户端（使用 window.supabase 或全局变量）
+        var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ============================================================
         //  数据层
         // ============================================================
         var DB = {
             get: function(key) {
-                try { return JSON.parse(localStorage.getItem('lezhe_' + key)) || null; } catch { return null; }
+                try { return JSON.parse(localStorage.getItem('lezhe_' + key)) || null; } catch (e) { return null; }
             },
             set: function(key, val) {
                 localStorage.setItem('lezhe_' + key, JSON.stringify(val));
-            },
-            getSoftware: function() {
-                return this.get('software') || [];
-            },
-            setSoftware: function(list) {
-                this.set('software', list);
-            },
-            getCategories: function() {
-                return this.get('categories') || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
-            },
-            setCategories: function(list) {
-                this.set('categories', list);
-            },
-            getUsers: function() {
-                var users = this.get('users');
-                if (!users || users.length === 0) {
-                    var hash = '8b7d8f3e2a1c9f4e6d5b8a7c9d4e2f1a3b5c7d9e1f2a3b4c5d6e7f8a9b0c1d2e';
-                    users = [{ username: 'admin', passwordHash: hash }];
-                    this.set('users', users);
-                }
-                return users;
             },
             genId: function() {
                 return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
             },
 
-            // Supabase 版本的操作
+            // Supabase 操作
             async getSoftwareFromCloud() {
-                var result = await supabaseClient
-                    .from('software')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                if (result.error) {
-                    console.error('获取软件失败:', result.error);
+                try {
+                    var result = await supabaseClient
+                        .from('software')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    if (result.error) {
+                        console.error('获取软件失败:', result.error);
+                        return [];
+                    }
+                    return result.data || [];
+                } catch (e) {
+                    console.error('获取软件异常:', e);
                     return [];
                 }
-                return result.data || [];
             },
 
             async addSoftwareToCloud(soft) {
-                var result = await supabaseClient
-                    .from('software')
-                    .insert(soft)
-                    .select();
-                if (result.error) {
-                    console.error('添加软件失败:', result.error);
+                try {
+                    var result = await supabaseClient
+                        .from('software')
+                        .insert(soft)
+                        .select();
+                    if (result.error) {
+                        console.error('添加软件失败:', result.error);
+                        return null;
+                    }
+                    return result.data ? result.data[0] : null;
+                } catch (e) {
+                    console.error('添加软件异常:', e);
                     return null;
                 }
-                return result.data ? result.data[0] : null;
             },
 
             async updateSoftwareInCloud(id, updates) {
-                var result = await supabaseClient
-                    .from('software')
-                    .update(updates)
-                    .eq('id', id);
-                if (result.error) console.error('更新软件失败:', result.error);
+                try {
+                    var result = await supabaseClient
+                        .from('software')
+                        .update(updates)
+                        .eq('id', id);
+                    if (result.error) console.error('更新软件失败:', result.error);
+                } catch (e) {
+                    console.error('更新软件异常:', e);
+                }
             },
 
             async deleteSoftwareFromCloud(id) {
-                var result = await supabaseClient
-                    .from('software')
-                    .delete()
-                    .eq('id', id);
-                if (result.error) console.error('删除软件失败:', result.error);
+                try {
+                    var result = await supabaseClient
+                        .from('software')
+                        .delete()
+                        .eq('id', id);
+                    if (result.error) console.error('删除软件失败:', result.error);
+                } catch (e) {
+                    console.error('删除软件异常:', e);
+                }
             },
 
             async getCategoriesFromCloud() {
-                var result = await supabaseClient
-                    .from('categories')
-                    .select('name')
-                    .order('name');
-                if (result.error) {
-                    console.error('获取分类失败:', result.error);
+                try {
+                    var result = await supabaseClient
+                        .from('categories')
+                        .select('name')
+                        .order('name');
+                    if (result.error) {
+                        console.error('获取分类失败:', result.error);
+                        return ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                    }
+                    return result.data.map(function(item) { return item.name; });
+                } catch (e) {
+                    console.error('获取分类异常:', e);
                     return ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                 }
-                return result.data.map(function(item) { return item.name; });
             },
 
             async addCategoryToCloud(name) {
-                var result = await supabaseClient
-                    .from('categories')
-                    .insert({ name: name });
-                if (result.error) console.error('添加分类失败:', result.error);
+                try {
+                    var result = await supabaseClient
+                        .from('categories')
+                        .insert({ name: name });
+                    if (result.error) console.error('添加分类失败:', result.error);
+                } catch (e) {
+                    console.error('添加分类异常:', e);
+                }
             },
 
             async deleteCategoryFromCloud(name) {
-                var result = await supabaseClient
-                    .from('categories')
-                    .delete()
-                    .eq('name', name);
-                if (result.error) console.error('删除分类失败:', result.error);
-            },
-
-            async verifyUserCloud(username, passwordHash) {
-                var result = await supabaseClient
-                    .from('users')
-                    .select('password_hash')
-                    .eq('username', username);
-                if (result.error || !result.data || result.data.length === 0) {
-                    return false;
+                try {
+                    var result = await supabaseClient
+                        .from('categories')
+                        .delete()
+                        .eq('name', name);
+                    if (result.error) console.error('删除分类失败:', result.error);
+                } catch (e) {
+                    console.error('删除分类异常:', e);
                 }
-                return result.data[0].password_hash === passwordHash;
             }
         };
 
@@ -930,15 +900,11 @@
         if (!localStorage.getItem('lezhe_users')) {
             DB.set('users', [{ username: 'admin', passwordHash: adminHash }]);
         } else {
-            var existingUsers = DB.getUsers();
-            if (existingUsers.length > 0 && existingUsers[0].passwordHash !== adminHash) {
+            var existingUsers = DB.get('users');
+            if (existingUsers && existingUsers.length > 0 && existingUsers[0].passwordHash !== adminHash) {
                 existingUsers[0].passwordHash = adminHash;
                 DB.set('users', existingUsers);
             }
-        }
-
-        if (!localStorage.getItem('lezhe_categories')) {
-            DB.set('categories', ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具']);
         }
 
         // ============================================================
@@ -1051,10 +1017,16 @@
                 document.getElementById('loginError').textContent = '';
             },
 
-            doLogin: async function() {
+            doLogin: function() {
                 var user = document.getElementById('loginUser').value.trim();
                 var pass = document.getElementById('loginPass').value.trim();
-                var users = DB.getUsers();
+                var users = DB.get('users');
+
+                if (!users || users.length === 0) {
+                    users = [{ username: 'admin', passwordHash: adminHash }];
+                    DB.set('users', users);
+                }
+
                 var found = false;
                 for (var i = 0; i < users.length; i++) {
                     if (users[i].username === user && verifyPassword(pass, users[i].passwordHash)) {
@@ -1062,6 +1034,7 @@
                         break;
                     }
                 }
+
                 if (found) {
                     sessionStorage.setItem('lezhe_admin', 'true');
                     document.getElementById('loginError').textContent = '';
