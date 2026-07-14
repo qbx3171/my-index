@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
     <style>
         :root {
             --bg-primary: #080c14;
@@ -30,7 +32,11 @@
             --max-width: 1200px;
             --header-height: 64px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: var(--font);
             background: var(--bg-primary);
@@ -38,259 +44,701 @@
             line-height: 1.6;
             min-height: 100vh;
             background-image: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
-                              radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+                radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
         }
-        a { text-decoration: none; color: inherit; }
-        button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
-        input, textarea, select { font-family: inherit; border: none; outline: none; background: none; color: var(--text-primary); }
-        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
-        .hidden { display: none !important; }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            background: none;
+            color: inherit;
+        }
+        input,
+        textarea,
+        select {
+            font-family: inherit;
+            border: none;
+            outline: none;
+            background: none;
+            color: var(--text-primary);
+        }
+        .container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .hidden {
+            display: none !important;
+        }
 
         .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 10px 28px; border-radius: 50px; font-size: 0.9rem; font-weight: 600;
-            transition: var(--transition); border: 1px solid transparent;
-            background: var(--bg-card); color: var(--text-primary);
-            backdrop-filter: blur(8px); border-color: var(--border-glow);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 28px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            backdrop-filter: blur(8px);
+            border-color: var(--border-glow);
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0,212,255,0.15); border-color: var(--accent-cyan); }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
+            border-color: var(--accent-cyan);
+        }
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            color: #080c14; border-color: transparent; font-weight: 700;
+            color: #080c14;
+            border-color: transparent;
+            font-weight: 700;
         }
-        .btn-primary:hover { box-shadow: 0 0 40px rgba(0,212,255,0.3); transform: translateY(-2px) scale(1.02); }
-        .btn-outline { background: transparent; border-color: var(--border-glow); color: var(--text-secondary); }
-        .btn-outline:hover { background: rgba(0,212,255,0.06); border-color: var(--accent-cyan); color: var(--text-primary); }
-        .btn-danger { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.2); color: #f87171; }
-        .btn-danger:hover { background: rgba(239,68,68,0.25); border-color: #ef4444; color: #fff; }
-        .btn-sm { padding: 6px 18px; font-size: 0.8rem; }
+        .btn-primary:hover {
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px) scale(1.02);
+        }
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border-glow);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            background: rgba(0, 212, 255, 0.06);
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+            color: #fff;
+        }
+        .btn-sm {
+            padding: 6px 18px;
+            font-size: 0.8rem;
+        }
 
         .card {
-            background: var(--bg-card); backdrop-filter: blur(16px);
-            border-radius: var(--radius-lg); border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card); transition: var(--transition); overflow: hidden;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glow);
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+            overflow: hidden;
         }
-        .card:hover { border-color: var(--border-glow-strong); box-shadow: var(--shadow-card), 0 0 30px rgba(0,212,255,0.05); transform: translateY(-4px); }
+        .card:hover {
+            border-color: var(--border-glow-strong);
+            box-shadow: var(--shadow-card), 0 0 30px rgba(0, 212, 255, 0.05);
+            transform: translateY(-4px);
+        }
 
         .badge {
-            display: inline-block; padding: 2px 14px; border-radius: 50px;
-            font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-            background: rgba(0,212,255,0.1); color: var(--accent-cyan);
-            border: 1px solid rgba(0,212,255,0.15);
+            display: inline-block;
+            padding: 2px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 212, 255, 0.15);
         }
-        .badge-purple { background: rgba(139,92,246,0.12); color: var(--accent-purple); border-color: rgba(139,92,246,0.2); }
+        .badge-purple {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--accent-purple);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
 
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
-        .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text-primary); }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .empty-state h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
 
         .login-page {
-            display: none; min-height: 100vh; align-items: center; justify-content: center;
-            background: var(--bg-primary); padding: 20px; position: relative;
+            display: none;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            padding: 20px;
+            position: relative;
         }
-        .login-page.active { display: flex; }
+        .login-page.active {
+            display: flex;
+        }
         .login-page .bg-glow {
-            position: absolute; border-radius: 50%; filter: blur(100px);
-            pointer-events: none; opacity: 0.12;
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            opacity: 0.12;
         }
-        .login-page .bg-glow:nth-child(1) { width: 400px; height: 400px; top: -100px; right: -100px; background: var(--accent-cyan); }
-        .login-page .bg-glow:nth-child(2) { width: 300px; height: 300px; bottom: -80px; left: -80px; background: var(--accent-purple); }
+        .login-page .bg-glow:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            right: -100px;
+            background: var(--accent-cyan);
+        }
+        .login-page .bg-glow:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -80px;
+            left: -80px;
+            background: var(--accent-purple);
+        }
         .login-box {
-            width: 100%; max-width: 380px; padding: 36px 32px;
-            background: var(--bg-card-solid); backdrop-filter: blur(32px);
-            border-radius: var(--radius-lg); border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card), 0 0 60px rgba(0,212,255,0.02);
-            position: relative; z-index: 2;
+            width: 100%;
+            max-width: 380px;
+            padding: 36px 32px;
+            background: var(--bg-card-solid);
+            backdrop-filter: blur(32px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glow-strong);
+            box-shadow: var(--shadow-card), 0 0 60px rgba(0, 212, 255, 0.02);
+            position: relative;
+            z-index: 2;
         }
         .login-box .login-logo {
-            font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2px;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2px;
             background: linear-gradient(135deg, #fff 30%, var(--accent-cyan) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .login-box .login-sub { text-align: center; color: var(--text-secondary); font-weight: 300; margin-bottom: 24px; font-size: 0.85rem; letter-spacing: 2px; }
-        .login-box .form-group { margin-bottom: 14px; }
-        .login-box label { display: block; font-size: 0.78rem; font-weight: 500; margin-bottom: 4px; color: var(--text-secondary); letter-spacing: 0.5px; }
+        .login-box .login-sub {
+            text-align: center;
+            color: var(--text-secondary);
+            font-weight: 300;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+        }
+        .login-box .form-group {
+            margin-bottom: 14px;
+        }
+        .login-box label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
         .login-box input {
-            width: 100%; padding: 11px 14px; border-radius: var(--radius-sm);
-            border: 1.5px solid var(--border-glow); background: rgba(0,0,0,0.2);
-            transition: var(--transition); font-size: 0.9rem; color: var(--text-primary);
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-glow);
+            background: rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            font-size: 0.9rem;
+            color: var(--text-primary);
         }
-        .login-box input:focus { border-color: var(--accent-cyan); background: rgba(0,0,0,0.4); }
-        .login-box .btn { width: 100%; margin-top: 6px; padding: 13px; font-size: 0.95rem; }
-        .login-box .login-error { color: #f87171; font-size: 0.8rem; text-align: center; margin-top: 10px; min-height: 22px; }
-        .login-box .demo-hint { text-align: center; margin-top: 14px; font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.5px; border-top: 1px solid var(--border-glow); padding-top: 14px; }
+        .login-box input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 0, 0, 0.4);
+        }
+        .login-box .btn {
+            width: 100%;
+            margin-top: 6px;
+            padding: 13px;
+            font-size: 0.95rem;
+        }
+        .login-box .login-error {
+            color: #f87171;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 10px;
+            min-height: 22px;
+        }
+        .login-box .demo-hint {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            border-top: 1px solid var(--border-glow);
+            padding-top: 14px;
+        }
 
         .admin-layout {
-            display: none; min-height: 100vh; background: var(--bg-primary);
+            display: none;
+            min-height: 100vh;
+            background: var(--bg-primary);
         }
-        .admin-layout.active { display: flex; }
+        .admin-layout.active {
+            display: flex;
+        }
 
         .admin-sidebar {
-            width: 210px; background: rgba(12,20,35,0.88); backdrop-filter: blur(24px);
-            border-right: 1px solid var(--border-glow); padding: 24px 14px;
-            flex-shrink: 0; height: 100vh; position: sticky; top: 0; overflow-y: auto;
+            width: 210px;
+            background: rgba(12, 20, 35, 0.88);
+            backdrop-filter: blur(24px);
+            border-right: 1px solid var(--border-glow);
+            padding: 24px 14px;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
         }
         .admin-sidebar .logo-sm {
-            font-size: 1.1rem; font-weight: 700; padding: 0 8px 20px;
-            border-bottom: 1px solid var(--border-glow); margin-bottom: 16px;
-            display: flex; align-items: center; gap: 8px; color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 0 8px 20px;
+            border-bottom: 1px solid var(--border-glow);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
         }
         .admin-sidebar .logo-sm .mark {
             font-size: 1.2rem;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .admin-sidebar .nav-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-            border-radius: var(--radius-sm); font-weight: 500; color: var(--text-secondary);
-            transition: var(--transition); margin-bottom: 4px; cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            margin-bottom: 4px;
+            cursor: pointer;
             border: 1px solid transparent;
         }
-        .admin-sidebar .nav-item:hover { background: rgba(0,212,255,0.04); border-color: var(--border-glow); color: var(--text-primary); }
-        .admin-sidebar .nav-item.active { background: rgba(0,212,255,0.06); border-color: var(--border-glow-strong); color: var(--text-primary); box-shadow: 0 0 30px rgba(0,212,255,0.03); }
-        .admin-sidebar .nav-item .icon { font-size: 1rem; width: 24px; text-align: center; color: var(--accent-cyan); }
-        .admin-sidebar .logout-btn {
-            margin-top: 28px; border-top: 1px solid var(--border-glow); padding-top: 16px;
-            color: var(--text-dim); font-size: 0.85rem; display: flex; align-items: center; gap: 10px;
-            cursor: pointer; transition: var(--transition);
+        .admin-sidebar .nav-item:hover {
+            background: rgba(0, 212, 255, 0.04);
+            border-color: var(--border-glow);
+            color: var(--text-primary);
         }
-        .admin-sidebar .logout-btn:hover { color: #f87171; }
+        .admin-sidebar .nav-item.active {
+            background: rgba(0, 212, 255, 0.06);
+            border-color: var(--border-glow-strong);
+            color: var(--text-primary);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.03);
+        }
+        .admin-sidebar .nav-item .icon {
+            font-size: 1rem;
+            width: 24px;
+            text-align: center;
+            color: var(--accent-cyan);
+        }
+        .admin-sidebar .logout-btn {
+            margin-top: 28px;
+            border-top: 1px solid var(--border-glow);
+            padding-top: 16px;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .admin-sidebar .logout-btn:hover {
+            color: #f87171;
+        }
 
-        .admin-main { flex: 1; padding: 28px 36px 60px; overflow-y: auto; max-height: 100vh; }
-        .admin-main .page-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
-        .admin-main .page-sub { color: var(--text-secondary); margin-bottom: 24px; font-weight: 400; font-size: 0.9rem; }
+        .admin-main {
+            flex: 1;
+            padding: 28px 36px 60px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+        .admin-main .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+        }
+        .admin-main .page-sub {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-weight: 400;
+            font-size: 0.9rem;
+        }
 
         .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 14px; margin-bottom: 28px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
         }
         .stat-card {
-            padding: 18px 20px; background: var(--bg-card); backdrop-filter: blur(8px);
-            border-radius: var(--radius-md); border: 1px solid var(--border-glow);
+            padding: 18px 20px;
+            background: var(--bg-card);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glow);
             box-shadow: var(--shadow-card);
         }
         .stat-card .num {
-            font-size: 2rem; font-weight: 700;
+            font-size: 2rem;
+            font-weight: 700;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .stat-card .label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
         .table-wrap {
-            background: var(--bg-card); backdrop-filter: blur(8px);
-            border-radius: var(--radius-md); border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card); overflow: hidden; margin-top: 6px;
+            background: var(--bg-card);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glow);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            margin-top: 6px;
         }
-        .table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
         .table-wrap th {
-            text-align: left; padding: 10px 16px; background: rgba(0,212,255,0.03);
-            font-weight: 600; color: var(--text-secondary); font-size: 0.65rem;
-            letter-spacing: 0.8px; text-transform: uppercase; border-bottom: 1px solid var(--border-glow);
+            text-align: left;
+            padding: 10px 16px;
+            background: rgba(0, 212, 255, 0.03);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-glow);
         }
-        .table-wrap td { padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,0.02); color: var(--text-primary); vertical-align: middle; }
+        .table-wrap td {
+            padding: 9px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
         .table-wrap td .icon-thumb {
-            width: 32px; height: 32px; border-radius: var(--radius-sm); overflow: hidden;
-            display: inline-flex; align-items: center; justify-content: center;
-            background: rgba(0,212,255,0.06); font-size: 18px; border: 1px solid rgba(0,212,255,0.06);
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 212, 255, 0.06);
+            font-size: 18px;
+            border: 1px solid rgba(0, 212, 255, 0.06);
         }
-        .table-wrap td .icon-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .table-wrap td .actions { display: flex; gap: 6px; }
+        .table-wrap td .icon-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .table-wrap td .actions {
+            display: flex;
+            gap: 6px;
+        }
         .table-wrap td .actions button {
-            padding: 3px 12px; border-radius: 50px; font-size: 0.65rem;
-            font-weight: 600; transition: var(--transition); border: 1px solid transparent;
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border: 1px solid transparent;
         }
-        .table-wrap td .actions .edit-btn { background: rgba(0,212,255,0.08); color: var(--accent-cyan); border-color: rgba(0,212,255,0.1); }
-        .table-wrap td .actions .edit-btn:hover { background: var(--accent-cyan); color: #080c14; }
-        .table-wrap td .actions .del-btn { background: rgba(239,68,68,0.08); color: #f87171; border-color: rgba(239,68,68,0.1); }
-        .table-wrap td .actions .del-btn:hover { background: #ef4444; color: #fff; }
-        .table-wrap .empty-row td { padding: 36px 18px; text-align: center; color: var(--text-dim); }
+        .table-wrap td .actions .edit-btn {
+            background: rgba(0, 212, 255, 0.08);
+            color: var(--accent-cyan);
+            border-color: rgba(0, 212, 255, 0.1);
+        }
+        .table-wrap td .actions .edit-btn:hover {
+            background: var(--accent-cyan);
+            color: #080c14;
+        }
+        .table-wrap td .actions .del-btn {
+            background: rgba(239, 68, 68, 0.08);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.1);
+        }
+        .table-wrap td .actions .del-btn:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+        .table-wrap .empty-row td {
+            padding: 36px 18px;
+            text-align: center;
+            color: var(--text-dim);
+        }
 
         .admin-form {
-            background: var(--bg-card); backdrop-filter: blur(8px);
-            border-radius: var(--radius-md); border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card); padding: 24px 28px; margin-top: 6px;
+            background: var(--bg-card);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glow);
+            box-shadow: var(--shadow-card);
+            padding: 24px 28px;
+            margin-top: 6px;
         }
-        .admin-form .form-group { margin-bottom: 16px; }
-        .admin-form label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 4px; color: var(--text-secondary); }
-        .admin-form label .required { color: #f87171; margin-left: 2px; }
-        .admin-form input, .admin-form textarea, .admin-form select {
-            width: 100%; padding: 9px 14px; border-radius: var(--radius-sm);
-            border: 1.5px solid var(--border-glow); background: rgba(0,0,0,0.25);
-            transition: var(--transition); font-size: 0.88rem; color: var(--text-primary);
+        .admin-form .form-group {
+            margin-bottom: 16px;
         }
-        .admin-form input:focus, .admin-form textarea:focus, .admin-form select:focus {
-            border-color: var(--accent-cyan); background: rgba(0,0,0,0.4);
+        .admin-form label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
         }
-        .admin-form textarea { min-height: 70px; resize: vertical; }
-        .admin-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .admin-form .form-actions { display: flex; gap: 12px; margin-top: 6px; }
-        .admin-form select option { background: #121e33; }
+        .admin-form label .required {
+            color: #f87171;
+            margin-left: 2px;
+        }
+        .admin-form input,
+        .admin-form textarea,
+        .admin-form select {
+            width: 100%;
+            padding: 9px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-glow);
+            background: rgba(0, 0, 0, 0.25);
+            transition: var(--transition);
+            font-size: 0.88rem;
+            color: var(--text-primary);
+        }
+        .admin-form input:focus,
+        .admin-form textarea:focus,
+        .admin-form select:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 0, 0, 0.4);
+        }
+        .admin-form textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+        .admin-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .admin-form .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        .admin-form select option {
+            background: #121e33;
+        }
         .admin-form .icon-preview {
-            display: inline-flex; align-items: center; gap: 10px; margin-top: 6px;
-            font-size: 0.8rem; color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
         }
         .admin-form .icon-preview .preview-box {
-            width: 40px; height: 40px; border-radius: var(--radius-sm);
-            border: 1px solid var(--border-glow); overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.2); font-size: 22px;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-glow);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 22px;
         }
-        .admin-form .icon-preview .preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .admin-form .icon-preview .preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .toast-container {
-            position: fixed; bottom: 28px; right: 28px; z-index: 999;
-            display: flex; flex-direction: column; gap: 8px; max-width: 340px;
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 340px;
         }
         .toast {
-            padding: 12px 20px; border-radius: var(--radius-sm);
-            background: var(--bg-card-solid); backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glow-strong); box-shadow: var(--shadow-card);
-            font-size: 0.85rem; color: var(--text-primary);
-            transform: translateX(120%); animation: toastIn 0.4s ease forwards;
-            display: flex; align-items: center; gap: 10px;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card-solid);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow-strong);
+            box-shadow: var(--shadow-card);
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            transform: translateX(120%);
+            animation: toastIn 0.4s ease forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .toast.success .icon { color: var(--accent-cyan); }
-        .toast.error .icon { color: #f87171; }
-        .toast .icon { font-size: 1.1rem; }
-        @keyframes toastIn { to { transform: translateX(0); } }
-        @keyframes toastOut { to { transform: translateX(120%); opacity: 0; } }
+        .toast.success .icon {
+            color: var(--accent-cyan);
+        }
+        .toast.error .icon {
+            color: #f87171;
+        }
+        .toast .icon {
+            font-size: 1.1rem;
+        }
+        @keyframes toastIn {
+            to {
+                transform: translateX(0);
+            }
+        }
+        @keyframes toastOut {
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
 
         .divider-cyber {
-            display: flex; align-items: center; justify-content: center;
-            gap: 14px; margin: 10px 0 16px;
-            color: var(--text-dim); font-size: 0.65rem; letter-spacing: 4px; font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin: 10px 0 16px;
+            color: var(--text-dim);
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            font-weight: 300;
         }
-        .divider-cyber::before, .divider-cyber::after {
-            content: ''; flex: 1; height: 1px;
+        .divider-cyber::before,
+        .divider-cyber::after {
+            content: '';
+            flex: 1;
+            height: 1px;
             background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
         }
-        .divider-cyber .dot { font-size: 0.35rem; color: var(--accent-cyan); }
+        .divider-cyber .dot {
+            font-size: 0.35rem;
+            color: var(--accent-cyan);
+        }
 
         @media (max-width: 900px) {
-            .admin-sidebar { width: 60px; padding: 14px 6px; }
-            .admin-sidebar .logo-sm span, .admin-sidebar .nav-item span:not(.icon), .admin-sidebar .logout-btn span { display: none; }
-            .admin-sidebar .logo-sm { justify-content: center; padding: 0 0 14px; font-size: 1.3rem; }
-            .admin-sidebar .nav-item { justify-content: center; padding: 10px; }
-            .admin-sidebar .nav-item .icon { font-size: 1.2rem; width: auto; }
-            .admin-sidebar .logout-btn { justify-content: center; }
-            .admin-main { padding: 20px 16px 40px; }
-            .admin-form .form-row { grid-template-columns: 1fr; }
+            .admin-sidebar {
+                width: 60px;
+                padding: 14px 6px;
+            }
+            .admin-sidebar .logo-sm span,
+            .admin-sidebar .nav-item span:not(.icon),
+            .admin-sidebar .logout-btn span {
+                display: none;
+            }
+            .admin-sidebar .logo-sm {
+                justify-content: center;
+                padding: 0 0 14px;
+                font-size: 1.3rem;
+            }
+            .admin-sidebar .nav-item {
+                justify-content: center;
+                padding: 10px;
+            }
+            .admin-sidebar .nav-item .icon {
+                font-size: 1.2rem;
+                width: auto;
+            }
+            .admin-sidebar .logout-btn {
+                justify-content: center;
+            }
+            .admin-main {
+                padding: 20px 16px 40px;
+            }
+            .admin-form .form-row {
+                grid-template-columns: 1fr;
+            }
         }
         @media (max-width: 768px) {
-            .admin-layout.active { flex-direction: column; }
-            .admin-sidebar {
-                width: 100%; height: auto; position: static; flex-direction: row;
-                padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 4px;
-                border-right: none; border-bottom: 1px solid var(--border-glow);
+            .admin-layout.active {
+                flex-direction: column;
             }
-            .admin-sidebar .logo-sm { display: none; }
-            .admin-sidebar .nav-item { padding: 6px 12px; font-size: 0.75rem; }
-            .admin-sidebar .nav-item .icon { font-size: 0.9rem; width: 20px; }
-            .admin-sidebar .logout-btn { margin-top: 0; border-top: none; padding-top: 0; margin-left: auto; font-size: 0.75rem; }
-            .admin-main { max-height: none; padding: 16px 14px 40px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .table-wrap { overflow-x: auto; }
-            .table-wrap table { font-size: 0.75rem; min-width: 480px; }
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                flex-direction: row;
+                padding: 10px 14px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-glow);
+            }
+            .admin-sidebar .logo-sm {
+                display: none;
+            }
+            .admin-sidebar .nav-item {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            .admin-sidebar .nav-item .icon {
+                font-size: 0.9rem;
+                width: 20px;
+            }
+            .admin-sidebar .logout-btn {
+                margin-top: 0;
+                border-top: none;
+                padding-top: 0;
+                margin-left: auto;
+                font-size: 0.75rem;
+            }
+            .admin-main {
+                max-height: none;
+                padding: 16px 14px 40px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .table-wrap {
+                overflow-x: auto;
+            }
+            .table-wrap table {
+                font-size: 0.75rem;
+                min-width: 480px;
+            }
         }
     </style>
 </head>
@@ -330,6 +778,10 @@
     </div>
 
     <script>
+        const SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         var DB = {
             get: function(key) {
                 try { return JSON.parse(localStorage.getItem('lezhe_' + key)) || null; } catch { return null; }
@@ -360,6 +812,85 @@
             },
             genId: function() {
                 return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+            },
+
+            // Supabase 版本的操作
+            async getSoftwareFromCloud() {
+                const { data, error } = await supabase
+                    .from('software')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) {
+                    console.error('获取软件失败:', error);
+                    return [];
+                }
+                return data || [];
+            },
+
+            async addSoftwareToCloud(soft) {
+                const { data, error } = await supabase
+                    .from('software')
+                    .insert(soft)
+                    .select();
+                if (error) {
+                    console.error('添加软件失败:', error);
+                    return null;
+                }
+                return data ? data[0] : null;
+            },
+
+            async updateSoftwareInCloud(id, updates) {
+                const { error } = await supabase
+                    .from('software')
+                    .update(updates)
+                    .eq('id', id);
+                if (error) console.error('更新软件失败:', error);
+            },
+
+            async deleteSoftwareFromCloud(id) {
+                const { error } = await supabase
+                    .from('software')
+                    .delete()
+                    .eq('id', id);
+                if (error) console.error('删除软件失败:', error);
+            },
+
+            async getCategoriesFromCloud() {
+                const { data, error } = await supabase
+                    .from('categories')
+                    .select('name')
+                    .order('name');
+                if (error) {
+                    console.error('获取分类失败:', error);
+                    return ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                }
+                return data.map(item => item.name);
+            },
+
+            async addCategoryToCloud(name) {
+                const { error } = await supabase
+                    .from('categories')
+                    .insert({ name: name });
+                if (error) console.error('添加分类失败:', error);
+            },
+
+            async deleteCategoryFromCloud(name) {
+                const { error } = await supabase
+                    .from('categories')
+                    .delete()
+                    .eq('name', name);
+                if (error) console.error('删除分类失败:', error);
+            },
+
+            async verifyUserCloud(username, passwordHash) {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('password_hash')
+                    .eq('username', username);
+                if (error || !data || data.length === 0) {
+                    return false;
+                }
+                return data[0].password_hash === passwordHash;
             }
         };
 
@@ -386,6 +917,7 @@
         var secretPassword = 'qbx12164811..';
         var adminHash = hashPassword(secretPassword);
 
+        // 初始化本地用户（兼容旧版）
         if (!localStorage.getItem('lezhe_users')) {
             DB.set('users', [{ username: 'admin', passwordHash: adminHash }]);
         } else {
@@ -396,100 +928,7 @@
             }
         }
 
-        if (!localStorage.getItem('lezhe_software')) {
-            var defaultSoftware = [{
-                id: 's1',
-                name: '乐哲笔记',
-                category: '办公软件',
-                version: '3.2.0',
-                description: '极简写作与知识管理，支持 Markdown 与双向链接。',
-                detail: '乐哲笔记是一款为创作者打造的轻量级笔记应用。沉浸式写作模式、云端同步、双向链接，构建你的数字花园。',
-                icon: '📝',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '14.2 MB',
-                date: '2026-07-12',
-                views: 512,
-                downloads: 128,
-                recommend: true
-            }, {
-                id: 's2',
-                name: '像素工坊',
-                category: '媒体工具',
-                version: '2.8.1',
-                description: '专业数字绘画与插图设计，丰富笔刷引擎。',
-                detail: '像素工坊提供丰富的笔刷引擎和色彩管理，支持多图层与高级混合模式，让创意自由流动。',
-                icon: '🎨',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '48.6 MB',
-                date: '2026-07-10',
-                views: 387,
-                downloads: 211,
-                recommend: true
-            }, {
-                id: 's3',
-                name: 'CodeNest',
-                category: '开发工具',
-                version: '1.9.4',
-                description: '智能代码编辑器，轻量高效，支持多语言。',
-                detail: 'CodeNest 集成语法高亮、智能补全与 Git 版本控制，支持数十种编程语言，开发体验流畅。',
-                icon: '⌨️',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '32.1 MB',
-                date: '2026-07-08',
-                views: 634,
-                downloads: 309,
-                recommend: false
-            }, {
-                id: 's4',
-                name: '光影矩阵',
-                category: '媒体工具',
-                version: '6.0.0',
-                description: 'AI 驱动的图片增强与编辑工具。',
-                detail: '光影矩阵利用深度学习算法实现智能抠图、画质修复与风格迁移，让每一张照片都焕发新生。',
-                icon: '📸',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '78.3 MB',
-                date: '2026-07-05',
-                views: 423,
-                downloads: 187,
-                recommend: true
-            }, {
-                id: 's5',
-                name: '数据罗盘',
-                category: '实用工具',
-                version: '2.1.3',
-                description: '数据可视化与商业智能分析平台。',
-                detail: '数据罗盘支持连接多种数据源，通过拖拽式操作生成交互式图表与仪表盘，洞察数据价值。',
-                icon: '📊',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '22.7 MB',
-                date: '2026-07-02',
-                views: 276,
-                downloads: 94,
-                recommend: false
-            }, {
-                id: 's6',
-                name: '极光浏览器',
-                category: '实用工具',
-                version: '5.0.2',
-                description: '极速、安全、无广告的现代浏览器。',
-                detail: '极光浏览器基于 Chromium 内核深度优化，内置智能拦截、隐私保护与沉浸式阅读模式。',
-                icon: '🌐',
-                iconUrl: '',
-                downloadUrl: '',
-                size: '9.8 MB',
-                date: '2026-06-28',
-                views: 589,
-                downloads: 312,
-                recommend: false
-            }];
-            DB.set('software', defaultSoftware);
-        }
+        // 初始化本地分类（兼容旧版，但优先使用云端）
         if (!localStorage.getItem('lezhe_categories')) {
             DB.set('categories', ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具']);
         }
@@ -513,8 +952,8 @@
         }
 
         function renderIconThumb(soft) {
-            if (soft.iconUrl && soft.iconUrl.trim()) {
-                return '<img src="' + soft.iconUrl + '" alt="' + soft.name + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (soft.icon || '📦') + '\'" />';
+            if (soft.icon_url && soft.icon_url.trim()) {
+                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (soft.icon || '📦') + '\'" />';
             }
             return soft.icon || '📦';
         }
@@ -595,7 +1034,7 @@
                 document.getElementById('loginError').textContent = '';
             },
 
-            doLogin: function() {
+            doLogin: async function() {
                 var user = document.getElementById('loginUser').value.trim();
                 var pass = document.getElementById('loginPass').value.trim();
                 var users = DB.getUsers();
@@ -631,9 +1070,9 @@
                 else if (tab === 'add') this.renderAddForm(main);
             },
 
-            renderDashboard: function(container) {
-                var all = DB.getSoftware();
-                var cats = DB.getCategories();
+            renderDashboard: async function(container) {
+                var all = await DB.getSoftwareFromCloud();
+                var cats = await DB.getCategoriesFromCloud();
                 var total = all.length;
                 var totalDownloads = 0;
                 var totalViews = 0;
@@ -658,14 +1097,14 @@
                 container.innerHTML = html;
             },
 
-            renderSoftwareList: function(container) {
-                var all = DB.getSoftware();
+            renderSoftwareList: async function(container) {
+                var all = await DB.getSoftwareFromCloud();
                 var self = this;
                 container.innerHTML = '<h2 class="page-title">⊞ 软件管理</h2><p class="page-sub">共 ' + all.length + ' 款资源</p><div style="margin-bottom:14px;"><button class="btn btn-sm btn-primary" id="adminAddBtn">⊕ 上传新软件</button></div><div class="table-wrap" id="adminTableWrap"></div>';
                 var wrap = document.getElementById('adminTableWrap');
                 Render.renderAdminTable(wrap, all,
                     function(id) {
-                        var soft = DB.getSoftware().find(function(s) { return s.id === id; });
+                        var soft = all.find(function(s) { return s.id === id; });
                         if (soft) {
                             self._editingId = id;
                             self.renderAdminTab('add');
@@ -677,20 +1116,24 @@
                                 form.querySelector('[name="description"]').value = soft.description || '';
                                 form.querySelector('[name="detail"]').value = soft.detail || '';
                                 form.querySelector('[name="icon"]').value = soft.icon || '📦';
-                                form.querySelector('[name="iconUrl"]').value = soft.iconUrl || '';
-                                form.querySelector('[name="downloadUrl"]').value = soft.downloadUrl || '';
+                                form.querySelector('[name="iconUrl"]').value = soft.icon_url || '';
+                                form.querySelector('[name="downloadUrl"]').value = soft.download_url || '';
                                 form.querySelector('[name="size"]').value = soft.size || '';
                                 form.querySelector('[name="recommend"]').checked = !!soft.recommend;
+                                // 平台选择
+                                var platforms = soft.platforms || [];
+                                var macCheck = form.querySelector('[name="platformMac"]');
+                                var winCheck = form.querySelector('[name="platformWin"]');
+                                if (macCheck) macCheck.checked = platforms.indexOf('mac') !== -1;
+                                if (winCheck) winCheck.checked = platforms.indexOf('windows') !== -1;
                                 self._updateIconPreview(form);
                                 document.querySelector('#adminForm .form-actions .btn-primary').textContent = '✎ 更新';
                                 document.querySelector('#adminForm .form-actions .btn-cancel').classList.remove('hidden');
                             }
                         }
                     },
-                    function(id) {
-                        var list = DB.getSoftware();
-                        list = list.filter(function(s) { return s.id !== id; });
-                        DB.setSoftware(list);
+                    async function(id) {
+                        await DB.deleteSoftwareFromCloud(id);
                         toast('已删除', 'success');
                         self.renderAdminTab('software');
                     }
@@ -708,26 +1151,26 @@
                 });
             },
 
-            renderCategories: function(container) {
-                var cats = DB.getCategories();
+            renderCategories: async function(container) {
+                var cats = await DB.getCategoriesFromCloud();
                 var self = this;
                 var html = '<h2 class="page-title">⌗ 分类管理</h2><p class="page-sub">管理分类标签</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="newCategoryInput" placeholder="输入新分类名称" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:rgba(0,0,0,0.2);flex:1;min-width:140px;color:var(--text-primary);" /><button class="btn btn-sm btn-primary" id="addCategoryBtn">⊕ 添加</button></div><div class="table-wrap"><table><thead><tr><th>分类名称</th><th>软件数</th><th style="width:80px;">操作</th></tr></thead><tbody>';
+                var all = await DB.getSoftwareFromCloud();
                 for (var i = 0; i < cats.length; i++) {
                     var c = cats[i];
-                    var count = DB.getSoftware().filter(function(s) { return s.category === c; }).length;
+                    var count = all.filter(function(s) { return s.category === c; }).length;
                     html += '<tr><td>' + getIconEmoji(c) + ' ' + c + '</td><td>' + count + '</td><td><button class="del-btn" data-cat="' + c + '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);transition:var(--transition);">删除</button></td></tr>';
                 }
                 html += '</tbody></table></div>';
                 container.innerHTML = html;
 
-                document.getElementById('addCategoryBtn').addEventListener('click', function() {
+                document.getElementById('addCategoryBtn').addEventListener('click', async function() {
                     var input = document.getElementById('newCategoryInput');
                     var name = input.value.trim();
                     if (!name) { toast('请输入分类名称', 'error'); return; }
-                    var list = DB.getCategories();
+                    var list = await DB.getCategoriesFromCloud();
                     if (list.indexOf(name) !== -1) { toast('分类已存在', 'error'); return; }
-                    list.push(name);
-                    DB.setCategories(list);
+                    await DB.addCategoryToCloud(name);
                     input.value = '';
                     toast('分类已添加', 'success');
                     self.renderAdminTab('categories');
@@ -735,17 +1178,16 @@
 
                 var delBtns = container.querySelectorAll('.del-btn[data-cat]');
                 for (var j = 0; j < delBtns.length; j++) {
-                    delBtns[j].addEventListener('click', function() {
+                    delBtns[j].addEventListener('click', async function() {
                         var cat = this.dataset.cat;
-                        var has = DB.getSoftware().some(function(s) { return s.category === cat; });
+                        var all = await DB.getSoftwareFromCloud();
+                        var has = all.some(function(s) { return s.category === cat; });
                         if (has) {
                             toast('该分类下还有软件，无法删除', 'error');
                             return;
                         }
                         if (confirm('确定删除分类 "' + cat + '" 吗？')) {
-                            var list = DB.getCategories();
-                            list = list.filter(function(c) { return c !== cat; });
-                            DB.setCategories(list);
+                            await DB.deleteCategoryFromCloud(cat);
                             toast('分类已删除', 'success');
                             self.renderAdminTab('categories');
                         }
@@ -767,15 +1209,27 @@
             renderAddForm: function(container) {
                 var isEdit = !!this._editingId;
                 var self = this;
-                var cats = DB.getCategories();
-                var optionsHtml = '';
-                for (var i = 0; i < cats.length; i++) {
-                    optionsHtml += '<option value="' + cats[i] + '">' + cats[i] + '</option>';
-                }
-                var html = '<h2 class="page-title">' + (isEdit ? '✎ 编辑资源' : '⊕ 上传资源') + '</h2><p class="page-sub">' + (isEdit ? '更新软件信息' : '向工坊提交新软件') + '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required>' + optionsHtml + '</select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 (软件包地址) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入软件下载直链或网盘链接</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary">' + (isEdit ? '✎ 更新' : '⊕ 上传') + '</button><button type="button" class="btn btn-outline btn-cancel ' + (isEdit ? '' : 'hidden') + '" id="cancelEditBtn">取消</button></div></form>';
+                var html = '<h2 class="page-title">' + (isEdit ? '✎ 编辑资源' : '⊕ 上传资源') + '</h2><p class="page-sub">' + (isEdit ? '更新软件信息' : '向工坊提交新软件') + '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required>';
+                DB.getCategoriesFromCloud().then(function(cats) {
+                    var select = document.querySelector('[name="category"]');
+                    if (select) {
+                        select.innerHTML = cats.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+                    }
+                });
+                html += '</select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 (软件包地址) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入软件下载直链或网盘链接</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-row"><div class="form-group"><label>支持平台</label><div style="display:flex;gap:20px;padding-top:6px;"><label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="platformMac" value="mac" /> 🍎 Mac</label><label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="platformWin" value="windows" /> 🪟 Windows</label></div></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary">' + (isEdit ? '✎ 更新' : '⊕ 上传') + '</button><button type="button" class="btn btn-outline btn-cancel ' + (isEdit ? '' : 'hidden') + '" id="cancelEditBtn">取消</button></div></form>';
                 container.innerHTML = html;
 
+                // 重新绑定分类选择器
+                var select = container.querySelector('[name="category"]');
+                DB.getCategoriesFromCloud().then(function(cats) {
+                    if (select) {
+                        select.innerHTML = cats.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+                    }
+                });
+
                 var form = document.getElementById('adminForm');
+                if (!form) return;
+
                 var iconUrlInput = form.querySelector('[name="iconUrl"]');
                 var iconEmojiInput = form.querySelector('[name="icon"]');
                 var previewBox = form.querySelector('.preview-box');
@@ -789,8 +1243,8 @@
                         previewBox.textContent = emoji;
                     }
                 };
-                iconUrlInput.addEventListener('input', updatePreview);
-                iconEmojiInput.addEventListener('input', updatePreview);
+                if (iconUrlInput) iconUrlInput.addEventListener('input', updatePreview);
+                if (iconEmojiInput) iconEmojiInput.addEventListener('input', updatePreview);
 
                 var cancelBtn = document.getElementById('cancelEditBtn');
                 if (cancelBtn) {
@@ -800,15 +1254,22 @@
                     });
                 }
 
-                form.addEventListener('submit', function(e) {
+                form.addEventListener('submit', async function(e) {
                     e.preventDefault();
+                    var platforms = [];
+                    var macCheck = form.querySelector('[name="platformMac"]');
+                    var winCheck = form.querySelector('[name="platformWin"]');
+                    if (macCheck && macCheck.checked) platforms.push('mac');
+                    if (winCheck && winCheck.checked) platforms.push('windows');
+
                     var data = {
                         name: form.querySelector('[name="name"]').value.trim(),
                         category: form.querySelector('[name="category"]').value,
                         version: form.querySelector('[name="version"]').value.trim(),
                         icon: form.querySelector('[name="icon"]').value.trim() || '📦',
-                        iconUrl: form.querySelector('[name="iconUrl"]').value.trim(),
-                        downloadUrl: form.querySelector('[name="downloadUrl"]').value.trim(),
+                        icon_url: form.querySelector('[name="iconUrl"]').value.trim(),
+                        download_url: form.querySelector('[name="downloadUrl"]').value.trim(),
+                        platforms: platforms,
                         size: form.querySelector('[name="size"]').value.trim(),
                         description: form.querySelector('[name="description"]').value.trim(),
                         detail: form.querySelector('[name="detail"]').value.trim(),
@@ -818,50 +1279,32 @@
                         toast('请填写完整信息', 'error');
                         return;
                     }
-                    var list = DB.getSoftware();
+                    if (platforms.length === 0) {
+                        toast('请至少选择一个支持平台', 'error');
+                        return;
+                    }
+
                     if (self._editingId) {
-                        var idx = -1;
-                        for (var i = 0; i < list.length; i++) {
-                            if (list[i].id === self._editingId) {
-                                idx = i;
-                                break;
-                            }
-                        }
-                        if (idx !== -1) {
-                            var old = list[idx];
-                            list[idx] = { id: old.id, date: old.date, views: old.views, downloads: old.downloads };
-                            for (var key in data) {
-                                if (data.hasOwnProperty(key)) {
-                                    list[idx][key] = data[key];
-                                }
-                            }
-                            DB.setSoftware(list);
-                            toast('已更新: ' + data.name, 'success');
-                            self._editingId = null;
-                            self.renderAdminTab('software');
-                        }
+                        await DB.updateSoftwareInCloud(self._editingId, data);
+                        toast('已更新: ' + data.name, 'success');
+                        self._editingId = null;
+                        self.renderAdminTab('software');
                     } else {
                         var newSoft = {
                             id: DB.genId(),
-                            name: data.name,
-                            category: data.category,
-                            version: data.version,
-                            icon: data.icon,
-                            iconUrl: data.iconUrl,
-                            downloadUrl: data.downloadUrl,
-                            size: data.size,
-                            description: data.description,
-                            detail: data.detail,
-                            recommend: data.recommend,
+                            ...data,
                             date: new Date().toISOString().slice(0, 10),
                             views: 0,
                             downloads: 0
                         };
-                        list.push(newSoft);
-                        DB.setSoftware(list);
-                        toast('上传成功: ' + data.name, 'success');
-                        form.reset();
-                        self.renderAdminTab('software');
+                        var result = await DB.addSoftwareToCloud(newSoft);
+                        if (result) {
+                            toast('上传成功: ' + data.name, 'success');
+                            form.reset();
+                            self.renderAdminTab('software');
+                        } else {
+                            toast('上传失败，请重试', 'error');
+                        }
                     }
                 });
             }
