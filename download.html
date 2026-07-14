@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
     <style>
         :root {
@@ -893,78 +893,73 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
-        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ============================================================
+        //  Supabase 配置（已内置您的项目信息）
+        // ============================================================
+        var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
+        var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+        var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const DB = {
+        // ============================================================
+        //  数据层（连接 Supabase）
+        // ============================================================
+        var DB = {
             async getSoftware() {
-                const { data, error } = await supabase
-                    .from('software')
-                    .select('*')
-                    .order('created_at', { ascending: false });
-                if (error) {
-                    console.error('获取软件失败:', error);
+                try {
+                    var result = await supabaseClient
+                        .from('software')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    if (result.error) {
+                        console.error('获取软件失败:', result.error);
+                        return [];
+                    }
+                    console.log('✅ 从 Supabase 获取到软件数据:', result.data);
+                    return result.data || [];
+                } catch (e) {
+                    console.error('获取软件异常:', e);
                     return [];
                 }
-                return data || [];
             },
 
             async getCategories() {
-                const { data, error } = await supabase
-                    .from('categories')
-                    .select('name')
-                    .order('name');
-                if (error) {
-                    console.error('获取分类失败:', error);
+                try {
+                    var result = await supabaseClient
+                        .from('categories')
+                        .select('name')
+                        .order('name');
+                    if (result.error) {
+                        console.error('获取分类失败:', result.error);
+                        return ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                    }
+                    var names = result.data.map(function(item) { return item.name; });
+                    console.log('✅ 从 Supabase 获取到分类:', names);
+                    return names;
+                } catch (e) {
+                    console.error('获取分类异常:', e);
                     return ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                 }
-                return data.map(item => item.name);
             },
 
             async updateSoftware(soft) {
-                const { error } = await supabase
-                    .from('software')
-                    .update({
-                        views: soft.views,
-                        downloads: soft.downloads
-                    })
-                    .eq('id', soft.id);
-                if (error) console.error('更新软件失败:', error);
-            },
-
-            async verifyUser(username, passwordHash) {
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('password_hash')
-                    .eq('username', username);
-                if (error || !data || data.length === 0) {
-                    return false;
+                try {
+                    var result = await supabaseClient
+                        .from('software')
+                        .update({
+                            views: soft.views,
+                            downloads: soft.downloads
+                        })
+                        .eq('id', soft.id);
+                    if (result.error) console.error('更新软件失败:', result.error);
+                } catch (e) {
+                    console.error('更新软件异常:', e);
                 }
-                return data[0].password_hash === passwordHash;
             }
         };
 
-        function hashPassword(password) {
-            var hash = 0;
-            for (var i = 0; i < password.length; i++) {
-                var char = password.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return hash.toString(16) + 'x' + password.length.toString(16);
-        }
-
-        function verifyPassword(input, storedHash) {
-            var parts = storedHash.split('x');
-            if (parts.length !== 2) return false;
-            var expectedHash = parts[0];
-            var len = parseInt(parts[1], 16);
-            if (input.length !== len) return false;
-            var computedHash = hashPassword(input).split('x')[0];
-            return computedHash === expectedHash;
-        }
-
+        // ============================================================
+        //  工具函数
+        // ============================================================
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
@@ -1002,6 +997,9 @@
             return html;
         }
 
+        // ============================================================
+        //  渲染引擎
+        // ============================================================
         var currentPage = 1;
         var PAGE_SIZE = 6;
         var currentFilteredList = [];
@@ -1009,6 +1007,7 @@
         var Render = {
             renderCategories: function(container, categories, active, onClick) {
                 if (!container) return;
+                var self = this;
                 DB.getSoftware().then(function(all) {
                     container.innerHTML = categories.map(function(c) {
                         var count = all.filter(function(s) { return s.category === c; }).length;
@@ -1024,7 +1023,7 @@
             },
 
             renderCards: function(container, list, showCategory) {
-                showCategory = showCategory !== undefined ? showCategory : true;
+                showCategory = (showCategory !== undefined) ? showCategory : true;
                 if (!container) return;
                 if (!list || list.length === 0) {
                     container.innerHTML = '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>等待新的资源加入</p></div>';
@@ -1059,6 +1058,9 @@
             }
         };
 
+        // ============================================================
+        //  详情弹窗
+        // ============================================================
         var Detail = {
             open: function(soft) {
                 var overlay = document.getElementById('detailOverlay');
@@ -1108,6 +1110,9 @@
             if (e.target === e.currentTarget) Detail.close();
         });
 
+        // ============================================================
+        //  应用主控
+        // ============================================================
         var App = {
             currentPage: 'home',
             currentCategory: 'all',
