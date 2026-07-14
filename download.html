@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
     <style>
@@ -142,11 +144,10 @@
             background: rgba(0, 136, 255, 0.10);
             color: var(--accent-cyan);
             border: 1px solid rgba(0, 136, 255, 0.15);
+            line-height: 1.6;
         }
-        .badge-purple {
-            background: rgba(108, 92, 231, 0.10);
-            color: var(--accent-purple);
-            border-color: rgba(108, 92, 231, 0.15);
+        .badge i {
+            margin-right: 4px;
         }
         .badge-mac {
             background: rgba(108, 92, 231, 0.10);
@@ -157,6 +158,11 @@
             background: rgba(0, 136, 255, 0.10);
             color: var(--accent-cyan);
             border-color: rgba(0, 136, 255, 0.15);
+        }
+        .badge-purple {
+            background: rgba(108, 92, 231, 0.10);
+            color: var(--accent-purple);
+            border-color: rgba(108, 92, 231, 0.15);
         }
 
         .empty-state {
@@ -467,10 +473,11 @@
             display: flex;
             gap: 6px;
             margin-top: 4px;
+            flex-wrap: wrap;
         }
         .software-card .card-info .platform-badges .badge {
-            font-size: 0.6rem;
-            padding: 1px 10px;
+            font-size: 0.65rem;
+            padding: 2px 12px;
         }
         .software-card .desc {
             font-size: 0.82rem;
@@ -627,6 +634,11 @@
         .detail-modal .detail-platforms {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
+        }
+        .detail-modal .detail-platforms .badge {
+            font-size: 0.75rem;
+            padding: 4px 14px;
         }
         .detail-modal .detail-desc {
             font-size: 0.9rem;
@@ -898,6 +910,10 @@
         // ============================================================
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+
+        if (typeof supabase === 'undefined') {
+            console.error('Supabase library not loaded. Check your network.');
+        }
         var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ============================================================
@@ -985,14 +1001,15 @@
             return soft.icon || '📦';
         }
 
+        // 核心修改：使用 Font Awesome 图标显示平台
         function renderPlatformBadges(soft) {
             var html = '';
             var platforms = soft.platforms || [];
             if (platforms.indexOf('mac') !== -1) {
-                html += '<span class="badge badge-mac">🍎 Mac</span>';
+                html += '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
             }
             if (platforms.indexOf('windows') !== -1) {
-                html += '<span class="badge badge-windows">🪟 Windows</span>';
+                html += '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             }
             return html;
         }
