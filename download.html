@@ -17,7 +17,6 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
     <style>
-        /* ===== 基础变量 & 重置 ===== */
         :root {
             --bg-primary: #f0f4fa;
             --bg-secondary: #e6ecf5;
@@ -44,13 +43,11 @@
             --success: #27ae60;
             --warning: #f39c12;
         }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: var(--font);
             background: var(--bg-primary);
@@ -61,7 +58,6 @@
             padding-bottom: 80px;
             transition: background 0.3s, color 0.3s;
         }
-
         a {
             text-decoration: none;
             color: inherit;
@@ -81,7 +77,6 @@
             background: none;
             color: var(--text-primary);
         }
-
         .container {
             max-width: var(--max-width);
             margin: 0 auto;
@@ -90,8 +85,6 @@
         .hidden {
             display: none !important;
         }
-
-        /* ===== 按钮 ===== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -178,8 +171,6 @@
                 transform: rotate(360deg);
             }
         }
-
-        /* ===== 卡片 ===== */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(16px);
@@ -194,8 +185,6 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
             transform: translateY(-4px);
         }
-
-        /* ===== 徽章 ===== */
         .badge {
             display: inline-block;
             padding: 2px 14px;
@@ -241,8 +230,6 @@
                 box-shadow: 0 0 0 6px rgba(0, 119, 255, 0);
             }
         }
-
-        /* ===== 空状态 ===== */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -258,8 +245,6 @@
             margin-bottom: 8px;
             color: var(--text-primary);
         }
-
-        /* ===== 头部 ===== */
         .header {
             position: sticky;
             top: 0;
@@ -315,7 +300,6 @@
             color: var(--text-dim);
             letter-spacing: 0.5px;
         }
-
         .nav-links {
             display: flex;
             align-items: center;
@@ -359,8 +343,6 @@
         .mobile-toggle:hover {
             background: rgba(0, 0, 0, 0.06);
         }
-
-        /* ===== Hero ===== */
         .hero {
             padding: 40px 0 20px;
             text-align: center;
@@ -387,8 +369,6 @@
             margin: 0 auto 24px;
             font-weight: 300;
         }
-
-        /* ===== 搜索 ===== */
         .search-wrapper {
             position: relative;
             max-width: 440px;
@@ -525,8 +505,6 @@
             background: rgba(0, 136, 255, 0.08);
             color: var(--accent-cyan);
         }
-
-        /* ===== 公告 ===== */
         .announcement-list {
             max-width: 680px;
             margin: 0 auto 12px;
@@ -559,8 +537,6 @@
         .announcement-item .text {
             flex: 1;
         }
-
-        /* ===== 分类 ===== */
         .section-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -669,8 +645,6 @@
             opacity: 0.3;
             pointer-events: none;
         }
-
-        /* ===== 软件网格 ===== */
         .software-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -814,8 +788,6 @@
             font-size: 0.7rem;
             font-weight: 600;
         }
-
-        /* ===== 分页 ===== */
         .pagination {
             display: flex;
             justify-content: center;
@@ -870,8 +842,6 @@
         .pagination .page-jump input:focus {
             border-color: var(--accent-cyan);
         }
-
-        /* ===== 详情弹窗 ===== */
         .detail-overlay {
             position: fixed;
             inset: 0;
@@ -1072,8 +1042,6 @@
             background: rgba(0, 119, 255, 0.2);
             border-radius: 4px;
         }
-
-        /* ===== 相关推荐 ===== */
         .related-software {
             margin-top: 18px;
             border-top: 1px solid var(--border-glow);
@@ -1259,8 +1227,6 @@
                 font-size: 0.7rem;
             }
         }
-
-        /* ===== 底部 ===== */
         .footer {
             padding: 32px 0 20px;
             border-top: 1px solid var(--border-glow);
@@ -1316,8 +1282,6 @@
             color: var(--accent-cyan);
             text-decoration: underline;
         }
-
-        /* ===== Toast ===== */
         .toast-container {
             position: fixed;
             bottom: 28px;
@@ -1365,8 +1329,6 @@
                 opacity: 0;
             }
         }
-
-        /* ===== 分隔线 ===== */
         .divider-cyber {
             display: flex;
             align-items: center;
@@ -1388,8 +1350,6 @@
             font-size: 0.35rem;
             color: var(--accent-cyan);
         }
-
-        /* ===== 回到顶部 ===== */
         .back-top {
             position: fixed;
             bottom: 30px;
@@ -1423,8 +1383,6 @@
             border-color: transparent;
             transform: scale(1.05);
         }
-
-        /* ===== 移动端底部导航 ===== */
         .mobile-bottom-nav {
             display: none;
             position: fixed;
@@ -1457,8 +1415,6 @@
             color: var(--accent-cyan);
             background: rgba(0, 119, 255, 0.08);
         }
-
-        /* ===== 桌面端专用 ===== */
         @media (min-width: 769px) {
             .toolbar {
                 display: flex;
@@ -1532,18 +1488,11 @@
                 margin-left: auto;
             }
         }
-
-        /* ============================================================
-                   改进点 ①：统一下拉框样式 — 更现代、更精致
-                   ============================================================ */
         .filter-panel .filter-group select,
         .toolbar .sort-group select {
-            /* 去掉原生外观，完全自定义 */
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
-
-            /* 基础尺寸与字体 */
             padding: 8px 38px 8px 18px;
             font-size: 0.82rem;
             font-weight: 500;
@@ -1559,18 +1508,13 @@
             transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
             min-width: 120px;
             outline: none;
-            /* 确保 option 文字颜色继承 */
             color-scheme: light dark;
         }
-
-        /* 下拉框 hover 状态 */
         .filter-panel .filter-group select:hover,
         .toolbar .sort-group select:hover {
             border-color: var(--accent-cyan);
             background-color: var(--bg-card);
         }
-
-        /* 下拉框 focus 状态 — 发光边框 + 轻微上浮 */
         .filter-panel .filter-group select:focus,
         .toolbar .sort-group select:focus {
             border-color: var(--accent-cyan);
@@ -1578,8 +1522,6 @@
             background-color: var(--bg-card-solid);
             transform: translateY(-1px);
         }
-
-        /* 下拉框 disabled 状态（如有） */
         .filter-panel .filter-group select:disabled,
         .toolbar .sort-group select:disabled {
             opacity: 0.5;
@@ -1587,8 +1529,6 @@
             filter: grayscale(40%);
             transform: none !important;
         }
-
-        /* 适配暗色模式的下拉框 */
         @media (prefers-color-scheme: dark) {
             .filter-panel .filter-group select,
             .toolbar .sort-group select {
@@ -1608,17 +1548,12 @@
                 border-color: #60a5fa;
                 box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
             }
-            /* option 在暗色下保持可读 */
             .filter-panel .filter-group select option,
             .toolbar .sort-group select option {
                 background-color: #1a2332;
                 color: #e2e8f0;
             }
         }
-
-        /* ============================================================
-                   改进点 ②：视图切换按钮 — 样式增强 + 点击修复
-                   ============================================================ */
         .view-toggle {
             display: flex;
             gap: 4px;
@@ -1648,7 +1583,6 @@
         .view-toggle button i {
             font-size: 0.9rem;
             pointer-events: none;
-            /* 让点击穿透到 button */;
         }
         .view-toggle button:hover {
             color: var(--text-primary);
@@ -1667,8 +1601,6 @@
         .view-toggle button:active {
             transform: scale(0.92);
         }
-
-        /* 移动端适配 */
         @media (max-width: 768px) {
             .view-toggle button {
                 width: 30px;
@@ -1679,10 +1611,6 @@
                 font-size: 0.8rem;
             }
         }
-
-        /* ============================================================
-                   改进点 ③：下拉框在工具栏中的布局微调
-                   ============================================================ */
         .toolbar .sort-group {
             gap: 8px;
         }
@@ -1703,8 +1631,6 @@
             color: var(--text-dim);
             padding: 0 4px;
         }
-
-        /* 过滤面板中的标签 */
         .filter-panel .filter-group label {
             font-size: 0.8rem;
             font-weight: 500;
@@ -1728,10 +1654,6 @@
             background: rgba(0, 119, 255, 0.06);
             border-color: var(--border-glow);
         }
-
-        /* ============================================================
-                   响应式补充
-                   ============================================================ */
         @media (max-width: 768px) {
             :root {
                 --header-height: 58px;
@@ -1824,7 +1746,6 @@
                 height: 40px;
                 font-size: 1rem;
             }
-            /* 移动端下拉框适配 */
             .filter-panel .filter-group select,
             .toolbar .sort-group select {
                 padding: 7px 34px 7px 14px;
@@ -1834,7 +1755,6 @@
                 background-position: right 12px center;
             }
         }
-
         @media (max-width: 480px) {
             .container {
                 padding: 0 16px;
@@ -1909,8 +1829,6 @@
                 min-height: 34px;
             }
         }
-
-        /* ===== 暗色模式全局 ===== */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-primary: #0f172a;
@@ -1957,8 +1875,6 @@
 <body>
     <div class="toast-container" id="toastContainer"></div>
     <button class="back-top" id="backTopBtn" aria-label="回到顶部"><i class="fas fa-arrow-up"></i></button>
-
-    <!-- ===== 头部 ===== -->
     <header class="header" id="mainHeader">
         <div class="container header-inner">
             <a href="#" class="logo" id="logoHome">
@@ -1972,11 +1888,8 @@
             <button class="mobile-toggle" id="mobileToggle" aria-label="菜单"><i class="fas fa-bars"></i></button>
         </div>
     </header>
-
     <main>
         <div class="container">
-
-            <!-- ===== 首页 ===== -->
             <section id="pageHome">
                 <div class="hero">
                     <h1>探索 · <span class="highlight">乐哲</span> 软件</h1>
@@ -1998,7 +1911,6 @@
                         <span data-kw="AI">🤖 AI</span>
                     </div>
                 </div>
-
                 <div class="divider-cyber"><span class="dot">◆</span> 分 类 导 航 <span class="dot">◆</span></div>
                 <div class="categories-wrapper" id="categoriesWrapper">
                     <button class="categories-nav-btn" id="catPrevBtn" aria-label="向左滚动"><i class="fas fa-chevron-left"></i></button>
@@ -2007,33 +1919,26 @@
                     </div>
                     <button class="categories-nav-btn" id="catNextBtn" aria-label="向右滚动"><i class="fas fa-chevron-right"></i></button>
                 </div>
-
                 <div style="margin-top:36px;" id="recentHistorySection" class="hidden">
                     <h2 class="section-title">🕒 最近浏览</h2>
                     <div class="software-grid" id="recentGrid"></div>
                 </div>
-
                 <div style="margin-top:36px;">
                     <h2 class="section-title">✦ 热门推荐</h2>
                     <p class="section-sub">社区口碑精选</p>
                     <div class="software-grid" id="recommendGrid"></div>
                 </div>
-
                 <div style="margin-top:40px;">
                     <h2 class="section-title">✦ 最新上架</h2>
                     <p class="section-sub">持续迭代，保持前沿</p>
                     <div class="software-grid" id="latestGrid"></div>
                 </div>
             </section>
-
-            <!-- ===== 软件库 ===== -->
             <section id="pageList" class="hidden">
                 <div style="padding:16px 0 6px;">
                     <h2 class="section-title">✦ 软件库</h2>
                     <p class="section-sub" id="listSub">全部资源</p>
                 </div>
-
-                <!-- 工具栏 -->
                 <div class="toolbar">
                     <div class="filters" id="filterTags">
                         <button class="btn btn-sm btn-outline active" data-cat="all">全部</button>
@@ -2052,8 +1957,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- 过滤面板 -->
                 <div class="filter-panel" id="filterPanel">
                     <div class="filter-group">
                         <label for="platformFilter"><i class="fas fa-desktop"></i> 平台</label>
@@ -2065,11 +1968,7 @@
                     </div>
                     <span class="reset-filters" id="resetFiltersBtn"><i class="fas fa-undo-alt"></i> 重置</span>
                 </div>
-
-                <!-- 列表网格 -->
                 <div class="software-grid" id="listGrid"></div>
-
-                <!-- 分页 -->
                 <div class="pagination" id="paginationControls">
                     <button id="prevPageBtn" disabled><i class="fas fa-chevron-left"></i> 上一页</button>
                     <span class="page-info" id="pageInfo">第 1 / 1 页</span>
@@ -2080,15 +1979,12 @@
                     </span>
                 </div>
             </section>
-
         </div>
-
-        <!-- ===== 底部 ===== -->
         <footer class="footer">
             <div class="brand">◆ 乐哲软件</div>
             <p class="copyright">
                 &copy; 2026 乐哲软件 &middot; 侵权请联系
-                <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a>
+                <a href="/cdn-cgi/l/email-protection#377b526d5f5264585143775842435b58585c1954585a"><span class="__cf_email__" data-cfemail="cc80a996a4a99fa3aab88ca3b9b8a0a3a3a7e2afa3a1">[email&#160;protected]</span></a>
             </p>
             <div class="friend-links">
                 <span>友情链接：</span>
@@ -2101,8 +1997,6 @@
             <div class="legal">免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。</div>
         </footer>
     </main>
-
-    <!-- ===== 详情弹窗 ===== -->
     <div class="detail-overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="detailName">
         <div class="detail-modal" id="detailModal">
             <div class="modal-body" id="modalBody">
@@ -2126,22 +2020,16 @@
             </div>
         </div>
     </div>
-
-    <!-- ===== 移动端底部导航 ===== -->
     <nav class="mobile-bottom-nav" id="mobileBottomNav">
         <a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a>
         <a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a>
     </nav>
-
-    <!-- ============================================================
-    JavaScript
-    ============================================================ -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
     <script>
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
         var supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         if (!supabaseClient) console.error('Supabase library not loaded.');
-
         var QUOTES = [
             "生活就像一盒巧克力，你永远不知道下一颗是什么味道。",
             "不积跬步，无以至千里。",
@@ -2188,9 +2076,7 @@
             "面朝大海，春暖花开。",
             "那些杀不死我的，必使我更强大。"
         ];
-
         var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
-
         var DB = {
             async loadAll(force) {
                 force = force || false;
@@ -2203,13 +2089,12 @@
                     if (softRes.error) throw softRes.error;
                     if (catRes.error) throw catRes.error;
                     cache.software = softRes.data || [];
-                    cache.categories = catRes.data.map(item => item.name) || ['设计工具', '开发工具', '办公软件', '媒体工具',
-                        '实用工具'
-                    ];
+                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                     cache.software.forEach(function(s) {
                         if (!s.screenshots) s.screenshots = [];
                         if (!s.changelog) s.changelog = '';
                         if (!s.requirements) s.requirements = '';
+                        if (!s.platforms) s.platforms = [];
                     });
                     cache.loaded = true;
                     cache.lastFetch = Date.now();
@@ -2224,8 +2109,7 @@
             getCategories: function() { return cache.categories; },
             async updateSoftware(soft) {
                 try {
-                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq(
-                        'id', soft.id);
+                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id', soft.id);
                     var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
                     if (idx !== -1) { cache.software[idx].views = soft.views;
                         cache.software[idx].downloads = soft.downloads; }
@@ -2233,14 +2117,12 @@
             }
         };
 
-        // ===== Toast =====
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
             var el = document.createElement('div');
             el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' +
-                msg;
+            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' + msg;
             c.appendChild(el);
             setTimeout(function() {
                 el.style.animation = 'toastOut 0.4s ease forwards';
@@ -2248,7 +2130,6 @@
             }, 2800);
         }
 
-        // ===== 工具函数 =====
         function getIconEmoji(cat) {
             var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
             return map[cat] || '📦';
@@ -2264,13 +2145,10 @@
 
         function renderPlatformBadges(soft) {
             var html = '';
-            if ((soft.platforms || []).includes('mac')) html +=
-                '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
-            if ((soft.platforms || []).includes('windows')) html +=
-                '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
+            if ((soft.platforms || []).includes('mac')) html += '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
+            if ((soft.platforms || []).includes('windows')) html += '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             return html;
         }
-
         var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
 
         function addSearchHistory(kw) {
@@ -2314,8 +2192,7 @@
                 }).slice(0, 8);
                 if (matches.length) {
                     sug.innerHTML = matches.map(function(s) {
-                        return '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s
-                            .name + '</div>';
+                        return '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s.name + '</div>';
                     }).join('');
                     sug.classList.add('open');
                     sug.querySelectorAll('.item').forEach(function(el) {
@@ -2329,7 +2206,6 @@
                 }
             }
         }
-
         var currentView = 'grid';
 
         function applyViewMode() {
@@ -2340,21 +2216,15 @@
                 grid.style.gridTemplateColumns = '';
             }
         }
-
-        // ============================================================
-        // 改进点 ②：视图切换 — 使用 closest('button') 修复点击
-        // ============================================================
         document.getElementById('viewToggle').addEventListener('click', function(e) {
             var btn = e.target.closest('button');
             if (!btn) return;
-            // 如果已经是 active 则不做切换（可保留）
             if (btn.classList.contains('active')) return;
             currentView = btn.dataset.view;
             this.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             applyViewMode();
         });
-
         var Render = {
             renderAnnouncements: function(container) {
                 if (!container) return;
@@ -2415,7 +2285,6 @@
                 container.innerHTML = html;
             }
         };
-
         var scrollContainer = document.getElementById('categoriesScroll');
         var catPrevBtn = document.getElementById('catPrevBtn');
         var catNextBtn = document.getElementById('catNextBtn');
@@ -2433,7 +2302,6 @@
             catPrevBtn.addEventListener('click', function() { scrollContainer.scrollBy({ left: -200, behavior: 'smooth' }); });
             catNextBtn.addEventListener('click', function() { scrollContainer.scrollBy({ left: 200, behavior: 'smooth' }); });
         }
-
         var viewHistory = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
 
         function addViewHistory(softwareId) {
@@ -2475,7 +2343,6 @@
                 document.getElementById('detailMeta').innerHTML = '<span class="badge">' + soft.category +
                     '</span><span class="badge badge-purple">v' + soft.version + '</span><span>' + (soft.size || '—') +
                     '</span>';
-
                 var descEl = document.getElementById('detailDesc');
                 var descText = soft.detail || soft.description || '';
                 if (descText.trim().length > 0) {
@@ -2485,7 +2352,6 @@
                     descEl.textContent = '';
                     descEl.style.display = 'none';
                 }
-
                 var scr = document.getElementById('detailScreenshots');
                 var screenshots = (soft.screenshots || []).filter(function(url) { return url && url.trim().length > 0; });
                 if (screenshots.length > 0) {
@@ -2497,7 +2363,6 @@
                     scr.classList.add('hidden');
                     scr.innerHTML = '';
                 }
-
                 var clog = document.getElementById('detailChangelog');
                 if (soft.changelog && soft.changelog.trim().length > 0) {
                     clog.classList.remove('hidden');
@@ -2512,7 +2377,6 @@
                 } else {
                     req.classList.add('hidden');
                 }
-
                 var related = document.getElementById('relatedSoftware');
                 var relatedGrid = document.getElementById('relatedGrid');
                 var relatedSoft = cache.software.filter(function(s) {
@@ -2532,7 +2396,8 @@
                         if (rs.recommend || (rs.downloads || 0) > 100) {
                             badgeHtml = '<span class="badge-mini">🔥 热门</span>';
                         }
-                        return '<div class="related-card" data-id="' + rs.id + '">' +
+                        var idStr = rs.id;
+                        return '<div class="related-card" data-id="' + idStr + '" onclick="Detail.openById(\'' + idStr + '\')">' +
                             badgeHtml +
                             '<div class="icon-wrap">' + renderIcon(rs) + '</div>' +
                             '<div class="name" title="' + rs.name + '">' + rs.name + '</div>' +
@@ -2540,14 +2405,7 @@
                             '<div class="platforms">' + platHtml + '</div>' +
                             '</div>';
                     }).join('');
-                    relatedGrid.querySelectorAll('.related-card').forEach(function(c) {
-                        c.addEventListener('click', function() {
-                            var s = cache.software.find(function(x) { return x.id === this.dataset.id; });
-                            if (s) Detail.open(s);
-                        });
-                    });
                 } else related.classList.add('hidden');
-
                 var dlBtn = document.getElementById('detailDownload');
                 dlBtn.innerHTML = '<i class="fas fa-download"></i> 下载';
                 dlBtn.classList.remove('btn-loading');
@@ -2573,8 +2431,7 @@
                 };
                 document.getElementById('detailShareBtn').onclick = function() {
                     var url = window.location.origin + window.location.pathname + '?soft=' + soft.id;
-                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function() { toast(
-                            '链接已复制'); });
+                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function() { toast('链接已复制'); });
                     else {
                         var input = document.createElement('input');
                         input.value = url;
@@ -2590,6 +2447,14 @@
                 document.getElementById('detailClose').focus();
                 setTimeout(function() { renderRecentHistory(); }, 100);
             },
+            openById: function(id) {
+                var soft = cache.software.find(function(s) { return s.id === id; });
+                if (soft) {
+                    this.open(soft);
+                } else {
+                    toast('未找到该软件', 'warning');
+                }
+            },
             close: function() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
@@ -2601,7 +2466,6 @@
         document.getElementById('detailOverlay').addEventListener('click', function(e) {
             if (e.target === e.currentTarget) Detail.close();
         });
-
         document.addEventListener('click', function(e) {
             var card = e.target.closest('.software-card');
             if (!card) return;
@@ -2612,7 +2476,6 @@
                 if (soft) Detail.open(soft);
             }
         });
-
         document.addEventListener('click', function(e) {
             var btn = e.target.closest('.detail-trigger');
             if (!btn) return;
@@ -2622,7 +2485,6 @@
                 if (soft) Detail.open(soft);
             }
         });
-
         document.addEventListener('keydown', function(e) {
             if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
                 e.preventDefault();
@@ -2632,11 +2494,9 @@
                 Detail.close();
             }
         });
-
         var currentPage = 1,
             PAGE_SIZE = 6,
             currentFilteredList = [];
-
         var App = {
             currentPage: 'home',
             currentCategory: 'all',
@@ -2655,7 +2515,6 @@
                         renderRecentHistory();
                     });
                 }, 600000);
-
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -2663,21 +2522,18 @@
                         else self.goList();
                     });
                 });
-
                 document.getElementById('searchBtn').addEventListener('click', function() { self.doSearch(); });
                 document.getElementById('searchInput').addEventListener('keyup', function(e) {
                     if (e.key === 'Enter') self.doSearch();
                     showSuggestions(this.value.trim());
                 });
-                document.getElementById('searchInput').addEventListener('focus', function() { showSuggestions(
-                    ''); });
+                document.getElementById('searchInput').addEventListener('focus', function() { showSuggestions(''); });
                 document.getElementById('searchInput').addEventListener('blur', function() {
                     setTimeout(function() {
                         document.getElementById('searchSuggestions').classList.remove('open');
                         document.getElementById('searchHistory').classList.remove('open');
                     }, 200);
                 });
-
                 document.getElementById('logoHome').addEventListener('click', function(e) {
                     e.preventDefault();
                     self.goHome();
@@ -2685,7 +2541,6 @@
                 document.getElementById('mobileToggle').addEventListener('click', function() {
                     document.getElementById('navLinks').classList.toggle('open');
                 });
-
                 document.getElementById('prevPageBtn').addEventListener('click', function() {
                     if (currentPage > 1) { currentPage--;
                         self.renderListPage(); }
@@ -2695,33 +2550,28 @@
                     if (currentPage < total) { currentPage++;
                         self.renderListPage(); }
                 });
-
                 document.getElementById('sortSelect').addEventListener('change', function() {
                     self.sortBy = this.value;
                     currentPage = 1;
                     self.refreshListWithFilters();
                 });
-
                 document.getElementById('jumpPageBtn').addEventListener('click', function() {
                     var p = parseInt(document.getElementById('jumpPageInput').value);
                     var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
                     if (p >= 1 && p <= total) { currentPage = p;
                         self.renderListPage(); }
                 });
-
                 document.getElementById('platformFilter').addEventListener('change', function() {
                     self.platformFilter = this.value;
                     currentPage = 1;
                     self.refreshListWithFilters();
                 });
-
                 document.getElementById('resetFiltersBtn').addEventListener('click', function() {
                     document.getElementById('platformFilter').value = 'all';
                     self.platformFilter = 'all';
                     currentPage = 1;
                     self.refreshListWithFilters();
                 });
-
                 document.querySelectorAll('#mobileBottomNav a').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -2729,25 +2579,21 @@
                         else self.goList();
                     });
                 });
-
                 var backBtn = document.getElementById('backTopBtn');
                 window.addEventListener('scroll', function() {
                     backBtn.classList.toggle('visible', window.pageYOffset > 300);
                 });
                 backBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-
                 document.addEventListener('click', function(e) {
                     var nav = document.getElementById('navLinks');
-                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
-                    'open');
+                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove('open');
                 });
             },
             goHome: function() {
                 this.currentPage = 'home';
                 document.getElementById('pageHome').classList.remove('hidden');
                 document.getElementById('pageList').classList.add('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
@@ -2761,8 +2607,7 @@
                 this.currentCategory = cat;
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 currentPage = 1;
@@ -2778,8 +2623,7 @@
                 this.currentPage = 'list';
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 currentPage = 1;
                 this.refreshList(keyword);
@@ -2788,10 +2632,9 @@
                 var self = this;
                 var all = DB.getSoftware();
                 Render.renderAnnouncements(document.getElementById('announcementContainer'));
-                Render.renderCategories(document.getElementById('categoryGridHome'), null, function(cat) { self.goList(
-                        cat); });
-                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s
-                        .recommend; }).slice(0, 6), true);
+                Render.renderCategories(document.getElementById('categoryGridHome'), null, function(cat) { self.goList(cat); });
+                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s.recommend; }).slice(
+                    0, 6), true);
                 Render.renderCards(document.getElementById('latestGrid'), all.slice().sort(function(a, b) {
                     return (b.date || '').localeCompare(a.date || '');
                 }).slice(0, 6), true);
@@ -2812,35 +2655,27 @@
                     if (btn.dataset.cat === self.currentCategory) btn.classList.add('active');
                     else btn.classList.remove('active');
                     btn.addEventListener('click', function() {
-                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove(
-                                'active'); });
+                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
                         this.classList.add('active');
                         self.currentCategory = this.dataset.cat;
                         currentPage = 1;
                         self.refreshListWithFilters();
                     });
                 });
-
                 if (keyword) {
                     var kw = keyword.toLowerCase();
                     list = list.filter(function(s) {
-                        return s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
-                            .includes(kw);
+                        return s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase().includes(kw);
                     });
-                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length +
-                        '项)';
+                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length + '项)';
                 } else document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
-
-                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self
-                        .currentCategory; });
-                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || [])
-                        .includes(self.platformFilter); });
-
+                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self.currentCategory; });
+                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || []).includes(self
+                        .platformFilter); });
                 if (self.sortBy === 'views') list.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
-                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a
-                        .downloads || 0); });
+                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a.downloads ||
+                        0); });
                 else list.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
-
                 currentFilteredList = list;
                 self.renderListPage(keyword);
                 document.getElementById('resultCount').textContent = '共 ' + list.length + ' 款';
@@ -2869,8 +2704,8 @@
                 else this.refreshListWithFilters();
             }
         };
-
         document.addEventListener('DOMContentLoaded', function() { App.init(); });
     </script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
