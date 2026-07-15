@@ -2409,13 +2409,6 @@
                             '<div class="platforms">' + platHtml + '</div>' +
                             '</div>';
                     }).join('');
-                    relatedGrid.querySelectorAll('.related-card').forEach(function(c) {
-                        c.addEventListener('click', function() {
-                            var targetId = Number(this.dataset.id);
-                            var s = cache.software.find(function(x) { return x.id === targetId; });
-                            if (s) Detail.open(s);
-                        });
-                    });
                 } else related.classList.add('hidden');
                 var dlBtn = document.getElementById('detailDownload');
                 dlBtn.innerHTML = '<i class="fas fa-download"></i> 下载';
@@ -2485,6 +2478,14 @@
             var id = btn.dataset.id;
             if (id) {
                 var soft = DB.getSoftware().find(function(s) { return s.id === id; });
+                if (soft) Detail.open(soft);
+            }
+        });
+        document.addEventListener('click', function(e) {
+            var relatedCard = e.target.closest('.related-card');
+            if (relatedCard) {
+                var targetId = Number(relatedCard.dataset.id);
+                var soft = cache.software.find(function(s) { return s.id === targetId; });
                 if (soft) Detail.open(soft);
             }
         });
