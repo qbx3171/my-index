@@ -1,27 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <meta name="description" content="乐哲软件 · 精选高效工具，赋能创作者生态。">
+    <meta name="keywords" content="软件下载,设计工具,开发工具,办公软件,媒体工具,实用工具,乐哲软件">
+    <meta name="theme-color" content="#0077ff">
+    <meta property="og:title" content="乐哲软件 · 构建数字未来">
+    <meta property="og:description" content="精选高效工具，赋能创作者生态。">
+    <meta property="og:type" content="website">
     <title>乐哲软件 · 构建数字未来</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2">
-    </script>
-    <script>
-        (function() {
-            var bp = document.createElement('script');
-            var curProtocol = window.location.protocol.split(':')[0];
-            if (curProtocol === 'https') {
-                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-            } else {
-                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-            }
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(bp, s);
-        })();
     </script>
     <style>
         :root {
@@ -46,6 +39,9 @@
             --font: 'Inter', -apple-system, sans-serif;
             --max-width: 1200px;
             --header-height: 64px;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
         }
         * {
             margin: 0;
@@ -59,7 +55,8 @@
             line-height: 1.6;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
-            padding-bottom: 2px;
+            padding-bottom: 80px;
+            transition: background 0.3s, color 0.3s;
         }
         a {
             text-decoration: none;
@@ -72,7 +69,8 @@
             background: none;
             color: inherit;
         }
-        input {
+        input,
+        select {
             font-family: inherit;
             border: none;
             outline: none;
@@ -87,7 +85,6 @@
         .hidden {
             display: none !important;
         }
-
         .btn {
             display: inline-flex;
             align-items: center;
@@ -103,11 +100,27 @@
             color: var(--text-primary);
             backdrop-filter: blur(8px);
             border-color: var(--border-glow);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(0, 119, 255, 0.15) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .btn:hover::after {
+            opacity: 1;
         }
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 20px rgba(0, 136, 255, 0.15);
             border-color: var(--accent-cyan);
+        }
+        .btn:active {
+            transform: scale(0.97);
         }
         .btn-primary {
             background: var(--accent-gradient);
@@ -133,26 +146,31 @@
             padding: 6px 18px;
             font-size: 0.8rem;
         }
-        .btn-icon {
-            padding: 8px 12px;
-            border-radius: 50px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            backdrop-filter: blur(4px);
-            transition: var(--transition);
-            font-size: 1rem;
-            color: var(--text-secondary);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .btn:disabled,
+        .btn.disabled {
+            opacity: 0.45;
+            pointer-events: none;
+            cursor: not-allowed;
+            filter: grayscale(30%);
         }
-        .btn-icon:hover {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.7;
         }
-
+        .btn-loading .btn-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(16px);
@@ -167,7 +185,6 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
             transform: translateY(-4px);
         }
-
         .badge {
             display: inline-block;
             padding: 2px 14px;
@@ -179,9 +196,7 @@
             color: var(--accent-cyan);
             border: 1px solid rgba(0, 136, 255, 0.15);
             line-height: 1.6;
-        }
-        .badge i {
-            margin-right: 4px;
+            transition: var(--transition);
         }
         .badge-mac {
             background: rgba(108, 92, 231, 0.10);
@@ -198,12 +213,23 @@
             color: var(--accent-purple);
             border-color: rgba(108, 92, 231, 0.15);
         }
-        .badge-announce {
-            background: rgba(255, 165, 0, 0.12);
-            color: #e8850c;
-            border-color: rgba(255, 165, 0, 0.2);
+        .badge-new {
+            font-size: 0.6rem;
+            background: var(--accent-gradient);
+            color: #fff;
+            padding: 0 10px;
+            border-radius: 50px;
+            animation: pulse-badge 2s infinite;
         }
-
+        @keyframes pulse-badge {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 119, 255, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(0, 119, 255, 0);
+            }
+        }
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -219,7 +245,6 @@
             margin-bottom: 8px;
             color: var(--text-primary);
         }
-
         .header {
             position: sticky;
             top: 0;
@@ -275,7 +300,6 @@
             color: var(--text-dim);
             letter-spacing: 0.5px;
         }
-
         .nav-links {
             display: flex;
             align-items: center;
@@ -306,13 +330,6 @@
             color: #fff;
             box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
         }
-        .nav-links a.active:hover {
-            filter: brightness(1.05);
-        }
-        .nav-links a::after {
-            display: none;
-        }
-
         .mobile-toggle {
             display: none;
             font-size: 1.6rem;
@@ -326,23 +343,10 @@
         .mobile-toggle:hover {
             background: rgba(0, 0, 0, 0.06);
         }
-
         .hero {
             padding: 40px 0 20px;
             text-align: center;
             position: relative;
-        }
-        .hero::before {
-            content: '◆';
-            position: absolute;
-            right: 5%;
-            top: 10%;
-            font-size: 120px;
-            opacity: 0.06;
-            color: var(--accent-cyan);
-            transform: rotate(10deg);
-            font-weight: 100;
-            pointer-events: none;
         }
         .hero h1 {
             font-size: 2.8rem;
@@ -365,9 +369,16 @@
             margin: 0 auto 24px;
             font-weight: 300;
         }
+        .search-wrapper {
+            position: relative;
+            max-width: 440px;
+            width: 100%;
+            margin: 0 auto;
+        }
         .hero .search-box {
             display: flex;
-            max-width: 480px;
+            max-width: 440px;
+            width: 100%;
             margin: 0 auto;
             background: var(--bg-card);
             backdrop-filter: blur(16px);
@@ -383,8 +394,8 @@
         }
         .hero .search-box input {
             flex: 1;
-            padding: 12px 22px;
-            font-size: 0.9rem;
+            padding: 12px 20px;
+            font-size: 0.85rem;
             background: transparent;
             color: var(--text-primary);
             min-width: 0;
@@ -393,19 +404,107 @@
             color: var(--text-dim);
         }
         .hero .search-box button {
-            padding: 0 24px;
+            padding: 0 22px;
             background: var(--accent-gradient);
             color: #fff;
             font-weight: 700;
             transition: var(--transition);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             white-space: nowrap;
         }
-        .hero .search-box button:hover {
-            filter: brightness(1.05);
-            box-shadow: 0 0 20px rgba(0, 136, 255, 0.2);
+        .search-suggestions,
+        .search-history {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: var(--bg-card-solid);
+            backdrop-filter: blur(16px);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glow-strong);
+            box-shadow: var(--shadow-card);
+            z-index: 50;
+            max-height: 220px;
+            overflow-y: auto;
+            display: none;
         }
-
+        .search-suggestions.open,
+        .search-history.open {
+            display: block;
+        }
+        .search-suggestions .item,
+        .search-history .item {
+            padding: 5px 12px;
+            font-size: 0.73rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            border-bottom: 1px solid rgba(0, 120, 255, 0.08);
+            color: var(--text-secondary);
+        }
+        .search-suggestions .item:last-child,
+        .search-history .item:last-child {
+            border-bottom: none;
+        }
+        .search-suggestions .item:hover,
+        .search-history .item:hover {
+            background: rgba(0, 136, 255, 0.06);
+            color: var(--text-primary);
+        }
+        .search-suggestions .item img,
+        .search-suggestions .item .icon-emoji {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            object-fit: cover;
+            flex-shrink: 0;
+            font-size: 16px;
+            text-align: center;
+            line-height: 18px;
+        }
+        .search-history .item .remove-history {
+            margin-left: auto;
+            color: var(--text-dim);
+            font-size: 0.6rem;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: 0.2s;
+        }
+        .search-history .item .remove-history:hover {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--danger);
+        }
+        .search-history .history-header {
+            padding: 4px 12px;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            border-bottom: 1px solid rgba(0, 120, 255, 0.08);
+        }
+        .hero .search-hints {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 0.72rem;
+            color: var(--text-dim);
+        }
+        .hero .search-hints span {
+            cursor: pointer;
+            padding: 3px 12px;
+            border-radius: 50px;
+            background: rgba(0, 136, 255, 0.04);
+            border: 1px solid transparent;
+            transition: var(--transition);
+            user-select: none;
+        }
+        .hero .search-hints span:hover {
+            border-color: var(--border-glow);
+            background: rgba(0, 136, 255, 0.08);
+            color: var(--accent-cyan);
+        }
         .announcement-list {
             max-width: 680px;
             margin: 0 auto 12px;
@@ -438,15 +537,6 @@
         .announcement-item .text {
             flex: 1;
         }
-        .announcement-item .badge-new {
-            font-size: 0.6rem;
-            background: var(--accent-gradient);
-            color: #fff;
-            padding: 0 10px;
-            border-radius: 50px;
-            flex-shrink: 0;
-        }
-
         .section-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -460,7 +550,6 @@
             margin-bottom: 20px;
             font-size: 0.9rem;
         }
-
         .categories-wrapper {
             position: relative;
             display: flex;
@@ -474,7 +563,6 @@
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
-            -ms-overflow-style: none;
             flex: 1;
             padding: 4px 0;
         }
@@ -530,7 +618,6 @@
         .category-item.active .count {
             color: rgba(255, 255, 255, 0.7);
         }
-
         .categories-nav-btn {
             flex-shrink: 0;
             width: 32px;
@@ -558,7 +645,6 @@
             opacity: 0.3;
             pointer-events: none;
         }
-
         .software-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -568,7 +654,7 @@
         .software-card {
             padding: 22px 20px 18px;
             transition: var(--transition);
-            cursor: default;
+            cursor: pointer;
             display: flex;
             flex-direction: column;
             background: var(--bg-card);
@@ -577,6 +663,22 @@
             border: 1px solid var(--border-glow);
             box-shadow: var(--shadow-card);
             min-height: 270px;
+            position: relative;
+        }
+        .software-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent-gradient);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .software-card:hover::before {
+            opacity: 1;
         }
         .software-card:hover {
             transform: translateY(-6px);
@@ -601,6 +703,11 @@
             border: 1px solid rgba(0, 136, 255, 0.08);
             overflow: hidden;
             font-size: 26px;
+            transition: var(--transition);
+        }
+        .software-card:hover .card-icon {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(0, 136, 255, 0.15);
         }
         .software-card .card-icon img {
             width: 100%;
@@ -629,6 +736,7 @@
         }
         .software-card .card-info .meta .version {
             color: var(--accent-cyan);
+            font-weight: 600;
         }
         .software-card .card-info .platform-badges {
             display: flex;
@@ -677,7 +785,6 @@
             font-size: 0.7rem;
             font-weight: 600;
         }
-
         .pagination {
             display: flex;
             justify-content: center;
@@ -713,7 +820,25 @@
             color: var(--text-secondary);
             font-size: 0.85rem;
         }
-
+        .pagination .page-jump {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .pagination .page-jump input {
+            width: 44px;
+            padding: 4px 8px;
+            border-radius: 50px;
+            border: 1px solid var(--border-glow);
+            text-align: center;
+            font-size: 0.8rem;
+            background: var(--bg-card);
+        }
+        .pagination .page-jump input:focus {
+            border-color: var(--accent-cyan);
+        }
         .detail-overlay {
             position: fixed;
             inset: 0;
@@ -736,8 +861,9 @@
             max-width: 620px;
             width: 100%;
             max-height: 90vh;
-            overflow-y: auto;
-            padding: 32px 36px 28px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
             background: var(--bg-card-solid);
             backdrop-filter: blur(32px);
             border-radius: var(--radius-lg);
@@ -745,9 +871,42 @@
             box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
             transform: scale(0.96) translateY(20px);
             transition: var(--transition);
+            overflow: hidden;
+            padding: 0;
         }
         .detail-overlay.open .detail-modal {
             transform: scale(1) translateY(0);
+        }
+        .detail-modal .modal-body {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 32px 36px 20px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 119, 255, 0.2) transparent;
+        }
+        .detail-modal .modal-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .detail-modal .modal-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .detail-modal .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(0, 119, 255, 0.25);
+            border-radius: 4px;
+        }
+        .detail-modal .modal-actions {
+            flex-shrink: 0;
+            padding: 16px 36px 28px;
+            border-top: 1px solid var(--border-glow);
+            background: var(--bg-card-solid);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .detail-modal .modal-actions .btn {
+            flex: 1;
+            min-width: 120px;
         }
         .detail-modal .close-btn {
             float: right;
@@ -756,6 +915,7 @@
             transition: var(--transition);
             line-height: 1;
             padding: 4px;
+            margin-top: -4px;
         }
         .detail-modal .close-btn:hover {
             color: var(--text-primary);
@@ -808,64 +968,259 @@
             font-size: 0.9rem;
             line-height: 1.8;
             color: var(--text-secondary);
-            margin: 14px 0 22px;
+            margin: 14px 0 18px;
             white-space: pre-wrap;
             background: var(--bg-primary);
             padding: 14px 18px;
             border-radius: var(--radius-sm);
             border-left: 3px solid var(--accent-cyan);
+            max-height: 150px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 119, 255, 0.2) transparent;
         }
-        .detail-modal .detail-actions {
+        .detail-modal .detail-desc::-webkit-scrollbar {
+            width: 4px;
+        }
+        .detail-modal .detail-desc::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .detail-modal .detail-desc::-webkit-scrollbar-thumb {
+            background: rgba(0, 119, 255, 0.2);
+            border-radius: 4px;
+        }
+        .detail-screenshots {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
+            margin: 12px 0;
         }
-        .detail-modal .detail-actions .btn {
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .toolbar .filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-        .toolbar .filters .btn {
-            padding: 4px 16px;
-            font-size: 0.75rem;
-        }
-        .toolbar .sort-group {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-        .toolbar .sort-group label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-        .toolbar .sort-group select {
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid var(--border-glow);
-            background: var(--bg-card);
-            font-size: 0.75rem;
-            color: var(--text-primary);
-            outline: none;
+        .detail-screenshots img {
+            width: 100px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
             cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
         }
-        .toolbar .sort-group select:focus {
+        .detail-screenshots img:hover {
             border-color: var(--accent-cyan);
+            transform: scale(1.05);
         }
-
+        .detail-changelog,
+        .detail-requirements {
+            margin: 10px 0;
+            font-size: 0.8rem;
+            background: var(--bg-primary);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--accent-purple);
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            max-height: 100px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 119, 255, 0.2) transparent;
+        }
+        .detail-changelog::-webkit-scrollbar,
+        .detail-requirements::-webkit-scrollbar {
+            width: 4px;
+        }
+        .detail-changelog::-webkit-scrollbar-track,
+        .detail-requirements::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .detail-changelog::-webkit-scrollbar-thumb,
+        .detail-requirements::-webkit-scrollbar-thumb {
+            background: rgba(0, 119, 255, 0.2);
+            border-radius: 4px;
+        }
+        .related-software {
+            margin-top: 18px;
+            border-top: 1px solid var(--border-glow);
+            padding-top: 14px;
+        }
+        .related-software h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.3px;
+        }
+        .related-software h4::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-glow), transparent);
+            margin-left: 6px;
+        }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+        .related-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-sm);
+            padding: 12px 8px 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid var(--border-glow);
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        .related-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .related-card:hover::before {
+            opacity: 1;
+        }
+        .related-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 20, 40, 0.10);
+            background: var(--bg-card-solid);
+        }
+        .related-card .icon-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, rgba(0, 119, 255, 0.06), rgba(108, 92, 231, 0.08));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 4px;
+            border: 1px solid var(--border-glow);
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .related-card .icon-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+        }
+        .related-card:hover .icon-wrap {
+            border-color: var(--accent-cyan);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 119, 255, 0.12);
+        }
+        .related-card .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            width: 100%;
+        }
+        .related-card .cat {
+            font-size: 0.6rem;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+        .related-card .platforms {
+            display: flex;
+            gap: 3px;
+            margin-top: 2px;
+            align-items: center;
+            justify-content: center;
+        }
+        .related-card .platforms .plat {
+            font-size: 0.55rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            background: rgba(0, 0, 0, 0.04);
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            transition: 0.2s;
+            color: var(--text-dim);
+        }
+        .related-card .platforms .plat i {
+            font-size: 0.5rem;
+        }
+        .related-card .platforms .plat.mac {
+            color: #6c5ce7;
+            background: rgba(108, 92, 231, 0.08);
+        }
+        .related-card .platforms .plat.win {
+            color: var(--accent-cyan);
+            background: rgba(0, 119, 255, 0.08);
+        }
+        .related-card .badge-mini {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 0.45rem;
+            padding: 0 6px;
+            border-radius: 50px;
+            background: var(--accent-gradient);
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s;
+        }
+        .related-card:hover .badge-mini {
+            opacity: 1;
+            transform: scale(1);
+        }
+        @media (prefers-color-scheme: dark) {
+            .related-card:hover {
+                background: rgba(30, 41, 59, 0.9);
+            }
+            .related-card .platforms .plat {
+                background: rgba(255, 255, 255, 0.06);
+            }
+            .related-card .platforms .plat.mac {
+                color: #a78bfa;
+                background: rgba(108, 92, 231, 0.15);
+            }
+            .related-card .platforms .plat.win {
+                color: #60a5fa;
+                background: rgba(0, 119, 255, 0.15);
+            }
+        }
+        @media (max-width: 480px) {
+            .related-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+            }
+            .related-card {
+                padding: 10px 6px 8px;
+            }
+            .related-card .icon-wrap {
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
+            }
+            .related-card .name {
+                font-size: 0.7rem;
+            }
+        }
         .footer {
             padding: 32px 0 20px;
             border-top: 1px solid var(--border-glow);
@@ -921,10 +1276,6 @@
             color: var(--accent-cyan);
             text-decoration: underline;
         }
-        .footer .friend-links .sep {
-            color: var(--border-glow);
-        }
-
         .toast-container {
             position: fixed;
             bottom: 28px;
@@ -953,13 +1304,13 @@
             pointer-events: auto;
         }
         .toast.success .icon {
-            color: var(--accent-cyan);
+            color: var(--success);
         }
         .toast.error .icon {
-            color: #e74c3c;
+            color: var(--danger);
         }
-        .toast .icon {
-            font-size: 1.1rem;
+        .toast.warning .icon {
+            color: var(--warning);
         }
         @keyframes toastIn {
             to {
@@ -972,7 +1323,6 @@
                 opacity: 0;
             }
         }
-
         .divider-cyber {
             display: flex;
             align-items: center;
@@ -982,7 +1332,6 @@
             color: var(--text-dim);
             font-size: 0.65rem;
             letter-spacing: 4px;
-            font-weight: 300;
         }
         .divider-cyber::before,
         .divider-cyber::after {
@@ -995,7 +1344,6 @@
             font-size: 0.35rem;
             color: var(--accent-cyan);
         }
-
         .back-top {
             position: fixed;
             bottom: 30px;
@@ -1028,16 +1376,40 @@
             border-color: transparent;
             transform: scale(1.05);
         }
-
-        .zen-divider {
-            text-align: center;
-            padding: 6px 0 2px;
-            font-size: 0.6rem;
-            color: var(--text-dim);
-            letter-spacing: 6px;
-            opacity: 0.5;
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(240, 244, 250, 0.92);
+            backdrop-filter: blur(24px);
+            border-top: 1px solid var(--border-glow);
+            padding: 8px 20px;
+            z-index: 90;
+            justify-content: space-around;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
+        }
+        .mobile-bottom-nav a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            transition: 0.2s;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        .mobile-bottom-nav a i {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+        .mobile-bottom-nav a.active {
+            color: var(--accent-cyan);
+            background: rgba(0, 119, 255, 0.08);
         }
 
+        /* ========== 移动端优化 ========== */
         @media (max-width: 768px) {
             :root {
                 --header-height: 58px;
@@ -1065,117 +1437,171 @@
             .hero h1 {
                 font-size: 2rem;
             }
-            .hero p {
-                font-size: 0.9rem;
-            }
-            .software-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 16px;
-            }
-            .category-item {
-                padding: 4px 12px;
-                font-size: 0.75rem;
-                gap: 4px;
-            }
-            .category-item .icon {
-                font-size: 14px;
-            }
-            .hero .search-box input {
-                padding: 10px 16px;
-                font-size: 0.85rem;
-            }
-            .hero .search-box button {
-                padding: 0 16px;
-                font-size: 0.8rem;
-            }
-            .pagination button {
-                padding: 6px 14px;
-                font-size: 0.8rem;
-            }
-            .detail-modal {
-                padding: 24px 20px 20px;
-            }
-            .detail-modal h2 {
-                font-size: 1.3rem;
-            }
-            .toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .toolbar .filters {
-                justify-content: center;
-            }
-            .toolbar .sort-group {
-                justify-content: center;
-            }
-            .back-top {
-                bottom: 20px;
-                left: 20px;
-                width: 38px;
-                height: 38px;
-                font-size: 1rem;
-            }
-            .categories-nav-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 0.8rem;
-            }
-            .announcement-item {
-                font-size: 0.75rem;
-                padding: 4px 12px 4px 16px;
-            }
-            .footer .friend-links {
-                font-size: 0.65rem;
-                gap: 8px 16px;
-            }
-        }
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 1.6rem;
-            }
             .software-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
             }
-            .categories-grid {
-                gap: 6px;
+            .detail-modal .modal-body {
+                padding: 20px 18px 16px;
             }
-            .category-item {
-                padding: 3px 10px;
+            .detail-modal .modal-actions {
+                padding: 12px 18px 20px;
+            }
+            .mobile-bottom-nav {
+                display: flex;
+            }
+            body {
+                padding-bottom: 70px;
+            }
+
+            /* 软件库页面在手机上更紧凑 */
+            #pageList .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            #pageList .toolbar .filters {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            #pageList .toolbar .filters .btn {
                 font-size: 0.7rem;
+                padding: 4px 12px;
             }
-            .category-item .icon {
-                font-size: 12px;
+            #pageList .toolbar .sort-group {
+                flex-wrap: wrap;
+                gap: 6px;
+                justify-content: space-between;
             }
+            #pageList .toolbar .sort-group .view-toggle {
+                margin-left: 0;
+            }
+            #pageList .filter-panel {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 8px 0;
+            }
+            #pageList .filter-panel .filter-group {
+                flex: 1 1 100%;
+            }
+            #pageList .filter-panel select {
+                width: 100%;
+            }
+            .pagination {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .pagination .page-jump {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* 回顶部按钮避开底部导航 */
+            .back-top {
+                bottom: 80px;
+                right: 20px;
+                left: auto;
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
             .container {
                 padding: 0 16px;
             }
-            .footer .copyright {
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            .software-card {
+                padding: 16px 14px 14px;
+                min-height: 200px;
+            }
+            .software-card .card-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            .software-card .card-info h3 {
+                font-size: 0.9rem;
+            }
+            .software-card .desc {
+                font-size: 0.75rem;
+                -webkit-line-clamp: 2;
+            }
+            .software-card .card-footer .stats {
+                font-size: 0.65rem;
+                gap: 8px;
+            }
+            .software-card .card-footer .btn {
+                font-size: 0.65rem;
+                padding: 3px 12px;
+            }
+            .categories-nav-btn {
+                width: 26px;
+                height: 26px;
                 font-size: 0.7rem;
             }
-            .footer .friend-links {
-                font-size: 0.6rem;
-                gap: 6px 10px;
+            .category-item {
+                padding: 4px 10px;
+                font-size: 0.7rem;
+            }
+            .section-title {
+                font-size: 1.2rem;
+            }
+            .pagination button {
+                padding: 6px 14px;
+                font-size: 0.75rem;
+            }
+            .pagination .page-info {
+                font-size: 0.75rem;
+            }
+            .back-top {
+                bottom: 75px;
+                right: 16px;
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
             }
         }
-        .category-item:active,
-        .software-card:active,
-        .btn:active {
-            transform: scale(0.97);
+
+        @media (prefers-color-scheme:dark) {
+            :root {
+                --bg-primary: #0f172a;
+                --bg-secondary: #1e293b;
+                --bg-card: rgba(30, 41, 59, 0.75);
+                --bg-card-solid: #1e293b;
+                --border-glow: rgba(99, 160, 255, 0.12);
+                --border-glow-strong: rgba(99, 160, 255, 0.25);
+                --text-primary: #e2e8f0;
+                --text-secondary: #94a3b8;
+                --text-dim: #64748b;
+                --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.25);
+            }
+            .header {
+                background: rgba(15, 23, 42, 0.85);
+            }
+            .detail-modal {
+                background: #1a2332;
+            }
+            .detail-modal .detail-desc {
+                background: rgba(0, 0, 0, 0.2);
+            }
+            .mobile-bottom-nav {
+                background: rgba(15, 23, 42, 0.92);
+            }
         }
     </style>
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
     <button class="back-top" id="backTopBtn" aria-label="回到顶部"><i class="fas fa-arrow-up"></i></button>
-
     <header class="header" id="mainHeader">
         <div class="container header-inner">
             <a href="#" class="logo" id="logoHome">
                 <span class="mark">◆</span>
-                <span class="brand-text">
-                    <span class="main">乐哲软件</span>
-                    <span class="sub">构建数字未来</span>
-                </span>
+                <span class="brand-text"><span class="main">乐哲软件</span><span class="sub">构建数字未来</span></span>
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#" class="active" data-page="home"><i class="fas fa-home"></i> 首页</a></li>
@@ -1184,24 +1610,30 @@
             <button class="mobile-toggle" id="mobileToggle" aria-label="菜单"><i class="fas fa-bars"></i></button>
         </div>
     </header>
-
     <main>
         <div class="container">
             <section id="pageHome">
                 <div class="hero">
                     <h1>探索 · <span class="highlight">乐哲</span> 软件</h1>
                     <p>精选高效工具，赋能创作者生态。</p>
-
                     <div id="announcementContainer" class="announcement-list"></div>
-
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="搜索软件名称或描述..." aria-label="搜索软件" />
-                        <button id="searchBtn"><i class="fas fa-search"></i> 检索</button>
+                    <div class="search-wrapper">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="搜索软件名称或描述..." autocomplete="off">
+                            <button id="searchBtn"><i class="fas fa-search"></i> 检索</button>
+                        </div>
+                        <div class="search-suggestions" id="searchSuggestions"></div>
+                        <div class="search-history" id="searchHistory"></div>
+                    </div>
+                    <div class="search-hints">
+                        <span data-kw="设计">🎨 设计</span>
+                        <span data-kw="开发">💻 开发</span>
+                        <span data-kw="办公">📋 办公</span>
+                        <span data-kw="视频">🎬 视频</span>
+                        <span data-kw="AI">🤖 AI</span>
                     </div>
                 </div>
-
                 <div class="divider-cyber"><span class="dot">◆</span> 分 类 导 航 <span class="dot">◆</span></div>
-
                 <div class="categories-wrapper" id="categoriesWrapper">
                     <button class="categories-nav-btn" id="catPrevBtn" aria-label="向左滚动"><i class="fas fa-chevron-left"></i></button>
                     <div class="categories-scroll" id="categoriesScroll">
@@ -1209,7 +1641,10 @@
                     </div>
                     <button class="categories-nav-btn" id="catNextBtn" aria-label="向右滚动"><i class="fas fa-chevron-right"></i></button>
                 </div>
-
+                <div style="margin-top:36px;" id="recentHistorySection" class="hidden">
+                    <h2 class="section-title">🕒 最近浏览</h2>
+                    <div class="software-grid" id="recentGrid"></div>
+                </div>
                 <div style="margin-top:36px;">
                     <h2 class="section-title">✦ 热门推荐</h2>
                     <p class="section-sub">社区口碑精选</p>
@@ -1220,10 +1655,7 @@
                     <p class="section-sub">持续迭代，保持前沿</p>
                     <div class="software-grid" id="latestGrid"></div>
                 </div>
-
-                <div class="zen-divider">· · · 静 心 修 行 · 随 缘 分 享 · · ·</div>
             </section>
-
             <section id="pageList" class="hidden">
                 <div style="padding:16px 0 6px;">
                     <h2 class="section-title">✦ 软件库</h2>
@@ -1240,66 +1672,89 @@
                             <option value="views">热度</option>
                             <option value="downloads">下载量</option>
                         </select>
+                        <span class="result-count" id="resultCount"></span>
+                        <div class="view-toggle" id="viewToggle">
+                            <button data-view="grid" class="active"><i class="fas fa-th-large"></i></button>
+                            <button data-view="list"><i class="fas fa-list"></i></button>
+                        </div>
                     </div>
+                </div>
+                <div class="filter-panel" id="filterPanel">
+                    <div class="filter-group">
+                        <label>平台：</label>
+                        <select id="platformFilter">
+                            <option value="all">全部</option>
+                            <option value="mac">macOS</option>
+                            <option value="windows">Windows</option>
+                        </select>
+                    </div>
+                    <span class="reset-filters" id="resetFiltersBtn"><i class="fas fa-undo-alt"></i> 重置</span>
                 </div>
                 <div class="software-grid" id="listGrid"></div>
                 <div class="pagination" id="paginationControls">
                     <button id="prevPageBtn" disabled><i class="fas fa-chevron-left"></i> 上一页</button>
                     <span class="page-info" id="pageInfo">第 1 / 1 页</span>
                     <button id="nextPageBtn">下一页 <i class="fas fa-chevron-right"></i></button>
+                    <span class="page-jump" id="pageJump">
+                        跳至 <input type="number" id="jumpPageInput" min="1" value="1" aria-label="跳转页码"> 页
+                        <button id="jumpPageBtn" class="btn btn-sm btn-outline">GO</button>
+                    </span>
                 </div>
             </section>
         </div>
-
         <footer class="footer">
             <div class="brand">◆ 乐哲软件</div>
             <p class="copyright">
-                &copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a>
+                &copy; 2026 乐哲软件 &middot; 侵权请联系
+                <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a>
             </p>
             <div class="friend-links">
                 <span>友情链接：</span>
-                <a href="https://github.com" target="_blank">GitHub</a>
-                <span class="sep">|</span>
-                <a href="https://www.v2ex.com" target="_blank">V2EX</a>
-                <span class="sep">|</span>
-                <a href="https://www.oschina.net" target="_blank">开源中国</a>
-                <span class="sep">|</span>
-                <a href="https://www.csdn.net" target="_blank">CSDN</a>
-                <span class="sep">|</span>
-                <a href="https://www.zhihu.com" target="_blank">知乎</a>
+                <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> |
+                <a href="https://www.v2ex.com" target="_blank" rel="noopener">V2EX</a> |
+                <a href="https://www.oschina.net" target="_blank" rel="noopener">开源中国</a> |
+                <a href="https://www.csdn.net" target="_blank" rel="noopener">CSDN</a> |
+                <a href="https://www.zhihu.com" target="_blank" rel="noopener">知乎</a>
             </div>
-            <div class="legal">
-                免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。
-            </div>
+            <div class="legal">免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。</div>
         </footer>
     </main>
-
-    <div class="detail-overlay" id="detailOverlay">
+    <div class="detail-overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="detailName">
         <div class="detail-modal" id="detailModal">
-            <button class="close-btn" id="detailClose">✕</button>
-            <div class="detail-icon" id="detailIcon">📦</div>
-            <h2 id="detailName">软件名称</h2>
-            <div class="detail-meta" id="detailMeta"></div>
-            <div class="detail-desc" id="detailDesc"></div>
-            <div class="detail-actions">
+            <div class="modal-body" id="modalBody">
+                <button class="close-btn" id="detailClose" aria-label="关闭详情">✕</button>
+                <div class="detail-icon" id="detailIcon">📦</div>
+                <h2 id="detailName">软件名称</h2>
+                <div class="detail-meta" id="detailMeta"></div>
+                <div class="detail-screenshots hidden" id="detailScreenshots"></div>
+                <div class="detail-changelog hidden" id="detailChangelog"></div>
+                <div class="detail-requirements hidden" id="detailRequirements"></div>
+                <div class="detail-desc" id="detailDesc"></div>
+                <div class="related-software hidden" id="relatedSoftware">
+                    <h4>📎 相关推荐</h4>
+                    <div class="related-grid" id="relatedGrid"></div>
+                </div>
+            </div>
+            <div class="modal-actions">
                 <button class="btn btn-primary" id="detailDownload"><i class="fas fa-download"></i> 下载</button>
+                <button class="btn btn-outline" id="detailShareBtn"><i class="fas fa-share-alt"></i> 分享</button>
                 <button class="btn btn-outline" id="detailCloseBtn">关闭</button>
             </div>
         </div>
     </div>
-
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a>
+        <a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a>
+    </nav>
     <script>
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
-        if (typeof supabase === 'undefined') {
-            console.error('Supabase library not loaded.');
-        }
-        var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+        var supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        if (!supabaseClient) console.error('Supabase library not loaded.');
         var QUOTES = [
             "生活就像一盒巧克力，你永远不知道下一颗是什么味道。",
             "不积跬步，无以至千里。",
-            "梦想还是要有的，万一实现了呢？",
+            "梦想还是要有的，万一实现了呢。",
             "世界那么大，我想去看看。",
             "人生没有白走的路，每一步都算数。",
             "愿你出走半生，归来仍是少年。",
@@ -1313,265 +1768,40 @@
             "学而不思则罔，思而不学则殆。",
             "温故而知新，可以为师矣。",
             "三人行，必有我师焉。",
-            "择其善者而从之，其不善者而改之。",
-            "士不可以不弘毅，任重而道远。",
-            "岁寒，然后知松柏之后凋也。",
             "己所不欲，勿施于人。",
-            "道不同，不相为谋。",
-            "君子和而不同，小人同而不和。",
-            "欲速则不达，见小利则大事不成。",
             "工欲善其事，必先利其器。",
             "人无远虑，必有近忧。",
-            "当断不断，反受其乱。",
-            "知之为知之，不知为不知，是知也。",
-            "见贤思齐焉，见不贤而内自省也。",
-            "良药苦口利于病，忠言逆耳利于行。",
             "千里之行，始于足下。",
-            "泰山不让土壤，故能成其大；河海不择细流，故能就其深。",
             "生于忧患，死于安乐。",
-            "得道多助，失道寡助。",
-            "天时不如地利，地利不如人和。",
-            "富贵不能淫，贫贱不能移，威武不能屈。",
             "穷则独善其身，达则兼济天下。",
-            "老吾老以及人之老，幼吾幼以及人之幼。",
-            "爱人者，人恒爱之；敬人者，人恒敬之。",
-            "万物并育而不相害，道并行而不相悖。",
-            "君子之交淡如水，小人之交甘若醴。",
-            "独学而无友，则孤陋而寡闻。",
-            "一张一弛，文武之道也。",
             "为者常成，行者常至。",
-            "明者因时而变，知者随事而制。",
             "临渊羡鱼，不如退而结网。",
-            "求木之长者，必固其根本；欲流之远者，必浚其泉源。",
             "大鹏一日同风起，扶摇直上九万里。",
             "天生我材必有用，千金散尽还复来。",
-            "人生得意须尽欢，莫使金樽空对月。",
-            "长风破浪会有时，直挂云帆济沧海。",
-            "安得广厦千万间，大庇天下寒士俱欢颜。",
-            "无边落木萧萧下，不尽长江滚滚来。",
-            "采菊东篱下，悠然见南山。",
-            "大漠沙如雪，燕山月似钩。",
-            "千山鸟飞绝，万径人踪灭。",
-            "孤舟蓑笠翁，独钓寒江雪。",
             "海内存知己，天涯若比邻。",
             "野火烧不尽，春风吹又生。",
-            "远芳侵古道，晴翠接荒城。",
-            "又送王孙去，萋萋满别情。",
+            "采菊东篱下，悠然见南山。",
             "明月松间照，清泉石上流。",
-            "竹喧归浣女，莲动下渔舟。",
-            "随意春芳歇，王孙自可留。",
-            "空山新雨后，天气晚来秋。",
-            "晴川历历汉阳树，芳草萋萋鹦鹉洲。",
-            "日暮乡关何处是？烟波江上使人愁。",
-            "昔人已乘黄鹤去，此地空余黄鹤楼。",
-            "黄鹤一去不复返，白云千载空悠悠。",
-            "百川东到海，何时复西归？少壮不努力，老大徒伤悲。",
-            "青青园中葵，朝露待日晞。",
-            "阳春布德泽，万物生光辉。",
-            "常恐秋节至，焜黄华叶衰。",
-            "东临碣石，以观沧海。水何澹澹，山岛竦峙。",
-            "树木丛生，百草丰茂。秋风萧瑟，洪波涌起。",
-            "日月之行，若出其中；星汉灿烂，若出其里。",
-            "幸甚至哉，歌以咏志。",
-            "对酒当歌，人生几何！譬如朝露，去日苦多。",
-            "慨当以慷，忧思难忘。何以解忧？唯有杜康。",
-            "青青子衿，悠悠我心。但为君故，沉吟至今。",
-            "呦呦鹿鸣，食野之苹。我有嘉宾，鼓瑟吹笙。",
-            "明明如月，何时可掇？忧从中来，不可断绝。",
-            "山不厌高，海不厌深。周公吐哺，天下归心。",
+            "少壮不努力，老大徒伤悲。",
             "老骥伏枥，志在千里。烈士暮年，壮心不已。",
-            "盈缩之期，不但在天。养怡之福，可得永年。",
-            "幸甚至哉，歌以咏志。",
-            "结庐在人境，而无车马喧。问君何能尔？心远地自偏。",
-            "采菊东篱下，悠然见南山。山气日夕佳，飞鸟相与还。",
-            "此中有真意，欲辨已忘言。",
-            "种豆南山下，草盛豆苗稀。晨兴理荒秽，带月荷锄归。",
-            "道狭草木长，夕露沾我衣。衣沾不足惜，但使愿无违。",
-            "关关雎鸠，在河之洲。窈窕淑女，君子好逑。",
-            "参差荇菜，左右流之。窈窕淑女，寤寐求之。",
-            "求之不得，寤寐思服。悠哉悠哉，辗转反侧。",
-            "参差荇菜，左右采之。窈窕淑女，琴瑟友之。",
-            "参差荇菜，左右芼之。窈窕淑女，钟鼓乐之。",
-            "蒹葭苍苍，白露为霜。所谓伊人，在水一方。",
-            "溯洄从之，道阻且长。溯游从之，宛在水中央。",
-            "蒹葭萋萋，白露未晞。所谓伊人，在水之湄。",
-            "溯洄从之，道阻且跻。溯游从之，宛在水中坻。",
-            "蒹葭采采，白露未已。所谓伊人，在水之涘。",
-            "溯洄从之，道阻且右。溯游从之，宛在水中沚。",
-            "静女其姝，俟我于城隅。爱而不见，搔首踟蹰。",
-            "静女其娈，贻我彤管。彤管有炜，说怿女美。",
-            "自牧归荑，洵美且异。匪女之为美，美人之贻。",
-            "上邪！我欲与君相知，长命无绝衰。山无陵，江水为竭，冬雷震震，夏雨雪，天地合，乃敢与君绝！",
-            "江南可采莲，莲叶何田田。鱼戏莲叶间。鱼戏莲叶东，鱼戏莲叶西，鱼戏莲叶南，鱼戏莲叶北。",
-            "敕勒川，阴山下。天似穹庐，笼盖四野。天苍苍，野茫茫，风吹草低见牛羊。",
-            "明月几时有？把酒问青天。不知天上宫阙，今夕是何年。我欲乘风归去，又恐琼楼玉宇，高处不胜寒。起舞弄清影，何似在人间。",
-            "转朱阁，低绮户，照无眠。不应有恨，何事长向别时圆？人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。",
-            "大江东去，浪淘尽，千古风流人物。故垒西边，人道是，三国周郎赤壁。乱石穿空，惊涛拍岸，卷起千堆雪。江山如画，一时多少豪杰。",
-            "遥想公瑾当年，小乔初嫁了，雄姿英发。羽扇纶巾，谈笑间，樯橹灰飞烟灭。故国神游，多情应笑我，早生华发。人生如梦，一尊还酹江月。",
-            "寻常一样窗前月，才有梅花便不同。",
-            "梅须逊雪三分白，雪却输梅一段香。",
-            "忽如一夜春风来，千树万树梨花开。",
             "山重水复疑无路，柳暗花明又一村。",
             "沉舟侧畔千帆过，病树前头万木春。",
-            "今日听君歌一曲，暂凭杯酒长精神。",
-            "巴山楚水凄凉地，二十三年弃置身。怀旧空吟闻笛赋，到乡翻似烂柯人。",
-            "烟笼寒水月笼沙，夜泊秦淮近酒家。商女不知亡国恨，隔江犹唱后庭花。",
-            "折戟沉沙铁未销，自将磨洗认前朝。东风不与周郎便，铜雀春深锁二乔。",
-            "远上寒山石径斜，白云生处有人家。停车坐爱枫林晚，霜叶红于二月花。",
-            "千里莺啼绿映红，水村山郭酒旗风。南朝四百八十寺，多少楼台烟雨中。",
-            "江雪：千山鸟飞绝，万径人踪灭。孤舟蓑笠翁，独钓寒江雪。",
-            "寻隐者不遇：松下问童子，言师采药去。只在此山中，云深不知处。",
-            "登鹳雀楼：白日依山尽，黄河入海流。欲穷千里目，更上一层楼。",
-            "春晓：春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。",
-            "静夜思：床前明月光，疑是地上霜。举头望明月，低头思故乡。",
-            "望庐山瀑布：日照香炉生紫烟，遥看瀑布挂前川。飞流直下三千尺，疑是银河落九天。",
-            "绝句：两个黄鹂鸣翠柳，一行白鹭上青天。窗含西岭千秋雪，门泊东吴万里船。",
-            "春夜喜雨：好雨知时节，当春乃发生。随风潜入夜，润物细无声。野径云俱黑，江船火独明。晓看红湿处，花重锦官城。",
-            "登高：风急天高猿啸哀，渚清沙白鸟飞回。无边落木萧萧下，不尽长江滚滚来。万里悲秋常作客，百年多病独登台。艰难苦恨繁霜鬓，潦倒新停浊酒杯。",
-            "闻官军收河南河北：剑外忽传收蓟北，初闻涕泪满衣裳。却看妻子愁何在，漫卷诗书喜欲狂。白日放歌须纵酒，青春作伴好还乡。即从巴峡穿巫峡，便下襄阳向洛阳。",
-            "蜀相：丞相祠堂何处寻，锦官城外柏森森。映阶碧草自春色，隔叶黄鹂空好音。三顾频烦天下计，两朝开济老臣心。出师未捷身先死，长使英雄泪满襟。",
-            "将进酒：君不见黄河之水天上来，奔流到海不复回。君不见高堂明镜悲白发，朝如青丝暮成雪。人生得意须尽欢，莫使金樽空对月。天生我材必有用，千金散尽还复来。烹羊宰牛且为乐，会须一饮三百杯。岑夫子，丹丘生，将进酒，杯莫停。与君歌一曲，请君为我倾耳听。钟鼓馔玉不足贵，但愿长醉不愿醒。古来圣贤皆寂寞，惟有饮者留其名。陈王昔时宴平乐，斗酒十千恣欢谑。主人何为言少钱，径须沽取对君酌。五花马，千金裘，呼儿将出换美酒，与尔同销万古愁。",
-            "行路难：金樽清酒斗十千，玉盘珍羞直万钱。停杯投箸不能食，拔剑四顾心茫然。欲渡黄河冰塞川，将登太行雪满山。闲来垂钓碧溪上，忽复乘舟梦日边。行路难，行路难，多歧路，今安在？长风破浪会有时，直挂云帆济沧海。",
-            "望岳：岱宗夫如何？齐鲁青未了。造化钟神秀，阴阳割昏晓。荡胸生曾云，决眦入归鸟。会当凌绝顶，一览众山小。",
-            "春望：国破山河在，城春草木深。感时花溅泪，恨别鸟惊心。烽火连三月，家书抵万金。白头搔更短，浑欲不胜簪。",
-            "茅屋为秋风所破歌：八月秋高风怒号，卷我屋上三重茅。茅飞渡江洒江郊，高者挂罥长林梢，下者飘转沉塘坳。南村群童欺我老无力，忍能对面为盗贼。公然抱茅入竹去，唇焦口燥呼不得，归来倚杖自叹息。俄顷风定云墨色，秋天漠漠向昏黑。布衾多年冷似铁，娇儿恶卧踏里裂。床头屋漏无干处，雨脚如麻未断绝。自经丧乱少睡眠，长夜沾湿何由彻！安得广厦千万间，大庇天下寒士俱欢颜！风雨不动安如山。呜呼！何时眼前突兀见此屋，吾庐独破受冻死亦足！",
-            "钱塘湖春行：孤山寺北贾亭西，水面初平云脚低。几处早莺争暖树，谁家新燕啄春泥。乱花渐欲迷人眼，浅草才能没马蹄。最爱湖东行不足，绿杨阴里白沙堤。",
-            "泊船瓜洲：京口瓜洲一水间，钟山只隔数重山。春风又绿江南岸，明月何时照我还。",
-            "题西林壁：横看成岭侧成峰，远近高低各不同。不识庐山真面目，只缘身在此山中。",
-            "饮湖上初晴后雨：水光潋滟晴方好，山色空蒙雨亦奇。欲把西湖比西子，淡妆浓抹总相宜。",
-            "惠崇春江晚景：竹外桃花三两枝，春江水暖鸭先知。蒌蒿满地芦芽短，正是河豚欲上时。",
-            "六月二十七日望湖楼醉书：黑云翻墨未遮山，白雨跳珠乱入船。卷地风来忽吹散，望湖楼下水如天。",
-            "绝句：古木阴中系短篷，杖藜扶我过桥东。沾衣欲湿杏花雨，吹面不寒杨柳风。",
-            "游园不值：应怜屐齿印苍苔，小扣柴扉久不开。春色满园关不住，一枝红杏出墙来。",
-            "雪梅：梅雪争春未肯降，骚人阁笔费评章。梅须逊雪三分白，雪却输梅一段香。",
-            "村晚：草满池塘水满陂，山衔落日浸寒漪。牧童归去横牛背，短笛无腔信口吹。",
-            "过零丁洋：辛苦遭逢起一经，干戈寥落四周星。山河破碎风飘絮，身世浮沉雨打萍。惶恐滩头说惶恐，零丁洋里叹零丁。人生自古谁无死，留取丹心照汗青。",
-            "己亥杂诗：浩荡离愁白日斜，吟鞭东指即天涯。落红不是无情物，化作春泥更护花。",
-            "竹石：咬定青山不放松，立根原在破岩中。千磨万击还坚劲，任尔东西南北风。",
-            "墨梅：吾家洗砚池头树，朵朵花开淡墨痕。不要人夸好颜色，只留清气满乾坤。",
-            "石灰吟：千锤万凿出深山，烈火焚烧若等闲。粉骨碎身浑不怕，要留清白在人间。",
-            "朝天子·咏喇叭：喇叭，唢呐，曲儿小腔儿大。官船来往乱如麻，全仗你抬声价。军听了军愁，民听了民怕。哪里去辨甚么真共假？眼见的吹翻了这家，吹伤了那家，只吹的水尽鹅飞罢！",
-            "临江仙·滚滚长江东逝水：滚滚长江东逝水，浪花淘尽英雄。是非成败转头空。青山依旧在，几度夕阳红。白发渔樵江渚上，惯看秋月春风。一壶浊酒喜相逢。古今多少事，都付笑谈中。",
-            "浣溪沙·一曲新词酒一杯：一曲新词酒一杯，去年天气旧亭台。夕阳西下几时回？无可奈何花落去，似曾相识燕归来。小园香径独徘徊。",
-            "蝶恋花·伫倚危楼风细细：伫倚危楼风细细，望极春愁，黯黯生天际。草色烟光残照里，无言谁会凭栏意。拟把疏狂图一醉，对酒当歌，强乐还无味。衣带渐宽终不悔，为伊消得人憔悴。",
-            "雨霖铃·寒蝉凄切：寒蝉凄切，对长亭晚，骤雨初歇。都门帐饮无绪，留恋处，兰舟催发。执手相看泪眼，竟无语凝噎。念去去，千里烟波，暮霭沉沉楚天阔。多情自古伤离别，更那堪，冷落清秋节！今宵酒醒何处？杨柳岸，晓风残月。此去经年，应是良辰好景虚设。便纵有千种风情，更与何人说？",
-            "望海潮·东南形胜：东南形胜，三吴都会，钱塘自古繁华。烟柳画桥，风帘翠幕，参差十万人家。云树绕堤沙，怒涛卷霜雪，天堑无涯。市列珠玑，户盈罗绮，竞豪奢。重湖叠巘清嘉，有三秋桂子，十里荷花。羌管弄晴，菱歌泛夜，嬉嬉钓叟莲娃。千骑拥高牙，乘醉听箫鼓，吟赏烟霞。异日图将好景，归去凤池夸。",
-            "念奴娇·赤壁怀古：大江东去，浪淘尽，千古风流人物。故垒西边，人道是，三国周郎赤壁。乱石穿空，惊涛拍岸，卷起千堆雪。江山如画，一时多少豪杰。遥想公瑾当年，小乔初嫁了，雄姿英发。羽扇纶巾，谈笑间，樯橹灰飞烟灭。故国神游，多情应笑我，早生华发。人生如梦，一尊还酹江月。",
-            "定风波·莫听穿林打叶声：莫听穿林打叶声，何妨吟啸且徐行。竹杖芒鞋轻胜马，谁怕？一蓑烟雨任平生。料峭春风吹酒醒，微冷，山头斜照却相迎。回首向来萧瑟处，归去，也无风雨也无晴。",
-            "水调歌头·明月几时有：明月几时有？把酒问青天。不知天上宫阙，今夕是何年。我欲乘风归去，又恐琼楼玉宇，高处不胜寒。起舞弄清影，何似在人间。转朱阁，低绮户，照无眠。不应有恨，何事长向别时圆？人有悲欢离合，月有阴晴圆缺，此事古难全。但愿人长久，千里共婵娟。",
-            "江城子·乙卯正月二十日夜记梦：十年生死两茫茫，不思量，自难忘。千里孤坟，无处话凄凉。纵使相逢应不识，尘满面，鬓如霜。夜来幽梦忽还乡，小轩窗，正梳妆。相顾无言，惟有泪千行。料得年年肠断处，明月夜，短松冈。",
-            "鹊桥仙·纤云弄巧：纤云弄巧，飞星传恨，银汉迢迢暗度。金风玉露一相逢，便胜却人间无数。柔情似水，佳期如梦，忍顾鹊桥归路。两情若是久长时，又岂在朝朝暮暮。",
-            "青玉案·元夕：东风夜放花千树，更吹落、星如雨。宝马雕车香满路。凤箫声动，玉壶光转，一夜鱼龙舞。蛾儿雪柳黄金缕，笑语盈盈暗香去。众里寻他千百度，蓦然回首，那人却在，灯火阑珊处。",
-            "虞美人·春花秋月何时了：春花秋月何时了？往事知多少。小楼昨夜又东风，故国不堪回首月明中。雕栏玉砌应犹在，只是朱颜改。问君能有几多愁？恰似一江春水向东流。",
-            "相见欢·无言独上西楼：无言独上西楼，月如钩。寂寞梧桐深院锁清秋。剪不断，理还乱，是离愁。别是一般滋味在心头。",
-            "浪淘沙令·帘外雨潺潺：帘外雨潺潺，春意阑珊。罗衾不耐五更寒。梦里不知身是客，一晌贪欢。独自莫凭栏，无限江山，别时容易见时难。流水落花春去也，天上人间。",
-            "破阵子·为陈同甫赋壮词以寄之：醉里挑灯看剑，梦回吹角连营。八百里分麾下炙，五十弦翻塞外声，沙场秋点兵。马作的卢飞快，弓如霹雳弦惊。了却君王天下事，赢得生前身后名。可怜白发生！",
-            "永遇乐·京口北固亭怀古：千古江山，英雄无觅孙仲谋处。舞榭歌台，风流总被雨打风吹去。斜阳草树，寻常巷陌，人道寄奴曾住。想当年，金戈铁马，气吞万里如虎。元嘉草草，封狼居胥，赢得仓皇北顾。四十三年，望中犹记，烽火扬州路。可堪回首，佛狸祠下，一片神鸦社鼓。凭谁问：廉颇老矣，尚能饭否？",
-            "扬州慢·淮左名都：淮左名都，竹西佳处，解鞍少驻初程。过春风十里，尽荠麦青青。自胡马窥江去后，废池乔木，犹厌言兵。渐黄昏，清角吹寒，都在空城。杜郎俊赏，算而今重到须惊。纵豆蔻词工，青楼梦好，难赋深情。二十四桥仍在，波心荡、冷月无声。念桥边红药，年年知为谁生？",
-            "满江红·怒发冲冠：怒发冲冠，凭栏处、潇潇雨歇。抬望眼，仰天长啸，壮怀激烈。三十功名尘与土，八千里路云和月。莫等闲、白了少年头，空悲切。靖康耻，犹未雪。臣子恨，何时灭！驾长车，踏破贺兰山缺。壮志饥餐胡虏肉，笑谈渴饮匈奴血。待从头、收拾旧山河，朝天阙。",
-            "卜算子·咏梅：风雨送春归，飞雪迎春到。已是悬崖百丈冰，犹有花枝俏。俏也不争春，只把春来报。待到山花烂漫时，她在丛中笑。",
-            "沁园春·雪：北国风光，千里冰封，万里雪飘。望长城内外，惟余莽莽；大河上下，顿失滔滔。山舞银蛇，原驰蜡象，欲与天公试比高。须晴日，看红装素裹，分外妖娆。江山如此多娇，引无数英雄竞折腰。惜秦皇汉武，略输文采；唐宗宋祖，稍逊风骚。一代天骄，成吉思汗，只识弯弓射大雕。俱往矣，数风流人物，还看今朝。",
+            "但愿人长久，千里共婵娟。",
+            "人生自古谁无死，留取丹心照汗青。",
+            "落红不是无情物，化作春泥更护花。",
+            "千磨万击还坚劲，任尔东西南北风。",
+            "不要人夸好颜色，只留清气满乾坤。",
+            "粉骨碎身浑不怕，要留清白在人间。",
             "生如夏花之绚烂，死如秋叶之静美。",
             "黑夜给了我黑色的眼睛，我却用它寻找光明。",
             "面朝大海，春暖花开。",
-            "从明天起，做一个幸福的人，喂马、劈柴，周游世界。",
-            "陌生人，我也为你祝福，愿你有一个灿烂的前程，愿你有情人终成眷属，愿你在尘世获得幸福，我只愿面朝大海，春暖花开。",
-            "我有一所房子，面朝大海，春暖花开。",
-            "那榆荫下的一潭，不是清泉，是天上虹，揉碎在浮藻间，沉淀着彩虹似的梦。",
-            "寻梦？撑一支长篙，向青草更青处漫溯，满载一船星辉，在星辉斑斓里放歌。",
-            "但我不能放歌，悄悄是别离的笙箫；夏虫也为我沉默，沉默是今晚的康桥。",
-            "悄悄的我走了，正如我悄悄的来；我挥一挥衣袖，不带走一片云彩。",
-            "轻轻地我走了，正如我轻轻地来；我轻轻地招手，作别西天的云彩。",
-            "你站在桥上看风景，看风景的人在楼上看你。明月装饰了你的窗子，你装饰了别人的梦。",
-            "卑鄙是卑鄙者的通行证，高尚是高尚者的墓志铭。",
-            "告诉你吧，世界，我--不--相--信！",
-            "纵使你脚下有一千名挑战者，那就把我算作第一千零一名。",
-            "我不相信天是蓝的，我不相信雷的回声，我不相信梦是假的，我不相信死无报应。",
-            "如果海洋注定要决堤，就让所有的苦水都注入我心中。",
-            "如果陆地注定要上升，就让人类重新选择生存的峰顶。",
-            "新的转机和闪闪星斗，正在缀满没有遮拦的天空，那是五千年的象形文字，那是未来人们凝视的眼睛。",
-            "一切都是命运，一切都是烟云，一切都是没有结局的开始，一切都是稍纵即逝的追寻。",
-            "一切欢乐都没有微笑，一切苦难都没有泪痕，一切语言都是重复，一切交往都是初逢。",
-            "一切爱情都在心里，一切往事都在梦中，一切希望都带着注释，一切信仰都带着呻吟。",
-            "一切爆发都有片刻的宁静，一切死亡都有冗长的回声。",
-            "走吧，落叶吹进深谷，歌声却没有归宿。",
-            "走吧，冰上的月光，已从河床上溢出。",
-            "走吧，眼睛望着同一片天空，心敲击着暮色的鼓。",
-            "走吧，我们没有失去记忆，我们去寻找生命的湖。",
-            "走吧，路呵路，飘满了红罂粟。",
-            "我不去想是否能够成功，既然选择了远方，便只顾风雨兼程。",
-            "我不去想能否赢得爱情，既然钟情于玫瑰，就勇敢地吐露真诚。",
-            "我不去想身后会不会袭来寒风冷雨，既然目标是地平线，留给世界的只能是背影。",
-            "我不去想未来是平坦还是泥泞，只要热爱生命，一切都在意料之中。",
-            "热爱生命，相信未来。",
-            "当蜘蛛网无情地查封了我的炉台，当灰烬的余烟叹息着贫困的悲哀，我依然固执地铺平失望的灰烬，用美丽的雪花写下：相信未来。",
-            "当我的紫葡萄化为深秋的露水，当我的鲜花依偎在别人的情怀，我依然固执地用凝霜的枯藤，在凄凉的大地上写下：相信未来。",
-            "我要用手指那涌向天边的排浪，我要用手掌那托住太阳的大海，摇曳着曙光那枝温暖漂亮的笔杆，用孩子的笔体写下：相信未来。",
-            "我之所以坚定地相信未来，是我相信未来人们的眼睛——她有拨开历史风尘的睫毛，她有看透岁月篇章的瞳孔。",
-            "不管人们对于我们腐烂的皮肉，那些迷途的惆怅、失败的苦痛，是寄予感动的热泪、深切的同情，还是给以轻蔑的微笑、辛辣的嘲讽。",
-            "我坚信人们对于我们的脊骨，那无数次的探索、迷途、失败和成功，一定会给予热情、客观、公正的评定。",
-            "是的，我焦急地等待着他们的评定。朋友，坚定地相信未来吧，相信不屈不挠的努力，相信战胜死亡的年轻，相信未来，热爱生命。",
-            "如果没有明天，今天就是最后一天。",
-            "每一个不曾起舞的日子，都是对生命的辜负。",
-            "那些杀不死我的，必使我更强大。",
-            "一个人知道自己为什么而活，就可以忍受任何一种生活。",
-            "人的一生，总是难免有浮沉。不会永远如旭日东升，也不会永远痛苦潦倒。反复地一浮一沉，对于一个人来说，正是磨炼。",
-            "人生就像一杯茶，不会苦一辈子，但总会苦一阵子。",
-            "生活不是林黛玉，不会因为忧伤而风情万种。",
-            "生活不是等待风暴过去，而是学会在雨中翩翩起舞。",
-            "生活不是缺少美，而是缺少发现美的眼睛。",
-            "走自己的路，让别人说去吧。",
-            "人生如逆旅，我亦是行人。",
-            "世间所有的相遇，都是久别重逢。",
-            "不乱于心，不困于情，不畏将来，不念过往，如此，安好。",
-            "以清净心看世界，以欢喜心过生活，以平常心生情味，以柔软心除挂碍。",
-            "在人生的道路上，每个人都是孤独的旅客。",
-            "生命中最伟大的光辉不在于永不坠落，而是坠落后总能再度升起。",
-            "世界上只有一种真正的英雄主义，那就是在认清生活的真相后依然热爱生活。",
-            "生活明朗，万物可爱，人间值得，未来可期。",
-            "愿时光能缓，愿故人不散；愿你独闯的日子里不觉得孤单。",
-            "愿你眼眸有星辰，心中有山海，从此以梦为马，不负韶华。",
-            "愿所有的美好，都不负归期。",
-            "愿世界温柔待你，愿岁月静好如初。",
-            "愿你一生努力，一生被爱，想要的都拥有，得不到的都释怀。",
-            "愿你不负时光，不惧未来；愿你坚定不移，勇往直前。",
-            "愿你所到之处，遍地阳光；愿你梦的远方，温暖为向。",
-            "愿你遍历山河，觉得人间值得。",
-            "愿你三冬暖，愿你春不寒；愿你天黑有灯，下雨有伞。",
-            "愿你一路上，有良人相伴。",
-            "愿有人陪你颠沛流离，如果没有，愿你成为自己的太阳。",
-            "愿你我既可以朝九晚五，又能够浪迹天涯。",
-            "愿生活不太拥挤，愿笑容不必刻意。",
-            "愿所有的美好，如约而至。",
-            "愿所有的遗憾，都是惊喜的铺垫。",
-            "愿你保持热爱，奔赴山海。",
-            "愿你眼中有光，心中有爱，活成自己想要的模样。",
-            "愿你沉淀又执着，对每件热爱的事物都全力以赴又满载而归。",
-            "愿你做一个美好的自己，然后遇见一个美好的人。",
-            "愿你有梦为马，随处可栖。",
-            "愿时光温柔，愿岁月不扰。",
-            "愿你此生尽兴，赤诚善良。",
-            "愿你的世界，星光满载，初心不改。",
-            "愿你所遇皆温柔，所行皆坦途。",
-            "愿你此生无憾，来生无忧。",
-            "愿所有的等待，都不被辜负。",
-            "愿所有的付出，都有回报。",
-            "愿你活成自己最喜欢的模样。"
+            "那些杀不死我的，必使我更强大。"
         ];
-
-        var cache = {
-            software: [],
-            categories: [],
-            loaded: false,
-            lastFetch: 0
-        };
-
+        var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
         var DB = {
             async loadAll(force) {
                 force = force || false;
-                if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) {
-                    return Promise.resolve();
-                }
+                if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) return;
                 try {
                     var [softRes, catRes] = await Promise.all([
                         supabaseClient.from('software').select('*').order('created_at', { ascending: false }),
@@ -1580,32 +1810,31 @@
                     if (softRes.error) throw softRes.error;
                     if (catRes.error) throw catRes.error;
                     cache.software = softRes.data || [];
-                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                    cache.categories = catRes.data.map(item => item.name) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                    cache.software.forEach((s, idx) => {
+                        if (!s.screenshots && idx < 2) s.screenshots = ['https://via.placeholder.com/400x300?text=Screenshot+1', 'https://via.placeholder.com/400x300?text=Screenshot+2'];
+                        if (!s.changelog && idx === 0) s.changelog = 'v1.2.0: 修复启动崩溃\nv1.1.0: 新增暗色主题';
+                        if (!s.requirements && idx === 0) s.requirements = 'Windows 10 或更高, 4GB RAM, 500MB 磁盘空间';
+                    });
                     cache.loaded = true;
                     cache.lastFetch = Date.now();
-                    return Promise.resolve();
                 } catch (e) {
                     console.error('加载数据失败:', e);
                     cache.software = [];
                     cache.categories = ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                     cache.loaded = true;
-                    cache.lastFetch = Date.now();
-                    return Promise.resolve();
                 }
             },
             getSoftware() { return cache.software; },
             getCategories() { return cache.categories; },
             async updateSoftware(soft) {
                 try {
-                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id', soft.id);
-                    var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
-                    if (idx !== -1) {
-                        cache.software[idx].views = soft.views;
-                        cache.software[idx].downloads = soft.downloads;
-                    }
-                } catch (e) {
-                    console.error('更新软件异常:', e);
-                }
+                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id',
+                    soft.id);
+                    var idx = cache.software.findIndex(s => s.id === soft.id);
+                    if (idx !== -1) { cache.software[idx].views = soft.views;
+                        cache.software[idx].downloads = soft.downloads; }
+                } catch (e) { console.error('更新失败:', e); }
             }
         };
 
@@ -1614,12 +1843,10 @@
             var c = document.getElementById('toastContainer');
             var el = document.createElement('div');
             el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : '✕') + '</span> ' + msg;
+            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' + msg;
             c.appendChild(el);
-            setTimeout(function() {
-                el.style.animation = 'toastOut 0.4s ease forwards';
-                setTimeout(function() { el.remove(); }, 500);
-            }, 2800);
+            setTimeout(() => { el.style.animation = 'toastOut 0.4s ease forwards';
+                setTimeout(() => el.remove(), 500); }, 2800);
         }
 
         function getIconEmoji(cat) {
@@ -1629,390 +1856,485 @@
 
         function renderIcon(soft) {
             if (soft.icon_url && soft.icon_url.trim()) {
-                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (soft.icon || '📦') + '\'" />';
+                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (
+                    soft.icon || '📦') + '\'">';
             }
             return soft.icon || '📦';
         }
 
         function renderPlatformBadges(soft) {
             var html = '';
-            var platforms = soft.platforms || [];
-            if (platforms.indexOf('mac') !== -1) {
-                html += '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
-            }
-            if (platforms.indexOf('windows') !== -1) {
-                html += '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
-            }
+            if ((soft.platforms || []).includes('mac')) html +=
+                '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
+            if ((soft.platforms || []).includes('windows')) html +=
+                '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             return html;
         }
+        var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
 
-        function highlightText(text, keyword) {
-            if (!keyword) return text;
-            var regex = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-            return text.replace(regex, '<mark style="background:rgba(0,136,255,0.2);border-radius:4px;padding:0 2px;">$1</mark>');
+        function addSearchHistory(kw) {
+            if (!kw) return;
+            searchHistory = [kw, ...searchHistory.filter(h => h !== kw)].slice(0, 10);
+            localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
         }
 
-        function formatDate(iso) {
-            if (!iso) return '';
-            var d = new Date(iso);
-            var m = String(d.getMonth() + 1).padStart(2, '0');
-            var day = String(d.getDate()).padStart(2, '0');
-            return m + '/' + day;
+        function showSuggestions(keyword) {
+            var sug = document.getElementById('searchSuggestions');
+            var hist = document.getElementById('searchHistory');
+            sug.innerHTML = '';
+            sug.classList.remove('open');
+            hist.innerHTML = '';
+            hist.classList.remove('open');
+            if (!keyword && searchHistory.length > 0) {
+                hist.innerHTML = '<div class="history-header">最近搜索</div>' +
+                    searchHistory.map(h => '<div class="item" data-kw="' + h + '">' + h +
+                        '<span class="remove-history" data-kw="' + h + '">✕</span></div>').join('');
+                hist.classList.add('open');
+                hist.querySelectorAll('.item').forEach(el => el.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('remove-history')) {
+                        var kw = e.target.dataset.kw;
+                        searchHistory = searchHistory.filter(h => h !== kw);
+                        localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
+                        showSuggestions('');
+                        return;
+                    }
+                    var kw = this.dataset.kw;
+                    document.getElementById('searchInput').value = kw;
+                    App.doSearch(kw);
+                    hist.classList.remove('open');
+                }));
+            } else if (keyword) {
+                var matches = cache.software.filter(s => s.name.toLowerCase().includes(keyword.toLowerCase())).slice(0, 8);
+                if (matches.length) {
+                    sug.innerHTML = matches.map(s => '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s
+                        .name + '</div>').join('');
+                    sug.classList.add('open');
+                    sug.querySelectorAll('.item').forEach(el => el.addEventListener('click', function() {
+                        var name = this.dataset.name;
+                        document.getElementById('searchInput').value = name;
+                        App.doSearch(name);
+                        sug.classList.remove('open');
+                    }));
+                }
+            }
         }
+        var currentView = 'grid';
 
-        function getTodaysQuote() {
-            var now = new Date();
-            var start = new Date(now.getFullYear(), 0, 0);
-            var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
-            var oneDay = 1000 * 60 * 60 * 24;
-            var dayOfYear = Math.floor(diff / oneDay);
-            var index = dayOfYear % QUOTES.length;
-            return QUOTES[index];
+        function applyViewMode() {
+            var grid = document.getElementById('listGrid');
+            if (currentView === 'list') grid.style.gridTemplateColumns = '1fr';
+            else grid.style.gridTemplateColumns = '';
         }
-
-        var currentPage = 1;
-        var PAGE_SIZE = 6;
-        var currentFilteredList = [];
-
+        document.getElementById('viewToggle').addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                currentView = e.target.dataset.view;
+                this.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                applyViewMode();
+            }
+        });
         var Render = {
-            renderAnnouncements: function(container) {
+            renderAnnouncements(container) {
                 if (!container) return;
-                var quote = getTodaysQuote();
+                var quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
                 var now = new Date();
-                var dateStr = (now.getMonth()+1) + '/' + now.getDate();
-                var html = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' + dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
-                container.innerHTML = html;
+                var dateStr = (now.getMonth() + 1) + '/' + now.getDate();
+                container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' +
+                    dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
             },
-
-            renderCategories: function(container, active, onClick) {
+            renderCategories(container, active, onClick) {
                 if (!container) return;
                 var categories = DB.getCategories();
                 var all = DB.getSoftware();
-                container.innerHTML = categories.map(function(c) {
-                    var count = all.filter(function(s) { return s.category === c; }).length;
-                    return '<div class="category-item ' + (c === active ? 'active' : '') + '" data-cat="' + c + '"><span class="icon">' + getIconEmoji(c) + '</span><span class="name">' + c + '</span><span class="count">' + count + '</span></div>';
+                container.innerHTML = categories.map(c => {
+                    var count = all.filter(s => s.category === c).length;
+                    return '<div class="category-item ' + (c === active ? 'active' : '') + '" data-cat="' + c +
+                        '"><span class="icon">' + getIconEmoji(c) + '</span><span class="name">' + c +
+                        '</span><span class="count">' + count + '</span></div>';
                 }).join('');
-                container.querySelectorAll('.category-item').forEach(function(el) {
-                    el.addEventListener('click', function() {
-                        var cat = this.dataset.cat;
-                        if (onClick) onClick(cat);
-                    });
-                });
+                container.querySelectorAll('.category-item').forEach(el => el.addEventListener('click', function() {
+                    if (onClick) onClick(this.dataset.cat);
+                }));
                 updateNavButtons();
             },
-
-            renderCards: function(container, list, showCategory, keyword) {
-                showCategory = (showCategory !== undefined) ? showCategory : true;
+            renderCards(container, list, showCategory, keyword) {
+                showCategory = showCategory !== false;
                 if (!container) return;
                 if (!list || list.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>等待新的资源加入</p></div>';
+                    container.innerHTML = '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p></div>';
                     return;
                 }
                 var html = '';
-                for (var i = 0; i < list.length; i++) {
-                    var s = list[i];
-                    var displayName = keyword ? highlightText(s.name, keyword) : s.name;
-                    var displayDesc = keyword ? highlightText(s.description || '', keyword) : (s.description || '');
-                    html += '<div class="software-card card" data-id="' + s.id + '"><div class="card-top"><div class="card-icon">' + renderIcon(s) + '</div><div class="card-info"><h3>' + displayName + '</h3><div class="meta">' + (showCategory ? '<span>' + s.category + '</span>' : '') + '<span class="version">v' + s.version + '</span><span>' + (s.size || '—') + '</span></div><div class="platform-badges">' + renderPlatformBadges(s) + '</div></div></div><div class="desc">' + displayDesc + '</div><div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (s.views || 0) + '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) + '</span></div><button class="btn btn-sm btn-primary detail-trigger" data-id="' + s.id + '">详情</button></div></div>';
+                for (var s of list) {
+                    var displayName = s.name,
+                        displayDesc = s.description || '';
+                    if (keyword) {
+                        var regex = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                        displayName = s.name.replace(regex, '<mark>$1</mark>');
+                        displayDesc = (s.description || '').replace(regex, '<mark>$1</mark>');
+                    }
+                    html += '<div class="software-card card" data-id="' + s.id +
+                        '" tabindex="0" role="button" aria-label="查看 ' + s.name + ' 详情">' +
+                        '<div class="card-top"><div class="card-icon">' + renderIcon(s) +
+                        '</div><div class="card-info"><h3>' + displayName +
+                        '</h3><div class="meta">' + (showCategory ? '<span>' + s.category + '</span>' : '') +
+                        '<span class="version">v' + s.version + '</span><span>' + (s.size || '—') +
+                        '</span></div><div class="platform-badges">' + renderPlatformBadges(s) +
+                        '</div></div></div>' +
+                        '<div class="desc">' + displayDesc +
+                        '</div><div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (
+                            s.views || 0) + '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) +
+                        '</span></div><button class="btn btn-sm btn-primary detail-trigger" data-id="' + s.id +
+                        '">详情</button></div></div>';
                 }
                 container.innerHTML = html;
-                container.querySelectorAll('.detail-trigger').forEach(function(btn) {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        var id = this.dataset.id;
-                        var soft = DB.getSoftware().find(function(s) { return s.id === id; });
-                        if (soft) Detail.open(soft);
-                    });
-                });
-                container.querySelectorAll('.software-card').forEach(function(card) {
-                    card.addEventListener('click', function() {
-                        var id = this.dataset.id;
-                        var soft = DB.getSoftware().find(function(s) { return s.id === id; });
-                        if (soft) Detail.open(soft);
-                    });
-                });
             }
         };
-
         var scrollContainer = document.getElementById('categoriesScroll');
         var catPrevBtn = document.getElementById('catPrevBtn');
         var catNextBtn = document.getElementById('catNextBtn');
 
         function updateNavButtons() {
             if (!scrollContainer) return;
-            var scrollLeft = scrollContainer.scrollLeft;
-            var maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-            catPrevBtn.disabled = scrollLeft <= 1;
-            catNextBtn.disabled = maxScroll <= 1 || scrollLeft >= maxScroll - 1;
+            var sl = scrollContainer.scrollLeft,
+                max = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+            catPrevBtn.disabled = sl <= 1;
+            catNextBtn.disabled = max <= 1 || sl >= max - 1;
         }
-
         if (scrollContainer) {
             scrollContainer.addEventListener('scroll', updateNavButtons);
             window.addEventListener('resize', updateNavButtons);
-            catPrevBtn.addEventListener('click', function() {
-                scrollContainer.scrollBy({ left: -200, behavior: 'smooth' });
-            });
-            catNextBtn.addEventListener('click', function() {
-                scrollContainer.scrollBy({ left: 200, behavior: 'smooth' });
-            });
+            catPrevBtn.addEventListener('click', () => scrollContainer.scrollBy({ left: -200, behavior: 'smooth' }));
+            catNextBtn.addEventListener('click', () => scrollContainer.scrollBy({ left: 200, behavior: 'smooth' }));
+        }
+        var viewHistory = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
+
+        function addViewHistory(softwareId) {
+            viewHistory = [softwareId, ...viewHistory.filter(id => id !== softwareId)].slice(0, 6);
+            localStorage.setItem('lezhe_view_history', JSON.stringify(viewHistory));
         }
 
+        function renderRecentHistory() {
+            var container = document.getElementById('recentGrid');
+            var section = document.getElementById('recentHistorySection');
+            if (!container) return;
+            var historyIds = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
+            if (historyIds.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            var recentSoftware = historyIds.map(id => cache.software.find(s => s.id === id)).filter(Boolean);
+            if (recentSoftware.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            section.classList.remove('hidden');
+            Render.renderCards(container, recentSoftware, true);
+        }
         var Detail = {
-            open: function(soft) {
+            open(soft) {
+                addViewHistory(soft.id);
                 var overlay = document.getElementById('detailOverlay');
                 var iconEl = document.getElementById('detailIcon');
                 if (soft.icon_url && soft.icon_url.trim()) {
-                    iconEl.innerHTML = '<img src="' + soft.icon_url + '" alt="' + soft.name + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (soft.icon || '📦') + '\'" />';
-                } else {
-                    iconEl.textContent = soft.icon || '📦';
-                }
+                    iconEl.innerHTML = '<img src="' + soft.icon_url + '" alt="' + soft.name +
+                        '" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent=\'' +
+                        (soft.icon || '📦') + '\'">';
+                } else iconEl.textContent = soft.icon || '📦';
                 document.getElementById('detailName').textContent = soft.name;
-                document.getElementById('detailMeta').innerHTML = '<span class="badge">' + soft.category + '</span><span class="badge badge-purple">v' + soft.version + '</span><span>' + (soft.size || '—') + '</span><span>📅 ' + (soft.date || '') + '</span><span><i class="far fa-eye"></i> ' + (soft.views || 0) + '</span><span><i class="fas fa-download"></i> ' + (soft.downloads || 0) + '</span><div class="detail-platforms">' + renderPlatformBadges(soft) + '</div>';
+                document.getElementById('detailMeta').innerHTML = '<span class="badge">' + soft.category +
+                    '</span><span class="badge badge-purple">v' + soft.version + '</span><span>' + (soft.size || '—') +
+                    '</span>';
                 document.getElementById('detailDesc').textContent = soft.detail || soft.description || '';
+                var scr = document.getElementById('detailScreenshots');
+                if (soft.screenshots && soft.screenshots.length) {
+                    scr.classList.remove('hidden');
+                    scr.innerHTML = soft.screenshots.map(url => '<img src="' + url +
+                        '" alt="截图" loading="lazy" onclick="window.open(\'' + url + '\',\'_blank\')">').join('');
+                } else scr.classList.add('hidden');
+                var clog = document.getElementById('detailChangelog');
+                if (soft.changelog) { clog.classList.remove('hidden');
+                    clog.textContent = soft.changelog; } else clog.classList.add('hidden');
+                var req = document.getElementById('detailRequirements');
+                if (soft.requirements) { req.classList.remove('hidden');
+                    req.innerHTML = '<strong>系统要求：</strong><br>' + soft.requirements; } else req.classList.add('hidden');
+                var related = document.getElementById('relatedSoftware');
+                var relatedGrid = document.getElementById('relatedGrid');
+                var relatedSoft = cache.software.filter(s => s.category === soft.category && s.id !== soft.id).slice(0, 3);
+                if (relatedSoft.length) {
+                    related.classList.remove('hidden');
+                    relatedGrid.innerHTML = relatedSoft.map(rs => {
+                        var platHtml = '';
+                        var platforms = rs.platforms || [];
+                        if (platforms.includes('mac')) platHtml +=
+                            '<span class="plat mac"><i class="fab fa-apple"></i></span>';
+                        if (platforms.includes('windows')) platHtml +=
+                            '<span class="plat win"><i class="fab fa-windows"></i></span>';
+                        if (!platHtml) platHtml = '<span class="plat" style="opacity:0.4;">—</span>';
+                        var badgeHtml = '';
+                        if (rs.recommend || (rs.downloads || 0) > 100) {
+                            badgeHtml = '<span class="badge-mini">🔥 热门</span>';
+                        }
+                        return '<div class="related-card" data-id="' + rs.id + '">' +
+                            badgeHtml +
+                            '<div class="icon-wrap">' + renderIcon(rs) + '</div>' +
+                            '<div class="name" title="' + rs.name + '">' + rs.name + '</div>' +
+                            '<div class="cat">' + (rs.category || '') + '</div>' +
+                            '<div class="platforms">' + platHtml + '</div>' +
+                            '</div>';
+                    }).join('');
+                    relatedGrid.querySelectorAll('.related-card').forEach(c => c.addEventListener('click', function() {
+                        var s = cache.software.find(x => x.id === this.dataset.id);
+                        if (s) Detail.open(s);
+                    }));
+                } else related.classList.add('hidden');
                 var dlBtn = document.getElementById('detailDownload');
                 dlBtn.innerHTML = '<i class="fas fa-download"></i> 下载';
+                dlBtn.classList.remove('btn-loading');
+                dlBtn.disabled = false;
                 dlBtn.onclick = function() {
-                    if (soft.download_url && soft.download_url.trim() !== '') {
+                    if (this.classList.contains('btn-loading')) return;
+                    this.classList.add('btn-loading');
+                    this.innerHTML = '<span class="btn-spinner"></span> 下载中';
+                    if (soft.download_url && soft.download_url.trim()) {
                         window.open(soft.download_url, '_blank');
                         soft.downloads = (soft.downloads || 0) + 1;
                         DB.updateSoftware(soft);
                         toast('开始下载 ' + soft.name, 'success');
-                        var meta = document.getElementById('detailMeta');
-                        var spans = meta.querySelectorAll('span');
-                        if (spans.length >= 6) spans[5].innerHTML = '<i class="fas fa-download"></i> ' + soft.downloads;
-                        App.refreshAll();
                     } else {
                         soft.downloads = (soft.downloads || 0) + 1;
                         DB.updateSoftware(soft);
-                        toast('暂无下载链接，已记录下载意向', 'error');
-                        var meta = document.getElementById('detailMeta');
-                        var spans = meta.querySelectorAll('span');
-                        if (spans.length >= 6) spans[5].innerHTML = '<i class="fas fa-download"></i> ' + soft.downloads;
-                        App.refreshAll();
+                        toast('暂无下载链接', 'warning');
+                    }
+                    setTimeout(() => { this.classList.remove('btn-loading');
+                        this.innerHTML = '<i class="fas fa-download"></i> 下载'; }, 1500);
+                };
+                document.getElementById('detailShareBtn').onclick = function() {
+                    var url = window.location.origin + window.location.pathname + '?soft=' + soft.id;
+                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => toast('链接已复制'));
+                    else {
+                        var input = document.createElement('input');
+                        input.value = url;
+                        document.body.appendChild(input);
+                        input.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(input);
+                        toast('链接已复制');
                     }
                 };
                 overlay.classList.add('open');
                 document.body.style.overflow = 'hidden';
+                document.getElementById('detailClose').focus();
+                setTimeout(() => renderRecentHistory(), 100);
             },
-            close: function() {
+            close() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
             }
         };
-
         document.getElementById('detailClose').addEventListener('click', Detail.close);
         document.getElementById('detailCloseBtn').addEventListener('click', Detail.close);
-        document.getElementById('detailOverlay').addEventListener('click', function(e) {
-            if (e.target === e.currentTarget) Detail.close();
+        document.getElementById('detailOverlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) Detail
+                .close(); });
+        document.addEventListener('click', function(e) {
+            var card = e.target.closest('.software-card');
+            if (!card) return;
+            if (e.target.closest('.detail-trigger')) return;
+            var id = card.dataset.id;
+            if (id) {
+                var soft = DB.getSoftware().find(s => s.id === id);
+                if (soft) Detail.open(soft);
+            }
         });
-
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.detail-trigger');
+            if (!btn) return;
+            var id = btn.dataset.id;
+            if (id) {
+                var soft = DB.getSoftware().find(s => s.id === id);
+                if (soft) Detail.open(soft);
+            }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            if (e.key === 'Escape' && document.getElementById('detailOverlay').classList.contains('open')) {
+                Detail.close();
+            }
+        });
+        var currentPage = 1,
+            PAGE_SIZE = 6,
+            currentFilteredList = [];
         var App = {
             currentPage: 'home',
             currentCategory: 'all',
             sortBy: 'date',
             searchKeyword: '',
-            init: function() {
+            platformFilter: 'all',
+            init() {
                 var self = this;
-                DB.loadAll().then(function() {
+                DB.loadAll().then(() => {
                     self.refreshAll();
+                    renderRecentHistory();
                 });
-
-                setInterval(function() {
-                    DB.loadAll(true).then(function() {
-                        self.refreshAll();
-                    });
-                }, 600000);
-
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
-                    a.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        var page = this.dataset.page;
-                        if (page === 'home') self.goHome();
-                        else if (page === 'list') self.goList();
-                    });
-                });
-                document.getElementById('searchBtn').addEventListener('click', function() { self.doSearch(); });
-                document.getElementById('searchInput').addEventListener('keyup', function(e) {
-                    if (e.key === 'Enter') self.doSearch();
-                });
-                document.getElementById('logoHome').addEventListener('click', function(e) {
+                setInterval(() => DB.loadAll(true).then(() => { self.refreshAll();
+                    renderRecentHistory(); }), 600000);
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.addEventListener('click', function(e) {
                     e.preventDefault();
-                    self.goHome();
-                });
-                document.getElementById('mobileToggle').addEventListener('click', function() {
-                    document.getElementById('navLinks').classList.toggle('open');
-                });
-                document.getElementById('prevPageBtn').addEventListener('click', function() {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        self.renderListPage();
-                    }
-                });
-                document.getElementById('nextPageBtn').addEventListener('click', function() {
-                    var totalPages = Math.ceil(currentFilteredList.length / PAGE_SIZE);
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        self.renderListPage();
-                    }
-                });
-                document.getElementById('sortSelect').addEventListener('change', function() {
-                    self.sortBy = this.value;
+                    if (this.dataset.page === 'home') self.goHome();
+                    else self.goList();
+                }));
+                document.getElementById('searchBtn').addEventListener('click', () => self.doSearch());
+                document.getElementById('searchInput').addEventListener('keyup', function(e) { if (e.key === 'Enter') self
+                        .doSearch();
+                    showSuggestions(this.value.trim()); });
+                document.getElementById('searchInput').addEventListener('focus', () => showSuggestions(''));
+                document.getElementById('searchInput').addEventListener('blur', () => setTimeout(() => { document
+                        .getElementById('searchSuggestions').classList.remove('open');
+                    document.getElementById('searchHistory').classList.remove('open'); }, 200));
+                document.getElementById('logoHome').addEventListener('click', e => { e.preventDefault();
+                    self.goHome(); });
+                document.getElementById('mobileToggle').addEventListener('click', () => document.getElementById('navLinks')
+                    .classList.toggle('open'));
+                document.getElementById('prevPageBtn').addEventListener('click', () => { if (currentPage > 1) { currentPage--;
+                        self.renderListPage(); } });
+                document.getElementById('nextPageBtn').addEventListener('click', () => { var total = Math.ceil(
+                        currentFilteredList.length / PAGE_SIZE);
+                    if (currentPage < total) { currentPage++;
+                        self.renderListPage(); } });
+                document.getElementById('sortSelect').addEventListener('change', function() { self.sortBy = this.value;
                     currentPage = 1;
-                    self.refreshListWithFilters();
-                });
-
+                    self.refreshListWithFilters(); });
+                document.getElementById('jumpPageBtn').addEventListener('click', () => { var p = parseInt(document
+                        .getElementById('jumpPageInput').value);
+                    var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
+                    if (p >= 1 && p <= total) { currentPage = p;
+                        self.renderListPage(); } });
+                document.getElementById('platformFilter').addEventListener('change', function() { self.platformFilter =
+                        this.value;
+                    currentPage = 1;
+                    self.refreshListWithFilters(); });
+                document.getElementById('resetFiltersBtn').addEventListener('click', () => { document.getElementById(
+                        'platformFilter').value = 'all';
+                    self.platformFilter = 'all';
+                    currentPage = 1;
+                    self.refreshListWithFilters(); });
+                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.addEventListener('click', function(e) { e
+                        .preventDefault();
+                    if (this.dataset.page === 'home') self.goHome();
+                    else self.goList(); }));
                 var backBtn = document.getElementById('backTopBtn');
-                window.addEventListener('scroll', function() {
-                    if (window.pageYOffset > 300) {
-                        backBtn.classList.add('visible');
-                    } else {
-                        backBtn.classList.remove('visible');
-                    }
-                });
-                backBtn.addEventListener('click', function() {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
+                window.addEventListener('scroll', () => backBtn.classList.toggle('visible', window.pageYOffset > 300));
+                backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+                document.addEventListener('click', function(e) { var nav = document.getElementById('navLinks');
+                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove('open'); });
             },
-            goHome: function() {
+            goHome() {
                 this.currentPage = 'home';
                 document.getElementById('pageHome').classList.remove('hidden');
                 document.getElementById('pageList').classList.add('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
                 document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
+                renderRecentHistory();
+                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.classList.remove('active'));
+                document.querySelector('#mobileBottomNav a[data-page="home"]').classList.add('active');
             },
-            goList: function(cat) {
-                cat = cat || 'all';
+            goList(cat = 'all') {
                 this.currentPage = 'list';
                 this.currentCategory = cat;
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 currentPage = 1;
                 this.refreshList();
+                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.classList.remove('active'));
+                document.querySelector('#mobileBottomNav a[data-page="list"]').classList.add('active');
             },
-            doSearch: function() {
-                var kw = document.getElementById('searchInput').value.trim();
-                if (!kw) { this.goHome(); return; }
-                this.searchKeyword = kw;
+            doSearch(kw) {
+                var keyword = kw || document.getElementById('searchInput').value.trim();
+                if (!keyword) { this.goHome(); return; }
+                addSearchHistory(keyword);
+                this.searchKeyword = keyword;
                 this.currentPage = 'list';
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
-                document.getElementById('navLinks').classList.remove('open');
                 currentPage = 1;
-                this.refreshList(kw);
+                this.refreshList(keyword);
             },
-            refreshHome: function() {
+            refreshHome() {
                 var self = this;
                 var all = DB.getSoftware();
-                var cats = DB.getCategories();
-
                 Render.renderAnnouncements(document.getElementById('announcementContainer'));
-                Render.renderCategories(document.getElementById('categoryGridHome'), null, function(cat) { self.goList(cat); });
-
-                var recommend = all.filter(function(s) { return s.recommend; }).slice(0, 6);
-                Render.renderCards(document.getElementById('recommendGrid'), recommend, true);
-
-                var latest = all.slice().sort(function(a, b) {
-                    return (b.date || '').localeCompare(a.date || '');
-                }).slice(0, 6);
-                Render.renderCards(document.getElementById('latestGrid'), latest, true);
-
+                Render.renderCategories(document.getElementById('categoryGridHome'), null, cat => self.goList(cat));
+                Render.renderCards(document.getElementById('recommendGrid'), all.filter(s => s.recommend).slice(0, 6), true);
+                Render.renderCards(document.getElementById('latestGrid'), all.slice().sort((a, b) => (b.date || '').localeCompare(
+                    a.date || '')).slice(0, 6), true);
+                renderRecentHistory();
                 setTimeout(updateNavButtons, 100);
             },
-            refreshList: function(keyword) {
+            refreshList(keyword) {
                 var self = this;
                 var all = DB.getSoftware();
                 var list = all.slice();
                 var cats = DB.getCategories();
-
                 var filterContainer = document.getElementById('filterTags');
-                var filterHtml = '<button class="btn btn-sm btn-outline active" data-cat="all">全部</button>';
-                cats.forEach(function(c) {
-                    filterHtml += '<button class="btn btn-sm btn-outline" data-cat="' + c + '">' + c + '</button>';
-                });
-                filterContainer.innerHTML = filterHtml;
-                filterContainer.querySelectorAll('button').forEach(function(btn) {
-                    if (btn.dataset.cat === self.currentCategory) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
+                filterContainer.innerHTML = '<button class="btn btn-sm btn-outline active" data-cat="all">全部</button>' +
+                    cats.map(c => '<button class="btn btn-sm btn-outline" data-cat="' + c + '">' + c + '</button>').join('');
+                filterContainer.querySelectorAll('button').forEach(btn => {
+                    if (btn.dataset.cat === self.currentCategory) btn.classList.add('active');
+                    else btn.classList.remove('active');
                     btn.addEventListener('click', function() {
-                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
-                        btn.classList.add('active');
-                        var cat = btn.dataset.cat;
-                        self.currentCategory = cat;
+                        filterContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        self.currentCategory = this.dataset.cat;
                         currentPage = 1;
                         self.refreshListWithFilters();
                     });
                 });
-
                 if (keyword) {
                     var kw = keyword.toLowerCase();
-                    list = list.filter(function(s) {
-                        return s.name.toLowerCase().includes(kw) ||
-                            (s.description || '').toLowerCase().includes(kw) ||
-                            (s.detail || '').toLowerCase().includes(kw);
-                    });
+                    list = list.filter(s => s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
+                        .includes(kw));
                     document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length + '项)';
-                } else {
-                    document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
-                }
-                if (self.currentCategory !== 'all') {
-                    list = list.filter(function(s) { return s.category === self.currentCategory; });
-                }
-                if (self.sortBy === 'views') {
-                    list.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
-                } else if (self.sortBy === 'downloads') {
-                    list.sort(function(a, b) { return (b.downloads || 0) - (a.downloads || 0); });
-                } else {
-                    list.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
-                }
+                } else document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
+                if (self.currentCategory !== 'all') list = list.filter(s => s.category === self.currentCategory);
+                if (self.platformFilter !== 'all') list = list.filter(s => (s.platforms || []).includes(self.platformFilter));
+                if (self.sortBy === 'views') list.sort((a, b) => (b.views || 0) - (a.views || 0));
+                else if (self.sortBy === 'downloads') list.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                else list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
                 currentFilteredList = list;
                 self.renderListPage(keyword);
+                document.getElementById('resultCount').textContent = '共 ' + list.length + ' 款';
             },
-            renderListPage: function(keyword) {
-                var total = currentFilteredList.length;
-                var totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+            renderListPage(keyword) {
+                var total = currentFilteredList.length,
+                    totalPages = Math.ceil(total / PAGE_SIZE) || 1;
                 if (currentPage > totalPages) currentPage = totalPages;
-                var start = (currentPage - 1) * PAGE_SIZE;
-                var end = Math.min(start + PAGE_SIZE, total);
-                var pageItems = currentFilteredList.slice(start, end);
-
-                Render.renderCards(document.getElementById('listGrid'), pageItems, true, keyword || this.searchKeyword);
-
+                var items = currentFilteredList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+                Render.renderCards(document.getElementById('listGrid'), items, true, keyword || this.searchKeyword);
                 document.getElementById('pageInfo').textContent = '第 ' + currentPage + ' / ' + totalPages + ' 页';
-                document.getElementById('prevPageBtn').disabled = (currentPage <= 1);
-                document.getElementById('nextPageBtn').disabled = (currentPage >= totalPages);
+                document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+                document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+                document.getElementById('jumpPageInput').value = currentPage;
+                document.getElementById('jumpPageInput').max = totalPages;
+                applyViewMode();
             },
-            refreshListWithFilters: function() {
-                var kw = document.getElementById('searchInput').value.trim();
+            refreshListWithFilters() { var kw = document.getElementById('searchInput').value.trim();
                 this.searchKeyword = kw;
-                if (kw) { this.refreshList(kw); } else { this.refreshList(null); }
-            },
-            refreshAll: function() {
-                if (this.currentPage === 'home') this.refreshHome();
-                else if (this.currentPage === 'list') this.refreshListWithFilters();
-            }
+                if (kw) this.refreshList(kw);
+                else this.refreshList(null); },
+            refreshAll() { if (this.currentPage === 'home') this.refreshHome();
+                else this.refreshListWithFilters(); }
         };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            App.init();
-            document.addEventListener('click', function(e) {
-                var nav = document.getElementById('navLinks');
-                if (nav.classList.contains('open') && !e.target.closest('.header')) {
-                    nav.classList.remove('open');
-                }
-            });
-        });
-        window.__APP = App;
-        window.__DB = DB;
+        document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
 </html>
