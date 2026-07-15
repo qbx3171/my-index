@@ -1220,12 +1220,6 @@
             .related-card .name {
                 font-size: 0.7rem;
             }
-            .detail-modal .modal-body {
-                padding: 20px 18px 16px;
-            }
-            .detail-modal .modal-actions {
-                padding: 12px 18px 20px;
-            }
         }
         .footer {
             padding: 32px 0 20px;
@@ -1414,7 +1408,9 @@
             color: var(--accent-cyan);
             background: rgba(0, 119, 255, 0.08);
         }
-        @media (max-width:768px) {
+
+        /* ========== 移动端优化 ========== */
+        @media (max-width: 768px) {
             :root {
                 --header-height: 58px;
             }
@@ -1442,11 +1438,8 @@
                 font-size: 2rem;
             }
             .software-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                grid-template-columns: 1fr;
                 gap: 16px;
-            }
-            .detail-modal {
-                max-height: 95vh;
             }
             .detail-modal .modal-body {
                 padding: 20px 18px 16px;
@@ -1460,7 +1453,119 @@
             body {
                 padding-bottom: 70px;
             }
+
+            /* 软件库页面在手机上更紧凑 */
+            #pageList .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            #pageList .toolbar .filters {
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+            #pageList .toolbar .filters .btn {
+                font-size: 0.7rem;
+                padding: 4px 12px;
+            }
+            #pageList .toolbar .sort-group {
+                flex-wrap: wrap;
+                gap: 6px;
+                justify-content: space-between;
+            }
+            #pageList .toolbar .sort-group .view-toggle {
+                margin-left: 0;
+            }
+            #pageList .filter-panel {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 8px 0;
+            }
+            #pageList .filter-panel .filter-group {
+                flex: 1 1 100%;
+            }
+            #pageList .filter-panel select {
+                width: 100%;
+            }
+            .pagination {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .pagination .page-jump {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* 回顶部按钮避开底部导航 */
+            .back-top {
+                bottom: 80px;
+                right: 20px;
+                left: auto;
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
         }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            .software-card {
+                padding: 16px 14px 14px;
+                min-height: 200px;
+            }
+            .software-card .card-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            .software-card .card-info h3 {
+                font-size: 0.9rem;
+            }
+            .software-card .desc {
+                font-size: 0.75rem;
+                -webkit-line-clamp: 2;
+            }
+            .software-card .card-footer .stats {
+                font-size: 0.65rem;
+                gap: 8px;
+            }
+            .software-card .card-footer .btn {
+                font-size: 0.65rem;
+                padding: 3px 12px;
+            }
+            .categories-nav-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 0.7rem;
+            }
+            .category-item {
+                padding: 4px 10px;
+                font-size: 0.7rem;
+            }
+            .section-title {
+                font-size: 1.2rem;
+            }
+            .pagination button {
+                padding: 6px 14px;
+                font-size: 0.75rem;
+            }
+            .pagination .page-info {
+                font-size: 0.75rem;
+            }
+            .back-top {
+                bottom: 75px;
+                right: 16px;
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+        }
+
         @media (prefers-color-scheme:dark) {
             :root {
                 --bg-primary: #0f172a;
