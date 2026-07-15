@@ -2401,7 +2401,8 @@
                         if (rs.recommend || (rs.downloads || 0) > 100) {
                             badgeHtml = '<span class="badge-mini">🔥 热门</span>';
                         }
-                        return '<div class="related-card" data-id="' + rs.id + '">' +
+                        return '<div class="related-card" data-id="' + rs.id + '" onclick="Detail.openById(' +
+                            rs.id + ')">' +
                             badgeHtml +
                             '<div class="icon-wrap">' + renderIcon(rs) + '</div>' +
                             '<div class="name" title="' + rs.name + '">' + rs.name + '</div>' +
@@ -2452,6 +2453,12 @@
                 document.getElementById('detailClose').focus();
                 setTimeout(function() { renderRecentHistory(); }, 100);
             },
+            openById: function(id) {
+                var soft = cache.software.find(function(s) { return s.id === id; });
+                if (soft) {
+                    this.open(soft);
+                }
+            },
             close: function() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
@@ -2478,14 +2485,6 @@
             var id = btn.dataset.id;
             if (id) {
                 var soft = DB.getSoftware().find(function(s) { return s.id === id; });
-                if (soft) Detail.open(soft);
-            }
-        });
-        document.addEventListener('click', function(e) {
-            var relatedCard = e.target.closest('.related-card');
-            if (relatedCard) {
-                var targetId = Number(relatedCard.dataset.id);
-                var soft = cache.software.find(function(s) { return s.id === targetId; });
                 if (soft) Detail.open(soft);
             }
         });
