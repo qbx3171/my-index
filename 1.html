@@ -2089,13 +2089,12 @@
                     if (softRes.error) throw softRes.error;
                     if (catRes.error) throw catRes.error;
                     cache.software = softRes.data || [];
-                    cache.categories = catRes.data.map(item => item.name) || ['设计工具', '开发工具', '办公软件', '媒体工具',
-                        '实用工具'
-                    ];
+                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                     cache.software.forEach(function(s) {
                         if (!s.screenshots) s.screenshots = [];
                         if (!s.changelog) s.changelog = '';
                         if (!s.requirements) s.requirements = '';
+                        if (!s.platforms) s.platforms = [];
                     });
                     cache.loaded = true;
                     cache.lastFetch = Date.now();
@@ -2110,8 +2109,7 @@
             getCategories: function() { return cache.categories; },
             async updateSoftware(soft) {
                 try {
-                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq(
-                        'id', soft.id);
+                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id', soft.id);
                     var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
                     if (idx !== -1) { cache.software[idx].views = soft.views;
                         cache.software[idx].downloads = soft.downloads; }
@@ -2124,8 +2122,7 @@
             var c = document.getElementById('toastContainer');
             var el = document.createElement('div');
             el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' +
-                msg;
+            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' + msg;
             c.appendChild(el);
             setTimeout(function() {
                 el.style.animation = 'toastOut 0.4s ease forwards';
@@ -2148,10 +2145,8 @@
 
         function renderPlatformBadges(soft) {
             var html = '';
-            if ((soft.platforms || []).includes('mac')) html +=
-                '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
-            if ((soft.platforms || []).includes('windows')) html +=
-                '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
+            if ((soft.platforms || []).includes('mac')) html += '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
+            if ((soft.platforms || []).includes('windows')) html += '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             return html;
         }
         var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
@@ -2197,8 +2192,7 @@
                 }).slice(0, 8);
                 if (matches.length) {
                     sug.innerHTML = matches.map(function(s) {
-                        return '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s
-                            .name + '</div>';
+                        return '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s.name + '</div>';
                     }).join('');
                     sug.classList.add('open');
                     sug.querySelectorAll('.item').forEach(function(el) {
@@ -2402,7 +2396,8 @@
                         if (rs.recommend || (rs.downloads || 0) > 100) {
                             badgeHtml = '<span class="badge-mini">🔥 热门</span>';
                         }
-                        return '<div class="related-card" data-id="' + rs.id + '">' +
+                        var idStr = rs.id;
+                        return '<div class="related-card" data-id="' + idStr + '" onclick="Detail.openById(\'' + idStr + '\')">' +
                             badgeHtml +
                             '<div class="icon-wrap">' + renderIcon(rs) + '</div>' +
                             '<div class="name" title="' + rs.name + '">' + rs.name + '</div>' +
@@ -2436,8 +2431,7 @@
                 };
                 document.getElementById('detailShareBtn').onclick = function() {
                     var url = window.location.origin + window.location.pathname + '?soft=' + soft.id;
-                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function() { toast(
-                            '链接已复制'); });
+                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function() { toast('链接已复制'); });
                     else {
                         var input = document.createElement('input');
                         input.value = url;
@@ -2453,25 +2447,19 @@
                 document.getElementById('detailClose').focus();
                 setTimeout(function() { renderRecentHistory(); }, 100);
             },
+            openById: function(id) {
+                var soft = cache.software.find(function(s) { return s.id === id; });
+                if (soft) {
+                    this.open(soft);
+                } else {
+                    toast('未找到该软件', 'warning');
+                }
+            },
             close: function() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
             }
         };
-
-        document.getElementById('relatedGrid').addEventListener('click', function(e) {
-            var card = e.target.closest('.related-card');
-            if (!card) return;
-            var id = card.dataset.id;
-            if (id) {
-                var soft = cache.software.find(function(s) { return s.id === id; });
-                if (soft) {
-                    Detail.open(soft);
-                } else {
-                    toast('未找到该软件', 'warning');
-                }
-            }
-        });
 
         document.getElementById('detailClose').addEventListener('click', Detail.close);
         document.getElementById('detailCloseBtn').addEventListener('click', Detail.close);
@@ -2539,8 +2527,7 @@
                     if (e.key === 'Enter') self.doSearch();
                     showSuggestions(this.value.trim());
                 });
-                document.getElementById('searchInput').addEventListener('focus', function() { showSuggestions(
-                    ''); });
+                document.getElementById('searchInput').addEventListener('focus', function() { showSuggestions(''); });
                 document.getElementById('searchInput').addEventListener('blur', function() {
                     setTimeout(function() {
                         document.getElementById('searchSuggestions').classList.remove('open');
@@ -2599,16 +2586,14 @@
                 backBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
                 document.addEventListener('click', function(e) {
                     var nav = document.getElementById('navLinks');
-                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
-                    'open');
+                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove('open');
                 });
             },
             goHome: function() {
                 this.currentPage = 'home';
                 document.getElementById('pageHome').classList.remove('hidden');
                 document.getElementById('pageList').classList.add('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
@@ -2622,8 +2607,7 @@
                 this.currentCategory = cat;
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 currentPage = 1;
@@ -2639,8 +2623,7 @@
                 this.currentPage = 'list';
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 currentPage = 1;
                 this.refreshList(keyword);
@@ -2649,10 +2632,9 @@
                 var self = this;
                 var all = DB.getSoftware();
                 Render.renderAnnouncements(document.getElementById('announcementContainer'));
-                Render.renderCategories(document.getElementById('categoryGridHome'), null, function(cat) { self.goList(
-                        cat); });
-                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s
-                        .recommend; }).slice(0, 6), true);
+                Render.renderCategories(document.getElementById('categoryGridHome'), null, function(cat) { self.goList(cat); });
+                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s.recommend; }).slice(
+                    0, 6), true);
                 Render.renderCards(document.getElementById('latestGrid'), all.slice().sort(function(a, b) {
                     return (b.date || '').localeCompare(a.date || '');
                 }).slice(0, 6), true);
@@ -2673,8 +2655,7 @@
                     if (btn.dataset.cat === self.currentCategory) btn.classList.add('active');
                     else btn.classList.remove('active');
                     btn.addEventListener('click', function() {
-                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove(
-                                'active'); });
+                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
                         this.classList.add('active');
                         self.currentCategory = this.dataset.cat;
                         currentPage = 1;
@@ -2684,19 +2665,16 @@
                 if (keyword) {
                     var kw = keyword.toLowerCase();
                     list = list.filter(function(s) {
-                        return s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
-                            .includes(kw);
+                        return s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase().includes(kw);
                     });
-                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length +
-                        '项)';
+                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length + '项)';
                 } else document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
-                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self
-                        .currentCategory; });
-                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || [])
-                        .includes(self.platformFilter); });
+                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self.currentCategory; });
+                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || []).includes(self
+                        .platformFilter); });
                 if (self.sortBy === 'views') list.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
-                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a
-                        .downloads || 0); });
+                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a.downloads ||
+                        0); });
                 else list.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
                 currentFilteredList = list;
                 self.renderListPage(keyword);
