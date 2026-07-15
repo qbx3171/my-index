@@ -1,42 +1,28 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="light">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <meta name="description" content="乐哲软件 · 精选高效工具，赋能创作者生态。">
+    <meta name="keywords" content="软件下载,设计工具,开发工具,办公软件,媒体工具,实用工具,乐哲软件">
+    <meta name="theme-color" content="#0077ff">
+    <meta property="og:title" content="乐哲软件 · 构建数字未来">
+    <meta property="og:description" content="精选高效工具，赋能创作者生态。">
+    <meta property="og:type" content="website">
     <title>乐哲软件 · 构建数字未来</title>
-    <meta name="description" content="乐哲软件 - 精选高效工具，赋能创作者生态。发现设计、开发、办公等领域的优质软件资源。" />
-    <meta name="keywords" content="软件下载, 设计工具, 开发工具, 办公软件, 媒体工具, 实用工具" />
-    <meta property="og:title" content="乐哲软件 · 构建数字未来" />
-    <meta property="og:description" content="精选高效工具，赋能创作者生态。" />
-    <meta property="og:type" content="website" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script src="https://unpkg.com/@supabase/supabase-js@2">
-    </script>
-    <script>
-        (function() {
-            var bp = document.createElement('script');
-            var curProtocol = window.location.protocol.split(':')[0];
-            if (curProtocol === 'https') {
-                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-            } else {
-                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-            }
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(bp, s);
-        })();
-    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-primary: #f0f4fa;
             --bg-secondary: #e6ecf5;
-            --bg-card: rgba(255, 255, 255, 0.72);
+            --bg-card: rgba(255,255,255,0.72);
             --bg-card-solid: #ffffff;
-            --bg-input: #ffffff;
-            --border-glow: rgba(0, 120, 255, 0.18);
-            --border-glow-strong: rgba(0, 120, 255, 0.35);
+            --border-glow: rgba(0,120,255,0.18);
+            --border-glow-strong: rgba(0,120,255,0.35);
             --text-primary: #0f1a2e;
             --text-secondary: #3d5068;
             --text-dim: #7a8ca3;
@@ -44,1374 +30,242 @@
             --accent-blue: #0055cc;
             --accent-purple: #6c5ce7;
             --accent-gradient: linear-gradient(135deg, #0077ff, #6c5ce7);
-            --shadow-card: 0 8px 32px rgba(0, 20, 40, 0.08);
+            --shadow-card: 0 8px 32px rgba(0,20,40,0.08);
             --radius-lg: 20px;
             --radius-md: 12px;
             --radius-sm: 8px;
-            --transition: 0.3s cubic-bezier(0.2, 0, 0, 1);
+            --transition: 0.3s cubic-bezier(0.2,0,0,1);
             --font: 'Inter', -apple-system, sans-serif;
             --max-width: 1200px;
             --header-height: 64px;
-            --skeleton-bg: #e6ecf5;
-            --skeleton-shine: #f0f4fa;
-        }
-        [data-theme="dark"] {
-            --bg-primary: #0f1a2e;
-            --bg-secondary: #1a2740;
-            --bg-card: rgba(30, 40, 60, 0.85);
-            --bg-card-solid: #1e2a44;
-            --bg-input: #1e2a44;
-            --border-glow: rgba(100, 180, 255, 0.15);
-            --border-glow-strong: rgba(100, 180, 255, 0.3);
-            --text-primary: #e8edf5;
-            --text-secondary: #a0b4cc;
-            --text-dim: #6a7e9a;
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
-            --skeleton-bg: #1e2a44;
-            --skeleton-shine: #2a3a5a;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: var(--font);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            padding-bottom: 2px;
-            transition: background 0.3s, color 0.3s;
-        }
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-        button {
-            cursor: pointer;
-            font-family: inherit;
-            border: none;
-            background: none;
-            color: inherit;
-        }
-        input,
-        textarea,
-        select {
-            font-family: inherit;
-            border: none;
-            outline: none;
-            background: var(--bg-input);
-            color: var(--text-primary);
-        }
-        .container {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 28px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: var(--transition);
-            border: 1px solid transparent;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            backdrop-filter: blur(8px);
-            border-color: var(--border-glow);
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 136, 255, 0.15);
-            border-color: var(--accent-cyan);
-        }
-        .btn-primary {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-            font-weight: 700;
-        }
-        .btn-primary:hover {
-            box-shadow: 0 4px 24px rgba(0, 136, 255, 0.3);
-            transform: translateY(-2px) scale(1.02);
-        }
-        .btn-outline {
-            background: transparent;
-            border-color: var(--border-glow);
-            color: var(--text-secondary);
-        }
-        .btn-outline:hover {
-            background: rgba(0, 136, 255, 0.06);
-            border-color: var(--accent-cyan);
-            color: var(--text-primary);
-        }
-        .btn-sm {
-            padding: 6px 18px;
-            font-size: 0.8rem;
-        }
-        .btn-icon {
-            padding: 8px 12px;
-            border-radius: 50px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            backdrop-filter: blur(4px);
-            transition: var(--transition);
-            font-size: 1rem;
-            color: var(--text-secondary);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-icon:hover {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
-        }
-        .card {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card);
-            transition: var(--transition);
-            overflow: hidden;
-        }
-        .card:hover {
-            border-color: var(--border-glow-strong);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-            transform: translateY(-4px);
-        }
-        .badge {
-            display: inline-block;
-            padding: 2px 14px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            background: rgba(0, 136, 255, 0.10);
-            color: var(--accent-cyan);
-            border: 1px solid rgba(0, 136, 255, 0.15);
-            line-height: 1.6;
-        }
-        .badge i {
-            margin-right: 4px;
-        }
-        .badge-mac {
-            background: rgba(108, 92, 231, 0.10);
-            color: #6c5ce7;
-            border-color: rgba(108, 92, 231, 0.15);
-        }
-        .badge-windows {
-            background: rgba(0, 136, 255, 0.10);
-            color: var(--accent-cyan);
-            border-color: rgba(0, 136, 255, 0.15);
-        }
-        .badge-purple {
-            background: rgba(108, 92, 231, 0.10);
-            color: var(--accent-purple);
-            border-color: rgba(108, 92, 231, 0.15);
-        }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-        }
-        .empty-state .icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            opacity: 0.6;
-        }
-        .empty-state h3 {
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-        .skeleton-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 22px;
-        }
-        .skeleton-card {
-            height: 270px;
-            border-radius: var(--radius-lg);
-            background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--skeleton-shine) 50%, var(--skeleton-bg) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer {
-            0% {
-                background-position: -200% 0;
-            }
-            100% {
-                background-position: 200% 0;
-            }
-        }
-        .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg-primary);
-            backdrop-filter: blur(24px);
-            border-bottom: 1px solid var(--border-glow);
-            height: var(--header-height);
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
-            transition: background 0.3s;
-        }
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: var(--header-height);
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: var(--text-primary);
-            flex-shrink: 0;
-        }
-        .logo .mark {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border-radius: var(--radius-sm);
-            background: var(--accent-gradient);
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: 800;
-            box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
-        }
-        .logo .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-        .logo .brand-text .main {
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-        .logo .brand-text .sub {
-            font-weight: 300;
-            font-size: 0.6rem;
-            color: var(--text-dim);
-            letter-spacing: 0.5px;
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            list-style: none;
-        }
-        .nav-links a {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            padding: 8px 16px;
-            border-radius: 50px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-        .nav-links a i {
-            font-size: 1rem;
-        }
-        .nav-links a:hover {
-            background: rgba(0, 136, 255, 0.08);
-            color: var(--text-primary);
-        }
-        .nav-links a.active {
-            background: var(--accent-gradient);
-            color: #fff;
-            box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
-        }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .theme-toggle {
-            font-size: 1.2rem;
-            padding: 6px 10px;
-            border-radius: 50px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            transition: var(--transition);
-        }
-        .theme-toggle:hover {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-        }
-        .mobile-toggle {
-            display: none;
-            font-size: 1.6rem;
-            color: var(--text-secondary);
-            padding: 4px 10px;
-            border-radius: var(--radius-sm);
-            background: rgba(0, 0, 0, 0.02);
-            line-height: 1;
-            transition: var(--transition);
-        }
-        .mobile-toggle:hover {
-            background: rgba(0, 0, 0, 0.06);
-        }
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: var(--header-height);
-                left: 0;
-                right: 0;
-                background: var(--bg-primary);
-                backdrop-filter: blur(24px);
-                flex-direction: column;
-                padding: 16px 24px;
-                gap: 14px;
-                border-bottom: 1px solid var(--border-glow);
-                box-shadow: var(--shadow-card);
-            }
-            .nav-links.open {
-                display: flex;
-            }
-            .mobile-toggle {
-                display: block;
-            }
-            .header-actions .theme-toggle {
-                font-size: 1rem;
-                padding: 4px 8px;
-            }
-        }
-        .hero {
-            padding: 40px 0 20px;
-            text-align: center;
-            position: relative;
-        }
-        .hero h1 {
-            font-size: 2.8rem;
-            font-weight: 700;
-            letter-spacing: -1px;
-            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent-cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-        }
-        .hero h1 .highlight {
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .hero p {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            max-width: 480px;
-            margin: 0 auto 24px;
-            font-weight: 300;
-        }
-        .search-wrapper {
-            max-width: 480px;
-            margin: 0 auto;
-            position: relative;
-        }
-        .search-box {
-            display: flex;
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            border-radius: 60px;
-            border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-        .search-box:focus-within {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 4px 24px rgba(0, 136, 255, 0.08);
-        }
-        .search-box input {
-            flex: 1;
-            padding: 12px 22px;
-            font-size: 0.9rem;
-            background: transparent;
-            color: var(--text-primary);
-            min-width: 0;
-        }
-        .search-box input::placeholder {
-            color: var(--text-dim);
-        }
-        .search-box button {
-            padding: 0 24px;
-            background: var(--accent-gradient);
-            color: #fff;
-            font-weight: 700;
-            transition: var(--transition);
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-        .search-box button:hover {
-            filter: brightness(1.05);
-            box-shadow: 0 0 20px rgba(0, 136, 255, 0.2);
-        }
-        .search-history {
-            margin-top: 8px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-        }
-        .search-history .tag {
-            font-size: 0.7rem;
-            padding: 2px 14px;
-            border-radius: 50px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        .search-history .tag:hover {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-        }
-        .announcement-list {
-            max-width: 680px;
-            margin: 0 auto 12px;
-        }
-        .announcement-item {
-            padding: 6px 16px 6px 20px;
-            border-left: 2px solid var(--border-glow);
-            margin-bottom: 4px;
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: var(--transition);
-            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-        }
-        .announcement-item:hover {
-            background: rgba(0, 136, 255, 0.04);
-            border-left-color: var(--accent-cyan);
-        }
-        .announcement-item .dot {
-            color: var(--accent-cyan);
-            font-size: 0.4rem;
-        }
-        .announcement-item .time {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            flex-shrink: 0;
-        }
-        .announcement-item .text {
-            flex: 1;
-        }
-        .announcement-item .badge-new {
-            font-size: 0.6rem;
-            background: var(--accent-gradient);
-            color: #fff;
-            padding: 0 10px;
-            border-radius: 50px;
-            flex-shrink: 0;
-        }
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
-            color: var(--text-primary);
-        }
-        .section-sub {
-            color: var(--text-secondary);
-            font-weight: 400;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-        }
-        .categories-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin: 16px 0 12px;
-        }
-        .categories-scroll {
-            overflow-x: auto;
-            overflow-y: hidden;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            flex: 1;
-            padding: 4px 0;
-        }
-        .categories-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        .categories-grid {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 8px;
-            padding: 0 4px;
-            width: max-content;
-        }
-        .category-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 50px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            transition: var(--transition);
-            cursor: pointer;
-            user-select: none;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            backdrop-filter: blur(4px);
-            flex-shrink: 0;
-        }
-        .category-item .icon {
-            font-size: 16px;
-            line-height: 1;
-        }
-        .category-item .name {
-            font-weight: 500;
-        }
-        .category-item .count {
-            font-size: 0.65rem;
-            color: var(--text-dim);
-            margin-left: 2px;
-        }
-        .category-item:hover {
-            background: rgba(0, 136, 255, 0.08);
-            border-color: var(--accent-cyan);
-            transform: translateY(-2px);
-        }
-        .category-item.active {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
-        }
-        .category-item.active .count {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        .categories-nav-btn {
-            flex-shrink: 0;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--bg-card-solid);
-            border: 1px solid var(--border-glow);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            color: var(--text-secondary);
-            box-shadow: var(--shadow-card);
-            font-size: 0.9rem;
-            z-index: 2;
-        }
-        .categories-nav-btn:hover {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 2px 12px rgba(0, 136, 255, 0.25);
-        }
-        .categories-nav-btn:disabled {
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        .software-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 22px;
-            margin-top: 6px;
-        }
-        .software-card {
-            padding: 22px 20px 18px;
-            transition: var(--transition);
-            cursor: default;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card);
-            min-height: 270px;
-            position: relative;
-        }
-        .software-card .favorite-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            font-size: 1.2rem;
-            color: var(--text-dim);
-            transition: var(--transition);
-            background: none;
-            border: none;
-            padding: 4px;
-            z-index: 2;
-        }
-        .software-card .favorite-btn.active {
-            color: #ff4757;
-        }
-        .software-card .favorite-btn:hover {
-            transform: scale(1.2);
-        }
-        .software-card .card-top {
-            display: flex;
-            align-items: flex-start;
-            gap: 14px;
-            margin-bottom: 10px;
-        }
-        .software-card .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-md);
-            background: rgba(0, 136, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            border: 1px solid rgba(0, 136, 255, 0.08);
-            overflow: hidden;
-            font-size: 26px;
-        }
-        .software-card .card-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .software-card .card-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .software-card .card-info h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 2px;
-            letter-spacing: -0.2px;
-            color: var(--text-primary);
-            word-break: break-word;
-            padding-right: 28px;
-        }
-        .software-card .card-info .meta {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .software-card .card-info .meta .version {
-            color: var(--accent-cyan);
-        }
-        .software-card .card-info .platform-badges {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
-            flex-wrap: wrap;
-        }
-        .software-card .card-info .platform-badges .badge {
-            font-size: 0.65rem;
-            padding: 2px 12px;
-        }
-        .software-card .desc {
-            font-size: 0.82rem;
-            color: var(--text-secondary);
-            margin: 8px 0 12px;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            flex: 1;
-        }
-        .software-card .card-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid var(--border-glow);
-            padding-top: 12px;
-            margin-top: 2px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .software-card .card-footer .stats {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            display: flex;
-            gap: 14px;
-        }
-        .software-card .card-footer .stats span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .software-card .card-footer .btn {
-            padding: 4px 16px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .software-card .rating-stars {
-            font-size: 0.75rem;
-            color: #f1c40f;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
-        .software-card .rating-stars .count {
-            color: var(--text-dim);
-            font-size: 0.65rem;
-            margin-left: 4px;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin-top: 28px;
-            flex-wrap: wrap;
-        }
-        .pagination button {
-            padding: 8px 20px;
-            border-radius: 50px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            font-weight: 500;
-            transition: var(--transition);
-            color: var(--text-secondary);
-        }
-        .pagination button:hover:not(:disabled) {
-            border-color: var(--accent-cyan);
-            color: var(--text-primary);
-            background: rgba(0, 136, 255, 0.04);
-        }
-        .pagination button.active {
-            background: var(--accent-cyan);
-            color: #fff;
-            border-color: var(--accent-cyan);
-        }
-        .pagination button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .pagination .page-info {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-        .detail-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 200;
-            background: rgba(0, 0, 0, 0.30);
-            backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-        .detail-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
-        .detail-modal {
-            max-width: 620px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 32px 36px 28px;
-            background: var(--bg-card-solid);
-            backdrop-filter: blur(32px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
-            transform: scale(0.96) translateY(20px);
-            transition: var(--transition);
-        }
-        .detail-overlay.open .detail-modal {
-            transform: scale(1) translateY(0);
-        }
-        .detail-modal .close-btn {
-            float: right;
-            font-size: 1.5rem;
-            color: var(--text-dim);
-            transition: var(--transition);
-            line-height: 1;
-            padding: 4px;
-        }
-        .detail-modal .close-btn:hover {
-            color: var(--text-primary);
-            transform: rotate(90deg);
-        }
-        .detail-modal .detail-icon {
-            font-size: 48px;
-            margin-bottom: 6px;
-            width: 64px;
-            height: 64px;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 136, 255, 0.06);
-            border: 1px solid rgba(0, 136, 255, 0.08);
-        }
-        .detail-modal .detail-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .detail-modal h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-top: 6px;
-            color: var(--text-primary);
-        }
-        .detail-modal .detail-meta {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin: 6px 0 14px;
-            align-items: center;
-        }
-        .detail-modal .detail-platforms {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .detail-modal .detail-platforms .badge {
-            font-size: 0.75rem;
-            padding: 4px 14px;
-        }
-        .detail-modal .detail-desc {
-            font-size: 0.9rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-            margin: 14px 0 22px;
-            white-space: pre-wrap;
-            background: var(--bg-primary);
-            padding: 14px 18px;
-            border-radius: var(--radius-sm);
-            border-left: 3px solid var(--accent-cyan);
-        }
-        .detail-modal .rating-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 10px 0 16px;
-            flex-wrap: wrap;
-        }
-        .detail-modal .rating-area .stars {
-            font-size: 1.4rem;
-            color: #d1d8e0;
-            cursor: pointer;
-            display: inline-flex;
-            gap: 4px;
-        }
-        .detail-modal .rating-area .stars .star.active {
-            color: #f1c40f;
-        }
-        .detail-modal .rating-area .avg {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-        .detail-modal .detail-actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-        .detail-modal .detail-actions .btn {
-            flex: 1;
-            min-width: 120px;
-        }
-        .detail-modal .related-section {
-            margin-top: 24px;
-            border-top: 1px solid var(--border-glow);
-            padding-top: 16px;
-        }
-        .detail-modal .related-section h4 {
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-        }
-        .detail-modal .related-section .related-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-        }
-        .detail-modal .related-section .related-item {
-            padding: 10px;
-            border-radius: var(--radius-sm);
-            background: var(--bg-primary);
-            border: 1px solid var(--border-glow);
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            font-size: 0.75rem;
-        }
-        .detail-modal .related-section .related-item:hover {
-            border-color: var(--accent-cyan);
-            transform: translateY(-2px);
-        }
-        .detail-modal .related-section .related-item .r-icon {
-            display: block;
-            margin: 0 auto 4px;
-            width: 32px;
-            height: 32px;
-            font-size: 28px;
-            line-height: 32px;
-            text-align: center;
-        }
-        .detail-modal .related-section .related-item .r-icon img {
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            object-fit: cover;
-            display: block;
-            margin: 0 auto;
-        }
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .toolbar .filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-        .toolbar .filters .btn {
-            padding: 4px 16px;
-            font-size: 0.75rem;
-        }
-        .toolbar .sort-group {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-        .toolbar .sort-group label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-        .toolbar .sort-group select {
-            padding: 4px 12px;
-            border-radius: 50px;
-            border: 1px solid var(--border-glow);
-            background: var(--bg-card);
-            font-size: 0.75rem;
-            color: var(--text-primary);
-            outline: none;
-            cursor: pointer;
-        }
-        .toolbar .sort-group select:focus {
-            border-color: var(--accent-cyan);
-        }
-        .submit-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 300;
-            background: rgba(0, 0, 0, 0.30);
-            backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-        .submit-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
-        .submit-modal {
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 28px 32px;
-            background: var(--bg-card-solid);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
-            transform: scale(0.96) translateY(20px);
-            transition: var(--transition);
-        }
-        .submit-overlay.open .submit-modal {
-            transform: scale(1) translateY(0);
-        }
-        .submit-modal h2 {
-            font-size: 1.4rem;
-            margin-bottom: 16px;
-        }
-        .submit-modal .form-group {
-            margin-bottom: 14px;
-        }
-        .submit-modal .form-group label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-        .submit-modal .form-group input,
-        .submit-modal .form-group textarea,
-        .submit-modal .form-group select {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-glow);
-            background: var(--bg-primary);
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-        .submit-modal .form-group input:focus,
-        .submit-modal .form-group textarea:focus,
-        .submit-modal .form-group select:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.1);
-        }
-        .submit-modal .form-group textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-        .submit-modal .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-            justify-content: flex-end;
-        }
-        .footer {
-            padding: 32px 0 20px;
-            border-top: 1px solid var(--border-glow);
-            margin-top: 32px;
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-        .footer .brand {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 2px;
-        }
-        .footer .copyright {
-            margin-top: 6px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-        .footer .copyright a {
-            color: var(--accent-cyan);
-            font-weight: 500;
-            transition: var(--transition);
-        }
-        .footer .copyright a:hover {
-            text-decoration: underline;
-        }
-        .footer .legal {
-            margin-top: 8px;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
-            opacity: 0.8;
-        }
-        .footer .friend-links {
-            margin-top: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 12px 24px;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-        }
-        .footer .friend-links a {
-            color: var(--text-secondary);
-            transition: var(--transition);
-        }
-        .footer .friend-links a:hover {
-            color: var(--accent-cyan);
-            text-decoration: underline;
-        }
-        .footer .friend-links .sep {
-            color: var(--border-glow);
-        }
-        .toast-container {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-width: 340px;
-            pointer-events: none;
-        }
-        .toast {
-            padding: 12px 20px;
-            border-radius: var(--radius-sm);
-            background: var(--bg-card-solid);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card);
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            transform: translateX(120%);
-            animation: toastIn 0.4s ease forwards;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            pointer-events: auto;
-        }
-        .toast.success .icon {
-            color: var(--accent-cyan);
-        }
-        .toast.error .icon {
-            color: #e74c3c;
-        }
-        .toast .icon {
-            font-size: 1.1rem;
-        }
-        @keyframes toastIn {
-            to {
-                transform: translateX(0);
-            }
-        }
-        @keyframes toastOut {
-            to {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-        }
-        .back-top {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            z-index: 50;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--bg-card-solid);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card);
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-        }
-        .back-top.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .back-top:hover {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-            transform: scale(1.05);
-        }
-        .divider-cyber {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            margin: 10px 0 16px;
-            color: var(--text-dim);
-            font-size: 0.65rem;
-            letter-spacing: 4px;
-            font-weight: 300;
-        }
-        .divider-cyber::before,
-        .divider-cyber::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
-        }
-        .divider-cyber .dot {
-            font-size: 0.35rem;
-            color: var(--accent-cyan);
-        }
-        .zen-divider {
-            text-align: center;
-            padding: 6px 0 2px;
-            font-size: 0.6rem;
-            color: var(--text-dim);
-            letter-spacing: 6px;
-            opacity: 0.5;
-        }
-        @media (max-width: 768px) {
-            :root {
-                --header-height: 58px;
-            }
-            .hero h1 {
-                font-size: 2rem;
-            }
-            .hero p {
-                font-size: 0.9rem;
-            }
-            .software-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 16px;
-            }
-            .category-item {
-                padding: 4px 12px;
-                font-size: 0.75rem;
-                gap: 4px;
-            }
-            .category-item .icon {
-                font-size: 14px;
-            }
-            .search-box input {
-                padding: 10px 16px;
-                font-size: 0.85rem;
-            }
-            .search-box button {
-                padding: 0 16px;
-                font-size: 0.8rem;
-            }
-            .pagination button {
-                padding: 6px 14px;
-                font-size: 0.8rem;
-            }
-            .detail-modal {
-                padding: 24px 20px 20px;
-            }
-            .detail-modal h2 {
-                font-size: 1.3rem;
-            }
-            .toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .toolbar .filters {
-                justify-content: center;
-            }
-            .toolbar .sort-group {
-                justify-content: center;
-            }
-            .back-top {
-                bottom: 20px;
-                left: 20px;
-                width: 38px;
-                height: 38px;
-                font-size: 1rem;
-            }
-            .categories-nav-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 0.8rem;
-            }
-            .announcement-item {
-                font-size: 0.75rem;
-                padding: 4px 12px 4px 16px;
-            }
-            .footer .friend-links {
-                font-size: 0.65rem;
-                gap: 8px 16px;
-            }
-            .detail-modal .related-section .related-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            }
-        }
-        @media (max-width: 480px) {
-            .hero h1 {
-                font-size: 1.6rem;
-            }
-            .software-grid {
-                grid-template-columns: 1fr;
-            }
-            .categories-grid {
-                gap: 6px;
-            }
-            .category-item {
-                padding: 3px 10px;
-                font-size: 0.7rem;
-            }
-            .category-item .icon {
-                font-size: 12px;
-            }
-            .container {
-                padding: 0 16px;
-            }
-            .footer .copyright {
-                font-size: 0.7rem;
-            }
-            .footer .friend-links {
-                font-size: 0.6rem;
-                gap: 6px 10px;
-            }
-        }
-        .category-item:active,
-        .software-card:active,
-        .btn:active {
-            transform: scale(0.97);
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:var(--font); background:var(--bg-primary); color:var(--text-primary); line-height:1.6; min-height:100vh; -webkit-font-smoothing:antialiased; padding-bottom:80px; transition:background 0.3s,color 0.3s; }
+        a { text-decoration:none; color:inherit; }
+        button { cursor:pointer; font-family:inherit; border:none; background:none; color:inherit; }
+        input,select { font-family:inherit; border:none; outline:none; background:none; color:var(--text-primary); }
+        .container { max-width:var(--max-width); margin:0 auto; padding:0 24px; }
+        .hidden { display:none !important; }
+        .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 28px; border-radius:50px; font-size:0.9rem; font-weight:600; transition:var(--transition); border:1px solid transparent; background:var(--bg-card); color:var(--text-primary); backdrop-filter:blur(8px); border-color:var(--border-glow); position:relative; overflow:hidden; }
+        .btn::after { content:''; position:absolute; inset:0; background:radial-gradient(circle at center, rgba(0,119,255,0.15) 0%, transparent 70%); opacity:0; transition:opacity 0.4s; }
+        .btn:hover::after { opacity:1; }
+        .btn:hover { transform:translateY(-2px); box-shadow:0 4px 20px rgba(0,136,255,0.15); border-color:var(--accent-cyan); }
+        .btn:active { transform:scale(0.97); }
+        .btn-primary { background:var(--accent-gradient); color:#fff; border-color:transparent; font-weight:700; }
+        .btn-primary:hover { box-shadow:0 4px 24px rgba(0,136,255,0.3); transform:translateY(-2px) scale(1.02); }
+        .btn-outline { background:transparent; border-color:var(--border-glow); color:var(--text-secondary); }
+        .btn-outline:hover { background:rgba(0,136,255,0.06); border-color:var(--accent-cyan); color:var(--text-primary); }
+        .btn-sm { padding:6px 18px; font-size:0.8rem; }
+        .btn:disabled,.btn.disabled { opacity:0.45; pointer-events:none; cursor:not-allowed; filter:grayscale(30%); }
+        .btn-loading { pointer-events:none; opacity:0.7; }
+        .btn-loading .btn-spinner { display:inline-block; width:14px; height:14px; border:2px solid transparent; border-top-color:currentColor; border-radius:50%; animation:spin 0.6s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .card { background:var(--bg-card); backdrop-filter:blur(16px); border-radius:var(--radius-lg); border:1px solid var(--border-glow); box-shadow:var(--shadow-card); transition:var(--transition); overflow:hidden; }
+        .card:hover { border-color:var(--border-glow-strong); box-shadow:0 12px 40px rgba(0,0,0,0.08); transform:translateY(-4px); }
+        .badge { display:inline-block; padding:2px 14px; border-radius:50px; font-size:0.7rem; font-weight:600; text-transform:uppercase; background:rgba(0,136,255,0.10); color:var(--accent-cyan); border:1px solid rgba(0,136,255,0.15); line-height:1.6; transition:var(--transition); }
+        .badge-mac { background:rgba(108,92,231,0.10); color:#6c5ce7; border-color:rgba(108,92,231,0.15); }
+        .badge-windows { background:rgba(0,136,255,0.10); color:var(--accent-cyan); border-color:rgba(0,136,255,0.15); }
+        .badge-purple { background:rgba(108,92,231,0.10); color:var(--accent-purple); border-color:rgba(108,92,231,0.15); }
+        .badge-new { font-size:0.6rem; background:var(--accent-gradient); color:#fff; padding:0 10px; border-radius:50px; animation:pulse-badge 2s infinite; }
+        @keyframes pulse-badge { 0%,100%{ box-shadow:0 0 0 0 rgba(0,119,255,0.4); } 50%{ box-shadow:0 0 0 6px rgba(0,119,255,0); } }
+        .empty-state { text-align:center; padding:60px 20px; color:var(--text-secondary); }
+        .empty-state .icon { font-size:48px; margin-bottom:16px; opacity:0.6; }
+        .empty-state h3 { font-size:1.2rem; margin-bottom:8px; color:var(--text-primary); }
+        .header { position:sticky; top:0; z-index:100; background:rgba(240,244,250,0.82); backdrop-filter:blur(24px); border-bottom:1px solid var(--border-glow); height:var(--header-height); box-shadow:0 2px 12px rgba(0,0,0,0.02); }
+        .header-inner { display:flex; align-items:center; justify-content:space-between; height:var(--header-height); }
+        .logo { display:flex; align-items:center; gap:10px; font-size:1.3rem; font-weight:700; letter-spacing:-0.5px; color:var(--text-primary); flex-shrink:0; }
+        .logo .mark { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:var(--radius-sm); background:var(--accent-gradient); color:#fff; font-size:1.1rem; font-weight:800; box-shadow:0 2px 12px rgba(0,136,255,0.25); }
+        .logo .brand-text { display:flex; flex-direction:column; line-height:1.2; }
+        .logo .brand-text .main { font-weight:700; font-size:1.1rem; color:var(--text-primary); }
+        .logo .brand-text .sub { font-weight:300; font-size:0.6rem; color:var(--text-dim); letter-spacing:0.5px; }
+        .nav-links { display:flex; align-items:center; gap:6px; list-style:none; }
+        .nav-links a { font-size:0.9rem; font-weight:500; color:var(--text-secondary); transition:var(--transition); padding:8px 16px; border-radius:50px; display:inline-flex; align-items:center; gap:8px; white-space:nowrap; }
+        .nav-links a i { font-size:1rem; }
+        .nav-links a:hover { background:rgba(0,136,255,0.08); color:var(--text-primary); }
+        .nav-links a.active { background:var(--accent-gradient); color:#fff; box-shadow:0 2px 12px rgba(0,136,255,0.25); }
+        .mobile-toggle { display:none; font-size:1.6rem; color:var(--text-secondary); padding:4px 10px; border-radius:var(--radius-sm); background:rgba(0,0,0,0.02); line-height:1; transition:var(--transition); }
+        .mobile-toggle:hover { background:rgba(0,0,0,0.06); }
+        .hero { padding:40px 0 20px; text-align:center; position:relative; }
+        .hero h1 { font-size:2.8rem; font-weight:700; letter-spacing:-1px; background:linear-gradient(135deg, var(--text-primary) 30%, var(--accent-cyan) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:8px; }
+        .hero h1 .highlight { background:var(--accent-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .hero p { font-size:1rem; color:var(--text-secondary); max-width:480px; margin:0 auto 24px; font-weight:300; }
+        .search-wrapper { position:relative; max-width:440px; width:100%; margin:0 auto; }
+        .hero .search-box { display:flex; max-width:440px; width:100%; margin:0 auto; background:var(--bg-card); backdrop-filter:blur(16px); border-radius:60px; border:1px solid var(--border-glow); box-shadow:var(--shadow-card); overflow:hidden; transition:var(--transition); }
+        .hero .search-box:focus-within { border-color:var(--accent-cyan); box-shadow:0 4px 24px rgba(0,136,255,0.08); }
+        .hero .search-box input { flex:1; padding:12px 20px; font-size:0.85rem; background:transparent; color:var(--text-primary); min-width:0; }
+        .hero .search-box input::placeholder { color:var(--text-dim); }
+        .hero .search-box button { padding:0 22px; background:var(--accent-gradient); color:#fff; font-weight:700; transition:var(--transition); font-size:0.85rem; white-space:nowrap; }
+        .search-suggestions,.search-history { position:absolute; top:calc(100% + 6px); left:0; right:0; background:var(--bg-card-solid); backdrop-filter:blur(16px); border-radius:var(--radius-md); border:1px solid var(--border-glow-strong); box-shadow:var(--shadow-card); z-index:50; max-height:220px; overflow-y:auto; display:none; }
+        .search-suggestions.open,.search-history.open { display:block; }
+        .search-suggestions .item,.search-history .item { padding:5px 12px; font-size:0.73rem; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background 0.2s; border-bottom:1px solid rgba(0,120,255,0.08); color:var(--text-secondary); }
+        .search-suggestions .item:last-child,.search-history .item:last-child { border-bottom:none; }
+        .search-suggestions .item:hover,.search-history .item:hover { background:rgba(0,136,255,0.06); color:var(--text-primary); }
+        .search-suggestions .item img,.search-suggestions .item .icon-emoji { width:18px; height:18px; border-radius:4px; object-fit:cover; flex-shrink:0; font-size:16px; text-align:center; line-height:18px; }
+        .search-history .item .remove-history { margin-left:auto; color:var(--text-dim); font-size:0.6rem; padding:2px 4px; border-radius:3px; transition:0.2s; }
+        .search-history .item .remove-history:hover { background:rgba(231,76,60,0.1); color:var(--danger); }
+        .search-history .history-header { padding:4px 12px; font-size:0.65rem; color:var(--text-dim); border-bottom:1px solid rgba(0,120,255,0.08); }
+        .hero .search-hints { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:12px; font-size:0.72rem; color:var(--text-dim); }
+        .hero .search-hints span { cursor:pointer; padding:3px 12px; border-radius:50px; background:rgba(0,136,255,0.04); border:1px solid transparent; transition:var(--transition); user-select:none; }
+        .hero .search-hints span:hover { border-color:var(--border-glow); background:rgba(0,136,255,0.08); color:var(--accent-cyan); }
+        .announcement-list { max-width:680px; margin:0 auto 12px; }
+        .announcement-item { padding:6px 16px 6px 20px; border-left:2px solid var(--border-glow); margin-bottom:4px; font-size:0.82rem; color:var(--text-secondary); display:flex; align-items:center; gap:10px; transition:var(--transition); border-radius:0 var(--radius-sm) var(--radius-sm) 0; }
+        .announcement-item:hover { background:rgba(0,136,255,0.04); border-left-color:var(--accent-cyan); }
+        .announcement-item .dot { color:var(--accent-cyan); font-size:0.4rem; }
+        .announcement-item .time { font-size:0.7rem; color:var(--text-dim); flex-shrink:0; }
+        .announcement-item .text { flex:1; }
+        .section-title { font-size:1.5rem; font-weight:600; margin-bottom:4px; letter-spacing:-0.5px; color:var(--text-primary); }
+        .section-sub { color:var(--text-secondary); font-weight:400; margin-bottom:20px; font-size:0.9rem; }
+        .categories-wrapper { position:relative; display:flex; align-items:center; gap:4px; margin:16px 0 12px; }
+        .categories-scroll { overflow-x:auto; overflow-y:hidden; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex:1; padding:4px 0; }
+        .categories-scroll::-webkit-scrollbar { display:none; }
+        .categories-grid { display:flex; flex-wrap:nowrap; gap:8px; padding:0 4px; width:max-content; }
+        .category-item { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:50px; background:var(--bg-card); border:1px solid var(--border-glow); transition:var(--transition); cursor:pointer; user-select:none; font-size:0.8rem; white-space:nowrap; backdrop-filter:blur(4px); flex-shrink:0; }
+        .category-item .icon { font-size:16px; line-height:1; }
+        .category-item .name { font-weight:500; }
+        .category-item .count { font-size:0.65rem; color:var(--text-dim); margin-left:2px; }
+        .category-item:hover { background:rgba(0,136,255,0.08); border-color:var(--accent-cyan); transform:translateY(-2px); }
+        .category-item.active { background:var(--accent-gradient); color:#fff; border-color:transparent; box-shadow:0 2px 12px rgba(0,136,255,0.25); }
+        .category-item.active .count { color:rgba(255,255,255,0.7); }
+        .categories-nav-btn { flex-shrink:0; width:32px; height:32px; border-radius:50%; background:var(--bg-card-solid); border:1px solid var(--border-glow); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; transition:var(--transition); color:var(--text-secondary); box-shadow:var(--shadow-card); font-size:0.9rem; z-index:2; }
+        .categories-nav-btn:hover { background:var(--accent-gradient); color:#fff; border-color:transparent; box-shadow:0 2px 12px rgba(0,136,255,0.25); }
+        .categories-nav-btn:disabled { opacity:0.3; pointer-events:none; }
+        .software-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:22px; margin-top:6px; }
+        .software-card { padding:22px 20px 18px; transition:var(--transition); cursor:pointer; display:flex; flex-direction:column; background:var(--bg-card); backdrop-filter:blur(16px); border-radius:var(--radius-lg); border:1px solid var(--border-glow); box-shadow:var(--shadow-card); min-height:270px; position:relative; }
+        .software-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent-gradient); border-radius:var(--radius-lg) var(--radius-lg) 0 0; opacity:0; transition:opacity 0.3s; }
+        .software-card:hover::before { opacity:1; }
+        .software-card:hover { transform:translateY(-6px); border-color:var(--border-glow-strong); box-shadow:0 12px 40px rgba(0,0,0,0.08); }
+        .software-card .card-top { display:flex; align-items:flex-start; gap:14px; margin-bottom:10px; }
+        .software-card .card-icon { width:48px; height:48px; border-radius:var(--radius-md); background:rgba(0,136,255,0.06); display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1px solid rgba(0,136,255,0.08); overflow:hidden; font-size:26px; transition:var(--transition); }
+        .software-card:hover .card-icon { transform:scale(1.05); box-shadow:0 4px 16px rgba(0,136,255,0.15); }
+        .software-card .card-icon img { width:100%; height:100%; object-fit:cover; }
+        .software-card .card-info { flex:1; min-width:0; }
+        .software-card .card-info h3 { font-size:1rem; font-weight:600; margin-bottom:2px; letter-spacing:-0.2px; color:var(--text-primary); word-break:break-word; }
+        .software-card .card-info .meta { font-size:0.7rem; color:var(--text-secondary); display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .software-card .card-info .meta .version { color:var(--accent-cyan); font-weight:600; }
+        .software-card .card-info .platform-badges { display:flex; gap:6px; margin-top:4px; flex-wrap:wrap; }
+        .software-card .card-info .platform-badges .badge { font-size:0.65rem; padding:2px 12px; }
+        .software-card .desc { font-size:0.82rem; color:var(--text-secondary); margin:8px 0 12px; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; flex:1; }
+        .software-card .card-footer { display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--border-glow); padding-top:12px; margin-top:2px; flex-wrap:wrap; gap:8px; }
+        .software-card .card-footer .stats { font-size:0.7rem; color:var(--text-dim); display:flex; gap:14px; }
+        .software-card .card-footer .stats span { display:flex; align-items:center; gap:4px; }
+        .software-card .card-footer .btn { padding:4px 16px; font-size:0.7rem; font-weight:600; }
+        .pagination { display:flex; justify-content:center; align-items:center; gap:12px; margin-top:28px; flex-wrap:wrap; }
+        .pagination button { padding:8px 20px; border-radius:50px; background:var(--bg-card); border:1px solid var(--border-glow); font-weight:500; transition:var(--transition); color:var(--text-secondary); }
+        .pagination button:hover:not(:disabled) { border-color:var(--accent-cyan); color:var(--text-primary); background:rgba(0,136,255,0.04); }
+        .pagination button.active { background:var(--accent-cyan); color:#fff; border-color:var(--accent-cyan); }
+        .pagination button:disabled { opacity:0.4; cursor:not-allowed; }
+        .pagination .page-info { color:var(--text-secondary); font-size:0.85rem; }
+        .pagination .page-jump { display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--text-secondary); }
+        .pagination .page-jump input { width:44px; padding:4px 8px; border-radius:50px; border:1px solid var(--border-glow); text-align:center; font-size:0.8rem; background:var(--bg-card); }
+        .pagination .page-jump input:focus { border-color:var(--accent-cyan); }
+        .detail-overlay { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.30); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; visibility:hidden; transition:var(--transition); }
+        .detail-overlay.open { opacity:1; visibility:visible; }
+        .detail-modal { max-width:620px; width:100%; max-height:90vh; overflow-y:auto; padding:32px 36px 28px; background:var(--bg-card-solid); backdrop-filter:blur(32px); border-radius:var(--radius-lg); border:1px solid var(--border-glow-strong); box-shadow:0 24px 64px rgba(0,0,0,0.12); transform:scale(0.96) translateY(20px); transition:var(--transition); }
+        .detail-overlay.open .detail-modal { transform:scale(1) translateY(0); }
+        .detail-modal .close-btn { float:right; font-size:1.5rem; color:var(--text-dim); transition:var(--transition); line-height:1; padding:4px; }
+        .detail-modal .close-btn:hover { color:var(--text-primary); transform:rotate(90deg); }
+        .detail-modal .detail-icon { font-size:48px; margin-bottom:6px; width:64px; height:64px; border-radius:var(--radius-md); overflow:hidden; display:flex; align-items:center; justify-content:center; background:rgba(0,136,255,0.06); border:1px solid rgba(0,136,255,0.08); }
+        .detail-modal .detail-icon img { width:100%; height:100%; object-fit:cover; }
+        .detail-modal h2 { font-size:1.6rem; font-weight:700; letter-spacing:-0.5px; margin-top:6px; color:var(--text-primary); }
+        .detail-modal .detail-meta { display:flex; gap:16px; flex-wrap:wrap; font-size:0.8rem; color:var(--text-secondary); margin:6px 0 14px; align-items:center; }
+        .detail-modal .detail-platforms { display:flex; gap:8px; flex-wrap:wrap; }
+        .detail-modal .detail-platforms .badge { font-size:0.75rem; padding:4px 14px; }
+        .detail-modal .detail-desc { font-size:0.9rem; line-height:1.8; color:var(--text-secondary); margin:14px 0 22px; white-space:pre-wrap; background:var(--bg-primary); padding:14px 18px; border-radius:var(--radius-sm); border-left:3px solid var(--accent-cyan); max-height:250px; overflow-y:auto; }
+        .detail-modal .detail-actions { display:flex; gap:12px; flex-wrap:wrap; }
+        .detail-modal .detail-actions .btn { flex:1; min-width:120px; }
+        .detail-screenshots { display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; }
+        .detail-screenshots img { width:100px; height:70px; object-fit:cover; border-radius:var(--radius-sm); cursor:pointer; border:2px solid transparent; transition:var(--transition); }
+        .detail-screenshots img:hover { border-color:var(--accent-cyan); transform:scale(1.05); }
+        .toolbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+        .toolbar .filters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+        .toolbar .filters .btn { padding:4px 16px; font-size:0.75rem; }
+        .toolbar .sort-group { display:flex; gap:6px; align-items:center; }
+        .toolbar .sort-group label { font-size:0.75rem; color:var(--text-secondary); }
+        .toolbar .sort-group select { padding:4px 12px; border-radius:50px; border:1px solid var(--border-glow); background:var(--bg-card); font-size:0.75rem; color:var(--text-primary); outline:none; cursor:pointer; }
+        .toolbar .sort-group select:focus { border-color:var(--accent-cyan); }
+        .toolbar .result-count { font-size:0.75rem; color:var(--text-dim); }
+        .view-toggle { display:flex; gap:4px; margin-left:auto; }
+        .view-toggle button { padding:5px 10px; border-radius:6px; font-size:0.85rem; color:var(--text-dim); transition:var(--transition); background:transparent; }
+        .view-toggle button.active { background:var(--accent-cyan); color:#fff; }
+        .filter-panel { display:flex; flex-wrap:wrap; gap:16px; align-items:center; padding:12px 0; margin-bottom:8px; font-size:0.8rem; }
+        .filter-panel .filter-group { display:flex; align-items:center; gap:8px; }
+        .filter-panel label { color:var(--text-secondary); font-weight:500; white-space:nowrap; }
+        .filter-panel select { padding:6px 14px; border-radius:50px; border:1px solid var(--border-glow); background:var(--bg-card); color:var(--text-primary); font-size:0.8rem; outline:none; cursor:pointer; }
+        .filter-panel select:focus { border-color:var(--accent-cyan); }
+        .filter-panel .reset-filters { color:var(--text-dim); cursor:pointer; font-size:0.75rem; padding:4px 12px; border-radius:50px; transition:0.2s; }
+        .filter-panel .reset-filters:hover { background:rgba(0,136,255,0.06); color:var(--accent-cyan); }
+        .detail-changelog,.detail-requirements { margin:10px 0; font-size:0.8rem; background:var(--bg-primary); padding:12px 16px; border-radius:var(--radius-sm); border-left:3px solid var(--accent-purple); color:var(--text-secondary); white-space:pre-wrap; max-height:120px; overflow-y:auto; }
+        .related-software { margin-top:20px; border-top:1px solid var(--border-glow); padding-top:16px; }
+        .related-software h4 { font-size:0.9rem; margin-bottom:10px; color:var(--text-primary); }
+        .related-grid { display:flex; flex-wrap:wrap; gap:12px; }
+        .related-card { flex:1 1 140px; background:var(--bg-card); border-radius:var(--radius-md); padding:12px; text-align:center; cursor:pointer; border:1px solid var(--border-glow); transition:var(--transition); }
+        .related-card:hover { border-color:var(--accent-cyan); transform:translateY(-2px); }
+        .related-card .icon { font-size:24px; margin-bottom:4px; }
+        .footer { padding:32px 0 20px; border-top:1px solid var(--border-glow); margin-top:32px; text-align:center; color:var(--text-dim); font-size:0.75rem; letter-spacing:0.5px; }
+        .footer .brand { font-size:1rem; font-weight:600; color:var(--text-secondary); margin-bottom:2px; }
+        .footer .copyright { margin-top:6px; font-size:0.8rem; color:var(--text-secondary); }
+        .footer .copyright a { color:var(--accent-cyan); font-weight:500; transition:var(--transition); }
+        .footer .copyright a:hover { text-decoration:underline; }
+        .footer .legal { margin-top:8px; font-size:0.7rem; color:var(--text-dim); max-width:600px; margin-left:auto; margin-right:auto; line-height:1.6; opacity:0.8; }
+        .footer .friend-links { margin-top:12px; display:flex; flex-wrap:wrap; justify-content:center; gap:12px 24px; font-size:0.7rem; color:var(--text-dim); }
+        .footer .friend-links a { color:var(--text-secondary); transition:var(--transition); }
+        .footer .friend-links a:hover { color:var(--accent-cyan); text-decoration:underline; }
+        .toast-container { position:fixed; bottom:28px; right:28px; z-index:999; display:flex; flex-direction:column; gap:8px; max-width:340px; pointer-events:none; }
+        .toast { padding:12px 20px; border-radius:var(--radius-sm); background:var(--bg-card-solid); backdrop-filter:blur(16px); border:1px solid var(--border-glow-strong); box-shadow:var(--shadow-card); font-size:0.85rem; color:var(--text-primary); transform:translateX(120%); animation:toastIn 0.4s ease forwards; display:flex; align-items:center; gap:10px; pointer-events:auto; }
+        .toast.success .icon { color:var(--success); }
+        .toast.error .icon { color:var(--danger); }
+        .toast.warning .icon { color:var(--warning); }
+        @keyframes toastIn { to { transform:translateX(0); } }
+        @keyframes toastOut { to { transform:translateX(120%); opacity:0; } }
+        .divider-cyber { display:flex; align-items:center; justify-content:center; gap:14px; margin:10px 0 16px; color:var(--text-dim); font-size:0.65rem; letter-spacing:4px; }
+        .divider-cyber::before,.divider-cyber::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, transparent, var(--border-glow), transparent); }
+        .divider-cyber .dot { font-size:0.35rem; color:var(--accent-cyan); }
+        .back-top { position:fixed; bottom:30px; left:30px; z-index:50; width:44px; height:44px; border-radius:50%; background:var(--bg-card-solid); border:1px solid var(--border-glow-strong); box-shadow:var(--shadow-card); color:var(--text-secondary); font-size:1.2rem; display:flex; align-items:center; justify-content:center; transition:var(--transition); opacity:0; visibility:hidden; transform:translateY(20px); }
+        .back-top.visible { opacity:1; visibility:visible; transform:translateY(0); }
+        .back-top:hover { background:var(--accent-gradient); color:#fff; border-color:transparent; transform:scale(1.05); }
+        .mobile-bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:rgba(240,244,250,0.92); backdrop-filter:blur(24px); border-top:1px solid var(--border-glow); padding:8px 20px; z-index:90; justify-content:space-around; box-shadow:0 -4px 12px rgba(0,0,0,0.04); }
+        .mobile-bottom-nav a { display:flex; flex-direction:column; align-items:center; font-size:0.65rem; color:var(--text-secondary); transition:0.2s; padding:4px 10px; border-radius:12px; }
+        .mobile-bottom-nav a i { font-size:1.2rem; margin-bottom:2px; }
+        .mobile-bottom-nav a.active { color:var(--accent-cyan); background:rgba(0,119,255,0.08); }
+        @media (max-width:768px) {
+            :root { --header-height:58px; }
+            .nav-links { display:none; position:absolute; top:var(--header-height); left:0; right:0; background:rgba(240,244,250,0.96); backdrop-filter:blur(24px); flex-direction:column; padding:16px 24px; gap:14px; border-bottom:1px solid var(--border-glow); box-shadow:var(--shadow-card); }
+            .nav-links.open { display:flex; }
+            .mobile-toggle { display:block; }
+            .hero h1 { font-size:2rem; }
+            .software-grid { grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; }
+            .detail-modal { padding:24px 20px 20px; }
+            .mobile-bottom-nav { display:flex; }
+            body { padding-bottom:70px; }
+        }
+        @media (prefers-color-scheme:dark) {
+            :root { --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-card:rgba(30,41,59,0.75); --bg-card-solid:#1e293b; --border-glow:rgba(99,160,255,0.12); --border-glow-strong:rgba(99,160,255,0.25); --text-primary:#e2e8f0; --text-secondary:#94a3b8; --text-dim:#64748b; --shadow-card:0 8px 32px rgba(0,0,0,0.25); }
+            .header { background:rgba(15,23,42,0.85); }
+            .detail-modal { background:#1a2332; }
+            .detail-modal .detail-desc { background:rgba(0,0,0,0.2); }
+            .mobile-bottom-nav { background:rgba(15,23,42,0.92); }
         }
     </style>
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
     <button class="back-top" id="backTopBtn" aria-label="回到顶部"><i class="fas fa-arrow-up"></i></button>
-
     <header class="header" id="mainHeader">
         <div class="container header-inner">
             <a href="#" class="logo" id="logoHome">
                 <span class="mark">◆</span>
-                <span class="brand-text">
-                    <span class="main">乐哲软件</span>
-                    <span class="sub">构建数字未来</span>
-                </span>
+                <span class="brand-text"><span class="main">乐哲软件</span><span class="sub">构建数字未来</span></span>
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#" class="active" data-page="home"><i class="fas fa-home"></i> 首页</a></li>
                 <li><a href="#" data-page="list"><i class="fas fa-th-list"></i> 软件库</a></li>
-                <li><a href="#" data-page="submit" id="submitNav"><i class="fas fa-plus-circle"></i> 提交</a></li>
             </ul>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="切换主题"><i class="fas fa-moon"></i></button>
-                <button class="mobile-toggle" id="mobileToggle" aria-label="菜单"><i class="fas fa-bars"></i></button>
-            </div>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="菜单"><i class="fas fa-bars"></i></button>
         </div>
     </header>
-
     <main>
         <div class="container">
             <section id="pageHome">
@@ -1421,13 +275,20 @@
                     <div id="announcementContainer" class="announcement-list"></div>
                     <div class="search-wrapper">
                         <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="搜索软件名称或描述..." aria-label="搜索软件" />
+                            <input type="text" id="searchInput" placeholder="搜索软件名称或描述..." autocomplete="off">
                             <button id="searchBtn"><i class="fas fa-search"></i> 检索</button>
                         </div>
-                        <div class="search-history" id="searchHistoryTags"></div>
+                        <div class="search-suggestions" id="searchSuggestions"></div>
+                        <div class="search-history" id="searchHistory"></div>
+                    </div>
+                    <div class="search-hints">
+                        <span data-kw="设计">🎨 设计</span>
+                        <span data-kw="开发">💻 开发</span>
+                        <span data-kw="办公">📋 办公</span>
+                        <span data-kw="视频">🎬 视频</span>
+                        <span data-kw="AI">🤖 AI</span>
                     </div>
                 </div>
-
                 <div class="divider-cyber"><span class="dot">◆</span> 分 类 导 航 <span class="dot">◆</span></div>
                 <div class="categories-wrapper" id="categoriesWrapper">
                     <button class="categories-nav-btn" id="catPrevBtn" aria-label="向左滚动"><i class="fas fa-chevron-left"></i></button>
@@ -1436,20 +297,17 @@
                     </div>
                     <button class="categories-nav-btn" id="catNextBtn" aria-label="向右滚动"><i class="fas fa-chevron-right"></i></button>
                 </div>
-
                 <div style="margin-top:36px;">
                     <h2 class="section-title">✦ 热门推荐</h2>
                     <p class="section-sub">社区口碑精选</p>
-                    <div id="recommendGrid" class="software-grid"></div>
+                    <div class="software-grid" id="recommendGrid"></div>
                 </div>
                 <div style="margin-top:40px;">
                     <h2 class="section-title">✦ 最新上架</h2>
                     <p class="section-sub">持续迭代，保持前沿</p>
-                    <div id="latestGrid" class="software-grid"></div>
+                    <div class="software-grid" id="latestGrid"></div>
                 </div>
-                <div class="zen-divider">· · · 静 心 修 行 · 随 缘 分 享 · · ·</div>
             </section>
-
             <section id="pageList" class="hidden">
                 <div style="padding:16px 0 6px;">
                     <h2 class="section-title">✦ 软件库</h2>
@@ -1466,932 +324,499 @@
                             <option value="views">热度</option>
                             <option value="downloads">下载量</option>
                         </select>
+                        <span class="result-count" id="resultCount"></span>
+                        <div class="view-toggle" id="viewToggle">
+                            <button data-view="grid" class="active"><i class="fas fa-th-large"></i></button>
+                            <button data-view="list"><i class="fas fa-list"></i></button>
+                        </div>
                     </div>
                 </div>
-                <div id="listGrid" class="software-grid"></div>
+                <div class="filter-panel" id="filterPanel">
+                    <div class="filter-group">
+                        <label>平台：</label>
+                        <select id="platformFilter">
+                            <option value="all">全部</option>
+                            <option value="mac">macOS</option>
+                            <option value="windows">Windows</option>
+                        </select>
+                    </div>
+                    <span class="reset-filters" id="resetFiltersBtn"><i class="fas fa-undo-alt"></i> 重置</span>
+                </div>
+                <div class="software-grid" id="listGrid"></div>
                 <div class="pagination" id="paginationControls">
                     <button id="prevPageBtn" disabled><i class="fas fa-chevron-left"></i> 上一页</button>
                     <span class="page-info" id="pageInfo">第 1 / 1 页</span>
                     <button id="nextPageBtn">下一页 <i class="fas fa-chevron-right"></i></button>
+                    <span class="page-jump" id="pageJump">
+                        跳至 <input type="number" id="jumpPageInput" min="1" value="1" aria-label="跳转页码"> 页
+                        <button id="jumpPageBtn" class="btn btn-sm btn-outline">GO</button>
+                    </span>
                 </div>
             </section>
         </div>
-
         <footer class="footer">
             <div class="brand">◆ 乐哲软件</div>
-            <p class="copyright">&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection#eea2ab94a6abbda9a0b2aea1bbbaa2a1a1a5c0ada1a3"><span class="__cf_email__" data-cfemail="315d546b5954465a534179564c4d555656521f525e5c">[email&#160;protected]</span></a></p>
+            <p class="copyright">
+                &copy; 2026 乐哲软件 &middot; 侵权请联系
+                <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a>
+            </p>
             <div class="friend-links">
                 <span>友情链接：</span>
-                <a href="https://github.com" target="_blank">GitHub</a>
-                <span class="sep">|</span>
-                <a href="https://www.v2ex.com" target="_blank">V2EX</a>
-                <span class="sep">|</span>
-                <a href="https://www.oschina.net" target="_blank">开源中国</a>
-                <span class="sep">|</span>
-                <a href="https://www.csdn.net" target="_blank">CSDN</a>
-                <span class="sep">|</span>
-                <a href="https://www.zhihu.com" target="_blank">知乎</a>
+                <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> |
+                <a href="https://www.v2ex.com" target="_blank" rel="noopener">V2EX</a> |
+                <a href="https://www.oschina.net" target="_blank" rel="noopener">开源中国</a> |
+                <a href="https://www.csdn.net" target="_blank" rel="noopener">CSDN</a> |
+                <a href="https://www.zhihu.com" target="_blank" rel="noopener">知乎</a>
             </div>
             <div class="legal">免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。</div>
         </footer>
     </main>
-
-    <div class="detail-overlay" id="detailOverlay">
+    <div class="detail-overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="detailName">
         <div class="detail-modal" id="detailModal">
-            <button class="close-btn" id="detailClose">✕</button>
+            <button class="close-btn" id="detailClose" aria-label="关闭详情">✕</button>
             <div class="detail-icon" id="detailIcon">📦</div>
             <h2 id="detailName">软件名称</h2>
             <div class="detail-meta" id="detailMeta"></div>
-            <div class="rating-area" id="detailRating">
-                <span class="stars" id="detailStars">
-                    <span class="star" data-score="1">★</span>
-                    <span class="star" data-score="2">★</span>
-                    <span class="star" data-score="3">★</span>
-                    <span class="star" data-score="4">★</span>
-                    <span class="star" data-score="5">★</span>
-                </span>
-                <span class="avg" id="detailAvg">(0人评分)</span>
-            </div>
+            <div class="detail-screenshots hidden" id="detailScreenshots"></div>
+            <div class="detail-changelog hidden" id="detailChangelog"></div>
+            <div class="detail-requirements hidden" id="detailRequirements"></div>
             <div class="detail-desc" id="detailDesc"></div>
-            <div class="detail-actions">
-                <button class="btn btn-primary" id="detailDownload"><i class="fas fa-download"></i> 下载</button>
-                <button class="btn btn-outline" id="detailShare"><i class="fas fa-share-alt"></i> 分享</button>
-                <button class="btn btn-outline" id="detailFavorite"><i class="fas fa-heart"></i> 收藏</button>
-                <button class="btn btn-outline" id="detailCloseBtn">关闭</button>
-            </div>
-            <div class="related-section" id="detailRelated">
-                <h4>🔗 相关推荐</h4>
+            <div class="related-software hidden" id="relatedSoftware">
+                <h4>📎 相关推荐</h4>
                 <div class="related-grid" id="relatedGrid"></div>
             </div>
+            <div class="detail-actions">
+                <button class="btn btn-primary" id="detailDownload"><i class="fas fa-download"></i> 下载</button>
+                <button class="btn btn-outline" id="detailShareBtn"><i class="fas fa-share-alt"></i> 分享</button>
+                <button class="btn btn-outline" id="detailCloseBtn">关闭</button>
+            </div>
         </div>
     </div>
-
-    <div class="submit-overlay" id="submitOverlay">
-        <div class="submit-modal">
-            <h2>📥 提交软件</h2>
-            <form id="submitForm">
-                <div class="form-group">
-                    <label>软件名称 *</label>
-                    <input type="text" id="submitName" required />
-                </div>
-                <div class="form-group">
-                    <label>分类 *</label>
-                    <select id="submitCategory" required>
-                        <option value="设计工具">设计工具</option>
-                        <option value="开发工具">开发工具</option>
-                        <option value="办公软件">办公软件</option>
-                        <option value="媒体工具">媒体工具</option>
-                        <option value="实用工具">实用工具</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>版本</label>
-                    <input type="text" id="submitVersion" placeholder="v1.0" />
-                </div>
-                <div class="form-group">
-                    <label>描述 *</label>
-                    <textarea id="submitDesc" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>图标 URL</label>
-                    <input type="url" id="submitIcon" placeholder="https://..." />
-                </div>
-                <div class="form-group">
-                    <label>下载链接</label>
-                    <input type="url" id="submitDownload" placeholder="https://..." />
-                </div>
-                <div class="form-group">
-                    <label>平台 (用逗号分隔)</label>
-                    <input type="text" id="submitPlatforms" placeholder="mac, windows" />
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-outline" id="submitCancel">取消</button>
-                    <button type="submit" class="btn btn-primary">提交</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a>
+        <a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a>
+    </nav>
     <script>
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
-        var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        var Store = {
-            software: [],
-            categories: [],
-            loaded: false,
-            lastFetch: 0,
-            favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
-            ratings: JSON.parse(localStorage.getItem('ratings') || '{}'),
-            searchHistory: JSON.parse(localStorage.getItem('searchHistory') || '[]'),
-            saveFavorites: function() {
-                localStorage.setItem('favorites', JSON.stringify(this.favorites));
-            },
-            saveRatings: function() {
-                localStorage.setItem('ratings', JSON.stringify(this.ratings));
-            },
-            saveSearchHistory: function() {
-                localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory));
-            },
-            toggleFavorite: function(id) {
-                var idx = this.favorites.indexOf(id);
-                if (idx > -1) {
-                    this.favorites.splice(idx, 1);
-                } else {
-                    this.favorites.push(id);
-                }
-                this.saveFavorites();
-                return this.favorites.indexOf(id) > -1;
-            },
-            isFavorite: function(id) { return this.favorites.indexOf(id) > -1; },
-            getRating: function(id) {
-                return this.ratings[id] || { total: 0, count: 0, userScore: 0 };
-            },
-            setUserRating: function(id, score) {
-                var r = this.getRating(id);
-                if (r.userScore === score) {
-                    r.total -= score;
-                    r.count -= 1;
-                    r.userScore = 0;
-                } else {
-                    if (r.userScore > 0) {
-                        r.total -= r.userScore;
-                        r.count -= 1;
-                    }
-                    r.total += score;
-                    r.count += 1;
-                    r.userScore = score;
-                }
-                this.ratings[id] = r;
-                this.saveRatings();
-                return r;
-            },
-            addSearchHistory: function(keyword) {
-                if (!keyword.trim()) return;
-                keyword = keyword.trim();
-                this.searchHistory = this.searchHistory.filter(function(item) { return item !== keyword; });
-                this.searchHistory.unshift(keyword);
-                if (this.searchHistory.length > 10) this.searchHistory.pop();
-                this.saveSearchHistory();
-            },
-            getSearchHistory: function() { return this.searchHistory; },
-            loadAll: function(force) {
-                var self = this;
+        var supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        if (!supabaseClient) console.error('Supabase library not loaded.');
+        var QUOTES = [
+            "生活就像一盒巧克力，你永远不知道下一颗是什么味道。",
+            "不积跬步，无以至千里。",
+            "梦想还是要有的，万一实现了呢。",
+            "世界那么大，我想去看看。",
+            "人生没有白走的路，每一步都算数。",
+            "愿你出走半生，归来仍是少年。",
+            "心有多大，舞台就有多大。",
+            "只要功夫深，铁杵磨成针。",
+            "不忘初心，方得始终。",
+            "长风破浪会有时，直挂云帆济沧海。",
+            "天行健，君子以自强不息。",
+            "地势坤，君子以厚德载物。",
+            "博学之，审问之，慎思之，明辨之，笃行之。",
+            "学而不思则罔，思而不学则殆。",
+            "温故而知新，可以为师矣。",
+            "三人行，必有我师焉。",
+            "己所不欲，勿施于人。",
+            "工欲善其事，必先利其器。",
+            "人无远虑，必有近忧。",
+            "千里之行，始于足下。",
+            "生于忧患，死于安乐。",
+            "穷则独善其身，达则兼济天下。",
+            "为者常成，行者常至。",
+            "临渊羡鱼，不如退而结网。",
+            "大鹏一日同风起，扶摇直上九万里。",
+            "天生我材必有用，千金散尽还复来。",
+            "海内存知己，天涯若比邻。",
+            "野火烧不尽，春风吹又生。",
+            "采菊东篱下，悠然见南山。",
+            "明月松间照，清泉石上流。",
+            "少壮不努力，老大徒伤悲。",
+            "老骥伏枥，志在千里。烈士暮年，壮心不已。",
+            "山重水复疑无路，柳暗花明又一村。",
+            "沉舟侧畔千帆过，病树前头万木春。",
+            "但愿人长久，千里共婵娟。",
+            "人生自古谁无死，留取丹心照汗青。",
+            "落红不是无情物，化作春泥更护花。",
+            "千磨万击还坚劲，任尔东西南北风。",
+            "不要人夸好颜色，只留清气满乾坤。",
+            "粉骨碎身浑不怕，要留清白在人间。",
+            "生如夏花之绚烂，死如秋叶之静美。",
+            "黑夜给了我黑色的眼睛，我却用它寻找光明。",
+            "面朝大海，春暖花开。",
+            "那些杀不死我的，必使我更强大。"
+        ];
+        var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
+        var DB = {
+            async loadAll(force) {
                 force = force || false;
-                if (self.loaded && !force && (Date.now() - self.lastFetch < 600000)) {
-                    return Promise.resolve();
-                }
-                return Promise.all([
-                    supabaseClient.from('software').select('*').order('created_at', { ascending: false }),
-                    supabaseClient.from('categories').select('name').order('name')
-                ]).then(function(results) {
-                    var softRes = results[0],
-                        catRes = results[1];
+                if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) return;
+                try {
+                    var [softRes, catRes] = await Promise.all([
+                        supabaseClient.from('software').select('*').order('created_at', { ascending: false }),
+                        supabaseClient.from('categories').select('name').order('name')
+                    ]);
                     if (softRes.error) throw softRes.error;
                     if (catRes.error) throw catRes.error;
-                    self.software = softRes.data || [];
-                    self.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件',
-                        '媒体工具', '实用工具'
-                    ];
-                    self.loaded = true;
-                    self.lastFetch = Date.now();
-                }).catch(function(e) {
+                    cache.software = softRes.data || [];
+                    cache.categories = catRes.data.map(item => item.name) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                    cache.software.forEach((s, idx) => {
+                        if (!s.screenshots && idx < 2) s.screenshots = ['https://via.placeholder.com/400x300?text=Screenshot+1', 'https://via.placeholder.com/400x300?text=Screenshot+2'];
+                        if (!s.changelog && idx === 0) s.changelog = 'v1.2.0: 修复启动崩溃\nv1.1.0: 新增暗色主题';
+                        if (!s.requirements && idx === 0) s.requirements = 'Windows 10 或更高, 4GB RAM, 500MB 磁盘空间';
+                    });
+                    cache.loaded = true;
+                    cache.lastFetch = Date.now();
+                } catch (e) {
                     console.error('加载数据失败:', e);
-                    self.software = [];
-                    self.categories = ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
-                    self.loaded = true;
-                    self.lastFetch = Date.now();
-                });
+                    cache.software = [];
+                    cache.categories = ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                    cache.loaded = true;
+                }
             },
-            getSoftware: function() { return this.software; },
-            getCategories: function() { return this.categories; },
-            updateSoftware: function(soft) {
-                var self = this;
-                return supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id',
-                    soft.id).then(function() {
-                    var idx = self.software.findIndex(function(s) { return s.id === soft.id; });
-                    if (idx !== -1) {
-                        self.software[idx].views = soft.views;
-                        self.software[idx].downloads = soft.downloads;
-                    }
-                }).catch(function(e) { console.error('更新软件异常:', e); });
+            getSoftware() { return cache.software; },
+            getCategories() { return cache.categories; },
+            async updateSoftware(soft) {
+                try {
+                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id', soft.id);
+                    var idx = cache.software.findIndex(s => s.id === soft.id);
+                    if (idx !== -1) { cache.software[idx].views = soft.views; cache.software[idx].downloads = soft.downloads; }
+                } catch (e) { console.error('更新失败:', e); }
             }
         };
-
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
             var el = document.createElement('div');
             el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : '✕') + '</span> ' + msg;
+            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' + msg;
             c.appendChild(el);
-            setTimeout(function() {
-                el.style.animation = 'toastOut 0.4s ease forwards';
-                setTimeout(function() { el.remove(); }, 500);
-            }, 2800);
+            setTimeout(() => { el.style.animation = 'toastOut 0.4s ease forwards'; setTimeout(() => el.remove(), 500); }, 2800);
         }
-
         function getIconEmoji(cat) {
             var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
             return map[cat] || '📦';
         }
-
         function renderIcon(soft) {
             if (soft.icon_url && soft.icon_url.trim()) {
-                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (soft
-                    .icon || '📦') + '\'" />';
+                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (soft.icon || '📦') + '\'">';
             }
             return soft.icon || '📦';
         }
-
         function renderPlatformBadges(soft) {
             var html = '';
-            var platforms = soft.platforms || [];
-            if (platforms.indexOf('mac') !== -1) {
-                html += '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
-            }
-            if (platforms.indexOf('windows') !== -1) {
-                html += '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
-            }
+            if ((soft.platforms || []).includes('mac')) html += '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
+            if ((soft.platforms || []).includes('windows')) html += '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             return html;
         }
-
-        function highlightText(text, keyword) {
-            if (!keyword) return text;
-            var regex = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-            return text.replace(regex, '<mark style="background:rgba(0,136,255,0.2);border-radius:4px;padding:0 2px;">$1</mark>');
+        var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
+        function addSearchHistory(kw) {
+            if (!kw) return;
+            searchHistory = [kw, ...searchHistory.filter(h => h !== kw)].slice(0, 10);
+            localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
         }
-
-        function getTodaysQuote() {
-            var QUOTES = [
-                "生活就像一盒巧克力，你永远不知道下一颗是什么味道。",
-                "不积跬步，无以至千里。",
-                "梦想还是要有的，万一实现了呢？",
-                "世界那么大，我想去看看。",
-                "人生没有白走的路，每一步都算数。",
-                "愿你出走半生，归来仍是少年。",
-                "心有多大，舞台就有多大。",
-                "只要功夫深，铁杵磨成针。",
-                "不忘初心，方得始终。",
-                "长风破浪会有时，直挂云帆济沧海。"
-            ];
-            var now = new Date();
-            var start = new Date(now.getFullYear(), 0, 0);
-            var diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
-            var oneDay = 1000 * 60 * 60 * 24;
-            var dayOfYear = Math.floor(diff / oneDay);
-            return QUOTES[dayOfYear % QUOTES.length];
-        }
-
-        function getRelatedSoftware(soft, limit) {
-            limit = limit || 4;
-            return Store.getSoftware().filter(function(s) {
-                return s.category === soft.category && s.id !== soft.id;
-            }).slice(0, limit);
-        }
-
-        var Theme = {
-            current: localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ?
-                'dark' : 'light'),
-            init: function() {
-                this.set(this.current);
-                document.getElementById('themeToggle').addEventListener('click', function() {
-                    Theme.toggle();
-                });
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-                    if (!localStorage.getItem('theme')) {
-                        Theme.set(e.matches ? 'dark' : 'light');
+        function showSuggestions(keyword) {
+            var sug = document.getElementById('searchSuggestions');
+            var hist = document.getElementById('searchHistory');
+            sug.innerHTML = ''; sug.classList.remove('open');
+            hist.innerHTML = ''; hist.classList.remove('open');
+            if (!keyword && searchHistory.length > 0) {
+                hist.innerHTML = '<div class="history-header">最近搜索</div>' +
+                    searchHistory.map(h => '<div class="item" data-kw="' + h + '">' + h + '<span class="remove-history" data-kw="' + h + '">✕</span></div>').join('');
+                hist.classList.add('open');
+                hist.querySelectorAll('.item').forEach(el => el.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('remove-history')) {
+                        var kw = e.target.dataset.kw;
+                        searchHistory = searchHistory.filter(h => h !== kw);
+                        localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
+                        showSuggestions('');
+                        return;
                     }
-                });
-            },
-            set: function(theme) {
-                document.documentElement.setAttribute('data-theme', theme);
-                this.current = theme;
-                localStorage.setItem('theme', theme);
-                var icon = document.querySelector('.theme-toggle i');
-                if (icon) {
-                    icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                    var kw = this.dataset.kw;
+                    document.getElementById('searchInput').value = kw;
+                    App.doSearch(kw);
+                    hist.classList.remove('open');
+                }));
+            } else if (keyword) {
+                var matches = cache.software.filter(s => s.name.toLowerCase().includes(keyword.toLowerCase())).slice(0, 8);
+                if (matches.length) {
+                    sug.innerHTML = matches.map(s => '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s.name + '</div>').join('');
+                    sug.classList.add('open');
+                    sug.querySelectorAll('.item').forEach(el => el.addEventListener('click', function() {
+                        var name = this.dataset.name;
+                        document.getElementById('searchInput').value = name;
+                        App.doSearch(name);
+                        sug.classList.remove('open');
+                    }));
                 }
-            },
-            toggle: function() {
-                this.set(this.current === 'dark' ? 'light' : 'dark');
-                toast('已切换至' + (this.current === 'dark' ? '暗色' : '亮色') + '模式', 'success');
             }
-        };
-
-        var UI = {
-            renderAnnouncements: function(container) {
+        }
+        var currentView = 'grid';
+        function applyViewMode() {
+            var grid = document.getElementById('listGrid');
+            if (currentView === 'list') grid.style.gridTemplateColumns = '1fr';
+            else grid.style.gridTemplateColumns = '';
+        }
+        document.getElementById('viewToggle').addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                currentView = e.target.dataset.view;
+                this.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                applyViewMode();
+            }
+        });
+        var Render = {
+            renderAnnouncements(container) {
                 if (!container) return;
-                var quote = getTodaysQuote();
+                var quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
                 var now = new Date();
-                var dateStr = (now.getMonth() + 1) + '/' + now.getDate();
-                container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' +
-                    dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
+                var dateStr = (now.getMonth()+1) + '/' + now.getDate();
+                container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' + dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
             },
-            renderCategories: function(container, active, onClick) {
+            renderCategories(container, active, onClick) {
                 if (!container) return;
-                var categories = Store.getCategories();
-                var all = Store.getSoftware();
-                container.innerHTML = categories.map(function(c) {
-                    var count = all.filter(function(s) { return s.category === c; }).length;
-                    return '<div class="category-item ' + (c === active ? 'active' : '') + '" data-cat="' + c +
-                        '"><span class="icon">' + getIconEmoji(c) + '</span><span class="name">' + c +
-                        '</span><span class="count">' + count + '</span></div>';
+                var categories = DB.getCategories();
+                var all = DB.getSoftware();
+                container.innerHTML = categories.map(c => {
+                    var count = all.filter(s => s.category === c).length;
+                    return '<div class="category-item ' + (c === active ? 'active' : '') + '" data-cat="' + c + '"><span class="icon">' + getIconEmoji(c) + '</span><span class="name">' + c + '</span><span class="count">' + count + '</span></div>';
                 }).join('');
-                container.querySelectorAll('.category-item').forEach(function(el) {
-                    el.addEventListener('click', function() {
-                        var cat = this.dataset.cat;
-                        if (onClick) onClick(cat);
-                    });
-                });
-                this.updateNavButtons();
+                container.querySelectorAll('.category-item').forEach(el => el.addEventListener('click', function() {
+                    if (onClick) onClick(this.dataset.cat);
+                }));
+                updateNavButtons();
             },
-            updateNavButtons: function() {
-                var scroll = document.getElementById('categoriesScroll');
-                if (!scroll) return;
-                var left = scroll.scrollLeft;
-                var max = scroll.scrollWidth - scroll.clientWidth;
-                document.getElementById('catPrevBtn').disabled = left <= 1;
-                document.getElementById('catNextBtn').disabled = max <= 1 || left >= max - 1;
-            },
-            renderCards: function(container, list, showCategory, keyword) {
-                showCategory = (showCategory !== undefined) ? showCategory : true;
+            renderCards(container, list, showCategory, keyword) {
+                showCategory = showCategory !== false;
                 if (!container) return;
                 if (!list || list.length === 0) {
-                    container.innerHTML =
-                        '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>等待新的资源加入</p></div>';
+                    container.innerHTML = '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p></div>';
                     return;
                 }
                 var html = '';
-                for (var i = 0; i < list.length; i++) {
-                    var s = list[i];
-                    var fav = Store.isFavorite(s.id);
-                    var rating = Store.getRating(s.id);
-                    var avg = rating.count > 0 ? (rating.total / rating.count).toFixed(1) : 0;
-                    var displayName = keyword ? highlightText(s.name, keyword) : s.name;
-                    var displayDesc = keyword ? highlightText(s.description || '', keyword) : (s.description || '');
-                    html += '<div class="software-card card" data-id="' + s.id +
-                        '"><button class="favorite-btn ' + (fav ? 'active' : '') +
-                        '" data-id="' + s.id + '"><i class="' + (fav ? 'fas' : 'far') + ' fa-heart"></i></button>' +
-                        '<div class="card-top"><div class="card-icon">' + renderIcon(s) +
-                        '</div><div class="card-info"><h3>' + displayName +
-                        '</h3><div class="meta">' + (showCategory ? '<span>' + s.category + '</span>' : '') +
-                        '<span class="version">v' + s.version + '</span><span>' + (s.size || '—') +
-                        '</span></div><div class="platform-badges">' + renderPlatformBadges(s) +
-                        '</div></div></div><div class="desc">' + displayDesc +
-                        '</div><div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (s
-                        .views || 0) +
-                        '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) +
-                        '</span></div><div class="rating-stars">' +
-                        '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg)) +
-                        '<span class="count">(' + rating.count + ')</span></div>' +
-                        '<button class="btn btn-sm btn-primary detail-trigger" data-id="' + s.id +
-                        '">详情</button></div></div>';
+                for (var s of list) {
+                    var displayName = s.name, displayDesc = s.description || '';
+                    if (keyword) {
+                        var regex = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                        displayName = s.name.replace(regex, '<mark>$1</mark>');
+                        displayDesc = (s.description || '').replace(regex, '<mark>$1</mark>');
+                    }
+                    html += '<div class="software-card card" data-id="' + s.id + '" tabindex="0" role="button" aria-label="查看 ' + s.name + ' 详情">' +
+                        '<div class="card-top"><div class="card-icon">' + renderIcon(s) + '</div><div class="card-info"><h3>' + displayName + '</h3><div class="meta">' + (showCategory ? '<span>' + s.category + '</span>' : '') + '<span class="version">v' + s.version + '</span><span>' + (s.size || '—') + '</span></div><div class="platform-badges">' + renderPlatformBadges(s) + '</div></div></div>' +
+                        '<div class="desc">' + displayDesc + '</div><div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (s.views || 0) + '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) + '</span></div><button class="btn btn-sm btn-primary detail-trigger" data-id="' + s.id + '">详情</button></div></div>';
                 }
                 container.innerHTML = html;
-                container.querySelectorAll('.detail-trigger').forEach(function(btn) {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        var id = this.dataset.id;
-                        var soft = Store.getSoftware().find(function(s) { return s.id === id; });
-                        if (soft) Detail.open(soft);
-                    });
-                });
-                container.querySelectorAll('.favorite-btn').forEach(function(btn) {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        var id = this.dataset.id;
-                        var active = Store.toggleFavorite(id);
-                        this.classList.toggle('active', active);
-                        this.querySelector('i').className = active ? 'fas fa-heart' : 'far fa-heart';
-                        toast(active ? '已收藏' : '已取消收藏', 'success');
-                        var detailFav = document.getElementById('detailFavorite');
-                        if (detailFav) {
-                            var detailId = detailFav.dataset.id;
-                            if (detailId === id) {
-                                detailFav.innerHTML = '<i class="' + (active ? 'fas' : 'far') +
-                                    ' fa-heart"></i> ' + (active ? '已收藏' : '收藏');
-                                detailFav.dataset.fav = active ? '1' : '0';
-                            }
-                        }
-                    });
-                });
-                container.querySelectorAll('.software-card').forEach(function(card) {
-                    card.addEventListener('click', function() {
-                        var id = this.dataset.id;
-                        var soft = Store.getSoftware().find(function(s) { return s.id === id; });
-                        if (soft) Detail.open(soft);
-                    });
-                });
-            },
-            renderSearchHistory: function(container) {
-                if (!container) return;
-                var history = Store.getSearchHistory();
-                if (history.length === 0) {
-                    container.innerHTML = '';
-                    return;
-                }
-                container.innerHTML = history.map(function(kw) {
-                    return '<span class="tag" data-keyword="' + kw + '">' + kw + '</span>';
-                }).join('');
-                container.querySelectorAll('.tag').forEach(function(tag) {
-                    tag.addEventListener('click', function() {
-                        var kw = this.dataset.keyword;
-                        document.getElementById('searchInput').value = kw;
-                        App.doSearch(kw);
-                    });
-                });
             }
         };
-
+        var scrollContainer = document.getElementById('categoriesScroll');
+        var catPrevBtn = document.getElementById('catPrevBtn');
+        var catNextBtn = document.getElementById('catNextBtn');
+        function updateNavButtons() {
+            if (!scrollContainer) return;
+            var sl = scrollContainer.scrollLeft, max = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+            catPrevBtn.disabled = sl <= 1;
+            catNextBtn.disabled = max <= 1 || sl >= max - 1;
+        }
+        if (scrollContainer) {
+            scrollContainer.addEventListener('scroll', updateNavButtons);
+            window.addEventListener('resize', updateNavButtons);
+            catPrevBtn.addEventListener('click', () => scrollContainer.scrollBy({ left: -200, behavior: 'smooth' }));
+            catNextBtn.addEventListener('click', () => scrollContainer.scrollBy({ left: 200, behavior: 'smooth' }));
+        }
         var Detail = {
-            currentSoft: null,
-            open: function(soft) {
-                this.currentSoft = soft;
+            open(soft) {
                 var overlay = document.getElementById('detailOverlay');
                 var iconEl = document.getElementById('detailIcon');
                 if (soft.icon_url && soft.icon_url.trim()) {
-                    iconEl.innerHTML = '<img src="' + soft.icon_url + '" alt="' + soft.name +
-                        '" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' +
-                        (soft.icon || '📦') + '\'" />';
-                } else {
-                    iconEl.textContent = soft.icon || '📦';
-                }
+                    iconEl.innerHTML = '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent=\'' + (soft.icon || '📦') + '\'">';
+                } else iconEl.textContent = soft.icon || '📦';
                 document.getElementById('detailName').textContent = soft.name;
-                document.getElementById('detailMeta').innerHTML =
-                    '<span class="badge">' + soft.category + '</span><span class="badge badge-purple">v' + soft
-                    .version + '</span><span>' + (soft.size || '—') +
-                    '</span><span>📅 ' + (soft.date || '') +
-                    '</span><span><i class="far fa-eye"></i> ' + (soft.views || 0) +
-                    '</span><span><i class="fas fa-download"></i> ' + (soft.downloads || 0) +
-                    '</span><div class="detail-platforms">' + renderPlatformBadges(soft) + '</div>';
+                document.getElementById('detailMeta').innerHTML = '<span class="badge">' + soft.category + '</span><span class="badge badge-purple">v' + soft.version + '</span><span>' + (soft.size || '—') + '</span>';
                 document.getElementById('detailDesc').textContent = soft.detail || soft.description || '';
-                var rating = Store.getRating(soft.id);
-                var avg = rating.count > 0 ? (rating.total / rating.count).toFixed(1) : 0;
-                document.getElementById('detailAvg').textContent = '(' + rating.count + '人评分, 均分' + avg + ')';
-                var stars = document.querySelectorAll('#detailStars .star');
-                stars.forEach(function(star) {
-                    var score = parseInt(star.dataset.score);
-                    star.classList.toggle('active', score <= Math.round(avg));
-                });
-                if (rating.userScore > 0) {
-                    stars.forEach(function(star) {
-                        var score = parseInt(star.dataset.score);
-                        star.classList.toggle('active', score <= rating.userScore);
-                    });
-                }
-                stars.forEach(function(star) {
-                    star.onclick = function(e) {
-                        e.stopPropagation();
-                        var score = parseInt(this.dataset.score);
-                        var newRating = Store.setUserRating(soft.id, score);
-                        var avg2 = newRating.count > 0 ? (newRating.total / newRating.count).toFixed(1) : 0;
-                        document.getElementById('detailAvg').textContent = '(' + newRating.count + '人评分, 均分' +
-                            avg2 + ')';
-                        stars.forEach(function(s) {
-                            var sc = parseInt(s.dataset.score);
-                            s.classList.toggle('active', sc <= (newRating.userScore || Math.round(
-                            avg2)));
-                        });
-                        App.refreshAll();
-                        toast('评分已更新', 'success');
-                    };
-                });
-                var favBtn = document.getElementById('detailFavorite');
-                var isFav = Store.isFavorite(soft.id);
-                favBtn.innerHTML = '<i class="' + (isFav ? 'fas' : 'far') + ' fa-heart"></i> ' + (isFav ? '已收藏' :
-                    '收藏');
-                favBtn.dataset.id = soft.id;
-                favBtn.dataset.fav = isFav ? '1' : '0';
-                favBtn.onclick = function() {
-                    var id = this.dataset.id;
-                    var active = Store.toggleFavorite(id);
-                    this.innerHTML = '<i class="' + (active ? 'fas' : 'far') +
-                        ' fa-heart"></i> ' + (active ? '已收藏' : '收藏');
-                    this.dataset.fav = active ? '1' : '0';
-                    toast(active ? '已收藏' : '已取消收藏', 'success');
-                    App.refreshAll();
-                };
-                var baseUrl = window.location.origin + window.location.pathname;
-                var shareUrl = baseUrl + (baseUrl.indexOf('?') > -1 ? '&' : '?') + 'id=' + encodeURIComponent(soft.id);
-                var shareText = soft.name + ' - ' + (soft.description || '乐哲软件精选工具').replace(/<[^>]*>/g, '');
-                document.getElementById('detailShare').onclick = function() {
-                    if (navigator.share) {
-                        navigator.share({
-                            title: soft.name,
-                            text: shareText,
-                            url: shareUrl
-                        }).catch(function(err) {
-                            if (err.name !== 'AbortError') {
-                                fallbackCopy(shareUrl);
-                            }
-                        });
-                    } else {
-                        fallbackCopy(shareUrl);
-                    }
-                };
-
-                function fallbackCopy(url) {
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(url).then(function() {
-                            toast('链接已复制到剪贴板', 'success');
-                        }).catch(function() {
-                            promptCopy(url);
-                        });
-                    } else {
-                        promptCopy(url);
-                    }
-                }
-
-                function promptCopy(url) {
-                    var userInput = window.prompt('请复制以下链接分享给好友', url);
-                    if (userInput !== null) {
-                        toast('已复制链接', 'success');
-                    } else {
-                        toast('分享取消', 'error');
-                    }
-                }
-
+                var scr = document.getElementById('detailScreenshots');
+                if (soft.screenshots && soft.screenshots.length) {
+                    scr.classList.remove('hidden');
+                    scr.innerHTML = soft.screenshots.map(url => '<img src="' + url + '" alt="截图" loading="lazy" onclick="window.open(\'' + url + '\',\'_blank\')">').join('');
+                } else scr.classList.add('hidden');
+                var clog = document.getElementById('detailChangelog');
+                if (soft.changelog) { clog.classList.remove('hidden'); clog.textContent = soft.changelog; } else clog.classList.add('hidden');
+                var req = document.getElementById('detailRequirements');
+                if (soft.requirements) { req.classList.remove('hidden'); req.innerHTML = '<strong>系统要求：</strong><br>' + soft.requirements; } else req.classList.add('hidden');
+                var related = document.getElementById('relatedSoftware');
+                var relatedGrid = document.getElementById('relatedGrid');
+                var relatedSoft = cache.software.filter(s => s.category === soft.category && s.id !== soft.id).slice(0, 4);
+                if (relatedSoft.length) {
+                    related.classList.remove('hidden');
+                    relatedGrid.innerHTML = relatedSoft.map(rs => '<div class="related-card" data-id="' + rs.id + '"><div class="icon">' + renderIcon(rs) + '</div><div style="font-size:0.8rem;font-weight:600;">' + rs.name + '</div></div>').join('');
+                    relatedGrid.querySelectorAll('.related-card').forEach(c => c.addEventListener('click', function() {
+                        var s = cache.software.find(x => x.id === this.dataset.id);
+                        if (s) Detail.open(s);
+                    }));
+                } else related.classList.add('hidden');
                 var dlBtn = document.getElementById('detailDownload');
                 dlBtn.innerHTML = '<i class="fas fa-download"></i> 下载';
+                dlBtn.classList.remove('btn-loading');
+                dlBtn.disabled = false;
                 dlBtn.onclick = function() {
-                    if (soft.download_url && soft.download_url.trim() !== '') {
+                    if (this.classList.contains('btn-loading')) return;
+                    this.classList.add('btn-loading');
+                    this.innerHTML = '<span class="btn-spinner"></span> 下载中';
+                    if (soft.download_url && soft.download_url.trim()) {
                         window.open(soft.download_url, '_blank');
                         soft.downloads = (soft.downloads || 0) + 1;
-                        Store.updateSoftware(soft);
+                        DB.updateSoftware(soft);
                         toast('开始下载 ' + soft.name, 'success');
-                        App.refreshAll();
                     } else {
                         soft.downloads = (soft.downloads || 0) + 1;
-                        Store.updateSoftware(soft);
-                        toast('暂无下载链接，已记录下载意向', 'error');
-                        App.refreshAll();
+                        DB.updateSoftware(soft);
+                        toast('暂无下载链接', 'warning');
+                    }
+                    setTimeout(() => { this.classList.remove('btn-loading'); this.innerHTML = '<i class="fas fa-download"></i> 下载'; }, 1500);
+                };
+                document.getElementById('detailShareBtn').onclick = function() {
+                    var url = window.location.origin + window.location.pathname + '?soft=' + soft.id;
+                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => toast('链接已复制'));
+                    else {
+                        var input = document.createElement('input'); input.value = url; document.body.appendChild(input); input.select(); document.execCommand('copy'); document.body.removeChild(input); toast('链接已复制');
                     }
                 };
-                var related = getRelatedSoftware(soft);
-                var grid = document.getElementById('relatedGrid');
-                if (related.length === 0) {
-                    grid.innerHTML = '<div style="color:var(--text-dim);font-size:0.8rem;">暂无相关软件</div>';
-                } else {
-                    grid.innerHTML = related.map(function(r) {
-                        var iconHtml = '';
-                        if (r.icon_url && r.icon_url.trim()) {
-                            iconHtml = '<img src="' + r.icon_url + '" alt="' + r.name +
-                                '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' +
-                                (r.icon || '📦') + '\'" />';
-                        } else {
-                            iconHtml = r.icon || '📦';
-                        }
-                        return '<div class="related-item" data-id="' + r.id +
-                            '"><span class="r-icon">' + iconHtml + '</span>' + r.name + '</div>';
-                    }).join('');
-                    grid.querySelectorAll('.related-item').forEach(function(item) {
-                        item.addEventListener('click', function() {
-                            var id = this.dataset.id;
-                            var soft2 = Store.getSoftware().find(function(s) { return s.id === id; });
-                            if (soft2) Detail.open(soft2);
-                        });
-                    });
-                }
                 overlay.classList.add('open');
                 document.body.style.overflow = 'hidden';
+                document.getElementById('detailClose').focus();
             },
-            close: function() {
+            close() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
-                var url = new URL(window.location);
-                if (url.searchParams.has('id')) {
-                    url.searchParams.delete('id');
-                    history.replaceState(null, '', url.toString());
-                }
             }
         };
-
         document.getElementById('detailClose').addEventListener('click', Detail.close);
         document.getElementById('detailCloseBtn').addEventListener('click', Detail.close);
-        document.getElementById('detailOverlay').addEventListener('click', function(e) {
-            if (e.target === e.currentTarget) Detail.close();
+        document.getElementById('detailOverlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) Detail.close(); });
+        document.addEventListener('click', function(e) {
+            var card = e.target.closest('.software-card');
+            if (!card) return;
+            if (e.target.closest('.detail-trigger')) return;
+            var id = card.dataset.id;
+            if (id) {
+                var soft = DB.getSoftware().find(s => s.id === id);
+                if (soft) Detail.open(soft);
+            }
         });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') Detail.close();
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.detail-trigger');
+            if (!btn) return;
+            var id = btn.dataset.id;
+            if (id) {
+                var soft = DB.getSoftware().find(s => s.id === id);
+                if (soft) Detail.open(soft);
+            }
         });
-
+        var currentPage = 1, PAGE_SIZE = 6, currentFilteredList = [];
         var App = {
-            currentPage: 'home',
-            currentCategory: 'all',
-            sortBy: 'date',
-            searchKeyword: '',
-            page: 1,
-            filteredList: [],
-            searchTimer: null,
-            init: function() {
+            currentPage: 'home', currentCategory: 'all', sortBy: 'date', searchKeyword: '', platformFilter: 'all',
+            init() {
                 var self = this;
-                Theme.init();
-                Store.loadAll().then(function() {
-                    self.refreshAll();
-                    var params = new URLSearchParams(window.location.search);
-                    var id = params.get('id');
-                    if (id) {
-                        var soft = Store.getSoftware().find(function(s) { return s.id === id; });
-                        if (soft) {
-                            setTimeout(function() {
-                                Detail.open(soft);
-                            }, 400);
-                        }
-                    }
-                });
-                setInterval(function() {
-                    Store.loadAll(true).then(function() {
-                        self.refreshAll();
-                    });
-                }, 600000);
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
-                    a.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        var page = this.dataset.page;
-                        if (page === 'home') self.goHome();
-                        else if (page === 'list') self.goList();
-                        else if (page === 'submit') self.openSubmit();
-                    });
-                });
-                document.getElementById('submitNav').addEventListener('click', function(e) {
+                DB.loadAll().then(() => self.refreshAll());
+                setInterval(() => DB.loadAll(true).then(() => self.refreshAll()), 600000);
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.addEventListener('click', function(e) {
                     e.preventDefault();
-                    self.openSubmit();
-                });
-                var searchInput = document.getElementById('searchInput');
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(self.searchTimer);
-                    self.searchTimer = setTimeout(function() {
-                        self.doSearch();
-                    }, 300);
-                });
-                searchInput.addEventListener('keyup', function(e) {
-                    if (e.key === 'Enter') self.doSearch();
-                });
-                document.getElementById('searchBtn').addEventListener('click', function() { self.doSearch(); });
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-                        e.preventDefault();
-                        document.getElementById('searchInput').focus();
-                    }
-                });
-                document.getElementById('logoHome').addEventListener('click', function(e) {
-                    e.preventDefault();
-                    self.goHome();
-                });
-                document.getElementById('mobileToggle').addEventListener('click', function() {
-                    document.getElementById('navLinks').classList.toggle('open');
-                });
-                document.getElementById('prevPageBtn').addEventListener('click', function() {
-                    if (self.page > 1) { self.page--;
-                        self.renderListPage(); }
-                });
-                document.getElementById('nextPageBtn').addEventListener('click', function() {
-                    var total = Math.ceil(self.filteredList.length / 6);
-                    if (self.page < total) { self.page++;
-                        self.renderListPage(); }
-                });
-                document.getElementById('sortSelect').addEventListener('change', function() {
-                    self.sortBy = this.value;
-                    self.page = 1;
-                    self.refreshListWithFilters();
-                });
+                    if (this.dataset.page === 'home') self.goHome(); else self.goList();
+                }));
+                document.getElementById('searchBtn').addEventListener('click', () => self.doSearch());
+                document.getElementById('searchInput').addEventListener('keyup', function(e) { if (e.key === 'Enter') self.doSearch(); showSuggestions(this.value.trim()); });
+                document.getElementById('searchInput').addEventListener('focus', () => showSuggestions(''));
+                document.getElementById('searchInput').addEventListener('blur', () => setTimeout(() => { document.getElementById('searchSuggestions').classList.remove('open'); document.getElementById('searchHistory').classList.remove('open'); }, 200));
+                document.getElementById('logoHome').addEventListener('click', e => { e.preventDefault(); self.goHome(); });
+                document.getElementById('mobileToggle').addEventListener('click', () => document.getElementById('navLinks').classList.toggle('open'));
+                document.getElementById('prevPageBtn').addEventListener('click', () => { if (currentPage > 1) { currentPage--; self.renderListPage(); } });
+                document.getElementById('nextPageBtn').addEventListener('click', () => { var total = Math.ceil(currentFilteredList.length / PAGE_SIZE); if (currentPage < total) { currentPage++; self.renderListPage(); } });
+                document.getElementById('sortSelect').addEventListener('change', function() { self.sortBy = this.value; currentPage = 1; self.refreshListWithFilters(); });
+                document.getElementById('jumpPageBtn').addEventListener('click', () => { var p = parseInt(document.getElementById('jumpPageInput').value); var total = Math.ceil(currentFilteredList.length / PAGE_SIZE); if (p >= 1 && p <= total) { currentPage = p; self.renderListPage(); } });
+                document.getElementById('platformFilter').addEventListener('change', function() { self.platformFilter = this.value; currentPage = 1; self.refreshListWithFilters(); });
+                document.getElementById('resetFiltersBtn').addEventListener('click', () => { document.getElementById('platformFilter').value = 'all'; self.platformFilter = 'all'; currentPage = 1; self.refreshListWithFilters(); });
+                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.addEventListener('click', function(e) { e.preventDefault(); if (this.dataset.page === 'home') self.goHome(); else self.goList(); }));
                 var backBtn = document.getElementById('backTopBtn');
-                window.addEventListener('scroll', function() {
-                    if (window.pageYOffset > 300) {
-                        backBtn.classList.add('visible');
-                    } else {
-                        backBtn.classList.remove('visible');
-                    }
-                });
-                backBtn.addEventListener('click', function() {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-                var scroll = document.getElementById('categoriesScroll');
-                scroll.addEventListener('scroll', UI.updateNavButtons);
-                window.addEventListener('resize', UI.updateNavButtons);
-                document.getElementById('catPrevBtn').addEventListener('click', function() {
-                    scroll.scrollBy({ left: -200, behavior: 'smooth' });
-                });
-                document.getElementById('catNextBtn').addEventListener('click', function() {
-                    scroll.scrollBy({ left: 200, behavior: 'smooth' });
-                });
-                document.getElementById('submitCancel').addEventListener('click', function() {
-                    self.closeSubmit();
-                });
-                document.getElementById('submitOverlay').addEventListener('click', function(e) {
-                    if (e.target === e.currentTarget) self.closeSubmit();
-                });
-                document.getElementById('submitForm').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    self.submitSoftware();
-                });
+                window.addEventListener('scroll', () => backBtn.classList.toggle('visible', window.pageYOffset > 300));
+                backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+                document.addEventListener('click', function(e) { var nav = document.getElementById('navLinks'); if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove('open'); });
             },
-            goHome: function() {
-                this.currentPage = 'home';
-                document.getElementById('pageHome').classList.remove('hidden');
-                document.getElementById('pageList').classList.add('hidden');
-                document.querySelectorAll('.nav-links a').forEach(function(a) { a.classList.remove('active'); });
+            goHome() {
+                this.currentPage = 'home'; document.getElementById('pageHome').classList.remove('hidden'); document.getElementById('pageList').classList.add('hidden');
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
                 document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
-                var url = new URL(window.location);
-                if (url.searchParams.has('id')) {
-                    url.searchParams.delete('id');
-                    history.replaceState(null, '', url.toString());
-                }
+                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.classList.remove('active'));
+                document.querySelector('#mobileBottomNav a[data-page="home"]').classList.add('active');
             },
-            goList: function(cat) {
-                cat = cat || 'all';
-                this.currentPage = 'list';
-                this.currentCategory = cat;
-                document.getElementById('pageHome').classList.add('hidden');
-                document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a').forEach(function(a) { a.classList.remove('active'); });
+            goList(cat = 'all') {
+                this.currentPage = 'list'; this.currentCategory = cat; document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageList').classList.remove('hidden');
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
-                document.getElementById('navLinks').classList.remove('open');
-                this.page = 1;
-                this.refreshList();
-                var url = new URL(window.location);
-                if (url.searchParams.has('id')) {
-                    url.searchParams.delete('id');
-                    history.replaceState(null, '', url.toString());
-                }
+                document.getElementById('navLinks').classList.remove('open'); currentPage = 1; this.refreshList();
+                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.classList.remove('active'));
+                document.querySelector('#mobileBottomNav a[data-page="list"]').classList.add('active');
             },
-            doSearch: function(kw) {
-                kw = kw || document.getElementById('searchInput').value.trim();
-                if (!kw) { this.goHome(); return; }
-                Store.addSearchHistory(kw);
-                this.searchKeyword = kw;
-                this.currentPage = 'list';
-                document.getElementById('pageHome').classList.add('hidden');
-                document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a').forEach(function(a) { a.classList.remove('active'); });
+            doSearch(kw) {
+                var keyword = kw || document.getElementById('searchInput').value.trim();
+                if (!keyword) { this.goHome(); return; }
+                addSearchHistory(keyword);
+                this.searchKeyword = keyword; this.currentPage = 'list'; document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageList').classList.remove('hidden');
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
-                document.getElementById('navLinks').classList.remove('open');
-                this.page = 1;
-                this.refreshList(kw);
-                var url = new URL(window.location);
-                if (url.searchParams.has('id')) {
-                    url.searchParams.delete('id');
-                    history.replaceState(null, '', url.toString());
-                }
+                currentPage = 1; this.refreshList(keyword);
             },
-            refreshHome: function() {
-                var self = this;
-                var all = Store.getSoftware();
-                UI.renderAnnouncements(document.getElementById('announcementContainer'));
-                UI.renderCategories(document.getElementById('categoryGridHome'), null, function(cat) { self.goList(
-                    cat); });
-                UI.renderSearchHistory(document.getElementById('searchHistoryTags'));
-                var recommend = all.filter(function(s) { return s.recommend; }).slice(0, 6);
-                UI.renderCards(document.getElementById('recommendGrid'), recommend, true);
-                var latest = all.slice().sort(function(a, b) {
-                    return (b.date || '').localeCompare(a.date || '');
-                }).slice(0, 6);
-                UI.renderCards(document.getElementById('latestGrid'), latest, true);
-                setTimeout(UI.updateNavButtons, 100);
+            refreshHome() {
+                var self = this; var all = DB.getSoftware();
+                Render.renderAnnouncements(document.getElementById('announcementContainer'));
+                Render.renderCategories(document.getElementById('categoryGridHome'), null, cat => self.goList(cat));
+                Render.renderCards(document.getElementById('recommendGrid'), all.filter(s => s.recommend).slice(0, 6), true);
+                Render.renderCards(document.getElementById('latestGrid'), all.slice().sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 6), true);
+                setTimeout(updateNavButtons, 100);
             },
-            refreshList: function(keyword) {
-                var self = this;
-                var all = Store.getSoftware();
-                var list = all.slice();
-                var cats = Store.getCategories();
+            refreshList(keyword) {
+                var self = this; var all = DB.getSoftware(); var list = all.slice(); var cats = DB.getCategories();
                 var filterContainer = document.getElementById('filterTags');
-                var html = '<button class="btn btn-sm btn-outline active" data-cat="all">全部</button>';
-                cats.forEach(function(c) {
-                    html += '<button class="btn btn-sm btn-outline" data-cat="' + c + '">' + c + '</button>';
-                });
-                filterContainer.innerHTML = html;
-                filterContainer.querySelectorAll('button').forEach(function(btn) {
-                    if (btn.dataset.cat === self.currentCategory) btn.classList.add('active');
+                filterContainer.innerHTML = '<button class="btn btn-sm btn-outline active" data-cat="all">全部</button>' + cats.map(c => '<button class="btn btn-sm btn-outline" data-cat="' + c + '">' + c + '</button>').join('');
+                filterContainer.querySelectorAll('button').forEach(btn => {
+                    if (btn.dataset.cat === self.currentCategory) btn.classList.add('active'); else btn.classList.remove('active');
                     btn.addEventListener('click', function() {
-                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove(
-                                'active'); });
-                        btn.classList.add('active');
-                        self.currentCategory = btn.dataset.cat;
-                        self.page = 1;
-                        self.refreshListWithFilters();
+                        filterContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        self.currentCategory = this.dataset.cat; currentPage = 1; self.refreshListWithFilters();
                     });
                 });
                 if (keyword) {
                     var kw = keyword.toLowerCase();
-                    list = list.filter(function(s) {
-                        return s.name.toLowerCase().includes(kw) ||
-                            (s.description || '').toLowerCase().includes(kw) ||
-                            (s.detail || '').toLowerCase().includes(kw);
-                    });
-                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length +
-                        '项)';
-                } else {
-                    document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
-                }
-                if (self.currentCategory !== 'all') {
-                    list = list.filter(function(s) { return s.category === self.currentCategory; });
-                }
-                if (self.sortBy === 'views') {
-                    list.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
-                } else if (self.sortBy === 'downloads') {
-                    list.sort(function(a, b) { return (b.downloads || 0) - (a.downloads || 0); });
-                } else {
-                    list.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
-                }
-                self.filteredList = list;
+                    list = list.filter(s => s.name.toLowerCase().includes(kw) || (s.description||'').toLowerCase().includes(kw));
+                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length + '项)';
+                } else document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
+                if (self.currentCategory !== 'all') list = list.filter(s => s.category === self.currentCategory);
+                if (self.platformFilter !== 'all') list = list.filter(s => (s.platforms||[]).includes(self.platformFilter));
+                if (self.sortBy === 'views') list.sort((a,b) => (b.views||0)-(a.views||0));
+                else if (self.sortBy === 'downloads') list.sort((a,b) => (b.downloads||0)-(a.downloads||0));
+                else list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+                currentFilteredList = list;
                 self.renderListPage(keyword);
+                document.getElementById('resultCount').textContent = '共 ' + list.length + ' 款';
             },
-            renderListPage: function(keyword) {
-                var total = this.filteredList.length;
-                var pageSize = 6;
-                var totalPages = Math.ceil(total / pageSize) || 1;
-                if (this.page > totalPages) this.page = totalPages;
-                var start = (this.page - 1) * pageSize;
-                var end = Math.min(start + pageSize, total);
-                var pageItems = this.filteredList.slice(start, end);
-                UI.renderCards(document.getElementById('listGrid'), pageItems, true, keyword || this.searchKeyword);
-                document.getElementById('pageInfo').textContent = '第 ' + this.page + ' / ' + totalPages + ' 页';
-                document.getElementById('prevPageBtn').disabled = (this.page <= 1);
-                document.getElementById('nextPageBtn').disabled = (this.page >= totalPages);
+            renderListPage(keyword) {
+                var total = currentFilteredList.length, totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+                if (currentPage > totalPages) currentPage = totalPages;
+                var items = currentFilteredList.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+                Render.renderCards(document.getElementById('listGrid'), items, true, keyword || this.searchKeyword);
+                document.getElementById('pageInfo').textContent = '第 ' + currentPage + ' / ' + totalPages + ' 页';
+                document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+                document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+                document.getElementById('jumpPageInput').value = currentPage;
+                document.getElementById('jumpPageInput').max = totalPages;
+                applyViewMode();
             },
-            refreshListWithFilters: function() {
-                var kw = document.getElementById('searchInput').value.trim();
-                this.searchKeyword = kw;
-                if (kw) this.refreshList(kw);
-                else this.refreshList(null);
-            },
-            refreshAll: function() {
-                if (this.currentPage === 'home') this.refreshHome();
-                else if (this.currentPage === 'list') this.refreshListWithFilters();
-                document.querySelectorAll('.software-card .favorite-btn').forEach(function(btn) {
-                    var id = btn.dataset.id;
-                    var fav = Store.isFavorite(id);
-                    btn.classList.toggle('active', fav);
-                    btn.querySelector('i').className = fav ? 'fas fa-heart' : 'far fa-heart';
-                });
-            },
-            openSubmit: function() {
-                document.getElementById('submitOverlay').classList.add('open');
-                document.body.style.overflow = 'hidden';
-            },
-            closeSubmit: function() {
-                document.getElementById('submitOverlay').classList.remove('open');
-                document.body.style.overflow = '';
-                document.getElementById('submitForm').reset();
-            },
-            submitSoftware: function() {
-                var name = document.getElementById('submitName').value.trim();
-                var category = document.getElementById('submitCategory').value;
-                var version = document.getElementById('submitVersion').value.trim() || 'v1.0';
-                var desc = document.getElementById('submitDesc').value.trim();
-                var icon = document.getElementById('submitIcon').value.trim();
-                var download = document.getElementById('submitDownload').value.trim();
-                var platforms = document.getElementById('submitPlatforms').value.trim().split(',').map(function(p) {
-                    return p.trim();
-                }).filter(function(p) { return p; });
-                if (!name || !desc) {
-                    toast('请填写完整信息', 'error');
-                    return;
-                }
-                var newSoft = {
-                    id: 'local_' + Date.now(),
-                    name: name,
-                    category: category,
-                    version: version,
-                    description: desc,
-                    detail: desc,
-                    icon_url: icon || '',
-                    icon: '📦',
-                    platforms: platforms.length ? platforms : ['mac', 'windows'],
-                    downloads: 0,
-                    views: 0,
-                    recommend: false,
-                    date: new Date().toISOString().slice(0, 10),
-                    size: '—',
-                    download_url: download || '',
-                    created_at: new Date().toISOString()
-                };
-                Store.software.unshift(newSoft);
-                toast('提交成功，感谢分享！', 'success');
-                this.closeSubmit();
-                this.refreshAll();
-            }
+            refreshListWithFilters() { var kw = document.getElementById('searchInput').value.trim(); this.searchKeyword = kw; if (kw) this.refreshList(kw); else this.refreshList(null); },
+            refreshAll() { if (this.currentPage === 'home') this.refreshHome(); else this.refreshListWithFilters(); }
         };
-
-        document.addEventListener('DOMContentLoaded', function() {
-            App.init();
-            document.addEventListener('click', function(e) {
-                var nav = document.getElementById('navLinks');
-                if (nav.classList.contains('open') && !e.target.closest('.header')) {
-                    nav.classList.remove('open');
-                }
-            });
-        });
-        window.App = App;
-        window.Store = Store;
-        window.Detail = Detail;
-    </script>
-    <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous">
+        document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
 </html>
