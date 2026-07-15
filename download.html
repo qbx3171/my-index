@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <meta name="description" content="乐哲软件 · 精选高效工具，赋能创作者生态。">
-    <meta name="keywords" content="软件下载,设计工具,开发工具,办公软件,媒体工具,实用工具,乐哲软件">
-    <meta name="theme-color" content="#0077ff">
-    <meta property="og:title" content="乐哲软件 · 构建数字未来">
-    <meta property="og:description" content="精选高效工具，赋能创作者生态。">
-    <meta property="og:type" content="website">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
+    <meta name="description" content="乐哲软件 · 精选高效工具，赋能创作者生态。" />
+    <meta name="keywords" content="软件下载,设计工具,开发工具,办公软件,媒体工具,实用工具,乐哲软件" />
+    <meta name="theme-color" content="#0077ff" />
+    <meta property="og:title" content="乐哲软件 · 构建数字未来" />
+    <meta property="og:description" content="精选高效工具，赋能创作者生态。" />
+    <meta property="og:type" content="website" />
     <title>乐哲软件 · 构建数字未来</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
     <style>
+        /* ===== 基础变量 & 重置 ===== */
         :root {
             --bg-primary: #f0f4fa;
             --bg-secondary: #e6ecf5;
@@ -43,11 +44,13 @@
             --success: #27ae60;
             --warning: #f39c12;
         }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: var(--font);
             background: var(--bg-primary);
@@ -58,6 +61,7 @@
             padding-bottom: 80px;
             transition: background 0.3s, color 0.3s;
         }
+
         a {
             text-decoration: none;
             color: inherit;
@@ -77,6 +81,7 @@
             background: none;
             color: var(--text-primary);
         }
+
         .container {
             max-width: var(--max-width);
             margin: 0 auto;
@@ -85,6 +90,8 @@
         .hidden {
             display: none !important;
         }
+
+        /* ===== 按钮 ===== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -171,6 +178,8 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* ===== 卡片 ===== */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(16px);
@@ -185,6 +194,8 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
             transform: translateY(-4px);
         }
+
+        /* ===== 徽章 ===== */
         .badge {
             display: inline-block;
             padding: 2px 14px;
@@ -230,6 +241,8 @@
                 box-shadow: 0 0 0 6px rgba(0, 119, 255, 0);
             }
         }
+
+        /* ===== 空状态 ===== */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -245,6 +258,8 @@
             margin-bottom: 8px;
             color: var(--text-primary);
         }
+
+        /* ===== 头部 ===== */
         .header {
             position: sticky;
             top: 0;
@@ -300,6 +315,7 @@
             color: var(--text-dim);
             letter-spacing: 0.5px;
         }
+
         .nav-links {
             display: flex;
             align-items: center;
@@ -343,6 +359,8 @@
         .mobile-toggle:hover {
             background: rgba(0, 0, 0, 0.06);
         }
+
+        /* ===== Hero ===== */
         .hero {
             padding: 40px 0 20px;
             text-align: center;
@@ -369,6 +387,8 @@
             margin: 0 auto 24px;
             font-weight: 300;
         }
+
+        /* ===== 搜索 ===== */
         .search-wrapper {
             position: relative;
             max-width: 440px;
@@ -505,6 +525,8 @@
             background: rgba(0, 136, 255, 0.08);
             color: var(--accent-cyan);
         }
+
+        /* ===== 公告 ===== */
         .announcement-list {
             max-width: 680px;
             margin: 0 auto 12px;
@@ -537,6 +559,8 @@
         .announcement-item .text {
             flex: 1;
         }
+
+        /* ===== 分类 ===== */
         .section-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -645,6 +669,8 @@
             opacity: 0.3;
             pointer-events: none;
         }
+
+        /* ===== 软件网格 ===== */
         .software-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -788,6 +814,8 @@
             font-size: 0.7rem;
             font-weight: 600;
         }
+
+        /* ===== 分页 ===== */
         .pagination {
             display: flex;
             justify-content: center;
@@ -842,6 +870,8 @@
         .pagination .page-jump input:focus {
             border-color: var(--accent-cyan);
         }
+
+        /* ===== 详情弹窗 ===== */
         .detail-overlay {
             position: fixed;
             inset: 0;
@@ -992,6 +1022,9 @@
             background: rgba(0, 119, 255, 0.2);
             border-radius: 4px;
         }
+        .detail-modal .detail-desc:empty {
+            display: none;
+        }
         .detail-screenshots {
             display: flex;
             gap: 10px;
@@ -1039,6 +1072,8 @@
             background: rgba(0, 119, 255, 0.2);
             border-radius: 4px;
         }
+
+        /* ===== 相关推荐 ===== */
         .related-software {
             margin-top: 18px;
             border-top: 1px solid var(--border-glow);
@@ -1224,6 +1259,8 @@
                 font-size: 0.7rem;
             }
         }
+
+        /* ===== 底部 ===== */
         .footer {
             padding: 32px 0 20px;
             border-top: 1px solid var(--border-glow);
@@ -1279,6 +1316,8 @@
             color: var(--accent-cyan);
             text-decoration: underline;
         }
+
+        /* ===== Toast ===== */
         .toast-container {
             position: fixed;
             bottom: 28px;
@@ -1326,6 +1365,8 @@
                 opacity: 0;
             }
         }
+
+        /* ===== 分隔线 ===== */
         .divider-cyber {
             display: flex;
             align-items: center;
@@ -1347,6 +1388,8 @@
             font-size: 0.35rem;
             color: var(--accent-cyan);
         }
+
+        /* ===== 回到顶部 ===== */
         .back-top {
             position: fixed;
             bottom: 30px;
@@ -1380,6 +1423,8 @@
             border-color: transparent;
             transform: scale(1.05);
         }
+
+        /* ===== 移动端底部导航 ===== */
         .mobile-bottom-nav {
             display: none;
             position: fixed;
@@ -1413,7 +1458,7 @@
             background: rgba(0, 119, 255, 0.08);
         }
 
-        /* ========== 桌面端专用优化 ========== */
+        /* ===== 桌面端专用 ===== */
         @media (min-width: 769px) {
             .toolbar {
                 display: flex;
@@ -1468,12 +1513,225 @@
             .filter-panel .filter-group select {
                 width: auto;
                 min-width: 120px;
+                padding: 6px 14px;
+                border-radius: 50px;
+                border: 1px solid var(--border-glow);
+                background: var(--bg-card);
+                color: var(--text-primary);
+                font-size: 0.8rem;
+                outline: none;
+                cursor: pointer;
+                transition: var(--transition);
+                appearance: auto;
+            }
+            .filter-panel .filter-group select:focus {
+                border-color: var(--accent-cyan);
+                box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.15);
             }
             .filter-panel .reset-filters {
                 margin-left: auto;
             }
         }
 
+        /* ============================================================
+                   改进点 ①：统一下拉框样式 — 更现代、更精致
+                   ============================================================ */
+        .filter-panel .filter-group select,
+        .toolbar .sort-group select {
+            /* 去掉原生外观，完全自定义 */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+
+            /* 基础尺寸与字体 */
+            padding: 8px 38px 8px 18px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            background-color: var(--bg-card-solid);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8ca3' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px 8px;
+            border: 1.5px solid var(--border-glow);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+            min-width: 120px;
+            outline: none;
+            /* 确保 option 文字颜色继承 */
+            color-scheme: light dark;
+        }
+
+        /* 下拉框 hover 状态 */
+        .filter-panel .filter-group select:hover,
+        .toolbar .sort-group select:hover {
+            border-color: var(--accent-cyan);
+            background-color: var(--bg-card);
+        }
+
+        /* 下拉框 focus 状态 — 发光边框 + 轻微上浮 */
+        .filter-panel .filter-group select:focus,
+        .toolbar .sort-group select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.15), 0 2px 8px rgba(0, 119, 255, 0.06);
+            background-color: var(--bg-card-solid);
+            transform: translateY(-1px);
+        }
+
+        /* 下拉框 disabled 状态（如有） */
+        .filter-panel .filter-group select:disabled,
+        .toolbar .sort-group select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(40%);
+            transform: none !important;
+        }
+
+        /* 适配暗色模式的下拉框 */
+        @media (prefers-color-scheme: dark) {
+            .filter-panel .filter-group select,
+            .toolbar .sort-group select {
+                background-color: #1a2332;
+                border-color: rgba(99, 160, 255, 0.18);
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+                color: #e2e8f0;
+            }
+            .filter-panel .filter-group select:hover,
+            .toolbar .sort-group select:hover {
+                background-color: #1e293b;
+                border-color: rgba(99, 160, 255, 0.35);
+            }
+            .filter-panel .filter-group select:focus,
+            .toolbar .sort-group select:focus {
+                background-color: #1a2332;
+                border-color: #60a5fa;
+                box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+            }
+            /* option 在暗色下保持可读 */
+            .filter-panel .filter-group select option,
+            .toolbar .sort-group select option {
+                background-color: #1a2332;
+                color: #e2e8f0;
+            }
+        }
+
+        /* ============================================================
+                   改进点 ②：视图切换按钮 — 样式增强 + 点击修复
+                   ============================================================ */
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-card);
+            border-radius: 50px;
+            padding: 3px;
+            border: 1px solid var(--border-glow);
+            backdrop-filter: blur(4px);
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .view-toggle button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            transition: all 0.25s ease;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+        .view-toggle button i {
+            font-size: 0.9rem;
+            pointer-events: none;
+            /* 让点击穿透到 button */;
+        }
+        .view-toggle button:hover {
+            color: var(--text-primary);
+            background: rgba(0, 119, 255, 0.06);
+        }
+        .view-toggle button.active {
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: 0 2px 12px rgba(0, 119, 255, 0.25);
+            transform: scale(1.02);
+        }
+        .view-toggle button.active:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 18px rgba(0, 119, 255, 0.30);
+        }
+        .view-toggle button:active {
+            transform: scale(0.92);
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .view-toggle button {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+            .view-toggle button i {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ============================================================
+                   改进点 ③：下拉框在工具栏中的布局微调
+                   ============================================================ */
+        .toolbar .sort-group {
+            gap: 8px;
+        }
+        .toolbar .sort-group label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .toolbar .sort-group label i {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        .toolbar .sort-group .result-count {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            padding: 0 4px;
+        }
+
+        /* 过滤面板中的标签 */
+        .filter-panel .filter-group label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .filter-panel .reset-filters {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 50px;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .filter-panel .reset-filters:hover {
+            color: var(--accent-cyan);
+            background: rgba(0, 119, 255, 0.06);
+            border-color: var(--border-glow);
+        }
+
+        /* ============================================================
+                   响应式补充
+                   ============================================================ */
         @media (max-width: 768px) {
             :root {
                 --header-height: 58px;
@@ -1546,8 +1804,9 @@
             #pageList .filter-panel .filter-group {
                 flex: 1 1 100%;
             }
-            #pageList .filter-panel select {
+            #pageList .filter-panel .filter-group select {
                 width: 100%;
+                min-width: unset;
             }
             .pagination {
                 flex-wrap: wrap;
@@ -1565,7 +1824,17 @@
                 height: 40px;
                 font-size: 1rem;
             }
+            /* 移动端下拉框适配 */
+            .filter-panel .filter-group select,
+            .toolbar .sort-group select {
+                padding: 7px 34px 7px 14px;
+                font-size: 0.78rem;
+                min-width: unset;
+                width: 100%;
+                background-position: right 12px center;
+            }
         }
+
         @media (max-width: 480px) {
             .container {
                 padding: 0 16px;
@@ -1623,8 +1892,26 @@
                 height: 36px;
                 font-size: 0.9rem;
             }
+            .view-toggle button {
+                width: 28px;
+                height: 28px;
+                font-size: 0.7rem;
+            }
+            .view-toggle button i {
+                font-size: 0.7rem;
+            }
+            .filter-panel .filter-group select,
+            .toolbar .sort-group select {
+                padding: 6px 30px 6px 12px;
+                font-size: 0.72rem;
+                background-position: right 10px center;
+                background-size: 10px 7px;
+                min-height: 34px;
+            }
         }
-        @media (prefers-color-scheme:dark) {
+
+        /* ===== 暗色模式全局 ===== */
+        @media (prefers-color-scheme: dark) {
             :root {
                 --bg-primary: #0f172a;
                 --bg-secondary: #1e293b;
@@ -1649,12 +1936,29 @@
             .mobile-bottom-nav {
                 background: rgba(15, 23, 42, 0.92);
             }
+            .view-toggle {
+                background: rgba(30, 41, 59, 0.8);
+                border-color: rgba(99, 160, 255, 0.15);
+            }
+            .view-toggle button {
+                color: var(--text-dim);
+            }
+            .view-toggle button:hover {
+                color: var(--text-primary);
+                background: rgba(96, 165, 250, 0.08);
+            }
+            .view-toggle button.active {
+                background: var(--accent-gradient);
+                color: #fff;
+            }
         }
     </style>
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
     <button class="back-top" id="backTopBtn" aria-label="回到顶部"><i class="fas fa-arrow-up"></i></button>
+
+    <!-- ===== 头部 ===== -->
     <header class="header" id="mainHeader">
         <div class="container header-inner">
             <a href="#" class="logo" id="logoHome">
@@ -1668,8 +1972,11 @@
             <button class="mobile-toggle" id="mobileToggle" aria-label="菜单"><i class="fas fa-bars"></i></button>
         </div>
     </header>
+
     <main>
         <div class="container">
+
+            <!-- ===== 首页 ===== -->
             <section id="pageHome">
                 <div class="hero">
                     <h1>探索 · <span class="highlight">乐哲</span> 软件</h1>
@@ -1677,7 +1984,7 @@
                     <div id="announcementContainer" class="announcement-list"></div>
                     <div class="search-wrapper">
                         <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="搜索软件名称或描述..." autocomplete="off">
+                            <input type="text" id="searchInput" placeholder="搜索软件名称或描述..." autocomplete="off" />
                             <button id="searchBtn"><i class="fas fa-search"></i> 检索</button>
                         </div>
                         <div class="search-suggestions" id="searchSuggestions"></div>
@@ -1691,6 +1998,7 @@
                         <span data-kw="AI">🤖 AI</span>
                     </div>
                 </div>
+
                 <div class="divider-cyber"><span class="dot">◆</span> 分 类 导 航 <span class="dot">◆</span></div>
                 <div class="categories-wrapper" id="categoriesWrapper">
                     <button class="categories-nav-btn" id="catPrevBtn" aria-label="向左滚动"><i class="fas fa-chevron-left"></i></button>
@@ -1699,26 +2007,33 @@
                     </div>
                     <button class="categories-nav-btn" id="catNextBtn" aria-label="向右滚动"><i class="fas fa-chevron-right"></i></button>
                 </div>
+
                 <div style="margin-top:36px;" id="recentHistorySection" class="hidden">
                     <h2 class="section-title">🕒 最近浏览</h2>
                     <div class="software-grid" id="recentGrid"></div>
                 </div>
+
                 <div style="margin-top:36px;">
                     <h2 class="section-title">✦ 热门推荐</h2>
                     <p class="section-sub">社区口碑精选</p>
                     <div class="software-grid" id="recommendGrid"></div>
                 </div>
+
                 <div style="margin-top:40px;">
                     <h2 class="section-title">✦ 最新上架</h2>
                     <p class="section-sub">持续迭代，保持前沿</p>
                     <div class="software-grid" id="latestGrid"></div>
                 </div>
             </section>
+
+            <!-- ===== 软件库 ===== -->
             <section id="pageList" class="hidden">
                 <div style="padding:16px 0 6px;">
                     <h2 class="section-title">✦ 软件库</h2>
                     <p class="section-sub" id="listSub">全部资源</p>
                 </div>
+
+                <!-- 工具栏 -->
                 <div class="toolbar">
                     <div class="filters" id="filterTags">
                         <button class="btn btn-sm btn-outline active" data-cat="all">全部</button>
@@ -1732,14 +2047,16 @@
                         </select>
                         <span class="result-count" id="resultCount"></span>
                         <div class="view-toggle" id="viewToggle">
-                            <button data-view="grid" class="active"><i class="fas fa-th-large"></i></button>
-                            <button data-view="list"><i class="fas fa-list"></i></button>
+                            <button data-view="grid" class="active" aria-label="网格视图"><i class="fas fa-th-large"></i></button>
+                            <button data-view="list" aria-label="列表视图"><i class="fas fa-list"></i></button>
                         </div>
                     </div>
                 </div>
+
+                <!-- 过滤面板 -->
                 <div class="filter-panel" id="filterPanel">
                     <div class="filter-group">
-                        <label>平台：</label>
+                        <label for="platformFilter"><i class="fas fa-desktop"></i> 平台</label>
                         <select id="platformFilter">
                             <option value="all">全部</option>
                             <option value="mac">macOS</option>
@@ -1748,18 +2065,25 @@
                     </div>
                     <span class="reset-filters" id="resetFiltersBtn"><i class="fas fa-undo-alt"></i> 重置</span>
                 </div>
+
+                <!-- 列表网格 -->
                 <div class="software-grid" id="listGrid"></div>
+
+                <!-- 分页 -->
                 <div class="pagination" id="paginationControls">
                     <button id="prevPageBtn" disabled><i class="fas fa-chevron-left"></i> 上一页</button>
                     <span class="page-info" id="pageInfo">第 1 / 1 页</span>
                     <button id="nextPageBtn">下一页 <i class="fas fa-chevron-right"></i></button>
                     <span class="page-jump" id="pageJump">
-                        跳至 <input type="number" id="jumpPageInput" min="1" value="1" aria-label="跳转页码"> 页
+                        跳至 <input type="number" id="jumpPageInput" min="1" value="1" aria-label="跳转页码" /> 页
                         <button id="jumpPageBtn" class="btn btn-sm btn-outline">GO</button>
                     </span>
                 </div>
             </section>
+
         </div>
+
+        <!-- ===== 底部 ===== -->
         <footer class="footer">
             <div class="brand">◆ 乐哲软件</div>
             <p class="copyright">
@@ -1777,6 +2101,8 @@
             <div class="legal">免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。</div>
         </footer>
     </main>
+
+    <!-- ===== 详情弹窗 ===== -->
     <div class="detail-overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="detailName">
         <div class="detail-modal" id="detailModal">
             <div class="modal-body" id="modalBody">
@@ -1800,15 +2126,22 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== 移动端底部导航 ===== -->
     <nav class="mobile-bottom-nav" id="mobileBottomNav">
         <a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a>
         <a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a>
     </nav>
+
+    <!-- ============================================================
+    JavaScript
+    ============================================================ -->
     <script>
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
         var supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         if (!supabaseClient) console.error('Supabase library not loaded.');
+
         var QUOTES = [
             "生活就像一盒巧克力，你永远不知道下一颗是什么味道。",
             "不积跬步，无以至千里。",
@@ -1855,7 +2188,9 @@
             "面朝大海，春暖花开。",
             "那些杀不死我的，必使我更强大。"
         ];
+
         var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
+
         var DB = {
             async loadAll(force) {
                 force = force || false;
@@ -1868,8 +2203,10 @@
                     if (softRes.error) throw softRes.error;
                     if (catRes.error) throw catRes.error;
                     cache.software = softRes.data || [];
-                    cache.categories = catRes.data.map(item => item.name) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
-                    cache.software.forEach((s) => {
+                    cache.categories = catRes.data.map(item => item.name) || ['设计工具', '开发工具', '办公软件', '媒体工具',
+                        '实用工具'
+                    ];
+                    cache.software.forEach(function(s) {
                         if (!s.screenshots) s.screenshots = [];
                         if (!s.changelog) s.changelog = '';
                         if (!s.requirements) s.requirements = '';
@@ -1883,30 +2220,35 @@
                     cache.loaded = true;
                 }
             },
-            getSoftware() { return cache.software; },
-            getCategories() { return cache.categories; },
+            getSoftware: function() { return cache.software; },
+            getCategories: function() { return cache.categories; },
             async updateSoftware(soft) {
                 try {
-                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id',
-                    soft.id);
-                    var idx = cache.software.findIndex(s => s.id === soft.id);
+                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq(
+                        'id', soft.id);
+                    var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
                     if (idx !== -1) { cache.software[idx].views = soft.views;
                         cache.software[idx].downloads = soft.downloads; }
                 } catch (e) { console.error('更新失败:', e); }
             }
         };
 
+        // ===== Toast =====
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
             var el = document.createElement('div');
             el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' + msg;
+            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' +
+                msg;
             c.appendChild(el);
-            setTimeout(() => { el.style.animation = 'toastOut 0.4s ease forwards';
-                setTimeout(() => el.remove(), 500); }, 2800);
+            setTimeout(function() {
+                el.style.animation = 'toastOut 0.4s ease forwards';
+                setTimeout(function() { el.remove(); }, 500);
+            }, 2800);
         }
 
+        // ===== 工具函数 =====
         function getIconEmoji(cat) {
             var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
             return map[cat] || '📦';
@@ -1928,11 +2270,12 @@
                 '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             return html;
         }
+
         var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
 
         function addSearchHistory(kw) {
             if (!kw) return;
-            searchHistory = [kw, ...searchHistory.filter(h => h !== kw)].slice(0, 10);
+            searchHistory = [kw, ...searchHistory.filter(function(h) { return h !== kw; })].slice(0, 10);
             localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
         }
 
@@ -1945,54 +2288,75 @@
             hist.classList.remove('open');
             if (!keyword && searchHistory.length > 0) {
                 hist.innerHTML = '<div class="history-header">最近搜索</div>' +
-                    searchHistory.map(h => '<div class="item" data-kw="' + h + '">' + h +
-                        '<span class="remove-history" data-kw="' + h + '">✕</span></div>').join('');
+                    searchHistory.map(function(h) {
+                        return '<div class="item" data-kw="' + h + '">' + h +
+                            '<span class="remove-history" data-kw="' + h + '">✕</span></div>';
+                    }).join('');
                 hist.classList.add('open');
-                hist.querySelectorAll('.item').forEach(el => el.addEventListener('click', function(e) {
-                    if (e.target.classList.contains('remove-history')) {
-                        var kw = e.target.dataset.kw;
-                        searchHistory = searchHistory.filter(h => h !== kw);
-                        localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
-                        showSuggestions('');
-                        return;
-                    }
-                    var kw = this.dataset.kw;
-                    document.getElementById('searchInput').value = kw;
-                    App.doSearch(kw);
-                    hist.classList.remove('open');
-                }));
+                hist.querySelectorAll('.item').forEach(function(el) {
+                    el.addEventListener('click', function(e) {
+                        if (e.target.classList.contains('remove-history')) {
+                            var kw = e.target.dataset.kw;
+                            searchHistory = searchHistory.filter(function(h) { return h !== kw; });
+                            localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
+                            showSuggestions('');
+                            return;
+                        }
+                        var kw = this.dataset.kw;
+                        document.getElementById('searchInput').value = kw;
+                        App.doSearch(kw);
+                        hist.classList.remove('open');
+                    });
+                });
             } else if (keyword) {
-                var matches = cache.software.filter(s => s.name.toLowerCase().includes(keyword.toLowerCase())).slice(0, 8);
+                var matches = cache.software.filter(function(s) {
+                    return s.name.toLowerCase().includes(keyword.toLowerCase());
+                }).slice(0, 8);
                 if (matches.length) {
-                    sug.innerHTML = matches.map(s => '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s
-                        .name + '</div>').join('');
+                    sug.innerHTML = matches.map(function(s) {
+                        return '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s
+                            .name + '</div>';
+                    }).join('');
                     sug.classList.add('open');
-                    sug.querySelectorAll('.item').forEach(el => el.addEventListener('click', function() {
-                        var name = this.dataset.name;
-                        document.getElementById('searchInput').value = name;
-                        App.doSearch(name);
-                        sug.classList.remove('open');
-                    }));
+                    sug.querySelectorAll('.item').forEach(function(el) {
+                        el.addEventListener('click', function() {
+                            var name = this.dataset.name;
+                            document.getElementById('searchInput').value = name;
+                            App.doSearch(name);
+                            sug.classList.remove('open');
+                        });
+                    });
                 }
             }
         }
+
         var currentView = 'grid';
 
         function applyViewMode() {
             var grid = document.getElementById('listGrid');
-            if (currentView === 'list') grid.style.gridTemplateColumns = '1fr';
-            else grid.style.gridTemplateColumns = '';
-        }
-        document.getElementById('viewToggle').addEventListener('click', function(e) {
-            if (e.target.tagName === 'BUTTON') {
-                currentView = e.target.dataset.view;
-                this.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                applyViewMode();
+            if (currentView === 'list') {
+                grid.style.gridTemplateColumns = '1fr';
+            } else {
+                grid.style.gridTemplateColumns = '';
             }
+        }
+
+        // ============================================================
+        // 改进点 ②：视图切换 — 使用 closest('button') 修复点击
+        // ============================================================
+        document.getElementById('viewToggle').addEventListener('click', function(e) {
+            var btn = e.target.closest('button');
+            if (!btn) return;
+            // 如果已经是 active 则不做切换（可保留）
+            if (btn.classList.contains('active')) return;
+            currentView = btn.dataset.view;
+            this.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            applyViewMode();
         });
+
         var Render = {
-            renderAnnouncements(container) {
+            renderAnnouncements: function(container) {
                 if (!container) return;
                 var quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
                 var now = new Date();
@@ -2000,26 +2364,29 @@
                 container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' +
                     dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
             },
-            renderCategories(container, active, onClick) {
+            renderCategories: function(container, active, onClick) {
                 if (!container) return;
                 var categories = DB.getCategories();
                 var all = DB.getSoftware();
-                container.innerHTML = categories.map(c => {
-                    var count = all.filter(s => s.category === c).length;
+                container.innerHTML = categories.map(function(c) {
+                    var count = all.filter(function(s) { return s.category === c; }).length;
                     return '<div class="category-item ' + (c === active ? 'active' : '') + '" data-cat="' + c +
                         '"><span class="icon">' + getIconEmoji(c) + '</span><span class="name">' + c +
                         '</span><span class="count">' + count + '</span></div>';
                 }).join('');
-                container.querySelectorAll('.category-item').forEach(el => el.addEventListener('click', function() {
-                    if (onClick) onClick(this.dataset.cat);
-                }));
+                container.querySelectorAll('.category-item').forEach(function(el) {
+                    el.addEventListener('click', function() {
+                        if (onClick) onClick(this.dataset.cat);
+                    });
+                });
                 updateNavButtons();
             },
-            renderCards(container, list, showCategory, keyword) {
+            renderCards: function(container, list, showCategory, keyword) {
                 showCategory = showCategory !== false;
                 if (!container) return;
                 if (!list || list.length === 0) {
-                    container.innerHTML = '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p></div>';
+                    container.innerHTML =
+                        '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p></div>';
                     return;
                 }
                 var html = '';
@@ -2048,6 +2415,7 @@
                 container.innerHTML = html;
             }
         };
+
         var scrollContainer = document.getElementById('categoriesScroll');
         var catPrevBtn = document.getElementById('catPrevBtn');
         var catNextBtn = document.getElementById('catNextBtn');
@@ -2062,13 +2430,14 @@
         if (scrollContainer) {
             scrollContainer.addEventListener('scroll', updateNavButtons);
             window.addEventListener('resize', updateNavButtons);
-            catPrevBtn.addEventListener('click', () => scrollContainer.scrollBy({ left: -200, behavior: 'smooth' }));
-            catNextBtn.addEventListener('click', () => scrollContainer.scrollBy({ left: 200, behavior: 'smooth' }));
+            catPrevBtn.addEventListener('click', function() { scrollContainer.scrollBy({ left: -200, behavior: 'smooth' }); });
+            catNextBtn.addEventListener('click', function() { scrollContainer.scrollBy({ left: 200, behavior: 'smooth' }); });
         }
+
         var viewHistory = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
 
         function addViewHistory(softwareId) {
-            viewHistory = [softwareId, ...viewHistory.filter(id => id !== softwareId)].slice(0, 6);
+            viewHistory = [softwareId, ...viewHistory.filter(function(id) { return id !== softwareId; })].slice(0, 6);
             localStorage.setItem('lezhe_view_history', JSON.stringify(viewHistory));
         }
 
@@ -2081,7 +2450,9 @@
                 section.classList.add('hidden');
                 return;
             }
-            var recentSoftware = historyIds.map(id => cache.software.find(s => s.id === id)).filter(Boolean);
+            var recentSoftware = historyIds.map(function(id) {
+                return cache.software.find(function(s) { return s.id === id; });
+            }).filter(Boolean);
             if (recentSoftware.length === 0) {
                 section.classList.add('hidden');
                 return;
@@ -2089,8 +2460,9 @@
             section.classList.remove('hidden');
             Render.renderCards(container, recentSoftware, true);
         }
+
         var Detail = {
-            open(soft) {
+            open: function(soft) {
                 addViewHistory(soft.id);
                 var overlay = document.getElementById('detailOverlay');
                 var iconEl = document.getElementById('detailIcon');
@@ -2103,13 +2475,22 @@
                 document.getElementById('detailMeta').innerHTML = '<span class="badge">' + soft.category +
                     '</span><span class="badge badge-purple">v' + soft.version + '</span><span>' + (soft.size || '—') +
                     '</span>';
-                document.getElementById('detailDesc').textContent = soft.detail || soft.description || '';
+
+                var descEl = document.getElementById('detailDesc');
+                var descText = soft.detail || soft.description || '';
+                if (descText.trim().length > 0) {
+                    descEl.textContent = descText;
+                    descEl.style.display = 'block';
+                } else {
+                    descEl.textContent = '';
+                    descEl.style.display = 'none';
+                }
 
                 var scr = document.getElementById('detailScreenshots');
-                var screenshots = (soft.screenshots || []).filter(url => url && url.trim().length > 0);
+                var screenshots = (soft.screenshots || []).filter(function(url) { return url && url.trim().length > 0; });
                 if (screenshots.length > 0) {
                     scr.classList.remove('hidden');
-                    scr.innerHTML = screenshots.map(url => {
+                    scr.innerHTML = screenshots.map(function(url) {
                         return '<img src="' + url + '" alt="截图" loading="lazy" onerror="this.style.display=\'none\';if(this.parentElement.children.length===0) this.parentElement.classList.add(\'hidden\')" onclick="window.open(\'' + url + '\',\'_blank\')">';
                     }).join('');
                 } else {
@@ -2131,12 +2512,15 @@
                 } else {
                     req.classList.add('hidden');
                 }
+
                 var related = document.getElementById('relatedSoftware');
                 var relatedGrid = document.getElementById('relatedGrid');
-                var relatedSoft = cache.software.filter(s => s.category === soft.category && s.id !== soft.id).slice(0, 3);
+                var relatedSoft = cache.software.filter(function(s) {
+                    return s.category === soft.category && s.id !== soft.id;
+                }).slice(0, 3);
                 if (relatedSoft.length) {
                     related.classList.remove('hidden');
-                    relatedGrid.innerHTML = relatedSoft.map(rs => {
+                    relatedGrid.innerHTML = relatedSoft.map(function(rs) {
                         var platHtml = '';
                         var platforms = rs.platforms || [];
                         if (platforms.includes('mac')) platHtml +=
@@ -2156,11 +2540,14 @@
                             '<div class="platforms">' + platHtml + '</div>' +
                             '</div>';
                     }).join('');
-                    relatedGrid.querySelectorAll('.related-card').forEach(c => c.addEventListener('click', function() {
-                        var s = cache.software.find(x => x.id === this.dataset.id);
-                        if (s) Detail.open(s);
-                    }));
+                    relatedGrid.querySelectorAll('.related-card').forEach(function(c) {
+                        c.addEventListener('click', function() {
+                            var s = cache.software.find(function(x) { return x.id === this.dataset.id; });
+                            if (s) Detail.open(s);
+                        });
+                    });
                 } else related.classList.add('hidden');
+
                 var dlBtn = document.getElementById('detailDownload');
                 dlBtn.innerHTML = '<i class="fas fa-download"></i> 下载';
                 dlBtn.classList.remove('btn-loading');
@@ -2179,12 +2566,15 @@
                         DB.updateSoftware(soft);
                         toast('暂无下载链接', 'warning');
                     }
-                    setTimeout(() => { this.classList.remove('btn-loading');
-                        this.innerHTML = '<i class="fas fa-download"></i> 下载'; }, 1500);
+                    setTimeout(function() {
+                        dlBtn.classList.remove('btn-loading');
+                        dlBtn.innerHTML = '<i class="fas fa-download"></i> 下载';
+                    }, 1500);
                 };
                 document.getElementById('detailShareBtn').onclick = function() {
                     var url = window.location.origin + window.location.pathname + '?soft=' + soft.id;
-                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(() => toast('链接已复制'));
+                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function() { toast(
+                            '链接已复制'); });
                     else {
                         var input = document.createElement('input');
                         input.value = url;
@@ -2198,36 +2588,41 @@
                 overlay.classList.add('open');
                 document.body.style.overflow = 'hidden';
                 document.getElementById('detailClose').focus();
-                setTimeout(() => renderRecentHistory(), 100);
+                setTimeout(function() { renderRecentHistory(); }, 100);
             },
-            close() {
+            close: function() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
             }
         };
+
         document.getElementById('detailClose').addEventListener('click', Detail.close);
         document.getElementById('detailCloseBtn').addEventListener('click', Detail.close);
-        document.getElementById('detailOverlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) Detail
-                .close(); });
+        document.getElementById('detailOverlay').addEventListener('click', function(e) {
+            if (e.target === e.currentTarget) Detail.close();
+        });
+
         document.addEventListener('click', function(e) {
             var card = e.target.closest('.software-card');
             if (!card) return;
             if (e.target.closest('.detail-trigger')) return;
             var id = card.dataset.id;
             if (id) {
-                var soft = DB.getSoftware().find(s => s.id === id);
+                var soft = DB.getSoftware().find(function(s) { return s.id === id; });
                 if (soft) Detail.open(soft);
             }
         });
+
         document.addEventListener('click', function(e) {
             var btn = e.target.closest('.detail-trigger');
             if (!btn) return;
             var id = btn.dataset.id;
             if (id) {
-                var soft = DB.getSoftware().find(s => s.id === id);
+                var soft = DB.getSoftware().find(function(s) { return s.id === id; });
                 if (soft) Detail.open(soft);
             }
         });
+
         document.addEventListener('keydown', function(e) {
             if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
                 e.preventDefault();
@@ -2237,99 +2632,145 @@
                 Detail.close();
             }
         });
+
         var currentPage = 1,
             PAGE_SIZE = 6,
             currentFilteredList = [];
+
         var App = {
             currentPage: 'home',
             currentCategory: 'all',
             sortBy: 'date',
             searchKeyword: '',
             platformFilter: 'all',
-            init() {
+            init: function() {
                 var self = this;
-                DB.loadAll().then(() => {
+                DB.loadAll().then(function() {
                     self.refreshAll();
                     renderRecentHistory();
                 });
-                setInterval(() => DB.loadAll(true).then(() => { self.refreshAll();
-                    renderRecentHistory(); }), 600000);
-                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.addEventListener('click', function(e) {
+                setInterval(function() {
+                    DB.loadAll(true).then(function() {
+                        self.refreshAll();
+                        renderRecentHistory();
+                    });
+                }, 600000);
+
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (this.dataset.page === 'home') self.goHome();
+                        else self.goList();
+                    });
+                });
+
+                document.getElementById('searchBtn').addEventListener('click', function() { self.doSearch(); });
+                document.getElementById('searchInput').addEventListener('keyup', function(e) {
+                    if (e.key === 'Enter') self.doSearch();
+                    showSuggestions(this.value.trim());
+                });
+                document.getElementById('searchInput').addEventListener('focus', function() { showSuggestions(
+                    ''); });
+                document.getElementById('searchInput').addEventListener('blur', function() {
+                    setTimeout(function() {
+                        document.getElementById('searchSuggestions').classList.remove('open');
+                        document.getElementById('searchHistory').classList.remove('open');
+                    }, 200);
+                });
+
+                document.getElementById('logoHome').addEventListener('click', function(e) {
                     e.preventDefault();
-                    if (this.dataset.page === 'home') self.goHome();
-                    else self.goList();
-                }));
-                document.getElementById('searchBtn').addEventListener('click', () => self.doSearch());
-                document.getElementById('searchInput').addEventListener('keyup', function(e) { if (e.key === 'Enter') self
-                        .doSearch();
-                    showSuggestions(this.value.trim()); });
-                document.getElementById('searchInput').addEventListener('focus', () => showSuggestions(''));
-                document.getElementById('searchInput').addEventListener('blur', () => setTimeout(() => { document
-                        .getElementById('searchSuggestions').classList.remove('open');
-                    document.getElementById('searchHistory').classList.remove('open'); }, 200));
-                document.getElementById('logoHome').addEventListener('click', e => { e.preventDefault();
-                    self.goHome(); });
-                document.getElementById('mobileToggle').addEventListener('click', () => document.getElementById('navLinks')
-                    .classList.toggle('open'));
-                document.getElementById('prevPageBtn').addEventListener('click', () => { if (currentPage > 1) { currentPage--;
-                        self.renderListPage(); } });
-                document.getElementById('nextPageBtn').addEventListener('click', () => { var total = Math.ceil(
-                        currentFilteredList.length / PAGE_SIZE);
+                    self.goHome();
+                });
+                document.getElementById('mobileToggle').addEventListener('click', function() {
+                    document.getElementById('navLinks').classList.toggle('open');
+                });
+
+                document.getElementById('prevPageBtn').addEventListener('click', function() {
+                    if (currentPage > 1) { currentPage--;
+                        self.renderListPage(); }
+                });
+                document.getElementById('nextPageBtn').addEventListener('click', function() {
+                    var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
                     if (currentPage < total) { currentPage++;
-                        self.renderListPage(); } });
-                document.getElementById('sortSelect').addEventListener('change', function() { self.sortBy = this.value;
+                        self.renderListPage(); }
+                });
+
+                document.getElementById('sortSelect').addEventListener('change', function() {
+                    self.sortBy = this.value;
                     currentPage = 1;
-                    self.refreshListWithFilters(); });
-                document.getElementById('jumpPageBtn').addEventListener('click', () => { var p = parseInt(document
-                        .getElementById('jumpPageInput').value);
+                    self.refreshListWithFilters();
+                });
+
+                document.getElementById('jumpPageBtn').addEventListener('click', function() {
+                    var p = parseInt(document.getElementById('jumpPageInput').value);
                     var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
                     if (p >= 1 && p <= total) { currentPage = p;
-                        self.renderListPage(); } });
-                document.getElementById('platformFilter').addEventListener('change', function() { self.platformFilter =
-                        this.value;
+                        self.renderListPage(); }
+                });
+
+                document.getElementById('platformFilter').addEventListener('change', function() {
+                    self.platformFilter = this.value;
                     currentPage = 1;
-                    self.refreshListWithFilters(); });
-                document.getElementById('resetFiltersBtn').addEventListener('click', () => { document.getElementById(
-                        'platformFilter').value = 'all';
+                    self.refreshListWithFilters();
+                });
+
+                document.getElementById('resetFiltersBtn').addEventListener('click', function() {
+                    document.getElementById('platformFilter').value = 'all';
                     self.platformFilter = 'all';
                     currentPage = 1;
-                    self.refreshListWithFilters(); });
-                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.addEventListener('click', function(e) { e
-                        .preventDefault();
-                    if (this.dataset.page === 'home') self.goHome();
-                    else self.goList(); }));
+                    self.refreshListWithFilters();
+                });
+
+                document.querySelectorAll('#mobileBottomNav a').forEach(function(a) {
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (this.dataset.page === 'home') self.goHome();
+                        else self.goList();
+                    });
+                });
+
                 var backBtn = document.getElementById('backTopBtn');
-                window.addEventListener('scroll', () => backBtn.classList.toggle('visible', window.pageYOffset > 300));
-                backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-                document.addEventListener('click', function(e) { var nav = document.getElementById('navLinks');
-                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove('open'); });
+                window.addEventListener('scroll', function() {
+                    backBtn.classList.toggle('visible', window.pageYOffset > 300);
+                });
+                backBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+                document.addEventListener('click', function(e) {
+                    var nav = document.getElementById('navLinks');
+                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
+                    'open');
+                });
             },
-            goHome() {
+            goHome: function() {
                 this.currentPage = 'home';
                 document.getElementById('pageHome').classList.remove('hidden');
                 document.getElementById('pageList').classList.add('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
+                        'active'); });
                 document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
                 renderRecentHistory();
-                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.classList.remove('active'));
+                document.querySelectorAll('#mobileBottomNav a').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('#mobileBottomNav a[data-page="home"]').classList.add('active');
             },
-            goList(cat = 'all') {
+            goList: function(cat) {
+                cat = cat || 'all';
                 this.currentPage = 'list';
                 this.currentCategory = cat;
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
+                        'active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 currentPage = 1;
                 this.refreshList();
-                document.querySelectorAll('#mobileBottomNav a').forEach(a => a.classList.remove('active'));
+                document.querySelectorAll('#mobileBottomNav a').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('#mobileBottomNav a[data-page="list"]').classList.add('active');
             },
-            doSearch(kw) {
+            doSearch: function(kw) {
                 var keyword = kw || document.getElementById('searchInput').value.trim();
                 if (!keyword) { this.goHome(); return; }
                 addSearchHistory(keyword);
@@ -2337,57 +2778,74 @@
                 this.currentPage = 'list';
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(a => a.classList.remove('active'));
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
+                        'active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 currentPage = 1;
                 this.refreshList(keyword);
             },
-            refreshHome() {
+            refreshHome: function() {
                 var self = this;
                 var all = DB.getSoftware();
                 Render.renderAnnouncements(document.getElementById('announcementContainer'));
-                Render.renderCategories(document.getElementById('categoryGridHome'), null, cat => self.goList(cat));
-                Render.renderCards(document.getElementById('recommendGrid'), all.filter(s => s.recommend).slice(0, 6), true);
-                Render.renderCards(document.getElementById('latestGrid'), all.slice().sort((a, b) => (b.date || '').localeCompare(
-                    a.date || '')).slice(0, 6), true);
+                Render.renderCategories(document.getElementById('categoryGridHome'), null, function(cat) { self.goList(
+                        cat); });
+                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s
+                        .recommend; }).slice(0, 6), true);
+                Render.renderCards(document.getElementById('latestGrid'), all.slice().sort(function(a, b) {
+                    return (b.date || '').localeCompare(a.date || '');
+                }).slice(0, 6), true);
                 renderRecentHistory();
                 setTimeout(updateNavButtons, 100);
             },
-            refreshList(keyword) {
+            refreshList: function(keyword) {
                 var self = this;
                 var all = DB.getSoftware();
                 var list = all.slice();
                 var cats = DB.getCategories();
                 var filterContainer = document.getElementById('filterTags');
                 filterContainer.innerHTML = '<button class="btn btn-sm btn-outline active" data-cat="all">全部</button>' +
-                    cats.map(c => '<button class="btn btn-sm btn-outline" data-cat="' + c + '">' + c + '</button>').join('');
-                filterContainer.querySelectorAll('button').forEach(btn => {
+                    cats.map(function(c) {
+                        return '<button class="btn btn-sm btn-outline" data-cat="' + c + '">' + c + '</button>';
+                    }).join('');
+                filterContainer.querySelectorAll('button').forEach(function(btn) {
                     if (btn.dataset.cat === self.currentCategory) btn.classList.add('active');
                     else btn.classList.remove('active');
                     btn.addEventListener('click', function() {
-                        filterContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove(
+                                'active'); });
                         this.classList.add('active');
                         self.currentCategory = this.dataset.cat;
                         currentPage = 1;
                         self.refreshListWithFilters();
                     });
                 });
+
                 if (keyword) {
                     var kw = keyword.toLowerCase();
-                    list = list.filter(s => s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
-                        .includes(kw));
-                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length + '项)';
+                    list = list.filter(function(s) {
+                        return s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
+                            .includes(kw);
+                    });
+                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length +
+                        '项)';
                 } else document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
-                if (self.currentCategory !== 'all') list = list.filter(s => s.category === self.currentCategory);
-                if (self.platformFilter !== 'all') list = list.filter(s => (s.platforms || []).includes(self.platformFilter));
-                if (self.sortBy === 'views') list.sort((a, b) => (b.views || 0) - (a.views || 0));
-                else if (self.sortBy === 'downloads') list.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
-                else list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self
+                        .currentCategory; });
+                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || [])
+                        .includes(self.platformFilter); });
+
+                if (self.sortBy === 'views') list.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
+                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a
+                        .downloads || 0); });
+                else list.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+
                 currentFilteredList = list;
                 self.renderListPage(keyword);
                 document.getElementById('resultCount').textContent = '共 ' + list.length + ' 款';
             },
-            renderListPage(keyword) {
+            renderListPage: function(keyword) {
                 var total = currentFilteredList.length,
                     totalPages = Math.ceil(total / PAGE_SIZE) || 1;
                 if (currentPage > totalPages) currentPage = totalPages;
@@ -2400,14 +2858,19 @@
                 document.getElementById('jumpPageInput').max = totalPages;
                 applyViewMode();
             },
-            refreshListWithFilters() { var kw = document.getElementById('searchInput').value.trim();
+            refreshListWithFilters: function() {
+                var kw = document.getElementById('searchInput').value.trim();
                 this.searchKeyword = kw;
                 if (kw) this.refreshList(kw);
-                else this.refreshList(null); },
-            refreshAll() { if (this.currentPage === 'home') this.refreshHome();
-                else this.refreshListWithFilters(); }
+                else this.refreshList(null);
+            },
+            refreshAll: function() {
+                if (this.currentPage === 'home') this.refreshHome();
+                else this.refreshListWithFilters();
+            }
         };
-        document.addEventListener('DOMContentLoaded', () => App.init());
+
+        document.addEventListener('DOMContentLoaded', function() { App.init(); });
     </script>
 </body>
 </html>
