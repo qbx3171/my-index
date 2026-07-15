@@ -2335,16 +2335,6 @@
             Render.renderCards(container, recentSoftware, true);
         }
 
-        function handleRelatedCardClick(e) {
-            var card = e.target.closest('.related-card');
-            if (!card) return;
-            var id = Number(card.dataset.id);
-            if (id) {
-                var soft = cache.software.find(function(s) { return s.id === id; });
-                if (soft) Detail.open(soft);
-            }
-        }
-
         var Detail = {
             open: function(soft) {
                 addViewHistory(soft.id);
@@ -2412,7 +2402,7 @@
                         if (rs.recommend || (rs.downloads || 0) > 100) {
                             badgeHtml = '<span class="badge-mini">🔥 热门</span>';
                         }
-                        return '<div class="related-card" data-id="' + rs.id + '">' +
+                        return '<div class="related-card" data-id="' + rs.id + '" onclick="Detail.openById(' + rs.id + ')">' +
                             badgeHtml +
                             '<div class="icon-wrap">' + renderIcon(rs) + '</div>' +
                             '<div class="name" title="' + rs.name + '">' + rs.name + '</div>' +
@@ -2463,13 +2453,19 @@
                 document.getElementById('detailClose').focus();
                 setTimeout(function() { renderRecentHistory(); }, 100);
             },
+            openById: function(id) {
+                var soft = cache.software.find(function(s) { return s.id === id; });
+                if (soft) {
+                    this.open(soft);
+                } else {
+                    toast('未找到该软件', 'warning');
+                }
+            },
             close: function() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
             }
         };
-
-        document.getElementById('relatedGrid').addEventListener('click', handleRelatedCardClick);
 
         document.getElementById('detailClose').addEventListener('click', Detail.close);
         document.getElementById('detailCloseBtn').addEventListener('click', Detail.close);
