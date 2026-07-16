@@ -2250,6 +2250,8 @@
                         if (!s.changelog) s.changelog = '';
                         if (!s.requirements) s.requirements = '';
                         if (!s.platforms) s.platforms = [];
+                        if (!s.name) s.name = '未命名软件';
+                        if (!s.description) s.description = '';
                     });
                     cache.loaded = true;
                     cache.lastFetch = Date.now();
@@ -2427,12 +2429,12 @@
                 }
                 var html = '';
                 for (var s of list) {
-                    var displayName = s.name,
-                        displayDesc = s.description || '';
+                    var displayName = (s.name && s.name.trim()) ? s.name : '未命名软件';
+                    var displayDesc = s.description || '';
                     if (keyword) {
                         var regex = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-                        displayName = s.name.replace(regex, '<mark>$1</mark>');
-                        displayDesc = (s.description || '').replace(regex, '<mark>$1</mark>');
+                        displayName = displayName.replace(regex, '<mark>$1</mark>');
+                        displayDesc = displayDesc.replace(regex, '<mark>$1</mark>');
                     }
                     html += '<div class="software-card card" data-id="' + s.id +
                         '" tabindex="0" role="button" aria-label="查看 ' + s.name + ' 详情">' +
@@ -2489,7 +2491,7 @@
                         '" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent=\'' +
                         (soft.icon || '📦') + '\'">';
                 } else iconEl.textContent = soft.icon || '📦';
-                document.getElementById('detailName').textContent = soft.name;
+                document.getElementById('detailName').textContent = soft.name || '未命名';
                 document.getElementById('detailMeta').innerHTML = '<span class="badge">' + soft.category +
                     '</span><span class="badge badge-purple">v' + soft.version + '</span><span>' + (soft.size || '—') +
                     '</span>';
@@ -2993,6 +2995,10 @@
                 document.querySelectorAll('.category-item-side').forEach(function(el) { el.classList.remove('active'); });
                 document.getElementById('sidebarSearchWrapper').classList.remove('active');
                 document.getElementById('sidebarStats').style.display = 'block';
+                document.getElementById('filterTags').querySelectorAll('button').forEach(function(b) {
+                    b.classList.remove('active');
+                    if (b.dataset.cat === 'all') b.classList.add('active');
+                });
             },
             goList: function(cat) {
                 cat = cat || 'all';
@@ -3023,6 +3029,14 @@
                 if (isMobile() && isOpen) {
                     closeSidebar();
                 }
+                document.getElementById('filterTags').querySelectorAll('button').forEach(function(b) {
+                    b.classList.remove('active');
+                    if (b.dataset.cat === cat) b.classList.add('active');
+                });
+                if (cat === 'all') {
+                    document.getElementById('filterTags').querySelector('button[data-cat="all"]').classList.add(
+                        'active');
+                }
             },
             doSearch: function(kw) {
                 var keyword = kw || document.getElementById('searchInput').value.trim() || document.getElementById(
@@ -3031,6 +3045,7 @@
                 addSearchHistory(keyword);
                 this.searchKeyword = keyword;
                 this.currentPage = 'list';
+                this.currentCategory = 'all';
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
@@ -3045,6 +3060,13 @@
                 if (isMobile() && isOpen) {
                     closeSidebar();
                 }
+                document.querySelectorAll('.category-item-side').forEach(function(el) { el.classList.remove('active'); });
+                var first = document.querySelector('.category-item-side');
+                if (first) first.classList.add('active');
+                document.getElementById('filterTags').querySelectorAll('button').forEach(function(b) {
+                    b.classList.remove('active');
+                    if (b.dataset.cat === 'all') b.classList.add('active');
+                });
             },
             refreshHome: function() {
                 var self = this;
