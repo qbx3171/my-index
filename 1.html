@@ -954,6 +954,7 @@
             letter-spacing: -0.2px;
             color: var(--text-primary);
             word-break: break-word;
+            min-height: 1.4em;
         }
         .software-card .card-info .meta {
             font-size: 0.7rem;
@@ -1968,6 +1969,19 @@
                 height: 36px;
                 font-size: 0.9rem;
             }
+            .hero .search-box input {
+                font-size: 0.8rem;
+                padding: 10px 14px;
+            }
+            .hero .search-box button {
+                font-size: 0.75rem;
+                padding: 0 14px;
+            }
+            .search-suggestions .item,
+            .search-history .item {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
         }
     </style>
 </head>
@@ -2250,8 +2264,12 @@
                         if (!s.changelog) s.changelog = '';
                         if (!s.requirements) s.requirements = '';
                         if (!s.platforms) s.platforms = [];
-                        if (!s.name) s.name = '未命名软件';
+                        if (!s.name || s.name.trim() === '') s.name = '未命名软件';
                         if (!s.description) s.description = '';
+                        if (!s.icon) s.icon = '📦';
+                        if (!s.version) s.version = '1.0';
+                        if (!s.category) s.category = '未分类';
+                        if (!s.size) s.size = '—';
                     });
                     cache.loaded = true;
                     cache.lastFetch = Date.now();
@@ -2295,11 +2313,12 @@
         }
 
         function renderIcon(soft) {
+            var fallback = soft.icon || '📦';
             if (soft.icon_url && soft.icon_url.trim()) {
-                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (
-                    soft.icon || '📦') + '\'">';
+                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' +
+                    fallback + '\'">';
             }
-            return soft.icon || '📦';
+            return fallback;
         }
 
         function renderPlatformBadges(soft) {
@@ -2351,12 +2370,13 @@
                 });
             } else if (keyword) {
                 var matches = cache.software.filter(function(s) {
-                    return s.name.toLowerCase().includes(keyword.toLowerCase());
+                    return s.name && s.name.toLowerCase().includes(keyword.toLowerCase());
                 }).slice(0, 8);
                 if (matches.length) {
                     sug.innerHTML = matches.map(function(s) {
-                        return '<div class="item" data-name="' + s.name + '">' + renderIcon(s) + ' ' + s
-                            .name + '</div>';
+                        var name = s.name || '未命名';
+                        return '<div class="item" data-name="' + name + '">' + renderIcon(s) + ' ' + name +
+                            '</div>';
                     }).join('');
                     sug.classList.add('open');
                     sug.querySelectorAll('.item').forEach(function(el) {
@@ -2999,6 +3019,9 @@
                     b.classList.remove('active');
                     if (b.dataset.cat === 'all') b.classList.add('active');
                 });
+                if (isMobile() && isOpen) {
+                    closeSidebar();
+                }
             },
             goList: function(cat) {
                 cat = cat || 'all';
@@ -3122,8 +3145,8 @@
                 if (keyword) {
                     var kw = keyword.toLowerCase();
                     list = list.filter(function(s) {
-                        return s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
-                            .includes(kw);
+                        return s.name && (s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
+                            .includes(kw));
                     });
                     document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length +
                         '项)';
