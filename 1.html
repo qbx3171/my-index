@@ -3284,11 +3284,11 @@
             var viewedIds = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
             if (viewedIds.length === 0) {
                 var recs = all.filter(function(s) { return s.recommend; });
-                if (recs.length >= 6) return recs.slice(0, 6);
+                if (recs.length >= 8) return recs.slice(0, 8);
                 var fallback = all.slice().sort(function(a, b) {
                     return (b.created_at || '').localeCompare(a.created_at || '');
                 });
-                return fallback.slice(0, 6);
+                return fallback.slice(0, 8);
             }
             var viewed = viewedIds.map(function(id) { return all.find(function(s) { return s.id === id; }); }).filter(Boolean);
             var catCount = {};
@@ -3306,16 +3306,16 @@
                 });
                 catSoft.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
                 candidates = candidates.concat(catSoft);
-                if (candidates.length >= 6) break;
+                if (candidates.length >= 8) break;
             }
-            if (candidates.length < 6) {
+            if (candidates.length < 8) {
                 var extra = all.filter(function(s) { return !usedIds.has(s.id) && !candidates.includes(s); });
                 extra.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
                 candidates = candidates.concat(extra);
             }
             var result = [];
             var pool = candidates.slice();
-            while (result.length < 6 && pool.length > 0) {
+            while (result.length < 8 && pool.length > 0) {
                 var idx = Math.floor(Math.random() * pool.length);
                 result.push(pool[idx]);
                 pool.splice(idx, 1);
@@ -3332,7 +3332,7 @@
                 if (aFav !== bFav) return bFav - aFav;
                 return (b.views || 0) - (a.views || 0);
             });
-            return sorted.slice(0, 6);
+            return sorted.slice(0, 8);
         }
 
         var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
@@ -4393,7 +4393,7 @@
         });
 
         var currentPage = 1,
-            PAGE_SIZE = 6,
+            PAGE_SIZE = 8,
             currentFilteredList = [];
 
         function getSortedCategories() {
@@ -4768,9 +4768,10 @@
                 renderRecommendations();
                 renderHotGrid();
                 renderTagCloud();
-                Render.renderCards(document.getElementById('latestGrid'), all.slice().sort(function(a, b) {
+                var latest = all.slice().sort(function(a, b) {
                     return (b.date || '').localeCompare(a.date || '');
-                }).slice(0, 6), true);
+                }).slice(0, 8);
+                Render.renderCards(document.getElementById('latestGrid'), latest, true);
                 renderRecentHistory();
                 document.getElementById('sidebarSearchWrapper').classList.remove('active');
                 document.getElementById('sidebarStats').style.display = 'block';
