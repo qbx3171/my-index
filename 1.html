@@ -2849,6 +2849,50 @@
             }
         };
 
+        var Render = {
+            renderAnnouncements: function(container) {
+                if (!container) return;
+                var quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+                var now = new Date();
+                var dateStr = (now.getMonth() + 1) + '/' + now.getDate();
+                container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' +
+                    dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
+            },
+            renderCards: function(container, list, showCategory, keyword) {
+                showCategory = showCategory !== false;
+                if (!container) return;
+                if (!list || list.length === 0) {
+                    container.innerHTML =
+                        '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p></div>';
+                    return;
+                }
+                var html = '';
+                for (var s of list) {
+                    var displayName = (s.name && s.name.trim()) ? s.name : '未命名软件';
+                    var displayDesc = s.description || '';
+                    if (keyword) {
+                        var regex = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                        displayName = displayName.replace(regex, '<mark>$1</mark>');
+                        displayDesc = displayDesc.replace(regex, '<mark>$1</mark>');
+                    }
+                    html += '<div class="software-card card" data-id="' + s.id +
+                        '" tabindex="0" role="button" aria-label="查看 ' + s.name + ' 详情">' +
+                        '<div class="card-top"><div class="card-icon">' + renderIcon(s) +
+                        '</div><div class="card-info"><h3>' + displayName +
+                        '</h3><div class="meta">' + (showCategory ? '<span>' + s.category + '</span>' : '') +
+                        '<span class="version">v' + s.version + '</span><span>' + (s.size || '—') +
+                        '</span></div><div class="platform-badges">' + renderPlatformBadges(s) +
+                        '</div></div></div>' +
+                        (displayDesc ? '<div class="desc">' + displayDesc + '</div>' : '') +
+                        '<div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (
+                            s.views || 0) + '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) +
+                        '</span></div><button class="btn btn-sm btn-primary detail-trigger" data-id="' + s.id +
+                        '">详情</button></div></div>';
+                }
+                container.innerHTML = html;
+            }
+        };
+
         var pinnedCategories = JSON.parse(localStorage.getItem('lezhe_pinned_cats') || '[]');
         var categoryClickCounts = JSON.parse(localStorage.getItem('lezhe_cat_clicks') || '{}');
         var sortUsage = JSON.parse(localStorage.getItem('lezhe_sort_usage') || '{}');
