@@ -893,6 +893,23 @@
             margin-bottom: 20px;
             font-size: 0.9rem;
         }
+        .section-title .refresh-btn {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 2px 12px;
+            border-radius: 50px;
+            background: rgba(0, 119, 255, 0.06);
+            border: 1px solid var(--border-glow);
+            margin-left: 8px;
+        }
+        .section-title .refresh-btn:hover {
+            background: var(--accent-gradient);
+            color: #fff;
+            border-color: transparent;
+        }
         .software-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -2597,11 +2614,6 @@
                         <span data-kw="视频">🎬 视频</span>
                         <span data-kw="AI">🤖 AI</span>
                     </div>
-                    <div style="text-align:center;margin-top:16px;">
-                        <button id="randomExploreBtn" class="btn btn-primary" style="font-size:0.9rem;padding:8px 28px;">
-                            🎲 命运之选 · 随机探索
-                        </button>
-                    </div>
                 </div>
 
                 <section id="pageHome">
@@ -2610,10 +2622,20 @@
                         <h2 class="section-title">🕒 最近浏览</h2>
                         <div class="software-grid" id="recentGrid"></div>
                     </div>
+
+                    <div style="margin-top:24px;" id="recommendSection">
+                        <h2 class="section-title">
+                            💡 为你推荐
+                            <button class="refresh-btn" id="refreshRecommendBtn"><i class="fas fa-sync-alt"></i> 换一批</button>
+                        </h2>
+                        <p class="section-sub" id="recommendSub">基于你的浏览历史智能推荐</p>
+                        <div class="software-grid" id="recommendGrid"></div>
+                    </div>
+
                     <div style="margin-top:24px;">
                         <h2 class="section-title">✦ 热门推荐</h2>
                         <p class="section-sub">社区口碑精选</p>
-                        <div class="software-grid" id="recommendGrid"></div>
+                        <div class="software-grid" id="hotGrid"></div>
                     </div>
                     <div style="margin-top:40px;">
                         <h2 class="section-title">✦ 最新上架</h2>
@@ -2947,6 +2969,50 @@
 
         function isHot(soft) {
             return (soft.downloads || 0) > 50 || (soft.views || 0) > 200 || soft.recommend;
+        }
+
+        function getRecommendations() {
+            var all = DB.getSoftware();
+            var viewedIds = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
+            if (viewedIds.length === 0) {
+                var recs = all.filter(function(s) { return s.recommend; });
+                if (recs.length >= 6) return recs.slice(0, 6);
+                var fallback = all.slice().sort(function(a, b) {
+                    return (b.created_at || '').localeCompare(a.created_at || '');
+                });
+                return fallback.slice(0, 6);
+            }
+            var viewed = viewedIds.map(function(id) { return all.find(function(s) { return s.id === id; }); }).filter(Boolean);
+            var catCount = {};
+            viewed.forEach(function(s) {
+                if (s && s.category) {
+                    catCount[s.category] = (catCount[s.category] || 0) + 1;
+                }
+            });
+            var sortedCats = Object.keys(catCount).sort(function(a, b) { return catCount[b] - catCount[a]; });
+            var candidates = [];
+            var usedIds = new Set(viewedIds);
+            for (var cat of sortedCats) {
+                var catSoft = all.filter(function(s) {
+                    return s.category === cat && !usedIds.has(s.id);
+                });
+                catSoft.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
+                candidates = candidates.concat(catSoft);
+                if (candidates.length >= 6) break;
+            }
+            if (candidates.length < 6) {
+                var extra = all.filter(function(s) { return !usedIds.has(s.id) && !candidates.includes(s); });
+                extra.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
+                candidates = candidates.concat(extra);
+            }
+            var result = [];
+            var pool = candidates.slice();
+            while (result.length < 6 && pool.length > 0) {
+                var idx = Math.floor(Math.random() * pool.length);
+                result.push(pool[idx]);
+                pool.splice(idx, 1);
+            }
+            return result;
         }
 
         var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
@@ -3323,6 +3389,29 @@
             section.classList.remove('hidden');
             Render.renderCards(container, recentSoftware, true);
         }
+
+        function renderRecommendations() {
+            var container = document.getElementById('recommendGrid');
+            var sub = document.getElementById('recommendSub');
+            var recs = getRecommendations();
+            if (recs.length > 0) {
+                var viewedIds = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
+                if (viewedIds.length > 0) {
+                    sub.textContent = '基于你浏览的 ' + viewedIds.length + ' 款软件智能推荐';
+                } else {
+                    sub.textContent = '暂无浏览历史，为你推荐精选软件';
+                }
+                Render.renderCards(container, recs, true);
+            } else {
+                container.innerHTML =
+                    '<div class="empty-state"><div class="icon">💡</div><h3>暂无推荐</h3><p>多浏览一些软件，推荐会更精准</p></div>';
+            }
+        }
+
+        document.getElementById('refreshRecommendBtn').addEventListener('click', function() {
+            renderRecommendations();
+            toast('推荐已刷新', 'success');
+        });
 
         var Detail = {
             open: function(soft) {
@@ -3824,38 +3913,6 @@
             });
         }
 
-        document.getElementById('randomExploreBtn').addEventListener('click', function() {
-            var all = DB.getSoftware();
-            if (all.length === 0) { toast('暂无软件', 'warning'); return; }
-            var weights = all.map(function(s) {
-                var base = 1;
-                if (s.recommend) base += 2;
-                if ((s.views || 0) > 50) base += 1;
-                if ((s.downloads || 0) > 20) base += 1;
-                return base;
-            });
-            var totalWeight = weights.reduce(function(a, b) { return a + b; }, 0);
-            var rand = Math.random() * totalWeight;
-            var idx = 0;
-            for (var i = 0; i < weights.length; i++) {
-                rand -= weights[i];
-                if (rand <= 0) { idx = i; break; }
-            }
-            var soft = all[idx];
-            var cards = document.querySelectorAll('.software-card');
-            cards.forEach(function(c) { c.style.transition = 'transform 0.1s, box-shadow 0.1s'; });
-            var targetCard = document.querySelector('.software-card[data-id="' + soft.id + '"]');
-            if (targetCard) {
-                targetCard.style.transform = 'scale(1.05)';
-                targetCard.style.boxShadow = '0 0 30px rgba(0,119,255,0.5)';
-                setTimeout(function() {
-                    targetCard.style.transform = '';
-                    targetCard.style.boxShadow = '';
-                }, 600);
-            }
-            setTimeout(function() { Detail.open(soft); }, 300);
-        });
-
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('shelfClear').addEventListener('click', function() {
                 shelfData = [];
@@ -3961,6 +4018,7 @@
                 DB.loadAll().then(function() {
                     self.refreshAll();
                     renderRecentHistory();
+                    renderRecommendations();
                     updateGreeting();
                     updateShelfUI();
                     updateDashboard();
@@ -3970,6 +4028,7 @@
                     DB.loadAll(true).then(function() {
                         self.refreshAll();
                         renderRecentHistory();
+                        renderRecommendations();
                         updateGreeting();
                         updateShelfUI();
                         updateDashboard();
@@ -4148,6 +4207,7 @@
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
                 renderRecentHistory();
+                renderRecommendations();
                 document.querySelectorAll('#mobileBottomNav a').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('#mobileBottomNav a[data-page="home"]').classList.add('active');
                 document.querySelectorAll('.category-item-side').forEach(function(el) { el.classList.remove('active'); });
@@ -4241,7 +4301,8 @@
                 var all = DB.getSoftware();
                 Render.renderAnnouncements(document.getElementById('announcementContainer'));
                 self.renderPinnedCategories();
-                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s
+                renderRecommendations();
+                Render.renderCards(document.getElementById('hotGrid'), all.filter(function(s) { return s
                         .recommend; }).slice(0, 6), true);
                 Render.renderCards(document.getElementById('latestGrid'), all.slice().sort(function(a, b) {
                     return (b.date || '').localeCompare(a.date || '');
