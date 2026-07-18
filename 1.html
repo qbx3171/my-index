@@ -3855,6 +3855,54 @@
             sortBy: localStorage.getItem('lezhe_pref_sort') || 'date',
             searchKeyword: '',
             platformFilter: localStorage.getItem('lezhe_pref_platform') || 'all',
+            getSortedCategories: function() {
+                var cats = DB.getCategories().slice();
+                var pinned = pinnedCategories.filter(function(c) { return cats.includes(c); });
+                var unpinned = cats.filter(function(c) { return !pinnedCategories.includes(c); });
+                return pinned.concat(unpinned);
+            },
+            renderPinnedCategories: function() {
+                var container = document.getElementById('categoryList');
+                if (!container) return;
+                var cats = this.getSortedCategories();
+                var all = DB.getSoftware();
+                var activeCat = this.currentPage === 'list' ? this.currentCategory : null;
+                container.innerHTML = cats.map(function(c) {
+                    var count = all.filter(function(s) { return s.category === c; }).length;
+                    var isPinned = pinnedCategories.includes(c);
+                    return '<div class="category-item-side ' + (c === activeCat ? 'active' : '') + '" data-cat="' + c +
+                        '"><span class="icon">' + getIconEmoji(c) + '</span><span class="name">' + c +
+                        '</span><span class="count">' + count +
+                        '</span><button class="pin-btn ' + (isPinned ? 'pinned' : '') + '" data-cat="' + c +
+                        '" title="固定到顶部"><i class="fas fa-thumbtack"></i></button></div>';
+                }).join('');
+                var self = this;
+                container.querySelectorAll('.category-item-side').forEach(function(el) {
+                    el.addEventListener('click', function(e) {
+                        if (e.target.closest('.pin-btn')) return;
+                        self.goList(this.dataset.cat);
+                    });
+                });
+                container.querySelectorAll('.pin-btn').forEach(function(el) {
+                    el.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        var cat = this.dataset.cat;
+                        var idx = pinnedCategories.indexOf(cat);
+                        if (idx > -1) {
+                            pinnedCategories.splice(idx, 1);
+                            this.classList.remove('pinned');
+                        } else {
+                            pinnedCategories.push(cat);
+                            this.classList.add('pinned');
+                        }
+                        localStorage.setItem('lezhe_pinned_cats', JSON.stringify(pinnedCategories));
+                        self.renderPinnedCategories();
+                        toast(pinnedCategories.includes(cat) ? '已固定: ' + cat : '已取消固定: ' + cat, 'success');
+                    });
+                });
+                var totalEl = document.getElementById('sidebarTotalCount');
+                if (totalEl) totalEl.textContent = '共 ' + all.length + ' 款软件';
+            },
             init: function() {
                 var self = this;
 
@@ -3991,7 +4039,7 @@
                 document.addEventListener('click', function(e) {
                     var nav = document.getElementById('navLinks');
                     if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
-                    'open');
+                        'open');
                 });
 
                 var themeToggle = document.getElementById('themeToggle');
@@ -4148,10 +4196,7 @@
                 var self = this;
                 var all = DB.getSoftware();
                 Render.renderAnnouncements(document.getElementById('announcementContainer'));
-                Render.renderCategories(document.getElementById('categoryList'), null, function(cat) {
-                    self.goList(cat);
-                });
-                this.renderPinnedCategories();
+                self.renderPinnedCategories();
                 Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s
                         .recommend; }).slice(0, 6), true);
                 Render.renderCards(document.getElementById('latestGrid'), all.slice().sort(function(a, b) {
@@ -4162,48 +4207,6 @@
                 document.getElementById('sidebarStats').style.display = 'block';
                 updateGreeting();
                 updateDashboard();
-            },
-            renderPinnedCategories: function() {
-                var container = document.getElementById('categoryList');
-                if (!container) return;
-                var cats = getSortedCategories();
-                var all = DB.getSoftware();
-                var activeCat = this.currentPage === 'list' ? this.currentCategory : null;
-                container.innerHTML = cats.map(function(c) {
-                    var count = all.filter(function(s) { return s.category === c; }).length;
-                    var isPinned = pinnedCategories.includes(c);
-                    return '<div class="category-item-side ' + (c === activeCat ? 'active' : '') + '" data-cat="' + c +
-                        '"><span class="icon">' + getIconEmoji(c) + '</span><span class="name">' + c +
-                        '</span><span class="count">' + count +
-                        '</span><button class="pin-btn ' + (isPinned ? 'pinned' : '') + '" data-cat="' + c +
-                        '" title="固定到顶部"><i class="fas fa-thumbtack"></i></button></div>';
-                }).join('');
-                container.querySelectorAll('.category-item-side').forEach(function(el) {
-                    el.addEventListener('click', function(e) {
-                        if (e.target.closest('.pin-btn')) return;
-                        if (self) self.goList(this.dataset.cat);
-                    });
-                });
-                container.querySelectorAll('.pin-btn').forEach(function(el) {
-                    el.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        var cat = this.dataset.cat;
-                        var idx = pinnedCategories.indexOf(cat);
-                        if (idx > -1) {
-                            pinnedCategories.splice(idx, 1);
-                            this.classList.remove('pinned');
-                        } else {
-                            pinnedCategories.push(cat);
-                            this.classList.add('pinned');
-                        }
-                        localStorage.setItem('lezhe_pinned_cats', JSON.stringify(pinnedCategories));
-                        if (self) self.renderPinnedCategories();
-                        toast(pinnedCategories.includes(cat) ? '已固定: ' + cat : '已取消固定: ' + cat,
-                        'success');
-                    });
-                });
-                var totalEl = document.getElementById('sidebarTotalCount');
-                if (totalEl) totalEl.textContent = '共 ' + all.length + ' 款软件';
             },
             refreshList: function(keyword) {
                 var self = this;
