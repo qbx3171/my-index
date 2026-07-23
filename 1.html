@@ -136,6 +136,7 @@
             transform: translateX(calc(-1 * var(--sidebar-width)));
             transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1), background 0.3s, border-color 0.3s;
             overflow: hidden;
+            will-change: transform;
         }
         .sidebar-categories.open {
             transform: translateX(0);
@@ -1898,7 +1899,7 @@
             position: fixed;
             bottom: 28px;
             right: 28px;
-            z-index: 999;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -2183,7 +2184,6 @@
         .stats-placeholder {
             display: none;
         }
-
         @media (max-width: 600px) {
             .software-grid {
                 gap: 14px;
@@ -2344,6 +2344,85 @@
                 font-size: 0.55rem;
                 padding: 1px 8px;
             }
+        }
+        .skeleton-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 22px 20px 18px;
+            min-height: 270px;
+            animation: shimmer 1.5s infinite;
+            border: 1px solid var(--border-glow);
+        }
+        @keyframes shimmer {
+            0% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.6;
+            }
+        }
+        .skeleton-card .skeleton-line {
+            height: 12px;
+            background: var(--border-glow);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .skeleton-card .skeleton-line.short {
+            width: 60%;
+        }
+        .skeleton-card .skeleton-line.medium {
+            width: 80%;
+        }
+        .skeleton-card .skeleton-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: var(--border-glow);
+            margin-bottom: 12px;
+        }
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+        .favorite-btn:hover {
+            color: var(--danger);
+            background: rgba(231, 76, 60, 0.08);
+        }
+        .favorite-btn.active {
+            color: var(--danger);
+        }
+        .detail-fav-btn {
+            font-size: 1.2rem;
+            padding: 4px 10px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 4px;
+        }
+        .detail-fav-btn.active {
+            color: var(--danger);
+        }
+        .detail-fav-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        .software-card .card-top .fav-wrap {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .software-card .card-top .fav-wrap .favorite-btn {
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -2541,7 +2620,7 @@
         <span class="share-label">分享</span>
     </div>
     <div class="stats-placeholder">
-        <script>
+        <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
             var _hmt = _hmt || [];
             (function() {
                 var hm = document.createElement("script");
@@ -2707,6 +2786,21 @@
             }, 2800);
         }
 
+        function escapeHTML(str) {
+            if (!str) return '';
+            var div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function highlightText(text, keyword) {
+            if (!keyword) return escapeHTML(text);
+            var escaped = escapeHTML(text);
+            var kw = escapeHTML(keyword);
+            var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            return escaped.replace(regex, '<mark>' + kw + '</mark>');
+        }
+
         function getIconEmoji(cat) {
             var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
             return map[cat] || '📦';
@@ -2728,6 +2822,20 @@
             if ((soft.platforms || []).includes('windows')) html +=
                 '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             return html;
+        }
+
+        function isFavorited(id) {
+            var favs = JSON.parse(localStorage.getItem('lezhe_favorites') || '[]');
+            return favs.includes(id);
+        }
+
+        function toggleFavorite(id) {
+            var favs = JSON.parse(localStorage.getItem('lezhe_favorites') || '[]');
+            var idx = favs.indexOf(id);
+            if (idx > -1) favs.splice(idx, 1);
+            else favs.push(id);
+            localStorage.setItem('lezhe_favorites', JSON.stringify(favs));
+            return favs.includes(id);
         }
         var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
 
@@ -2968,18 +3076,22 @@
                     var displayName = (s.name && s.name.trim()) ? s.name : '未命名软件';
                     var displayDesc = s.description || '';
                     if (keyword) {
-                        var regex = new RegExp('(' + keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-                        displayName = displayName.replace(regex, '<mark>$1</mark>');
-                        displayDesc = displayDesc.replace(regex, '<mark>$1</mark>');
+                        displayName = highlightText(displayName, keyword);
+                        displayDesc = highlightText(displayDesc, keyword);
+                    } else {
+                        displayName = escapeHTML(displayName);
+                        displayDesc = escapeHTML(displayDesc);
                     }
+                    var fav = isFavorited(s.id) ? 'active' : '';
                     html += '<div class="software-card card" data-id="' + s.id +
                         '" tabindex="0" role="button" aria-label="查看 ' + s.name + ' 详情">' +
                         '<div class="card-top"><div class="card-icon">' + renderIcon(s) +
                         '</div><div class="card-info"><h3>' + displayName +
-                        '</h3><div class="meta">' + (showCategory ? '<span>' + s.category + '</span>' : '') +
-                        '<span class="version">v' + s.version + '</span><span>' + (s.size || '—') +
+                        '</h3><div class="meta">' + (showCategory ? '<span>' + escapeHTML(s.category) + '</span>' : '') +
+                        '<span class="version">v' + escapeHTML(s.version) + '</span><span>' + escapeHTML(s.size || '—') +
                         '</span></div><div class="platform-badges">' + renderPlatformBadges(s) +
-                        '</div></div></div>' +
+                        '</div></div><div class="fav-wrap"><button class="favorite-btn ' + fav +
+                        '" data-id="' + s.id + '" aria-label="收藏"><i class="fas fa-heart"></i></button></div></div>' +
                         (displayDesc ? '<div class="desc">' + displayDesc + '</div>' : '') +
                         '<div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (
                             s.views || 0) + '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) +
@@ -2987,6 +3099,25 @@
                         '">详情</button></div></div>';
                 }
                 container.innerHTML = html;
+                container.querySelectorAll('.favorite-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        var id = this.dataset.id;
+                        var nowFav = toggleFavorite(id);
+                        if (nowFav) {
+                            this.classList.add('active');
+                            toast('已收藏', 'success');
+                        } else {
+                            this.classList.remove('active');
+                            toast('已取消收藏', 'warning');
+                        }
+                        var detailFav = document.querySelector('.detail-fav-btn[data-id="' + id + '"]');
+                        if (detailFav) {
+                            if (nowFav) detailFav.classList.add('active');
+                            else detailFav.classList.remove('active');
+                        }
+                    });
+                });
             }
         };
         var viewHistory = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
@@ -3026,9 +3157,9 @@
                         (soft.icon || '📦') + '\'">';
                 } else iconEl.textContent = soft.icon || '📦';
                 document.getElementById('detailName').textContent = soft.name || '未命名';
-                document.getElementById('detailMeta').innerHTML = '<span class="badge">' + soft.category +
-                    '</span><span class="badge badge-purple">v' + soft.version + '</span><span>' + (soft.size || '—') +
-                    '</span>';
+                document.getElementById('detailMeta').innerHTML = '<span class="badge">' + escapeHTML(soft.category) +
+                    '</span><span class="badge badge-purple">v' + escapeHTML(soft.version) + '</span><span>' + escapeHTML(
+                        soft.size || '—') + '</span>';
                 var descEl = document.getElementById('detailDesc');
                 var descText = soft.detail || soft.description || '';
                 if (descText.trim().length > 0) {
@@ -3083,8 +3214,7 @@
                             badgeHtml = '<span class="badge-mini">🔥 热门</span>';
                         }
                         var idStr = rs.id;
-                        return '<div class="related-card" data-id="' + idStr + '" onclick="Detail.openById(\'' + idStr +
-                            '\')">' +
+                        return '<div class="related-card" data-id="' + idStr + '">' +
                             badgeHtml +
                             '<div class="icon-wrap">' + renderIcon(rs) + '</div>' +
                             '<div class="name" title="' + rs.name + '">' + rs.name + '</div>' +
@@ -3092,6 +3222,13 @@
                             '<div class="platforms">' + platHtml + '</div>' +
                             '</div>';
                     }).join('');
+                    relatedGrid.querySelectorAll('.related-card').forEach(function(el) {
+                        el.addEventListener('click', function() {
+                            var id = this.dataset.id;
+                            Detail.close();
+                            setTimeout(function() { Detail.openById(id); }, 200);
+                        });
+                    });
                 } else related.classList.add('hidden');
                 var dlBtn = document.getElementById('detailDownload');
                 dlBtn.innerHTML = '<i class="fas fa-download"></i> 下载';
@@ -3157,6 +3294,7 @@
             var card = e.target.closest('.software-card');
             if (!card) return;
             if (e.target.closest('.detail-trigger')) return;
+            if (e.target.closest('.favorite-btn')) return;
             var id = card.dataset.id;
             if (id) {
                 var soft = DB.getSoftware().find(function(s) { return s.id === id; });
@@ -3749,5 +3887,6 @@
             }
         }
     </script>
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
