@@ -2025,7 +2025,7 @@
                 font-size: 1rem;
             }
             .share-float {
-                bottom: 140px;
+                bottom: 160px;
                 right: 12px;
             }
             .share-float a {
@@ -2174,10 +2174,7 @@
             border-color: transparent;
         }
         .share-float .share-label {
-            font-size: 0.6rem;
-            text-align: center;
-            color: var(--text-dim);
-            margin-top: 4px;
+            display: none;
         }
         .stats-placeholder {
             display: none;
@@ -2310,8 +2307,17 @@
                 font-size: 0.7rem;
             }
             .back-top {
-                bottom: 75px;
+                bottom: 70px;
                 right: 16px;
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+            .share-float {
+                bottom: 150px;
+                right: 12px;
+            }
+            .share-float a {
                 width: 36px;
                 height: 36px;
                 font-size: 0.9rem;
@@ -2341,6 +2347,22 @@
             .software-card .card-footer .btn {
                 font-size: 0.55rem;
                 padding: 1px 8px;
+            }
+            .back-top {
+                bottom: 60px;
+                right: 14px;
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+            .share-float {
+                bottom: 140px;
+                right: 10px;
+            }
+            .share-float a {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
             }
         }
         .skeleton-card {
@@ -2615,7 +2637,6 @@
         <a href="#" onclick="shareOn('weibo')" title="分享到微博"><i class="fab fa-weibo"></i></a>
         <a href="#" onclick="shareOn('twitter')" title="分享到Twitter"><i class="fab fa-twitter"></i></a>
         <a href="#" onclick="copyLink()" title="复制链接"><i class="fas fa-link"></i></a>
-        <span class="share-label">分享</span>
     </div>
     <div class="stats-placeholder">
         <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
