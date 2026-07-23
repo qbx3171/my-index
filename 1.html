@@ -1874,6 +1874,9 @@
             margin-bottom: 8px;
             color: var(--text-primary);
         }
+        .empty-state .btn {
+            margin-top: 16px;
+        }
         .divider-cyber {
             display: flex;
             align-items: center;
@@ -1921,6 +1924,7 @@
             align-items: center;
             gap: 10px;
             pointer-events: auto;
+            cursor: pointer;
         }
         .toast.success .icon {
             color: var(--success);
@@ -1930,6 +1934,9 @@
         }
         .toast.warning .icon {
             color: var(--warning);
+        }
+        .toast:hover {
+            opacity: 0.8;
         }
         @keyframes toastIn {
             to {
@@ -2444,6 +2451,68 @@
         .software-card .card-top .fav-wrap .favorite-btn {
             font-size: 0.9rem;
         }
+        .error-retry {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .error-retry .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+        .error-retry h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .error-retry .btn {
+            margin-top: 16px;
+        }
+        .toast .toast-close {
+            margin-left: auto;
+            padding: 0 4px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            cursor: pointer;
+        }
+        .toast .toast-close:hover {
+            opacity: 1;
+        }
+        .detail-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .detail-nav-btn:hover {
+            background: rgba(0, 0, 0, 0.12);
+            color: var(--text-primary);
+        }
+        .detail-nav-btn.left {
+            left: 8px;
+        }
+        .detail-nav-btn.right {
+            right: 8px;
+        }
+        .detail-modal .modal-body {
+            position: relative;
+        }
+        @media (max-width: 640px) {
+            .detail-nav-btn {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2768,6 +2837,7 @@
                     cache.loaded = true;
                     cache.lastFetch = Date.now();
                     saveCacheToStorage();
+                    return true;
                 } catch (e) {
                     console.error('加载数据失败:', e);
                     if (!cache.loaded) {
@@ -2775,6 +2845,7 @@
                         cache.categories = ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                         cache.loaded = true;
                     }
+                    return false;
                 }
             },
             getSoftware: function() { return cache.software; },
@@ -2797,12 +2868,24 @@
             var el = document.createElement('div');
             el.className = 'toast ' + type;
             el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' +
-                msg;
+                msg + '<span class="toast-close">✕</span>';
             c.appendChild(el);
+            el.querySelector('.toast-close').addEventListener('click', function(e) {
+                e.stopPropagation();
+                el.style.animation = 'toastOut 0.3s ease forwards';
+                setTimeout(function() { el.remove(); }, 400);
+            });
+            el.addEventListener('click', function(e) {
+                if (e.target.classList.contains('toast-close')) return;
+                this.style.animation = 'toastOut 0.3s ease forwards';
+                setTimeout(function() { this.remove(); }, 400);
+            });
             setTimeout(function() {
-                el.style.animation = 'toastOut 0.4s ease forwards';
-                setTimeout(function() { el.remove(); }, 500);
-            }, 2800);
+                if (el.parentNode) {
+                    el.style.animation = 'toastOut 0.4s ease forwards';
+                    setTimeout(function() { el.remove(); }, 500);
+                }
+            }, 3500);
         }
 
         function escapeHTML(str) {
@@ -2864,7 +2947,10 @@
             localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
         }
 
+        var searchDebounceTimer = null;
+
         function showSuggestions(keyword) {
+            clearTimeout(searchDebounceTimer);
             var sug = document.getElementById('searchSuggestions');
             var hist = document.getElementById('searchHistory');
             sug.innerHTML = '';
@@ -2895,25 +2981,28 @@
                     });
                 });
             } else if (keyword) {
-                var matches = cache.software.filter(function(s) {
-                    return s.name && s.name.toLowerCase().includes(keyword.toLowerCase());
-                }).slice(0, 8);
-                if (matches.length) {
-                    sug.innerHTML = matches.map(function(s) {
-                        var name = s.name || '未命名';
-                        return '<div class="item" data-name="' + name + '">' + renderIcon(s) + ' ' + name +
-                            '</div>';
-                    }).join('');
-                    sug.classList.add('open');
-                    sug.querySelectorAll('.item').forEach(function(el) {
-                        el.addEventListener('click', function() {
-                            var name = this.dataset.name;
-                            document.getElementById('searchInput').value = name;
-                            App.doSearch(name);
-                            sug.classList.remove('open');
+                searchDebounceTimer = setTimeout(function() {
+                    var matches = cache.software.filter(function(s) {
+                        return s.name && s.name.toLowerCase().includes(keyword.toLowerCase());
+                    }).slice(0, 8);
+                    if (matches.length) {
+                        sug.innerHTML = matches.map(function(s) {
+                            var name = s.name || '未命名';
+                            return '<div class="item" data-name="' + name + '">' + renderIcon(s) + ' ' +
+                                name +
+                                '</div>';
+                        }).join('');
+                        sug.classList.add('open');
+                        sug.querySelectorAll('.item').forEach(function(el) {
+                            el.addEventListener('click', function() {
+                                var name = this.dataset.name;
+                                document.getElementById('searchInput').value = name;
+                                App.doSearch(name);
+                                sug.classList.remove('open');
+                            });
                         });
-                    });
-                }
+                    }
+                }, 200);
             }
         }
         var currentView = 'grid';
@@ -3081,13 +3170,48 @@
                 var totalEl = document.getElementById('sidebarTotalCount');
                 if (totalEl) totalEl.textContent = '共 ' + totalCount + ' 款软件';
                 scrollToActiveItem();
+                if (active && active !== 'all') {
+                    var target = container.querySelector('.category-item-side[data-cat="' + active + '"]');
+                    if (target) {
+                        var group = target.closest('.category-group');
+                        if (group) {
+                            var header = group.querySelector('.group-header');
+                            var items = group.querySelector('.group-items');
+                            if (header && items) {
+                                var gid = header.dataset.group;
+                                var states = getGroupStates();
+                                if (!states[gid]) {
+                                    states[gid] = true;
+                                    saveGroupStates(states);
+                                    items.classList.add('open');
+                                    var icon = header.querySelector('.toggle-icon');
+                                    if (icon) icon.classList.add('open');
+                                }
+                            }
+                        }
+                        target.classList.add('active');
+                        requestAnimationFrame(function() {
+                            target.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        });
+                    }
+                }
             },
             renderCards: function(container, list, showCategory, keyword) {
                 showCategory = showCategory !== false;
                 if (!container) return;
                 if (!list || list.length === 0) {
                     container.innerHTML =
-                        '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p></div>';
+                        '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p>' +
+                        (keyword ? '<button class="btn btn-sm btn-outline" id="clearSearchBtn">清空搜索</button>' : '') +
+                        '</div>';
+                    var clearBtn = container.querySelector('#clearSearchBtn');
+                    if (clearBtn) {
+                        clearBtn.addEventListener('click', function() {
+                            document.getElementById('searchInput').value = '';
+                            document.getElementById('sidebarSearchInput').value = '';
+                            App.goHome();
+                        });
+                    }
                     return;
                 }
                 var html = '';
@@ -3284,23 +3408,35 @@
                 };
                 document.getElementById('detailShareBtn').onclick = function() {
                     var url = window.location.origin + window.location.pathname + '?soft=' + soft.id;
-                    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function() { toast(
-                            '链接已复制'); });
-                    else {
-                        var input = document.createElement('input');
-                        input.value = url;
-                        document.body.appendChild(input);
-                        input.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(input);
-                        toast('链接已复制');
-                    }
+                    copyLinkText(soft.name + ' - 乐哲软件', url);
                 };
                 overlay.classList.add('open');
                 document.body.style.overflow = 'hidden';
                 document.getElementById('detailClose').focus();
                 setTimeout(function() { renderRecentHistory(); }, 100);
+                this._currentSoft = soft;
+                this._currentIdx = cache.software.indexOf(soft);
+                var self = this;
+                document.addEventListener('keydown', this._keyHandler = function(e) {
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        var dir = e.key === 'ArrowLeft' ? -1 : 1;
+                        var list = cache.software.filter(function(s) { return s.category === self._currentSoft
+                                .category; });
+                        var idx = list.indexOf(self._currentSoft);
+                        var newIdx = idx + dir;
+                        if (newIdx >= 0 && newIdx < list.length) {
+                            self.close();
+                            setTimeout(function() { self.open(list[newIdx]); }, 150);
+                        } else {
+                            toast('已是第一个或最后一个', 'warning');
+                        }
+                    }
+                });
             },
+            _keyHandler: null,
+            _currentSoft: null,
+            _currentIdx: -1,
             openById: function(id) {
                 var soft = cache.software.find(function(s) { return s.id === id; });
                 if (soft) {
@@ -3312,6 +3448,17 @@
             close: function() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
+                if (this._keyHandler) {
+                    document.removeEventListener('keydown', this._keyHandler);
+                    this._keyHandler = null;
+                }
+                this._currentSoft = null;
+                this._currentIdx = -1;
+                var listGrid = document.getElementById('listGrid');
+                if (listGrid && App._scrollPos) {
+                    listGrid.scrollTop = App._scrollPos;
+                    App._scrollPos = 0;
+                }
             }
         };
         document.getElementById('detailClose').addEventListener('click', Detail.close);
@@ -3327,7 +3474,11 @@
             var id = card.dataset.id;
             if (id) {
                 var soft = DB.getSoftware().find(function(s) { return s.id === id; });
-                if (soft) Detail.open(soft);
+                if (soft) {
+                    var listGrid = document.getElementById('listGrid');
+                    if (listGrid) App._scrollPos = listGrid.scrollTop;
+                    Detail.open(soft);
+                }
             }
         });
         document.addEventListener('click', function(e) {
@@ -3336,7 +3487,11 @@
             var id = btn.dataset.id;
             if (id) {
                 var soft = DB.getSoftware().find(function(s) { return s.id === id; });
-                if (soft) Detail.open(soft);
+                if (soft) {
+                    var listGrid = document.getElementById('listGrid');
+                    if (listGrid) App._scrollPos = listGrid.scrollTop;
+                    Detail.open(soft);
+                }
             }
         });
         document.addEventListener('keydown', function(e) {
@@ -3523,6 +3678,7 @@
             sortBy: 'date',
             searchKeyword: '',
             platformFilter: 'all',
+            _scrollPos: 0,
             init: function() {
                 var self = this;
                 var savedSort = localStorage.getItem('lezhe_sort_by');
@@ -3534,14 +3690,37 @@
                 if (hasCache) {
                     self.refreshAll();
                 }
-                DB.loadAll(true).then(function() {
-                    self.refreshAll();
-                    renderRecentHistory();
-                });
+                this._loadDataWithRetry = function() {
+                    DB.loadAll(true).then(function(success) {
+                        if (success) {
+                            self.refreshAll();
+                            renderRecentHistory();
+                            var errContainer = document.getElementById('listGrid');
+                            if (errContainer && errContainer.querySelector('.error-retry')) {
+                                errContainer.innerHTML = '';
+                            }
+                        } else {
+                            var grid = document.getElementById('listGrid');
+                            if (grid) {
+                                grid.innerHTML =
+                                    '<div class="error-retry"><div class="icon">⚠</div><h3>数据加载失败</h3><p>请检查网络后重试</p><button class="btn btn-primary" id="retryLoadBtn">重新加载</button></div>';
+                                var retryBtn = document.getElementById('retryLoadBtn');
+                                if (retryBtn) {
+                                    retryBtn.addEventListener('click', function() {
+                                        self._loadDataWithRetry();
+                                    });
+                                }
+                            }
+                        }
+                    });
+                };
+                this._loadDataWithRetry();
                 setInterval(function() {
-                    DB.loadAll(true).then(function() {
-                        self.refreshAll();
-                        renderRecentHistory();
+                    DB.loadAll(true).then(function(success) {
+                        if (success) {
+                            self.refreshAll();
+                            renderRecentHistory();
+                        }
                     });
                 }, 600000);
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
@@ -3875,13 +4054,22 @@
                     totalPages = Math.ceil(total / PAGE_SIZE) || 1;
                 if (currentPage > totalPages) currentPage = totalPages;
                 var items = currentFilteredList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-                Render.renderCards(document.getElementById('listGrid'), items, true, keyword || this.searchKeyword);
+                var grid = document.getElementById('listGrid');
+                if (items.length === 0 && !keyword) {
+                    Render.renderCards(grid, [], true);
+                } else {
+                    Render.renderCards(grid, items, true, keyword || this.searchKeyword);
+                }
                 document.getElementById('pageInfo').textContent = '第 ' + currentPage + ' / ' + totalPages + ' 页';
                 document.getElementById('prevPageBtn').disabled = currentPage <= 1;
                 document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
                 document.getElementById('jumpPageInput').value = currentPage;
                 document.getElementById('jumpPageInput').max = totalPages;
                 applyViewMode();
+                if (this._scrollPos && grid) {
+                    grid.scrollTop = this._scrollPos;
+                    this._scrollPos = 0;
+                }
             },
             refreshListWithFilters: function() {
                 var kw = document.getElementById('searchInput').value.trim() || document.getElementById(
@@ -3907,7 +4095,7 @@
                 twitter: 'https://twitter.com/intent/tweet?text=' + title + '&url=' + url
             };
             if (platform === 'wechat') {
-                copyLink();
+                copyLinkText('乐哲软件 · 精选高效工具', window.location.href);
                 toast('请复制链接后打开微信分享给好友', 'success');
                 return;
             }
@@ -3915,21 +4103,25 @@
             if (typeof gtag !== 'undefined') gtag('event', 'share', { platform: platform });
         }
 
-        function copyLink() {
-            var url = window.location.href;
+        function copyLinkText(title, url) {
+            var text = title + '\n' + url;
             if (navigator.clipboard) {
-                navigator.clipboard.writeText(url).then(function() {
-                    toast('链接已复制，快去分享吧', 'success');
+                navigator.clipboard.writeText(text).then(function() {
+                    toast('已复制标题与链接', 'success');
                 });
             } else {
                 var input = document.createElement('input');
-                input.value = url;
+                input.value = text;
                 document.body.appendChild(input);
                 input.select();
                 document.execCommand('copy');
                 document.body.removeChild(input);
-                toast('链接已复制，快去分享吧', 'success');
+                toast('已复制标题与链接', 'success');
             }
+        }
+
+        function copyLink() {
+            copyLinkText('乐哲软件 · 精选高效工具', window.location.href);
         }
     </script>
     <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
