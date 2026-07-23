@@ -1404,6 +1404,23 @@
                 font-size: 0.7rem;
             }
         }
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+            gap: 14px;
+        }
+        .loading-spinner .spinner {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border-glow);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -1822,6 +1839,8 @@
             _tabCache: {},
             _sortField: null,
             _sortOrder: null,
+            _refreshing: false,
+            _dataLoaded: false,
 
             init: function() {
                 var theme = localStorage.getItem('lezhe_theme') || 'dark';
@@ -1857,6 +1876,7 @@
                         }
                         this.classList.add('active');
                         App._editingId = null;
+                        App._selectedIds = [];
                         App.renderAdminTab(tab);
                     });
                 }
@@ -1879,6 +1899,24 @@
                     if (e.target === this) {
                         this.classList.add('hidden');
                     }
+                });
+
+                this.preloadData();
+            },
+
+            preloadData: function() {
+                var self = this;
+                DB.getSoftwareFromCloud().then(function(data) {
+                    self._allSoftware = data;
+                    self._filteredSoftware = data.slice();
+                    self._dataLoaded = true;
+                    if (self._currentAdminTab === 'software') {
+                        var main = document.getElementById('adminMain');
+                        if (main) self._renderSoftwarePage(main);
+                    }
+                });
+                DB.getCategoriesFromCloud().then(function(cats) {
+                    self._categories = cats;
                 });
             },
 
@@ -1928,26 +1966,38 @@
             renderAdminTab: function(tab) {
                 this._currentAdminTab = tab;
                 var main = document.getElementById('adminMain');
-                var cacheKey = tab;
-                if (this._tabCache[tab] && tab !== 'add') {
-                    main.innerHTML = this._tabCache[tab];
-                    if (tab === 'software') {
-                        this._bindSoftwareEvents(main);
-                    } else if (tab === 'categories') {
-                        this._bindCategoriesEvents(main);
-                    } else if (tab === 'users') {
-                        this._bindUsersEvents(main);
-                    } else if (tab === 'settings') {
-                        this._bindSettingsEvents(main);
+
+                if (tab === 'software') {
+                    if (this._dataLoaded) {
+                        this._renderSoftwarePage(main);
+                    } else {
+                        main.innerHTML =
+                            '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
+                        var self = this;
+                        var checkData = function() {
+                            if (self._dataLoaded) {
+                                self._renderSoftwarePage(main);
+                            } else {
+                                setTimeout(checkData, 100);
+                            }
+                        };
+                        checkData();
                     }
                     return;
                 }
 
-                main.innerHTML =
-                    '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;color:var(--text-dim);"><span class="spinner" style="width:28px;height:28px;border:2px solid var(--border-glow);border-top-color:var(--accent-cyan);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;margin-right:14px;"></span> 加载中...</div>';
+                if (this._tabCache[tab]) {
+                    main.innerHTML = this._tabCache[tab];
+                    if (tab === 'categories') this._bindCategoriesEvents(main);
+                    else if (tab === 'users') this._bindUsersEvents(main);
+                    else if (tab === 'settings') this._bindSettingsEvents(main);
+                    return;
+                }
 
+                main.innerHTML =
+                    '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
+                var self = this;
                 if (tab === 'dashboard') this.renderDashboard(main);
-                else if (tab === 'software') this.renderSoftwareList(main);
                 else if (tab === 'categories') this.renderCategories(main);
                 else if (tab === 'add') this.renderAddForm(main);
                 else if (tab === 'users') this.renderUsers(main);
@@ -1982,9 +2032,14 @@
                 if (refreshBtn) {
                     refreshBtn.addEventListener('click', function() {
                         DB.invalidateCache();
-                        self._allSoftware = [];
-                        self.renderAdminTab('software');
-                        toast('已刷新', 'success');
+                        self._dataLoaded = false;
+                        DB.getSoftwareFromCloud(true).then(function(data) {
+                            self._allSoftware = data;
+                            self._filteredSoftware = data.slice();
+                            self._dataLoaded = true;
+                            self._renderSoftwarePage(container);
+                            toast('已刷新', 'success');
+                        });
                     });
                 }
                 var exportBtn = container.querySelector('#exportBtn');
@@ -2004,8 +2059,13 @@
                                 toast('已批量删除 ' + ids.length + ' 个软件', 'success');
                                 self._selectedIds = [];
                                 DB.invalidateCache();
-                                self._allSoftware = [];
-                                self.renderAdminTab('software');
+                                self._dataLoaded = false;
+                                DB.getSoftwareFromCloud(true).then(function(data) {
+                                    self._allSoftware = data;
+                                    self._filteredSoftware = data.slice();
+                                    self._dataLoaded = true;
+                                    self._renderSoftwarePage(container);
+                                });
                             });
                         }
                     });
@@ -2021,8 +2081,13 @@
                                 toast('已批量推荐 ' + ids.length + ' 个软件', 'success');
                                 self._selectedIds = [];
                                 DB.invalidateCache();
-                                self._allSoftware = [];
-                                self.renderAdminTab('software');
+                                self._dataLoaded = false;
+                                DB.getSoftwareFromCloud(true).then(function(data) {
+                                    self._allSoftware = data;
+                                    self._filteredSoftware = data.slice();
+                                    self._dataLoaded = true;
+                                    self._renderSoftwarePage(container);
+                                });
                             });
                         }
                     });
@@ -2038,8 +2103,13 @@
                                 toast('已取消推荐 ' + ids.length + ' 个软件', 'success');
                                 self._selectedIds = [];
                                 DB.invalidateCache();
-                                self._allSoftware = [];
-                                self.renderAdminTab('software');
+                                self._dataLoaded = false;
+                                DB.getSoftwareFromCloud(true).then(function(data) {
+                                    self._allSoftware = data;
+                                    self._filteredSoftware = data.slice();
+                                    self._dataLoaded = true;
+                                    self._renderSoftwarePage(container);
+                                });
                             });
                         }
                     });
@@ -2063,6 +2133,7 @@
                 if (backLink) {
                     backLink.addEventListener('click', function() {
                         self._editingId = null;
+                        self._selectedIds = [];
                         self.renderAdminTab('software');
                     });
                 }
@@ -2082,6 +2153,8 @@
                         DB.addLog('添加分类', '添加分类: ' + name);
                         input.value = '';
                         toast('分类已添加', 'success');
+                        self._tabCache['categories'] = null;
+                        self._tabCache['software'] = null;
                         self.renderAdminTab('categories');
                     });
                 }
@@ -2100,6 +2173,8 @@
                             await DB.deleteCategoryFromCloud(cat);
                             DB.addLog('删除分类', '删除分类: ' + cat);
                             toast('分类已删除', 'success');
+                            self._tabCache['categories'] = null;
+                            self._tabCache['software'] = null;
                             self.renderAdminTab('categories');
                         }
                     });
@@ -2126,6 +2201,7 @@
                         document.getElementById('newUsername').value = '';
                         document.getElementById('newPassword').value = '';
                         toast('用户 ' + name + ' 已添加', 'success');
+                        self._tabCache['users'] = null;
                         self.renderUsers(container);
                     });
                 }
@@ -2139,6 +2215,7 @@
                             DB.set('users', usersList);
                             DB.addLog('删除用户', '删除用户: ' + username);
                             toast('用户已删除', 'success');
+                            self._tabCache['users'] = null;
                             self.renderUsers(container);
                         }
                     });
@@ -2198,6 +2275,7 @@
                         if (confirm('确定清空所有操作日志吗？')) {
                             DB.clearLogs();
                             toast('日志已清空', 'success');
+                            self._tabCache['settings'] = null;
                             self.renderSettings(container);
                         }
                     });
@@ -2291,29 +2369,40 @@
                 if (refreshBtn) {
                     refreshBtn.addEventListener('click', function() {
                         DB.invalidateCache();
+                        App._dataLoaded = false;
+                        DB.getSoftwareFromCloud(true).then(function(data) {
+                            App._allSoftware = data;
+                            App._filteredSoftware = data.slice();
+                            App._dataLoaded = true;
+                        });
                         App.renderAdminTab('dashboard');
                         toast('已刷新', 'success');
                     });
                 }
             },
 
-            renderSoftwareList: async function(container) {
-                this._isLoading = true;
-                var all = await DB.getSoftwareFromCloud();
-                this._isLoading = false;
-                this._allSoftware = all;
-                this._filteredSoftware = all.slice();
-                this._currentPage = 1;
-                this._selectedIds = [];
-                this._sortField = null;
-                this._sortOrder = null;
-                this._renderSoftwarePage(container);
-                this._tabCache['software'] = container.innerHTML;
+            renderSoftwareList: function(container) {
+                if (this._dataLoaded) {
+                    this._renderSoftwarePage(container);
+                } else {
+                    container.innerHTML =
+                        '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
+                    var self = this;
+                    var checkData = function() {
+                        if (self._dataLoaded) {
+                            self._renderSoftwarePage(container);
+                        } else {
+                            setTimeout(checkData, 100);
+                        }
+                    };
+                    checkData();
+                }
             },
 
             _renderSoftwarePage: function(container) {
                 var self = this;
                 var all = this._allSoftware;
+                if (!all) all = [];
                 var keyword = this._searchKeyword.toLowerCase().trim();
                 var filterCat = this._filterCategory;
 
@@ -2401,6 +2490,7 @@
                 html += '</div></div>';
 
                 container.innerHTML = html;
+                this._tabCache['software'] = container.innerHTML;
 
                 var wrap = document.getElementById('softwareTableWrap');
                 var selectedIds = this._selectedIds;
@@ -2426,24 +2516,39 @@
                     onView: function(id) {
                         var soft = self._allSoftware.find(function(s) { return s.id === id; });
                         if (soft) App.showDetail(soft);
+                        else toast('未找到该软件', 'error');
                     },
                     onEdit: function(id) {
                         var soft = self._allSoftware.find(function(s) { return s.id === id; });
                         if (soft) {
                             self._editingId = id;
+                            self._selectedIds = [];
                             self.renderAdminTab('add');
-                            setTimeout(function() { self._fillEditForm(soft); }, 100);
+                            setTimeout(function() {
+                                var form = document.getElementById('adminForm');
+                                if (form) {
+                                    self._fillEditForm(soft);
+                                }
+                            }, 50);
+                        } else {
+                            toast('未找到该软件', 'error');
                         }
                     },
                     onDelete: async function(id) {
-                        await DB.deleteSoftwareFromCloud(id);
-                        DB.addLog('删除软件', '删除软件 ID: ' + shortId(id));
-                        toast('已删除', 'success');
-                        DB.invalidateCache();
-                        self._allSoftware = await DB.getSoftwareFromCloud(true);
-                        self._selectedIds = [];
-                        self._renderSoftwarePage(container);
-                        self._tabCache['software'] = container.innerHTML;
+                        if (confirm('确定要删除此软件吗？')) {
+                            await DB.deleteSoftwareFromCloud(id);
+                            DB.addLog('删除软件', '删除软件 ID: ' + shortId(id));
+                            toast('已删除', 'success');
+                            DB.invalidateCache();
+                            self._dataLoaded = false;
+                            var data = await DB.getSoftwareFromCloud(true);
+                            self._allSoftware = data;
+                            self._filteredSoftware = data.slice();
+                            self._dataLoaded = true;
+                            self._selectedIds = [];
+                            self._renderSoftwarePage(container);
+                            self._tabCache['software'] = container.innerHTML;
+                        }
                     },
                     onSelect: function() {
                         var checks = wrap.querySelectorAll('.row-checkbox:checked');
@@ -2481,12 +2586,9 @@
                                 batchUnrecBtn.style.display = 'none';
                             }
                         }
-                        self._renderSoftwarePage(container);
-                        self._tabCache['software'] = container.innerHTML;
                     }
                 });
 
-                this._tabCache['software'] = container.innerHTML;
                 this._bindSoftwareEvents(container);
             },
 
@@ -2518,26 +2620,39 @@
             _fillEditForm: function(soft) {
                 var form = document.getElementById('adminForm');
                 if (!form) return;
-                form.querySelector('[name="name"]').value = soft.name || '';
-                form.querySelector('[name="category"]').value = soft.category || '';
-                form.querySelector('[name="version"]').value = soft.version || '';
-                form.querySelector('[name="description"]').value = soft.description || '';
-                form.querySelector('[name="detail"]').value = soft.detail || '';
-                form.querySelector('[name="icon"]').value = soft.icon || '📦';
-                form.querySelector('[name="iconUrl"]').value = soft.icon_url || '';
-                form.querySelector('[name="downloadUrl"]').value = soft.download_url || '';
-                form.querySelector('[name="size"]').value = soft.size || '';
-                form.querySelector('[name="recommend"]').checked = !!soft.recommend;
-                var platforms = soft.platforms || [];
+                var nameInput = form.querySelector('[name="name"]');
+                var catSelect = form.querySelector('[name="category"]');
+                var versionInput = form.querySelector('[name="version"]');
+                var descInput = form.querySelector('[name="description"]');
+                var detailInput = form.querySelector('[name="detail"]');
+                var iconInput = form.querySelector('[name="icon"]');
+                var iconUrlInput = form.querySelector('[name="iconUrl"]');
+                var downloadUrlInput = form.querySelector('[name="downloadUrl"]');
+                var sizeInput = form.querySelector('[name="size"]');
+                var recommendCheck = form.querySelector('[name="recommend"]');
                 var macCheck = form.querySelector('[name="platformMac"]');
                 var winCheck = form.querySelector('[name="platformWin"]');
+                var submitBtn = document.querySelector('#adminForm .form-actions .btn-primary');
+                var cancelBtn = document.querySelector('#adminForm .form-actions .btn-cancel');
+
+                if (nameInput) nameInput.value = soft.name || '';
+                if (catSelect) {
+                    catSelect.value = soft.category || '';
+                }
+                if (versionInput) versionInput.value = soft.version || '';
+                if (descInput) descInput.value = soft.description || '';
+                if (detailInput) detailInput.value = soft.detail || '';
+                if (iconInput) iconInput.value = soft.icon || '📦';
+                if (iconUrlInput) iconUrlInput.value = soft.icon_url || '';
+                if (downloadUrlInput) downloadUrlInput.value = soft.download_url || '';
+                if (sizeInput) sizeInput.value = soft.size || '';
+                if (recommendCheck) recommendCheck.checked = !!soft.recommend;
+                var platforms = soft.platforms || [];
                 if (macCheck) macCheck.checked = platforms.indexOf('mac') !== -1;
                 if (winCheck) winCheck.checked = platforms.indexOf('windows') !== -1;
-                this._updateIconPreview(form);
-                var submitBtn = document.querySelector('#adminForm .form-actions .btn-primary');
                 if (submitBtn) submitBtn.textContent = '✎ 更新';
-                var cancelBtn = document.querySelector('#adminForm .form-actions .btn-cancel');
                 if (cancelBtn) cancelBtn.classList.remove('hidden');
+                this._updateIconPreview(form);
             },
 
             renderCategories: async function(container) {
@@ -2583,13 +2698,22 @@
                 container.innerHTML = html;
 
                 var select = container.querySelector('[name="category"]');
+                var selfRef = this;
                 DB.getCategoriesFromCloud().then(function(cats) {
                     if (select) {
                         select.innerHTML = cats.map(function(c) { return '<option value="' + c + '">' + c +
                             '</option>'; }).join('');
-                        if (self._editingId) {
-                            var soft = self._allSoftware.find(function(s) { return s.id === self._editingId; });
+                        if (selfRef._editingId) {
+                            var soft = selfRef._allSoftware.find(function(s) { return s.id === selfRef
+                                ._editingId; });
                             if (soft) select.value = soft.category || '';
+                        }
+                    }
+                    if (selfRef._editingId) {
+                        var soft = selfRef._allSoftware.find(function(s) { return s.id === selfRef
+                            ._editingId; });
+                        if (soft) {
+                            selfRef._fillEditForm(soft);
                         }
                     }
                 });
@@ -2598,6 +2722,7 @@
                 if (backLink) {
                     backLink.addEventListener('click', function() {
                         self._editingId = null;
+                        self._selectedIds = [];
                         self.renderAdminTab('software');
                     });
                 }
@@ -2627,6 +2752,7 @@
                 if (cancelBtn) {
                     cancelBtn.addEventListener('click', function() {
                         self._editingId = null;
+                        self._selectedIds = [];
                         self.renderAdminTab('software');
                     });
                 }
@@ -2676,6 +2802,12 @@
                             DB.addLog('更新软件', '更新软件: ' + data.name + ' (ID: ' + shortId(self._editingId) + ')');
                             toast('已更新: ' + data.name, 'success');
                             self._editingId = null;
+                            self._tabCache['software'] = null;
+                            self._dataLoaded = false;
+                            var updated = await DB.getSoftwareFromCloud(true);
+                            self._allSoftware = updated;
+                            self._filteredSoftware = updated.slice();
+                            self._dataLoaded = true;
                             self.renderAdminTab('software');
                         } else {
                             var newSoft = {
@@ -2701,7 +2833,14 @@
                                 DB.addLog('添加软件', '添加软件: ' + data.name + ' (ID: ' + shortId(newSoft.id) + ')');
                                 toast('上传成功: ' + data.name, 'success');
                                 form.reset();
+                                if (previewBox) previewBox.textContent = '📦';
                                 self._editingId = null;
+                                self._tabCache['software'] = null;
+                                self._dataLoaded = false;
+                                var newData = await DB.getSoftwareFromCloud(true);
+                                self._allSoftware = newData;
+                                self._filteredSoftware = newData.slice();
+                                self._dataLoaded = true;
                                 self.renderAdminTab('software');
                             } else {
                                 toast('上传失败，请检查网络后重试', 'error');
@@ -2718,14 +2857,6 @@
                     }
                 });
 
-                if (this._editingId) {
-                    var soft = this._allSoftware.find(function(s) { return s.id === self._editingId; });
-                    if (soft) {
-                        setTimeout(function() {
-                            self._fillEditForm(soft);
-                        }, 100);
-                    }
-                }
                 this._tabCache['add'] = container.innerHTML;
             },
 
