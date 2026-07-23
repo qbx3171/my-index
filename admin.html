@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
     <title>乐哲软件 · 管理后台</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -10,7 +10,6 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
     <style>
-        /* ===== CSS Variables ===== */
         :root {
             --bg-primary: #080c14;
             --bg-secondary: #0f172a;
@@ -30,12 +29,12 @@
             --radius-lg: 20px;
             --radius-md: 12px;
             --radius-sm: 8px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             --font: 'Inter', -apple-system, sans-serif;
             --max-width: 1200px;
             --header-height: 64px;
+            --sidebar-width: 210px;
         }
-        /* 亮色主题 */
         [data-theme="light"] {
             --bg-primary: #f0f4ff;
             --bg-secondary: #e8edf8;
@@ -49,8 +48,6 @@
             --text-dim: #7a8aa8;
             --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.08);
         }
-
-        /* ===== Reset ===== */
         * {
             margin: 0;
             padding: 0;
@@ -90,11 +87,6 @@
             background: none;
             color: var(--text-primary);
         }
-        [data-theme="light"] input,
-        [data-theme="light"] textarea,
-        [data-theme="light"] select {
-            color: var(--text-primary);
-        }
         .container {
             max-width: var(--max-width);
             margin: 0 auto;
@@ -103,8 +95,6 @@
         .hidden {
             display: none !important;
         }
-
-        /* ===== Buttons ===== */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -120,11 +110,17 @@
             color: var(--text-primary);
             backdrop-filter: blur(8px);
             border-color: var(--border-glow);
+            min-height: 44px;
         }
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
             border-color: var(--accent-cyan);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
@@ -132,7 +128,7 @@
             border-color: transparent;
             font-weight: 700;
         }
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
             transform: translateY(-2px) scale(1.02);
         }
@@ -141,7 +137,7 @@
             border-color: var(--border-glow);
             color: var(--text-secondary);
         }
-        .btn-outline:hover {
+        .btn-outline:hover:not(:disabled) {
             background: rgba(0, 212, 255, 0.06);
             border-color: var(--accent-cyan);
             color: var(--text-primary);
@@ -151,7 +147,7 @@
             border-color: rgba(239, 68, 68, 0.2);
             color: #f87171;
         }
-        .btn-danger:hover {
+        .btn-danger:hover:not(:disabled) {
             background: rgba(239, 68, 68, 0.25);
             border-color: #ef4444;
             color: #fff;
@@ -161,7 +157,7 @@
             border-color: rgba(52, 211, 153, 0.2);
             color: var(--accent-green);
         }
-        .btn-success:hover {
+        .btn-success:hover:not(:disabled) {
             background: rgba(52, 211, 153, 0.25);
             border-color: var(--accent-green);
             color: #fff;
@@ -169,14 +165,29 @@
         .btn-sm {
             padding: 6px 18px;
             font-size: 0.8rem;
+            min-height: 36px;
         }
         .btn-xs {
             padding: 3px 12px;
             font-size: 0.7rem;
             border-radius: 50px;
+            min-height: 30px;
         }
-
-        /* ===== Cards ===== */
+        .btn-back {
+            background: transparent;
+            border-color: transparent;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            gap: 4px;
+            min-height: 32px;
+            font-size: 0.85rem;
+        }
+        .btn-back:hover:not(:disabled) {
+            border-color: var(--border-glow);
+            color: var(--text-primary);
+            transform: translateX(-2px);
+            box-shadow: none;
+        }
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(16px);
@@ -186,13 +197,6 @@
             transition: var(--transition);
             overflow: hidden;
         }
-        .card:hover {
-            border-color: var(--border-glow-strong);
-            box-shadow: var(--shadow-card), 0 0 30px rgba(0, 212, 255, 0.05);
-            transform: translateY(-4px);
-        }
-
-        /* ===== Badge ===== */
         .badge {
             display: inline-block;
             padding: 2px 14px;
@@ -214,8 +218,11 @@
             color: var(--accent-green);
             border-color: rgba(52, 211, 153, 0.2);
         }
-
-        /* ===== Empty State ===== */
+        .badge-dim {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-dim);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -231,8 +238,6 @@
             margin-bottom: 8px;
             color: var(--text-primary);
         }
-
-        /* ===== Login ===== */
         .login-page {
             display: none;
             min-height: 100vh;
@@ -320,6 +325,7 @@
             transition: var(--transition);
             font-size: 0.9rem;
             color: var(--text-primary);
+            min-height: 48px;
         }
         .login-box input:focus {
             border-color: var(--accent-cyan);
@@ -330,6 +336,7 @@
             margin-top: 6px;
             padding: 13px;
             font-size: 0.95rem;
+            min-height: 52px;
         }
         .login-box .login-error {
             color: #f87171;
@@ -338,8 +345,6 @@
             margin-top: 10px;
             min-height: 22px;
         }
-
-        /* ===== Admin Layout ===== */
         .admin-layout {
             display: none;
             min-height: 100vh;
@@ -348,10 +353,8 @@
         .admin-layout.active {
             display: flex;
         }
-
-        /* ===== Sidebar ===== */
         .admin-sidebar {
-            width: 210px;
+            width: var(--sidebar-width);
             background: rgba(12, 20, 35, 0.88);
             backdrop-filter: blur(24px);
             border-right: 1px solid var(--border-glow);
@@ -397,6 +400,7 @@
             cursor: pointer;
             border: 1px solid transparent;
             font-size: 0.9rem;
+            min-height: 44px;
         }
         .admin-sidebar .nav-item:hover {
             background: rgba(0, 212, 255, 0.04);
@@ -426,6 +430,7 @@
             gap: 10px;
             cursor: pointer;
             transition: var(--transition);
+            min-height: 44px;
         }
         .admin-sidebar .logout-btn:hover {
             color: #f87171;
@@ -443,13 +448,12 @@
             cursor: pointer;
             transition: var(--transition);
             background: transparent;
+            min-height: 44px;
         }
         .admin-sidebar .theme-toggle:hover {
             border-color: var(--accent-cyan);
             color: var(--text-primary);
         }
-
-        /* ===== Main ===== */
         .admin-main {
             flex: 1;
             padding: 28px 36px 60px;
@@ -461,6 +465,28 @@
             font-weight: 700;
             letter-spacing: -0.5px;
             margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .admin-main .page-title .back-link {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 10px;
+            border-radius: 50px;
+            border: 1px solid transparent;
+        }
+        .admin-main .page-title .back-link:hover {
+            border-color: var(--border-glow);
+            color: var(--text-primary);
+            transform: translateX(-2px);
         }
         .admin-main .page-sub {
             color: var(--text-secondary);
@@ -468,8 +494,6 @@
             font-weight: 400;
             font-size: 0.9rem;
         }
-
-        /* ===== Stats ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -498,8 +522,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        /* ===== Table ===== */
         .table-wrap {
             background: var(--bg-card);
             backdrop-filter: blur(8px);
@@ -508,15 +530,46 @@
             box-shadow: var(--shadow-card);
             overflow: hidden;
             margin-top: 6px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            min-height: auto;
+        }
+        .table-wrap .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            gap: 10px;
+        }
+        .table-wrap .loading-overlay .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-glow);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
         .table-wrap table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.82rem;
+            min-width: 500px;
         }
         .table-wrap th {
             text-align: left;
-            padding: 10px 16px;
+            padding: 10px 12px;
             background: rgba(0, 212, 255, 0.03);
             font-weight: 600;
             color: var(--text-secondary);
@@ -524,14 +577,14 @@
             letter-spacing: 0.8px;
             text-transform: uppercase;
             border-bottom: 1px solid var(--border-glow);
-        }
-        .table-wrap th .th-inner {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 1;
+            backdrop-filter: blur(8px);
         }
         .table-wrap td {
-            padding: 9px 16px;
+            padding: 8px 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.02);
             color: var(--text-primary);
             vertical-align: middle;
@@ -565,16 +618,17 @@
         }
         .table-wrap td .actions {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
         }
         .table-wrap td .actions button {
-            padding: 3px 12px;
+            padding: 3px 10px;
             border-radius: 50px;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 600;
             transition: var(--transition);
             border: 1px solid transparent;
+            min-height: 28px;
         }
         .table-wrap td .actions .edit-btn {
             background: rgba(0, 212, 255, 0.08);
@@ -613,13 +667,11 @@
             text-align: center;
         }
         .table-wrap .checkbox-cell input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             accent-color: var(--accent-cyan);
             cursor: pointer;
         }
-
-        /* ===== Form ===== */
         .admin-form {
             background: var(--bg-card);
             backdrop-filter: blur(8px);
@@ -654,6 +706,7 @@
             transition: var(--transition);
             font-size: 0.88rem;
             color: var(--text-primary);
+            min-height: 44px;
         }
         .admin-form input:focus,
         .admin-form textarea:focus,
@@ -690,6 +743,7 @@
             margin-top: 6px;
             font-size: 0.8rem;
             color: var(--text-secondary);
+            flex-wrap: wrap;
         }
         .admin-form .icon-preview .preview-box {
             width: 40px;
@@ -702,14 +756,35 @@
             justify-content: center;
             background: rgba(0, 0, 0, 0.2);
             font-size: 22px;
+            flex-shrink: 0;
         }
         .admin-form .icon-preview .preview-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
-        /* ===== Toolbar ===== */
+        .admin-form .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-top: 6px;
+        }
+        .admin-form .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 400;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .admin-form .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-cyan);
+            cursor: pointer;
+            min-height: auto;
+            width: 18px;
+        }
         .toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -727,7 +802,7 @@
             padding: 0 14px;
             transition: var(--transition);
             flex: 1;
-            min-width: 160px;
+            min-width: 140px;
         }
         .toolbar .search-box:focus-within {
             border-color: var(--accent-cyan);
@@ -740,6 +815,7 @@
             color: var(--text-primary);
             flex: 1;
             font-size: 0.85rem;
+            min-height: 40px;
         }
         .toolbar .search-box .icon {
             color: var(--text-dim);
@@ -752,8 +828,9 @@
             background: var(--bg-input);
             color: var(--text-primary);
             font-size: 0.85rem;
-            min-width: 120px;
+            min-width: 100px;
             cursor: pointer;
+            min-height: 44px;
         }
         .toolbar .filter-select option {
             background: var(--bg-card-solid);
@@ -767,8 +844,15 @@
             gap: 6px;
             flex-wrap: wrap;
         }
-
-        /* ===== Pagination ===== */
+        .toolbar .selected-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.06);
+            border-radius: 50px;
+            border: 1px solid var(--border-glow);
+            white-space: nowrap;
+        }
         .pagination {
             display: flex;
             align-items: center;
@@ -785,6 +869,7 @@
         .pagination .pages {
             display: flex;
             gap: 4px;
+            flex-wrap: wrap;
         }
         .pagination .pages button {
             padding: 4px 12px;
@@ -795,8 +880,9 @@
             font-size: 0.8rem;
             transition: var(--transition);
             min-width: 32px;
+            min-height: 32px;
         }
-        .pagination .pages button:hover {
+        .pagination .pages button:hover:not(:disabled) {
             border-color: var(--accent-cyan);
             color: var(--text-primary);
         }
@@ -810,8 +896,6 @@
             opacity: 0.3;
             cursor: not-allowed;
         }
-
-        /* ===== Modal ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -821,7 +905,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
             animation: fadeIn 0.25s ease;
         }
         .modal-overlay.hidden {
@@ -836,17 +920,17 @@
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 32px 36px;
+            padding: 28px 24px;
             animation: slideUp 0.3s ease;
         }
         .modal-box .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .modal-box .modal-header h3 {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 700;
         }
         .modal-box .modal-header .close-btn {
@@ -855,6 +939,7 @@
             cursor: pointer;
             transition: var(--transition);
             line-height: 1;
+            padding: 4px 8px;
         }
         .modal-box .modal-header .close-btn:hover {
             color: var(--text-primary);
@@ -868,9 +953,11 @@
             display: flex;
             padding: 6px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            flex-wrap: wrap;
+            gap: 4px;
         }
         .modal-box .modal-body .detail-row .label {
-            width: 80px;
+            width: 72px;
             flex-shrink: 0;
             font-weight: 500;
             color: var(--text-secondary);
@@ -878,6 +965,7 @@
         .modal-box .modal-body .detail-row .value {
             color: var(--text-primary);
             word-break: break-all;
+            flex: 1;
         }
         .modal-box .modal-body .detail-row .value .icon-thumb {
             width: 48px;
@@ -902,8 +990,6 @@
             gap: 10px;
             justify-content: flex-end;
         }
-
-        /* ===== Toast ===== */
         .toast-container {
             position: fixed;
             bottom: 28px;
@@ -913,6 +999,7 @@
             flex-direction: column;
             gap: 8px;
             max-width: 340px;
+            pointer-events: none;
         }
         .toast {
             padding: 12px 20px;
@@ -928,6 +1015,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            pointer-events: auto;
+            min-height: 48px;
         }
         .toast.success .icon {
             color: var(--accent-cyan);
@@ -967,9 +1056,7 @@
                 opacity: 1;
             }
         }
-
-        /* ===== Responsive ===== */
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
             .admin-sidebar {
                 width: 60px;
                 padding: 14px 6px;
@@ -988,6 +1075,7 @@
             .admin-sidebar .nav-item {
                 justify-content: center;
                 padding: 10px;
+                min-height: 44px;
             }
             .admin-sidebar .nav-item .icon {
                 font-size: 1.2rem;
@@ -997,10 +1085,12 @@
                 justify-content: center;
                 padding-top: 12px;
                 margin-top: 16px;
+                min-height: 44px;
             }
             .admin-sidebar .theme-toggle {
                 justify-content: center;
                 padding: 6px 10px;
+                min-height: 40px;
             }
             .admin-main {
                 padding: 20px 16px 40px;
@@ -1009,7 +1099,7 @@
                 grid-template-columns: 1fr;
             }
             .modal-box {
-                padding: 24px 20px;
+                padding: 20px 16px;
             }
         }
         @media (max-width: 768px) {
@@ -1019,14 +1109,19 @@
             .admin-sidebar {
                 width: 100%;
                 height: auto;
-                position: static;
+                position: sticky;
+                top: 0;
                 flex-direction: row;
-                padding: 10px 14px;
+                padding: 8px 12px;
                 display: flex;
                 flex-wrap: wrap;
                 gap: 2px;
                 border-right: none;
                 border-bottom: 1px solid var(--border-glow);
+                overflow-y: visible;
+                z-index: 10;
+                min-height: 52px;
+                align-items: center;
             }
             .admin-sidebar .logo-sm {
                 display: none;
@@ -1034,6 +1129,9 @@
             .admin-sidebar .nav-item {
                 padding: 6px 12px;
                 font-size: 0.75rem;
+                min-height: 36px;
+                gap: 4px;
+                flex: 0 1 auto;
             }
             .admin-sidebar .nav-item .icon {
                 font-size: 0.9rem;
@@ -1045,25 +1143,40 @@
                 padding-top: 0;
                 margin-left: auto;
                 font-size: 0.75rem;
+                min-height: 36px;
             }
             .admin-sidebar .theme-toggle {
                 margin-top: 0;
                 font-size: 0.7rem;
                 padding: 4px 10px;
+                min-height: 32px;
             }
             .admin-main {
                 max-height: none;
-                padding: 16px 14px 40px;
+                padding: 12px 12px 40px;
+                overflow-y: visible;
             }
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .stat-card {
+                padding: 12px 14px;
+            }
+            .stat-card .num {
+                font-size: 1.5rem;
             }
             .table-wrap {
                 overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
             .table-wrap table {
                 font-size: 0.75rem;
                 min-width: 480px;
+            }
+            .table-wrap th,
+            .table-wrap td {
+                padding: 6px 10px;
             }
             .toolbar {
                 flex-direction: column;
@@ -1078,34 +1191,130 @@
             .pagination {
                 flex-direction: column;
                 align-items: center;
+                padding: 10px 12px;
+            }
+            .pagination .pages {
+                justify-content: center;
+            }
+            .admin-form {
+                padding: 16px 14px;
+            }
+            .admin-form .form-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .admin-form .form-actions {
+                flex-direction: column;
+            }
+            .admin-form .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .login-box {
+                padding: 24px 18px;
+                margin: 0 12px;
+            }
+            .modal-box {
+                padding: 16px 14px;
+                margin: 0 8px;
+            }
+            .modal-box .modal-body .detail-row {
+                flex-direction: column;
+                gap: 2px;
+            }
+            .modal-box .modal-body .detail-row .label {
+                width: 100%;
+                font-size: 0.75rem;
+            }
+            .modal-box .modal-footer {
+                flex-direction: column;
+            }
+            .modal-box .modal-footer .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .toast-container {
+                bottom: 16px;
+                right: 16px;
+                max-width: calc(100vw - 32px);
+            }
+            .admin-main .page-title {
+                font-size: 1.3rem;
+            }
+            .admin-main .page-title .back-link {
+                font-size: 0.75rem;
+                padding: 0 6px;
             }
         }
         @media (max-width: 480px) {
-            .login-box {
-                padding: 24px 18px;
+            .admin-sidebar .nav-item {
+                padding: 4px 8px;
+                font-size: 0.7rem;
+                min-height: 32px;
+            }
+            .admin-sidebar .nav-item .icon {
+                font-size: 0.8rem;
+                width: 18px;
             }
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
-                gap: 10px;
+                gap: 8px;
             }
             .stat-card {
-                padding: 12px 14px;
+                padding: 10px 12px;
             }
             .stat-card .num {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
             }
-            .modal-box {
-                padding: 18px 16px;
+            .stat-card .label {
+                font-size: 0.65rem;
+            }
+            .admin-main .page-title {
+                font-size: 1.1rem;
+            }
+            .admin-form input,
+            .admin-form textarea,
+            .admin-form select {
+                font-size: 0.82rem;
+                padding: 8px 12px;
+                min-height: 40px;
+            }
+            .table-wrap table {
+                font-size: 0.7rem;
+                min-width: 400px;
+            }
+            .table-wrap th,
+            .table-wrap td {
+                padding: 4px 8px;
+            }
+            .table-wrap td .actions button {
+                font-size: 0.55rem;
+                padding: 2px 8px;
+                min-height: 24px;
+            }
+            .login-box .login-logo {
+                font-size: 1.6rem;
+            }
+            .btn {
+                font-size: 0.82rem;
+                padding: 8px 20px;
+                min-height: 40px;
+            }
+            .btn-sm {
+                font-size: 0.7rem;
+                padding: 4px 14px;
+                min-height: 32px;
+            }
+            .btn-back {
+                font-size: 0.75rem;
+                padding: 2px 6px;
+                min-height: 28px;
             }
         }
     </style>
 </head>
 <body>
-
-    <!-- ===== Toast Container ===== -->
     <div class="toast-container" id="toastContainer"></div>
-
-    <!-- ===== Login Page ===== -->
     <div class="login-page active" id="loginPage">
         <div class="bg-glow"></div>
         <div class="bg-glow"></div>
@@ -1124,8 +1333,6 @@
             <div class="login-error" id="loginError"></div>
         </div>
     </div>
-
-    <!-- ===== Admin App ===== -->
     <div class="admin-layout" id="adminApp">
         <aside class="admin-sidebar">
             <div class="logo-sm"><span class="mark">◆</span> <span>乐哲软件</span></div>
@@ -1140,8 +1347,6 @@
         </aside>
         <div class="admin-main" id="adminMain"></div>
     </div>
-
-    <!-- ===== Detail Modal ===== -->
     <div class="modal-overlay hidden" id="detailModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -1154,18 +1359,11 @@
             </div>
         </div>
     </div>
-
     <script>
-        // ============================================================
-        //  配置 Supabase
-        // ============================================================
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
         var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ============================================================
-        //  数据层
-        // ============================================================
         var DB = {
             get: function(key) {
                 try { return JSON.parse(localStorage.getItem('lezhe_' + key)) || null; } catch (e) { return null; }
@@ -1176,22 +1374,53 @@
             genId: function() {
                 return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
             },
+            _softwareCache: null,
+            _cacheTime: 0,
+            _cacheTTL: 120000,
+            _categoriesCache: null,
+            _categoriesTime: 0,
 
-            // ---- Software ----
-            async getSoftwareFromCloud() {
+            async getSoftwareFromCloud(force) {
+                force = force || false;
+                var now = Date.now();
+                if (!force && this._softwareCache && (now - this._cacheTime < this._cacheTTL)) {
+                    return this._softwareCache;
+                }
                 try {
-                    var result = await supabaseClient
-                        .from('software')
-                        .select('*')
-                        .order('created_at', { ascending: false });
-                    if (result.error) { console.error('获取软件失败:', result.error); return []; }
-                    return result.data || [];
-                } catch (e) { console.error('获取软件异常:', e); return []; }
+                    var result = await supabaseClient.from('software').select('*').order('created_at', { ascending: false });
+                    if (result.error) { console.error('获取软件失败:', result.error); return this._softwareCache || []; }
+                    this._softwareCache = result.data || [];
+                    this._cacheTime = now;
+                    return this._softwareCache;
+                } catch (e) { console.error('获取软件异常:', e); return this._softwareCache || []; }
+            },
+            async getCategoriesFromCloud(force) {
+                force = force || false;
+                var now = Date.now();
+                if (!force && this._categoriesCache && (now - this._categoriesTime < this._cacheTTL)) {
+                    return this._categoriesCache;
+                }
+                try {
+                    var result = await supabaseClient.from('categories').select('name').order('name');
+                    if (result.error) { console.error('获取分类失败:', result.error); return ['设计工具', '开发工具', '办公软件',
+                            '媒体工具', '实用工具'
+                        ]; }
+                    this._categoriesCache = result.data.map(function(item) { return item.name; });
+                    this._categoriesTime = now;
+                    return this._categoriesCache;
+                } catch (e) { console.error('获取分类异常:', e); return ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具']; }
+            },
+            invalidateCache: function() {
+                this._softwareCache = null;
+                this._cacheTime = 0;
+                this._categoriesCache = null;
+                this._categoriesTime = 0;
             },
             async addSoftwareToCloud(soft) {
                 try {
                     var result = await supabaseClient.from('software').insert(soft).select();
                     if (result.error) { console.error('添加软件失败:', result.error); return null; }
+                    this.invalidateCache();
                     return result.data ? result.data[0] : null;
                 } catch (e) { console.error('添加软件异常:', e); return null; }
             },
@@ -1199,45 +1428,37 @@
                 try {
                     var result = await supabaseClient.from('software').update(updates).eq('id', id);
                     if (result.error) console.error('更新软件失败:', result.error);
+                    this.invalidateCache();
                 } catch (e) { console.error('更新软件异常:', e); }
             },
             async deleteSoftwareFromCloud(id) {
                 try {
                     var result = await supabaseClient.from('software').delete().eq('id', id);
                     if (result.error) console.error('删除软件失败:', result.error);
+                    this.invalidateCache();
                 } catch (e) { console.error('删除软件异常:', e); }
             },
             async deleteSoftwareBatchFromCloud(ids) {
                 try {
                     var result = await supabaseClient.from('software').delete().in('id', ids);
                     if (result.error) console.error('批量删除失败:', result.error);
+                    this.invalidateCache();
                 } catch (e) { console.error('批量删除异常:', e); }
-            },
-
-            // ---- Categories ----
-            async getCategoriesFromCloud() {
-                try {
-                    var result = await supabaseClient.from('categories').select('name').order('name');
-                    if (result.error) { console.error('获取分类失败:', result.error); return ['设计工具', '开发工具', '办公软件',
-                            '媒体工具', '实用工具'
-                        ]; }
-                    return result.data.map(function(item) { return item.name; });
-                } catch (e) { console.error('获取分类异常:', e); return ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具']; }
             },
             async addCategoryToCloud(name) {
                 try {
                     var result = await supabaseClient.from('categories').insert({ name: name });
                     if (result.error) console.error('添加分类失败:', result.error);
+                    this._categoriesCache = null;
                 } catch (e) { console.error('添加分类异常:', e); }
             },
             async deleteCategoryFromCloud(name) {
                 try {
                     var result = await supabaseClient.from('categories').delete().eq('name', name);
                     if (result.error) console.error('删除分类失败:', result.error);
+                    this._categoriesCache = null;
                 } catch (e) { console.error('删除分类异常:', e); }
             },
-
-            // ---- Logs ----
             getLogs: function() {
                 return this.get('logs') || [];
             },
@@ -1258,9 +1479,6 @@
             }
         };
 
-        // ============================================================
-        //  密码工具
-        // ============================================================
         function hashPassword(password) {
             var hash = 0;
             for (var i = 0; i < password.length; i++) {
@@ -1283,8 +1501,6 @@
 
         var secretPassword = 'qbx12164811..';
         var adminHash = hashPassword(secretPassword);
-
-        // 初始化用户
         if (!localStorage.getItem('lezhe_users')) {
             DB.set('users', [{ username: 'admin', passwordHash: adminHash }]);
         } else {
@@ -1295,9 +1511,6 @@
             }
         }
 
-        // ============================================================
-        //  工具函数
-        // ============================================================
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
@@ -1340,9 +1553,6 @@
             return platforms.map(function(p) { return map[p] || p; }).join(' · ');
         }
 
-        // ============================================================
-        //  渲染引擎
-        // ============================================================
         var Render = {
             renderAdminTable: function(container, list, options) {
                 options = options || {};
@@ -1351,8 +1561,15 @@
                 var onView = options.onView || null;
                 var onSelect = options.onSelect || null;
                 var selectedIds = options.selectedIds || [];
-
+                var isLoading = options.isLoading || false;
                 if (!container) return;
+
+                if (isLoading) {
+                    container.innerHTML =
+                        '<div class="loading-overlay"><span class="spinner"></span> 加载中...</div><table><thead><tr><th class="checkbox-cell"><input type="checkbox" disabled /></th><th style="width:50px;">图标</th><th>名称</th><th>分类</th><th>版本</th><th>下载</th><th style="width:180px;">操作</th></tr></thead><tbody><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-dim);">⏳ 数据加载中...</td></tr></tbody></table>';
+                    return;
+                }
+
                 if (!list || list.length === 0) {
                     container.innerHTML =
                         '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p style="color:var(--text-dim);font-size:0.85rem;">点击「上传软件」添加第一条数据</p></div>';
@@ -1380,7 +1597,6 @@
                 html += '</tbody></table>';
                 container.innerHTML = html;
 
-                // 全选
                 var selectAll = container.querySelector('#selectAll');
                 if (selectAll) {
                     selectAll.addEventListener('change', function() {
@@ -1404,11 +1620,9 @@
                     });
                 }
 
-                // 行点击
                 var rows = container.querySelectorAll('tr.clickable');
                 for (var r = 0; r < rows.length; r++) {
                     rows[r].addEventListener('click', function(e) {
-                        // 忽略点击 checkbox 和按钮
                         if (e.target.closest('input[type="checkbox"]')) return;
                         if (e.target.closest('button')) return;
                         var id = this.dataset.id;
@@ -1416,7 +1630,6 @@
                     });
                 }
 
-                // 事件绑定
                 if (onEdit) {
                     var editBtns = container.querySelectorAll('.edit-btn');
                     for (var eIdx = 0; eIdx < editBtns.length; eIdx++) {
@@ -1452,9 +1665,6 @@
             }
         };
 
-        // ============================================================
-        //  应用主控
-        // ============================================================
         var App = {
             _currentAdminTab: 'dashboard',
             _editingId: null,
@@ -1465,6 +1675,10 @@
             _selectedIds: [],
             _searchKeyword: '',
             _filterCategory: 'all',
+            _isSubmitting: false,
+            _isLoading: false,
+            _searchTimer: null,
+            _tabCache: {},
 
             init: function() {
                 var theme = localStorage.getItem('lezhe_theme') || 'dark';
@@ -1499,11 +1713,11 @@
                             allItems[j].classList.remove('active');
                         }
                         this.classList.add('active');
+                        App._editingId = null;
                         App.renderAdminTab(tab);
                     });
                 }
 
-                // 主题切换
                 document.getElementById('themeToggle').addEventListener('click', function() {
                     var current = document.documentElement.getAttribute('data-theme');
                     var next = current === 'dark' ? 'light' : 'dark';
@@ -1512,7 +1726,6 @@
                     toast('已切换至 ' + (next === 'dark' ? '暗色' : '亮色') + ' 主题', 'success');
                 });
 
-                // Modal 关闭
                 document.getElementById('detailClose').addEventListener('click', function() {
                     document.getElementById('detailModal').classList.add('hidden');
                 });
@@ -1572,6 +1785,24 @@
             renderAdminTab: function(tab) {
                 this._currentAdminTab = tab;
                 var main = document.getElementById('adminMain');
+                var cacheKey = tab;
+                if (this._tabCache[tab] && tab !== 'add') {
+                    main.innerHTML = this._tabCache[tab];
+                    if (tab === 'software') {
+                        this._bindSoftwareEvents(main);
+                    } else if (tab === 'categories') {
+                        this._bindCategoriesEvents(main);
+                    } else if (tab === 'users') {
+                        this._bindUsersEvents(main);
+                    } else if (tab === 'settings') {
+                        this._bindSettingsEvents(main);
+                    }
+                    return;
+                }
+
+                main.innerHTML =
+                    '<div style="display:flex;align-items:center;justify-content:center;padding:60px 20px;color:var(--text-dim);"><span class="spinner" style="width:28px;height:28px;border:2px solid var(--border-glow);border-top-color:var(--accent-cyan);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;margin-right:14px;"></span> 加载中...</div>';
+
                 if (tab === 'dashboard') this.renderDashboard(main);
                 else if (tab === 'software') this.renderSoftwareList(main);
                 else if (tab === 'categories') this.renderCategories(main);
@@ -1580,9 +1811,220 @@
                 else if (tab === 'settings') this.renderSettings(main);
             },
 
-            // ============================================================
-            //  仪表盘
-            // ============================================================
+            _bindSoftwareEvents: function(container) {
+                var self = this;
+                var searchInput = container.querySelector('#searchInput');
+                if (searchInput) {
+                    var doSearch = function() {
+                        self._searchKeyword = searchInput.value;
+                        self._currentPage = 1;
+                        self._renderSoftwarePage(container);
+                    };
+                    searchInput.addEventListener('input', function() {
+                        clearTimeout(self._searchTimer);
+                        self._searchTimer = setTimeout(doSearch, 300);
+                    });
+                }
+                var filterSelect = container.querySelector('#categoryFilter');
+                if (filterSelect) {
+                    filterSelect.addEventListener('change', function() {
+                        self._filterCategory = this.value;
+                        self._currentPage = 1;
+                        self._renderSoftwarePage(container);
+                    });
+                }
+                var refreshBtn = container.querySelector('#refreshBtn');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', function() {
+                        DB.invalidateCache();
+                        self._allSoftware = [];
+                        self.renderAdminTab('software');
+                        toast('已刷新', 'success');
+                    });
+                }
+                var exportBtn = container.querySelector('#exportBtn');
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', function() {
+                        self._exportCSV(self._filteredSoftware);
+                    });
+                }
+                var batchBtn = container.querySelector('#batchDelBtn');
+                if (batchBtn) {
+                    batchBtn.addEventListener('click', function() {
+                        if (self._selectedIds.length === 0) return;
+                        if (confirm('确定要删除选中的 ' + self._selectedIds.length + ' 款软件吗？')) {
+                            var ids = self._selectedIds.slice();
+                            DB.deleteSoftwareBatchFromCloud(ids).then(function() {
+                                DB.addLog('批量删除', '批量删除 ' + ids.length + ' 个软件');
+                                toast('已批量删除 ' + ids.length + ' 个软件', 'success');
+                                self._selectedIds = [];
+                                DB.invalidateCache();
+                                self._allSoftware = [];
+                                self.renderAdminTab('software');
+                            });
+                        }
+                    });
+                }
+                var pageBtns = container.querySelectorAll('.page-btn');
+                for (var pb = 0; pb < pageBtns.length; pb++) {
+                    pageBtns[pb].addEventListener('click', function() {
+                        var page = this.dataset.page;
+                        var total = Math.ceil(self._filteredSoftware.length / self._pageSize) || 1;
+                        if (page === 'prev') {
+                            if (self._currentPage > 1) self._currentPage--;
+                        } else if (page === 'next') {
+                            if (self._currentPage < total) self._currentPage++;
+                        } else {
+                            self._currentPage = parseInt(page);
+                        }
+                        self._renderSoftwarePage(container);
+                    });
+                }
+                var backLink = container.querySelector('#backFromAdd');
+                if (backLink) {
+                    backLink.addEventListener('click', function() {
+                        self._editingId = null;
+                        self.renderAdminTab('software');
+                    });
+                }
+            },
+
+            _bindCategoriesEvents: function(container) {
+                var self = this;
+                var addBtn = container.querySelector('#addCategoryBtn');
+                if (addBtn) {
+                    addBtn.addEventListener('click', async function() {
+                        var input = document.getElementById('newCategoryInput');
+                        var name = input.value.trim();
+                        if (!name) { toast('请输入分类名称', 'error'); return; }
+                        var list = await DB.getCategoriesFromCloud();
+                        if (list.indexOf(name) !== -1) { toast('分类已存在', 'error'); return; }
+                        await DB.addCategoryToCloud(name);
+                        DB.addLog('添加分类', '添加分类: ' + name);
+                        input.value = '';
+                        toast('分类已添加', 'success');
+                        self.renderAdminTab('categories');
+                    });
+                }
+                var delBtns = container.querySelectorAll('.del-btn[data-cat]');
+                for (var j = 0; j < delBtns.length; j++) {
+                    delBtns[j].addEventListener('click', async function() {
+                        var cat = this.dataset.cat;
+                        var allSoft = await DB.getSoftwareFromCloud();
+                        var has = allSoft.some(function(s) { return s.category === cat; });
+                        if (has) {
+                            toast('该分类下还有 ' + allSoft.filter(function(s) { return s.category === cat; })
+                                .length + ' 款软件，无法删除', 'error');
+                            return;
+                        }
+                        if (confirm('确定删除分类 "' + cat + '" 吗？')) {
+                            await DB.deleteCategoryFromCloud(cat);
+                            DB.addLog('删除分类', '删除分类: ' + cat);
+                            toast('分类已删除', 'success');
+                            self.renderAdminTab('categories');
+                        }
+                    });
+                }
+            },
+
+            _bindUsersEvents: function(container) {
+                var self = this;
+                var addBtn = container.querySelector('#addUserBtn');
+                if (addBtn) {
+                    addBtn.addEventListener('click', function() {
+                        var name = document.getElementById('newUsername').value.trim();
+                        var pass = document.getElementById('newPassword').value.trim();
+                        if (!name || !pass) { toast('请填写用户名和密码', 'error'); return; }
+                        var usersList = DB.get('users') || [];
+                        if (usersList.some(function(u) { return u.username === name; })) {
+                            toast('用户名已存在', 'error');
+                            return;
+                        }
+                        if (pass.length < 4) { toast('密码至少4位', 'error'); return; }
+                        usersList.push({ username: name, passwordHash: hashPassword(pass) });
+                        DB.set('users', usersList);
+                        DB.addLog('添加用户', '添加用户: ' + name);
+                        document.getElementById('newUsername').value = '';
+                        document.getElementById('newPassword').value = '';
+                        toast('用户 ' + name + ' 已添加', 'success');
+                        self.renderUsers(container);
+                    });
+                }
+                var delBtns = container.querySelectorAll('.del-btn[data-user]');
+                for (var j = 0; j < delBtns.length; j++) {
+                    delBtns[j].addEventListener('click', function() {
+                        var username = this.dataset.user;
+                        if (confirm('确定删除用户 "' + username + '" 吗？')) {
+                            var usersList = DB.get('users') || [];
+                            usersList = usersList.filter(function(u) { return u.username !== username; });
+                            DB.set('users', usersList);
+                            DB.addLog('删除用户', '删除用户: ' + username);
+                            toast('用户已删除', 'success');
+                            self.renderUsers(container);
+                        }
+                    });
+                }
+            },
+
+            _bindSettingsEvents: function(container) {
+                var self = this;
+                var form = container.querySelector('#changePwdForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        var currentUser = sessionStorage.getItem('lezhe_admin_user') || 'admin';
+                        var oldPwd = document.getElementById('oldPwd').value.trim();
+                        var newPwd = document.getElementById('newPwd').value.trim();
+                        var confirmPwd = document.getElementById('confirmPwd').value.trim();
+
+                        if (!oldPwd || !newPwd || !confirmPwd) {
+                            toast('请填写完整', 'error');
+                            return;
+                        }
+                        if (newPwd.length < 4) {
+                            toast('新密码至少4位', 'error');
+                            return;
+                        }
+                        if (newPwd !== confirmPwd) {
+                            toast('两次密码不一致', 'error');
+                            return;
+                        }
+
+                        var users = DB.get('users') || [];
+                        var found = false;
+                        for (var i = 0; i < users.length; i++) {
+                            if (users[i].username === currentUser) {
+                                if (!verifyPassword(oldPwd, users[i].passwordHash)) {
+                                    toast('当前密码错误', 'error');
+                                    return;
+                                }
+                                users[i].passwordHash = hashPassword(newPwd);
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) { toast('用户不存在', 'error'); return; }
+
+                        DB.set('users', users);
+                        DB.addLog('修改密码', '用户 ' + currentUser + ' 修改了密码');
+                        toast('密码已更新', 'success');
+                        document.getElementById('oldPwd').value = '';
+                        document.getElementById('newPwd').value = '';
+                        document.getElementById('confirmPwd').value = '';
+                    });
+                }
+                var clearBtn = container.querySelector('#clearLogsBtn');
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', function() {
+                        if (confirm('确定清空所有操作日志吗？')) {
+                            DB.clearLogs();
+                            toast('日志已清空', 'success');
+                            self.renderSettings(container);
+                        }
+                    });
+                }
+            },
+
             renderDashboard: async function(container) {
                 var all = await DB.getSoftwareFromCloud();
                 var cats = await DB.getCategoriesFromCloud();
@@ -1608,7 +2050,7 @@
                     recommendCount + '</div><div class="label">推荐软件</div></div></div>';
 
                 html +=
-                    '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;"><h3 style="font-weight:600;color:var(--text-secondary);font-size:0.95rem;">📋 最近添加</h3><button class="btn btn-xs btn-outline" id="refreshDashboard">⟳ 刷新</button></div>';
+                    '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:8px;"><h3 style="font-weight:600;color:var(--text-secondary);font-size:0.95rem;">📋 最近添加</h3><button class="btn btn-xs btn-outline" id="refreshDashboard">⟳ 刷新</button></div>';
                 html += '<div class="table-wrap"><table><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>日期</th></tr></thead><tbody>';
                 if (recent.length) {
                     for (var j = 0; j < recent.length; j++) {
@@ -1622,25 +2064,27 @@
                 }
                 html += '</tbody></table></div>';
                 container.innerHTML = html;
-
-                document.getElementById('refreshDashboard').addEventListener('click', function() {
-                    App.renderAdminTab('dashboard');
-                    toast('已刷新', 'success');
-                });
+                this._tabCache['dashboard'] = html;
+                var refreshBtn = container.querySelector('#refreshDashboard');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', function() {
+                        DB.invalidateCache();
+                        App.renderAdminTab('dashboard');
+                        toast('已刷新', 'success');
+                    });
+                }
             },
 
-            // ============================================================
-            //  软件管理（含搜索、筛选、分页、批量操作、导出）
-            // ============================================================
             renderSoftwareList: async function(container) {
+                this._isLoading = true;
                 var all = await DB.getSoftwareFromCloud();
+                this._isLoading = false;
                 this._allSoftware = all;
                 this._filteredSoftware = all.slice();
                 this._currentPage = 1;
                 this._selectedIds = [];
-                this._searchKeyword = '';
-                this._filterCategory = 'all';
                 this._renderSoftwarePage(container);
+                this._tabCache['software'] = container.innerHTML;
             },
 
             _renderSoftwarePage: function(container) {
@@ -1649,7 +2093,6 @@
                 var keyword = this._searchKeyword.toLowerCase().trim();
                 var filterCat = this._filterCategory;
 
-                // 筛选
                 var filtered = all.filter(function(s) {
                     var matchName = s.name.toLowerCase().includes(keyword);
                     var matchCat = filterCat === 'all' || s.category === filterCat;
@@ -1657,7 +2100,6 @@
                 });
                 this._filteredSoftware = filtered;
 
-                // 分页
                 var total = filtered.length;
                 var pageSize = this._pageSize;
                 var totalPages = Math.ceil(total / pageSize) || 1;
@@ -1666,7 +2108,6 @@
                 var end = Math.min(start + pageSize, total);
                 var pageItems = filtered.slice(start, end);
 
-                // 获取分类列表
                 var cats = ['all'];
                 var catSet = {};
                 for (var ci = 0; ci < all.length; ci++) {
@@ -1692,17 +2133,21 @@
                     '<div class="btn-group"><button class="btn btn-sm btn-outline" id="refreshBtn">⟳ 刷新</button><button class="btn btn-sm btn-success" id="exportBtn">📥 导出</button>';
                 if (this._selectedIds.length > 0) {
                     html +=
-                        '<button class="btn btn-sm btn-danger" id="batchDelBtn">🗑 批量删除 (' + this._selectedIds.length + ')</button>';
+                        '<button class="btn btn-sm btn-danger" id="batchDelBtn">🗑 删除 (' + this._selectedIds.length + ')</button>';
                 }
+                html += '<span class="selected-info" id="selectedInfo">已选 ' + this._selectedIds.length + ' 项</span>';
                 html += '</div></div>';
 
-                // 表格
                 html += '<div class="table-wrap" id="softwareTableWrap"></div>';
 
-                // 分页
-                html += '<div class="pagination"><div class="info">共 ' + total + ' 条，第 ' + start + '-' + end + ' 条</div><div class="pages">';
+                html += '<div class="pagination"><div class="info">共 ' + total + ' 条，第 ' + (start + 1) + '-' + end +
+                    ' 条</div><div class="pages">';
                 html += '<button class="page-btn" data-page="prev" ' + (this._currentPage <= 1 ? 'disabled' : '') + '>‹</button>';
-                for (var p = 1; p <= totalPages; p++) {
+                var maxShow = Math.min(totalPages, 7);
+                var startPage = Math.max(1, this._currentPage - 3);
+                var endPage = Math.min(totalPages, startPage + 6);
+                if (endPage - startPage < 6) startPage = Math.max(1, endPage - 6);
+                for (var p = startPage; p <= endPage; p++) {
                     var active = p === this._currentPage ? 'active' : '';
                     html += '<button class="page-btn ' + active + '" data-page="' + p + '">' + p + '</button>';
                 }
@@ -1712,11 +2157,12 @@
 
                 container.innerHTML = html;
 
-                // 渲染表格
                 var wrap = document.getElementById('softwareTableWrap');
                 var selectedIds = this._selectedIds;
+                var isLoading = this._isLoading;
                 Render.renderAdminTable(wrap, pageItems, {
                     selectedIds: selectedIds,
+                    isLoading: isLoading,
                     onView: function(id) {
                         var soft = self._allSoftware.find(function(s) { return s.id === id; });
                         if (soft) App.showDetail(soft);
@@ -1726,14 +2172,17 @@
                         if (soft) {
                             self._editingId = id;
                             self.renderAdminTab('add');
-                            self._fillEditForm(soft);
+                            setTimeout(function() { self._fillEditForm(soft); }, 100);
                         }
                     },
                     onDelete: async function(id) {
                         await DB.deleteSoftwareFromCloud(id);
                         DB.addLog('删除软件', '删除软件 ID: ' + shortId(id));
                         toast('已删除', 'success');
-                        self.renderAdminTab('software');
+                        DB.invalidateCache();
+                        self._allSoftware = await DB.getSoftwareFromCloud(true);
+                        self._renderSoftwarePage(container);
+                        self._tabCache['software'] = container.innerHTML;
                     },
                     onSelect: function() {
                         var checks = wrap.querySelectorAll('.row-checkbox:checked');
@@ -1742,72 +2191,24 @@
                             ids.push(checks[i].dataset.id);
                         }
                         self._selectedIds = ids;
-                        // 重新渲染以更新批量删除按钮
+                        var info = document.getElementById('selectedInfo');
+                        if (info) info.textContent = '已选 ' + ids.length + ' 项';
+                        var batchBtn = document.getElementById('batchDelBtn');
+                        if (batchBtn) {
+                            if (ids.length > 0) {
+                                batchBtn.textContent = '🗑 删除 (' + ids.length + ')';
+                                batchBtn.style.display = 'inline-flex';
+                            } else {
+                                batchBtn.style.display = 'none';
+                            }
+                        }
                         self._renderSoftwarePage(container);
+                        self._tabCache['software'] = container.innerHTML;
                     }
                 });
 
-                // 事件绑定
-                var searchInput = document.getElementById('searchInput');
-                if (searchInput) {
-                    searchInput.addEventListener('input', function() {
-                        self._searchKeyword = this.value;
-                        self._currentPage = 1;
-                        self._renderSoftwarePage(container);
-                    });
-                }
-                var filterSelect = document.getElementById('categoryFilter');
-                if (filterSelect) {
-                    filterSelect.addEventListener('change', function() {
-                        self._filterCategory = this.value;
-                        self._currentPage = 1;
-                        self._renderSoftwarePage(container);
-                    });
-                }
-
-                // 分页
-                var pageBtns = container.querySelectorAll('.page-btn');
-                for (var pb = 0; pb < pageBtns.length; pb++) {
-                    pageBtns[pb].addEventListener('click', function() {
-                        var page = this.dataset.page;
-                        if (page === 'prev') {
-                            if (self._currentPage > 1) self._currentPage--;
-                        } else if (page === 'next') {
-                            if (self._currentPage < totalPages) self._currentPage++;
-                        } else {
-                            self._currentPage = parseInt(page);
-                        }
-                        self._renderSoftwarePage(container);
-                    });
-                }
-
-                // 刷新
-                document.getElementById('refreshBtn').addEventListener('click', function() {
-                    self.renderAdminTab('software');
-                    toast('已刷新', 'success');
-                });
-
-                // 导出
-                document.getElementById('exportBtn').addEventListener('click', function() {
-                    self._exportCSV(filtered);
-                });
-
-                // 批量删除
-                var batchBtn = document.getElementById('batchDelBtn');
-                if (batchBtn) {
-                    batchBtn.addEventListener('click', function() {
-                        if (self._selectedIds.length === 0) return;
-                        if (confirm('确定要删除选中的 ' + self._selectedIds.length + ' 款软件吗？')) {
-                            var ids = self._selectedIds.slice();
-                            DB.deleteSoftwareBatchFromCloud(ids).then(function() {
-                                DB.addLog('批量删除', '批量删除 ' + ids.length + ' 个软件');
-                                toast('已批量删除 ' + ids.length + ' 个软件', 'success');
-                                self._selectedIds = [];
-                                self.renderAdminTab('software');
-                            });
-                        }
-                    });
-                }
+                this._tabCache['software'] = container.innerHTML;
+                this._bindSoftwareEvents(container);
             },
 
             _exportCSV: function(data) {
@@ -1860,80 +2261,67 @@
                 if (cancelBtn) cancelBtn.classList.remove('hidden');
             },
 
-            // ============================================================
-            //  分类管理
-            // ============================================================
             renderCategories: async function(container) {
                 var cats = await DB.getCategoriesFromCloud();
                 var all = await DB.getSoftwareFromCloud();
                 var self = this;
                 var html =
-                    '<h2 class="page-title">⌗ 分类管理</h2><p class="page-sub">管理分类标签</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="newCategoryInput" placeholder="输入新分类名称" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:140px;color:var(--text-primary);" /><button class="btn btn-sm btn-primary" id="addCategoryBtn">⊕ 添加</button></div><div class="table-wrap"><table><thead><tr><th>分类名称</th><th>软件数</th><th style="width:80px;">操作</th></tr></thead><tbody>';
+                    '<h2 class="page-title">⌗ 分类管理</h2><p class="page-sub">管理分类标签</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="newCategoryInput" placeholder="输入新分类名称" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:140px;color:var(--text-primary);min-height:44px;" /><button class="btn btn-sm btn-primary" id="addCategoryBtn">⊕ 添加</button></div><div class="table-wrap"><table><thead><tr><th>分类名称</th><th>软件数</th><th style="width:80px;">操作</th></tr></thead><tbody>';
                 for (var i = 0; i < cats.length; i++) {
                     var c = cats[i];
                     var count = all.filter(function(s) { return s.category === c; }).length;
                     html += '<tr><td>' + getIconEmoji(c) + ' ' + c + '</td><td>' + count + '</td><td><button class="del-btn" data-cat="' +
                         c +
-                        '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);transition:var(--transition);">删除</button></td></tr>';
+                        '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);transition:var(--transition);min-height:30px;">删除</button></td></tr>';
                 }
                 html += '</tbody></table></div>';
                 container.innerHTML = html;
-
-                document.getElementById('addCategoryBtn').addEventListener('click', async function() {
-                    var input = document.getElementById('newCategoryInput');
-                    var name = input.value.trim();
-                    if (!name) { toast('请输入分类名称', 'error'); return; }
-                    var list = await DB.getCategoriesFromCloud();
-                    if (list.indexOf(name) !== -1) { toast('分类已存在', 'error'); return; }
-                    await DB.addCategoryToCloud(name);
-                    DB.addLog('添加分类', '添加分类: ' + name);
-                    input.value = '';
-                    toast('分类已添加', 'success');
-                    self.renderAdminTab('categories');
-                });
-
-                var delBtns = container.querySelectorAll('.del-btn[data-cat]');
-                for (var j = 0; j < delBtns.length; j++) {
-                    delBtns[j].addEventListener('click', async function() {
-                        var cat = this.dataset.cat;
-                        var allSoft = await DB.getSoftwareFromCloud();
-                        var has = allSoft.some(function(s) { return s.category === cat; });
-                        if (has) {
-                            toast('该分类下还有软件，无法删除', 'error');
-                            return;
-                        }
-                        if (confirm('确定删除分类 "' + cat + '" 吗？')) {
-                            await DB.deleteCategoryFromCloud(cat);
-                            DB.addLog('删除分类', '删除分类: ' + cat);
-                            toast('分类已删除', 'success');
-                            self.renderAdminTab('categories');
-                        }
-                    });
-                }
+                this._tabCache['categories'] = html;
+                this._bindCategoriesEvents(container);
             },
 
-            // ============================================================
-            //  上传 / 编辑
-            // ============================================================
             renderAddForm: function(container) {
                 var isEdit = !!this._editingId;
                 var self = this;
-                var html = '<h2 class="page-title">' + (isEdit ? '✎ 编辑资源' : '⊕ 上传资源') +
-                    '</h2><p class="page-sub">' + (isEdit ? '更新软件信息' : '向工坊提交新软件') +
-                    '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required></select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 (软件包地址) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入软件下载直链或网盘链接</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-row"><div class="form-group"><label>支持平台</label><div style="display:flex;gap:20px;padding-top:6px;flex-wrap:wrap;"><label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="platformMac" value="mac" /> 🍎 Mac</label><label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" name="platformWin" value="windows" /> 🪟 Windows</label></div></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary">' +
+                var editName = isEdit ? (this._allSoftware.find(function(s) { return s.id === self._editingId; }) || {})
+                    .name || '' : '';
+
+                var html = '<h2 class="page-title">';
+                if (isEdit) {
+                    html +=
+                        '<span>✎ 编辑资源 <span style="font-weight:400;font-size:0.9rem;color:var(--text-secondary);">· ' +
+                        editName + '</span></span>';
+                } else {
+                    html += '⊕ 上传资源';
+                }
+                html +=
+                    ' <span class="back-link" id="backFromAdd"><span style="font-size:1rem;">←</span> 返回列表</span></h2><p class="page-sub">' +
+                    (isEdit ? '更新软件信息' : '向工坊提交新软件') +
+                    '</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required></select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">软件包直链或网盘</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-group"><label>支持平台 <span class="required">*</span></label><div class="checkbox-group"><label><input type="checkbox" name="platformMac" value="mac" /> 🍎 Mac</label><label><input type="checkbox" name="platformWin" value="windows" /> 🪟 Windows</label></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary" id="submitFormBtn">' +
                     (isEdit ? '✎ 更新' : '⊕ 上传') +
                     '</button><button type="button" class="btn btn-outline btn-cancel ' + (isEdit ? '' : 'hidden') +
                     '" id="cancelEditBtn">取消</button></div></form>';
                 container.innerHTML = html;
 
-                // 填充分类选择
                 var select = container.querySelector('[name="category"]');
                 DB.getCategoriesFromCloud().then(function(cats) {
                     if (select) {
                         select.innerHTML = cats.map(function(c) { return '<option value="' + c + '">' + c +
                             '</option>'; }).join('');
+                        if (self._editingId) {
+                            var soft = self._allSoftware.find(function(s) { return s.id === self._editingId; });
+                            if (soft) select.value = soft.category || '';
+                        }
                     }
                 });
+
+                var backLink = container.querySelector('#backFromAdd');
+                if (backLink) {
+                    backLink.addEventListener('click', function() {
+                        self._editingId = null;
+                        self.renderAdminTab('software');
+                    });
+                }
 
                 var form = document.getElementById('adminForm');
                 if (!form) return;
@@ -1966,76 +2354,100 @@
 
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
-                    var platforms = [];
-                    var macCheck = form.querySelector('[name="platformMac"]');
-                    var winCheck = form.querySelector('[name="platformWin"]');
-                    if (macCheck && macCheck.checked) platforms.push('mac');
-                    if (winCheck && winCheck.checked) platforms.push('windows');
-
-                    var data = {
-                        name: form.querySelector('[name="name"]').value.trim(),
-                        category: form.querySelector('[name="category"]').value,
-                        version: form.querySelector('[name="version"]').value.trim(),
-                        icon: form.querySelector('[name="icon"]').value.trim() || '📦',
-                        icon_url: form.querySelector('[name="iconUrl"]').value.trim(),
-                        download_url: form.querySelector('[name="downloadUrl"]').value.trim(),
-                        platforms: platforms,
-                        size: form.querySelector('[name="size"]').value.trim(),
-                        description: form.querySelector('[name="description"]').value.trim(),
-                        detail: form.querySelector('[name="detail"]').value.trim(),
-                        recommend: form.querySelector('[name="recommend"]').checked
-                    };
-                    if (!data.name || !data.category || !data.version || !data.description) {
-                        toast('请填写完整信息', 'error');
-                        return;
-                    }
-                    if (platforms.length === 0) {
-                        toast('请至少选择一个支持平台', 'error');
-                        return;
+                    if (self._isSubmitting) return;
+                    self._isSubmitting = true;
+                    var submitBtn = document.getElementById('submitFormBtn');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = '⏳ 提交中...';
                     }
 
-                    if (self._editingId) {
-                        await DB.updateSoftwareInCloud(self._editingId, data);
-                        DB.addLog('更新软件', '更新软件: ' + data.name + ' (ID: ' + shortId(self._editingId) + ')');
-                        toast('已更新: ' + data.name, 'success');
-                        self._editingId = null;
-                        self.renderAdminTab('software');
-                    } else {
-                        var newSoft = {
-                            id: DB.genId(),
-                            name: data.name,
-                            category: data.category,
-                            version: data.version,
-                            icon: data.icon,
-                            icon_url: data.icon_url,
-                            download_url: data.download_url,
-                            platforms: data.platforms,
-                            size: data.size,
-                            description: data.description,
-                            detail: data.detail,
-                            recommend: data.recommend,
-                            date: new Date().toISOString().slice(0, 10),
-                            created_at: new Date().toISOString(),
-                            views: 0,
-                            downloads: 0
+                    try {
+                        var platforms = [];
+                        var macCheck = form.querySelector('[name="platformMac"]');
+                        var winCheck = form.querySelector('[name="platformWin"]');
+                        if (macCheck && macCheck.checked) platforms.push('mac');
+                        if (winCheck && winCheck.checked) platforms.push('windows');
+
+                        var data = {
+                            name: form.querySelector('[name="name"]').value.trim(),
+                            category: form.querySelector('[name="category"]').value,
+                            version: form.querySelector('[name="version"]').value.trim(),
+                            icon: form.querySelector('[name="icon"]').value.trim() || '📦',
+                            icon_url: form.querySelector('[name="iconUrl"]').value.trim(),
+                            download_url: form.querySelector('[name="downloadUrl"]').value.trim(),
+                            platforms: platforms,
+                            size: form.querySelector('[name="size"]').value.trim(),
+                            description: form.querySelector('[name="description"]').value.trim(),
+                            detail: form.querySelector('[name="detail"]').value.trim(),
+                            recommend: form.querySelector('[name="recommend"]').checked
                         };
-                        var result = await DB.addSoftwareToCloud(newSoft);
-                        if (result) {
-                            DB.addLog('添加软件', '添加软件: ' + data.name + ' (ID: ' + shortId(newSoft.id) + ')');
-                            toast('上传成功: ' + data.name, 'success');
-                            form.reset();
+
+                        if (!data.name || !data.category || !data.version || !data.description) {
+                            toast('请填写完整信息（名称、分类、版本、简介为必填）', 'error');
+                            return;
+                        }
+                        if (platforms.length === 0) {
+                            toast('请至少选择一个支持平台', 'error');
+                            return;
+                        }
+
+                        if (self._editingId) {
+                            await DB.updateSoftwareInCloud(self._editingId, data);
+                            DB.addLog('更新软件', '更新软件: ' + data.name + ' (ID: ' + shortId(self._editingId) + ')');
+                            toast('已更新: ' + data.name, 'success');
+                            self._editingId = null;
                             self.renderAdminTab('software');
                         } else {
-                            toast('上传失败，请重试', 'error');
+                            var newSoft = {
+                                id: DB.genId(),
+                                name: data.name,
+                                category: data.category,
+                                version: data.version,
+                                icon: data.icon,
+                                icon_url: data.icon_url,
+                                download_url: data.download_url,
+                                platforms: data.platforms,
+                                size: data.size,
+                                description: data.description,
+                                detail: data.detail,
+                                recommend: data.recommend,
+                                date: new Date().toISOString().slice(0, 10),
+                                created_at: new Date().toISOString(),
+                                views: 0,
+                                downloads: 0
+                            };
+                            var result = await DB.addSoftwareToCloud(newSoft);
+                            if (result) {
+                                DB.addLog('添加软件', '添加软件: ' + data.name + ' (ID: ' + shortId(newSoft.id) + ')');
+                                toast('上传成功: ' + data.name, 'success');
+                                form.reset();
+                                self._editingId = null;
+                                self.renderAdminTab('software');
+                            } else {
+                                toast('上传失败，请检查网络后重试', 'error');
+                            }
+                        }
+                    } catch (err) {
+                        toast('操作失败: ' + err.message, 'error');
+                    } finally {
+                        self._isSubmitting = false;
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = self._editingId ? '✎ 更新' : '⊕ 上传';
                         }
                     }
                 });
 
-                // 如果是编辑，填充数据
                 if (this._editingId) {
                     var soft = this._allSoftware.find(function(s) { return s.id === self._editingId; });
-                    if (soft) this._fillEditForm(soft);
+                    if (soft) {
+                        setTimeout(function() {
+                            self._fillEditForm(soft);
+                        }, 100);
+                    }
                 }
+                this._tabCache['add'] = container.innerHTML;
             },
 
             _updateIconPreview: function(form) {
@@ -2051,83 +2463,45 @@
                 }
             },
 
-            // ============================================================
-            //  用户管理
-            // ============================================================
             renderUsers: function(container) {
                 var users = DB.get('users') || [];
-                var self = this;
                 var currentUser = sessionStorage.getItem('lezhe_admin_user') || 'admin';
 
                 var html =
-                    '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理后台账号</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="newUsername" placeholder="新用户名" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:120px;color:var(--text-primary);" /><input type="password" id="newPassword" placeholder="密码" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:120px;color:var(--text-primary);" /><button class="btn btn-sm btn-primary" id="addUserBtn">⊕ 添加用户</button></div><div class="table-wrap"><table><thead><tr><th>用户名</th><th>角色</th><th style="width:120px;">操作</th></tr></thead><tbody>';
-                for (var i = 0; i < users.length; i++) {
-                    var u = users[i];
-                    var isSelf = u.username === currentUser;
-                    html += '<tr><td>' + u.username + (isSelf ? ' <span class="badge badge-green">当前</span>' : '') +
-                        '</td><td>管理员</td><td>';
-                    if (!isSelf) {
-                        html +=
-                            '<button class="del-btn" data-user="' + u.username +
-                            '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);">删除</button>';
-                    } else {
-                        html += '<span style="color:var(--text-dim);font-size:0.7rem;">不可删除</span>';
+                    '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理后台账号</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="newUsername" placeholder="新用户名" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:120px;color:var(--text-primary);min-height:44px;" /><input type="password" id="newPassword" placeholder="密码 (至少4位)" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:120px;color:var(--text-primary);min-height:44px;" /><button class="btn btn-sm btn-primary" id="addUserBtn">⊕ 添加用户</button></div><div class="table-wrap"><table><thead><tr><th>用户名</th><th>角色</th><th style="width:120px;">操作</th></tr></thead><tbody>';
+                if (users.length === 0) {
+                    html += '<tr class="empty-row"><td colspan="3">暂无用户</td></tr>';
+                } else {
+                    for (var i = 0; i < users.length; i++) {
+                        var u = users[i];
+                        var isSelf = u.username === currentUser;
+                        html += '<tr><td>' + u.username + (isSelf ? ' <span class="badge badge-green">当前</span>' : '') +
+                            '</td><td>管理员</td><td>';
+                        if (!isSelf) {
+                            html +=
+                                '<button class="del-btn" data-user="' + u.username +
+                                '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);min-height:30px;">删除</button>';
+                        } else {
+                            html += '<span style="color:var(--text-dim);font-size:0.7rem;">不可删除</span>';
+                        }
+                        html += '</td></tr>';
                     }
-                    html += '</td></tr>';
                 }
                 html += '</tbody></table></div>';
                 container.innerHTML = html;
-
-                document.getElementById('addUserBtn').addEventListener('click', function() {
-                    var name = document.getElementById('newUsername').value.trim();
-                    var pass = document.getElementById('newPassword').value.trim();
-                    if (!name || !pass) { toast('请填写用户名和密码', 'error'); return; }
-                    var usersList = DB.get('users') || [];
-                    if (usersList.some(function(u) { return u.username === name; })) {
-                        toast('用户名已存在', 'error');
-                        return;
-                    }
-                    if (pass.length < 4) { toast('密码至少4位', 'error'); return; }
-                    usersList.push({ username: name, passwordHash: hashPassword(pass) });
-                    DB.set('users', usersList);
-                    DB.addLog('添加用户', '添加用户: ' + name);
-                    document.getElementById('newUsername').value = '';
-                    document.getElementById('newPassword').value = '';
-                    toast('用户 ' + name + ' 已添加', 'success');
-                    self.renderUsers(container);
-                });
-
-                var delBtns = container.querySelectorAll('.del-btn[data-user]');
-                for (var j = 0; j < delBtns.length; j++) {
-                    delBtns[j].addEventListener('click', function() {
-                        var username = this.dataset.user;
-                        if (confirm('确定删除用户 "' + username + '" 吗？')) {
-                            var usersList = DB.get('users') || [];
-                            usersList = usersList.filter(function(u) { return u.username !== username; });
-                            DB.set('users', usersList);
-                            DB.addLog('删除用户', '删除用户: ' + username);
-                            toast('用户已删除', 'success');
-                            self.renderUsers(container);
-                        }
-                    });
-                }
+                this._tabCache['users'] = html;
+                this._bindUsersEvents(container);
             },
 
-            // ============================================================
-            //  系统设置
-            // ============================================================
             renderSettings: function(container) {
-                var self = this;
                 var currentUser = sessionStorage.getItem('lezhe_admin_user') || 'admin';
                 var logs = DB.getLogs();
 
                 var html = '<h2 class="page-title">⚙ 系统设置</h2><p class="page-sub">管理配置与操作日志</p>';
 
-                // 修改密码
                 html +=
-                    '<div class="card" style="padding:24px 28px;margin-bottom:20px;"><h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;">🔑 修改密码</h3><form id="changePwdForm"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;"><input type="password" id="oldPwd" placeholder="当前密码" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);" /><input type="password" id="newPwd" placeholder="新密码 (至少4位)" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);" /><input type="password" id="confirmPwd" placeholder="确认新密码" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);" /></div><button type="submit" class="btn btn-sm btn-primary">更新密码</button></form></div>';
+                    '<div class="card" style="padding:24px 28px;margin-bottom:20px;"><h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;">🔑 修改密码</h3><form id="changePwdForm"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;"><input type="password" id="oldPwd" placeholder="当前密码" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:44px;" /><input type="password" id="newPwd" placeholder="新密码 (至少4位)" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:44px;" /><input type="password" id="confirmPwd" placeholder="确认新密码" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:44px;" /></div><button type="submit" class="btn btn-sm btn-primary">更新密码</button></form></div>';
 
-                // 操作日志
                 html +=
                     '<div class="card" style="padding:24px 28px;"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;"><h3 style="font-size:1rem;font-weight:600;">📋 操作日志 (' +
                     logs.length + ')</h3><div><button class="btn btn-xs btn-outline" id="clearLogsBtn">清空日志</button></div></div>';
@@ -2150,63 +2524,10 @@
                 html += '</div>';
 
                 container.innerHTML = html;
-
-                // 修改密码
-                document.getElementById('changePwdForm').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var oldPwd = document.getElementById('oldPwd').value.trim();
-                    var newPwd = document.getElementById('newPwd').value.trim();
-                    var confirmPwd = document.getElementById('confirmPwd').value.trim();
-
-                    if (!oldPwd || !newPwd || !confirmPwd) {
-                        toast('请填写完整', 'error');
-                        return;
-                    }
-                    if (newPwd.length < 4) {
-                        toast('新密码至少4位', 'error');
-                        return;
-                    }
-                    if (newPwd !== confirmPwd) {
-                        toast('两次密码不一致', 'error');
-                        return;
-                    }
-
-                    var users = DB.get('users') || [];
-                    var found = false;
-                    for (var i = 0; i < users.length; i++) {
-                        if (users[i].username === currentUser) {
-                            if (!verifyPassword(oldPwd, users[i].passwordHash)) {
-                                toast('当前密码错误', 'error');
-                                return;
-                            }
-                            users[i].passwordHash = hashPassword(newPwd);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) { toast('用户不存在', 'error'); return; }
-
-                    DB.set('users', users);
-                    DB.addLog('修改密码', '用户 ' + currentUser + ' 修改了密码');
-                    toast('密码已更新', 'success');
-                    document.getElementById('oldPwd').value = '';
-                    document.getElementById('newPwd').value = '';
-                    document.getElementById('confirmPwd').value = '';
-                });
-
-                // 清空日志
-                document.getElementById('clearLogsBtn').addEventListener('click', function() {
-                    if (confirm('确定清空所有操作日志吗？')) {
-                        DB.clearLogs();
-                        toast('日志已清空', 'success');
-                        self.renderSettings(container);
-                    }
-                });
+                this._tabCache['settings'] = html;
+                this._bindSettingsEvents(container);
             },
 
-            // ============================================================
-            //  详情弹窗
-            // ============================================================
             showDetail: function(soft) {
                 var modal = document.getElementById('detailModal');
                 var title = document.getElementById('detailTitle');
@@ -2253,14 +2574,10 @@
             }
         };
 
-        // ============================================================
-        //  启动
-        // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             App.init();
         });
 
-        // 暴露全局（便于调试）
         window.__APP = App;
         window.__DB = DB;
     </script>
