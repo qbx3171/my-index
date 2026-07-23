@@ -3176,9 +3176,19 @@
                         (soft.icon || '📦') + '\'">';
                 } else iconEl.textContent = soft.icon || '📦';
                 document.getElementById('detailName').textContent = soft.name || '未命名';
-                document.getElementById('detailMeta').innerHTML = '<span class="badge">' + escapeHTML(soft.category) +
+                var metaHtml = '<span class="badge">' + escapeHTML(soft.category) +
                     '</span><span class="badge badge-purple">v' + escapeHTML(soft.version) + '</span><span>' + escapeHTML(
                         soft.size || '—') + '</span>';
+                if (soft.platforms && soft.platforms.length) {
+                    var platHtml = soft.platforms.map(function(p) {
+                        return p === 'mac' ? '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>' :
+                            p === 'windows' ?
+                            '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>' :
+                            '<span class="badge">' + p + '</span>';
+                    }).join('');
+                    metaHtml += '<span style="display:inline-flex;gap:6px;flex-wrap:wrap;">' + platHtml + '</span>';
+                }
+                document.getElementById('detailMeta').innerHTML = metaHtml;
                 var descEl = document.getElementById('detailDesc');
                 var descText = soft.detail || soft.description || '';
                 if (descText.trim().length > 0) {
@@ -3515,6 +3525,11 @@
             platformFilter: 'all',
             init: function() {
                 var self = this;
+                var savedSort = localStorage.getItem('lezhe_sort_by');
+                if (savedSort && ['date', 'views', 'downloads'].includes(savedSort)) {
+                    self.sortBy = savedSort;
+                    document.getElementById('sortSelect').value = savedSort;
+                }
                 var hasCache = loadCacheFromStorage();
                 if (hasCache) {
                     self.refreshAll();
@@ -3585,6 +3600,7 @@
                 });
                 document.getElementById('sortSelect').addEventListener('change', function() {
                     self.sortBy = this.value;
+                    localStorage.setItem('lezhe_sort_by', self.sortBy);
                     currentPage = 1;
                     self.refreshListWithFilters();
                 });
@@ -3593,6 +3609,12 @@
                     var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
                     if (p >= 1 && p <= total) { currentPage = p;
                         self.renderListPage(); }
+                });
+                document.getElementById('jumpPageInput').addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        document.getElementById('jumpPageBtn').click();
+                    }
                 });
                 document.getElementById('platformFilter').addEventListener('change', function() {
                     self.platformFilter = this.value;
@@ -3777,6 +3799,10 @@
                     b.classList.remove('active');
                     if (b.dataset.cat === 'all') b.classList.add('active');
                 });
+                var sug = document.getElementById('searchSuggestions');
+                if (sug) sug.classList.remove('open');
+                var hist = document.getElementById('searchHistory');
+                if (hist) hist.classList.remove('open');
             },
             refreshHome: function() {
                 var self = this;
