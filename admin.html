@@ -582,6 +582,20 @@
             background: var(--bg-card);
             z-index: 1;
             backdrop-filter: blur(8px);
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+        .table-wrap th:hover {
+            color: var(--text-primary);
+        }
+        .table-wrap th .sort-icon {
+            font-size: 0.6rem;
+            margin-left: 4px;
+            opacity: 0.4;
+        }
+        .table-wrap th.active .sort-icon {
+            opacity: 1;
         }
         .table-wrap td {
             padding: 8px 12px;
@@ -671,6 +685,7 @@
             height: 18px;
             accent-color: var(--accent-cyan);
             cursor: pointer;
+            flex-shrink: 0;
         }
         .admin-form {
             background: var(--bg-card);
@@ -843,6 +858,7 @@
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
+            align-items: center;
         }
         .toolbar .selected-info {
             font-size: 0.75rem;
@@ -852,6 +868,9 @@
             border-radius: 50px;
             border: 1px solid var(--border-glow);
             white-space: nowrap;
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
         }
         .pagination {
             display: flex;
@@ -1055,6 +1074,66 @@
                 transform: translateY(0);
                 opacity: 1;
             }
+        }
+        .cat-distribution {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 4px 0;
+        }
+        .cat-distribution .cat-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+        .cat-distribution .cat-row .cat-name {
+            min-width: 72px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+        .cat-distribution .cat-row .cat-bar-bg {
+            flex: 1;
+            height: 20px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .cat-distribution .cat-row .cat-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            transition: width 0.6s ease;
+            min-width: 4px;
+        }
+        .cat-distribution .cat-row .cat-count {
+            min-width: 32px;
+            text-align: right;
+            color: var(--text-primary);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .chart-card {
+            padding: 16px 20px;
+            margin-bottom: 18px;
+        }
+        .chart-card .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .chart-card .chart-header h4 {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
         }
         @media (max-width: 1024px) {
             .admin-sidebar {
@@ -1310,6 +1389,20 @@
                 padding: 2px 6px;
                 min-height: 28px;
             }
+            .cat-distribution .cat-row {
+                font-size: 0.7rem;
+                gap: 6px;
+            }
+            .cat-distribution .cat-row .cat-name {
+                min-width: 50px;
+            }
+            .cat-distribution .cat-row .cat-bar-bg {
+                height: 16px;
+            }
+            .cat-distribution .cat-row .cat-count {
+                min-width: 24px;
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
@@ -1445,6 +1538,13 @@
                     this.invalidateCache();
                 } catch (e) { console.error('批量删除异常:', e); }
             },
+            async setRecommendBatchFromCloud(ids, recommend) {
+                try {
+                    var result = await supabaseClient.from('software').update({ recommend: recommend }).in('id', ids);
+                    if (result.error) console.error('批量设置推荐失败:', result.error);
+                    this.invalidateCache();
+                } catch (e) { console.error('批量设置推荐异常:', e); }
+            },
             async addCategoryToCloud(name) {
                 try {
                     var result = await supabaseClient.from('categories').insert({ name: name });
@@ -1562,6 +1662,9 @@
                 var onSelect = options.onSelect || null;
                 var selectedIds = options.selectedIds || [];
                 var isLoading = options.isLoading || false;
+                var sortField = options.sortField || null;
+                var sortOrder = options.sortOrder || null;
+                var onSort = options.onSort || null;
                 if (!container) return;
 
                 if (isLoading) {
@@ -1575,8 +1678,24 @@
                         '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p style="color:var(--text-dim);font-size:0.85rem;">点击「上传软件」添加第一条数据</p></div>';
                     return;
                 }
+
+                var sortIcon = function(field) {
+                    if (sortField !== field) return '<span class="sort-icon">↕</span>';
+                    return sortOrder === 'asc' ? '<span class="sort-icon">↑</span>' :
+                        '<span class="sort-icon">↓</span>';
+                };
+                var thClass = function(field) {
+                    return sortField === field ? 'active' : '';
+                };
+
                 var html =
-                    '<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="selectAll" /></th><th style="width:50px;">图标</th><th>名称</th><th>分类</th><th>版本</th><th>下载</th><th style="width:180px;">操作</th></tr></thead><tbody>';
+                    '<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="selectAll" /></th><th style="width:50px;">图标</th><th data-sort="name" class="' +
+                    thClass('name') + '">名称 ' + sortIcon('name') +
+                    '</th><th data-sort="category" class="' + thClass('category') + '">分类 ' + sortIcon('category') +
+                    '</th><th data-sort="version" class="' + thClass('version') + '">版本 ' + sortIcon('version') +
+                    '</th><th data-sort="downloads" class="' + thClass('downloads') + '">下载 ' + sortIcon(
+                        'downloads') +
+                    '</th><th style="width:180px;">操作</th></tr></thead><tbody>';
                 for (var i = 0; i < list.length; i++) {
                     var s = list[i];
                     var checked = selectedIds.indexOf(s.id) !== -1 ? 'checked' : '';
@@ -1598,31 +1717,41 @@
                 container.innerHTML = html;
 
                 var selectAll = container.querySelector('#selectAll');
+                var rowCheckboxes = container.querySelectorAll('.row-checkbox');
+
+                var updateSelectAllState = function() {
+                    if (!selectAll) return;
+                    var allChecked = true;
+                    var anyChecked = false;
+                    for (var j = 0; j < rowCheckboxes.length; j++) {
+                        if (rowCheckboxes[j].checked) anyChecked = true;
+                        else allChecked = false;
+                    }
+                    selectAll.checked = rowCheckboxes.length > 0 && allChecked;
+                    selectAll.indeterminate = !allChecked && anyChecked;
+                };
+
                 if (selectAll) {
                     selectAll.addEventListener('change', function() {
-                        var checkboxes = container.querySelectorAll('.row-checkbox');
-                        for (var j = 0; j < checkboxes.length; j++) {
-                            checkboxes[j].checked = this.checked;
+                        var isChecked = this.checked;
+                        for (var k = 0; k < rowCheckboxes.length; k++) {
+                            rowCheckboxes[k].checked = isChecked;
                         }
                         if (onSelect) onSelect();
+                        updateSelectAllState();
                     });
                 }
-                var rowCheckboxes = container.querySelectorAll('.row-checkbox');
-                for (var k = 0; k < rowCheckboxes.length; k++) {
-                    rowCheckboxes[k].addEventListener('change', function() {
+
+                for (var r = 0; r < rowCheckboxes.length; r++) {
+                    rowCheckboxes[r].addEventListener('change', function() {
                         if (onSelect) onSelect();
-                        var all = container.querySelectorAll('.row-checkbox');
-                        var checked = container.querySelectorAll('.row-checkbox:checked');
-                        var selectAllEl = container.querySelector('#selectAll');
-                        if (selectAllEl) {
-                            selectAllEl.checked = all.length > 0 && checked.length === all.length;
-                        }
+                        updateSelectAllState();
                     });
                 }
 
                 var rows = container.querySelectorAll('tr.clickable');
-                for (var r = 0; r < rows.length; r++) {
-                    rows[r].addEventListener('click', function(e) {
+                for (var ri = 0; ri < rows.length; ri++) {
+                    rows[ri].addEventListener('click', function(e) {
                         if (e.target.closest('input[type="checkbox"]')) return;
                         if (e.target.closest('button')) return;
                         var id = this.dataset.id;
@@ -1632,8 +1761,8 @@
 
                 if (onEdit) {
                     var editBtns = container.querySelectorAll('.edit-btn');
-                    for (var eIdx = 0; eIdx < editBtns.length; eIdx++) {
-                        editBtns[eIdx].addEventListener('click', function(ev) {
+                    for (var ei = 0; ei < editBtns.length; ei++) {
+                        editBtns[ei].addEventListener('click', function(ev) {
                             ev.stopPropagation();
                             var id = this.dataset.id;
                             onEdit(id);
@@ -1642,8 +1771,8 @@
                 }
                 if (onDelete) {
                     var delBtns = container.querySelectorAll('.del-btn');
-                    for (var dIdx = 0; dIdx < delBtns.length; dIdx++) {
-                        delBtns[dIdx].addEventListener('click', function(ev) {
+                    for (var di = 0; di < delBtns.length; di++) {
+                        delBtns[di].addEventListener('click', function(ev) {
                             ev.stopPropagation();
                             var id = this.dataset.id;
                             if (confirm('确定要删除此软件吗？')) {
@@ -1654,14 +1783,26 @@
                 }
                 if (onView) {
                     var viewBtns = container.querySelectorAll('.view-btn');
-                    for (var vIdx = 0; vIdx < viewBtns.length; vIdx++) {
-                        viewBtns[vIdx].addEventListener('click', function(ev) {
+                    for (var vi = 0; vi < viewBtns.length; vi++) {
+                        viewBtns[vi].addEventListener('click', function(ev) {
                             ev.stopPropagation();
                             var id = this.dataset.id;
                             onView(id);
                         });
                     }
                 }
+
+                if (onSort) {
+                    var ths = container.querySelectorAll('th[data-sort]');
+                    for (var ti = 0; ti < ths.length; ti++) {
+                        ths[ti].addEventListener('click', function() {
+                            var field = this.dataset.sort;
+                            onSort(field);
+                        });
+                    }
+                }
+
+                updateSelectAllState();
             }
         };
 
@@ -1679,6 +1820,8 @@
             _isLoading: false,
             _searchTimer: null,
             _tabCache: {},
+            _sortField: null,
+            _sortOrder: null,
 
             init: function() {
                 var theme = localStorage.getItem('lezhe_theme') || 'dark';
@@ -1817,6 +1960,7 @@
                 if (searchInput) {
                     var doSearch = function() {
                         self._searchKeyword = searchInput.value;
+                        self._selectedIds = [];
                         self._currentPage = 1;
                         self._renderSoftwarePage(container);
                     };
@@ -1829,6 +1973,7 @@
                 if (filterSelect) {
                     filterSelect.addEventListener('change', function() {
                         self._filterCategory = this.value;
+                        self._selectedIds = [];
                         self._currentPage = 1;
                         self._renderSoftwarePage(container);
                     });
@@ -1848,15 +1993,49 @@
                         self._exportCSV(self._filteredSoftware);
                     });
                 }
-                var batchBtn = container.querySelector('#batchDelBtn');
-                if (batchBtn) {
-                    batchBtn.addEventListener('click', function() {
+                var batchDelBtn = container.querySelector('#batchDelBtn');
+                if (batchDelBtn) {
+                    batchDelBtn.addEventListener('click', function() {
                         if (self._selectedIds.length === 0) return;
                         if (confirm('确定要删除选中的 ' + self._selectedIds.length + ' 款软件吗？')) {
                             var ids = self._selectedIds.slice();
                             DB.deleteSoftwareBatchFromCloud(ids).then(function() {
                                 DB.addLog('批量删除', '批量删除 ' + ids.length + ' 个软件');
                                 toast('已批量删除 ' + ids.length + ' 个软件', 'success');
+                                self._selectedIds = [];
+                                DB.invalidateCache();
+                                self._allSoftware = [];
+                                self.renderAdminTab('software');
+                            });
+                        }
+                    });
+                }
+                var batchRecommendBtn = container.querySelector('#batchRecommendBtn');
+                if (batchRecommendBtn) {
+                    batchRecommendBtn.addEventListener('click', function() {
+                        if (self._selectedIds.length === 0) return;
+                        if (confirm('确定将选中的 ' + self._selectedIds.length + ' 款软件设为推荐吗？')) {
+                            var ids = self._selectedIds.slice();
+                            DB.setRecommendBatchFromCloud(ids, true).then(function() {
+                                DB.addLog('批量推荐', '批量推荐 ' + ids.length + ' 个软件');
+                                toast('已批量推荐 ' + ids.length + ' 个软件', 'success');
+                                self._selectedIds = [];
+                                DB.invalidateCache();
+                                self._allSoftware = [];
+                                self.renderAdminTab('software');
+                            });
+                        }
+                    });
+                }
+                var batchUnrecommendBtn = container.querySelector('#batchUnrecommendBtn');
+                if (batchUnrecommendBtn) {
+                    batchUnrecommendBtn.addEventListener('click', function() {
+                        if (self._selectedIds.length === 0) return;
+                        if (confirm('确定取消选中的 ' + self._selectedIds.length + ' 款软件的推荐状态吗？')) {
+                            var ids = self._selectedIds.slice();
+                            DB.setRecommendBatchFromCloud(ids, false).then(function() {
+                                DB.addLog('批量取消推荐', '取消推荐 ' + ids.length + ' 个软件');
+                                toast('已取消推荐 ' + ids.length + ' 个软件', 'success');
                                 self._selectedIds = [];
                                 DB.invalidateCache();
                                 self._allSoftware = [];
@@ -2032,14 +2211,53 @@
                 var totalDownloads = 0;
                 var totalViews = 0;
                 var recommendCount = 0;
+                var catCount = {};
                 for (var i = 0; i < all.length; i++) {
                     totalDownloads += (all[i].downloads || 0);
                     totalViews += (all[i].views || 0);
                     if (all[i].recommend) recommendCount++;
+                    var c = all[i].category || '未分类';
+                    catCount[c] = (catCount[c] || 0) + 1;
                 }
                 var recent = all.slice().sort(function(a, b) {
                     return (b.created_at || '').localeCompare(a.created_at || '');
                 }).slice(0, 5);
+
+                var maxCount = 0;
+                var sortedCats = Object.keys(catCount).sort(function(a, b) { return catCount[b] - catCount[a]; });
+                for (var ci = 0; ci < sortedCats.length; ci++) {
+                    if (catCount[sortedCats[ci]] > maxCount) maxCount = catCount[sortedCats[ci]];
+                }
+                maxCount = Math.max(maxCount, 1);
+
+                var catRowsHtml = '';
+                var showCount = Math.min(sortedCats.length, 10);
+                for (var ci2 = 0; ci2 < showCount; ci2++) {
+                    var cName = sortedCats[ci2];
+                    var count = catCount[cName];
+                    var pct = Math.round((count / maxCount) * 100);
+                    var icon = getIconEmoji(cName);
+                    catRowsHtml += '<div class="cat-row">' +
+                        '<span class="cat-name">' + icon + ' ' + cName + '</span>' +
+                        '<div class="cat-bar-bg"><div class="cat-bar" style="width:' + pct + '%;"></div></div>' +
+                        '<span class="cat-count">' + count + '</span>' +
+                        '</div>';
+                }
+                if (sortedCats.length > 10) {
+                    var remaining = sortedCats.length - 10;
+                    var remainCount = 0;
+                    for (var r = 10; r < sortedCats.length; r++) {
+                        remainCount += catCount[sortedCats[r]];
+                    }
+                    catRowsHtml += '<div class="cat-row" style="opacity:0.6;">' +
+                        '<span class="cat-name">📂 其他 ' + remaining + ' 类</span>' +
+                        '<div class="cat-bar-bg"><div class="cat-bar" style="width:' + Math.round((remainCount / maxCount) *
+                            100) + '%;background:linear-gradient(90deg,var(--text-dim),var(--text-secondary));"></div></div>' +
+                        '<span class="cat-count">' + remainCount + '</span>' +
+                        '</div>';
+                }
+
+                var chartHtml = '<div class="cat-distribution">' + catRowsHtml + '</div>';
 
                 var html =
                     '<h2 class="page-title">◈ 控制台</h2><p class="page-sub">乐哲软件 · 资源总览</p><div class="stats-grid"><div class="stat-card"><div class="num">' +
@@ -2048,6 +2266,10 @@
                     totalDownloads + '</div><div class="label">总下载</div></div><div class="stat-card"><div class="num">' +
                     totalViews + '</div><div class="label">总浏览</div></div><div class="stat-card"><div class="num">' +
                     recommendCount + '</div><div class="label">推荐软件</div></div></div>';
+
+                html +=
+                    '<div class="card chart-card"><div class="chart-header"><h4>📊 分类分布</h4><span style="font-size:0.7rem;color:var(--text-dim);">共 ' +
+                    sortedCats.length + ' 个分类</span></div>' + chartHtml + '</div>';
 
                 html +=
                     '<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:8px;"><h3 style="font-weight:600;color:var(--text-secondary);font-size:0.95rem;">📋 最近添加</h3><button class="btn btn-xs btn-outline" id="refreshDashboard">⟳ 刷新</button></div>';
@@ -2083,6 +2305,8 @@
                 this._filteredSoftware = all.slice();
                 this._currentPage = 1;
                 this._selectedIds = [];
+                this._sortField = null;
+                this._sortOrder = null;
                 this._renderSoftwarePage(container);
                 this._tabCache['software'] = container.innerHTML;
             },
@@ -2098,6 +2322,23 @@
                     var matchCat = filterCat === 'all' || s.category === filterCat;
                     return matchName && matchCat;
                 });
+
+                if (this._sortField) {
+                    var field = this._sortField;
+                    var order = this._sortOrder || 'asc';
+                    filtered.sort(function(a, b) {
+                        var va = (a[field] || '').toString().toLowerCase();
+                        var vb = (b[field] || '').toString().toLowerCase();
+                        if (field === 'downloads') {
+                            va = parseInt(a[field]) || 0;
+                            vb = parseInt(b[field]) || 0;
+                        }
+                        if (va < vb) return order === 'asc' ? -1 : 1;
+                        if (va > vb) return order === 'asc' ? 1 : -1;
+                        return 0;
+                    });
+                }
+
                 this._filteredSoftware = filtered;
 
                 var total = filtered.length;
@@ -2129,11 +2370,15 @@
                     html += '<option value="' + cName + '" ' + sel + '>' + label + '</option>';
                 }
                 html += '</select>';
-                html +=
-                    '<div class="btn-group"><button class="btn btn-sm btn-outline" id="refreshBtn">⟳ 刷新</button><button class="btn btn-sm btn-success" id="exportBtn">📥 导出</button>';
+                html += '<div class="btn-group">';
+                html += '<button class="btn btn-sm btn-outline" id="refreshBtn">⟳ 刷新</button>';
+                html += '<button class="btn btn-sm btn-success" id="exportBtn">📥 导出</button>';
                 if (this._selectedIds.length > 0) {
-                    html +=
-                        '<button class="btn btn-sm btn-danger" id="batchDelBtn">🗑 删除 (' + this._selectedIds.length + ')</button>';
+                    html += '<button class="btn btn-sm btn-success" id="batchRecommendBtn">⭐ 推荐 (' + this._selectedIds
+                        .length + ')</button>';
+                    html += '<button class="btn btn-sm btn-outline" id="batchUnrecommendBtn">☆ 取消推荐</button>';
+                    html += '<button class="btn btn-sm btn-danger" id="batchDelBtn">🗑 删除 (' + this._selectedIds
+                        .length + ')</button>';
                 }
                 html += '<span class="selected-info" id="selectedInfo">已选 ' + this._selectedIds.length + ' 项</span>';
                 html += '</div></div>';
@@ -2160,9 +2405,24 @@
                 var wrap = document.getElementById('softwareTableWrap');
                 var selectedIds = this._selectedIds;
                 var isLoading = this._isLoading;
+                var selfRef = this;
+
+                var handleSort = function(field) {
+                    if (selfRef._sortField === field) {
+                        selfRef._sortOrder = selfRef._sortOrder === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        selfRef._sortField = field;
+                        selfRef._sortOrder = 'asc';
+                    }
+                    selfRef._renderSoftwarePage(container);
+                };
+
                 Render.renderAdminTable(wrap, pageItems, {
                     selectedIds: selectedIds,
                     isLoading: isLoading,
+                    sortField: this._sortField,
+                    sortOrder: this._sortOrder,
+                    onSort: handleSort,
                     onView: function(id) {
                         var soft = self._allSoftware.find(function(s) { return s.id === id; });
                         if (soft) App.showDetail(soft);
@@ -2181,6 +2441,7 @@
                         toast('已删除', 'success');
                         DB.invalidateCache();
                         self._allSoftware = await DB.getSoftwareFromCloud(true);
+                        self._selectedIds = [];
                         self._renderSoftwarePage(container);
                         self._tabCache['software'] = container.innerHTML;
                     },
@@ -2193,13 +2454,31 @@
                         self._selectedIds = ids;
                         var info = document.getElementById('selectedInfo');
                         if (info) info.textContent = '已选 ' + ids.length + ' 项';
-                        var batchBtn = document.getElementById('batchDelBtn');
-                        if (batchBtn) {
+                        var batchDelBtn = document.getElementById('batchDelBtn');
+                        var batchRecBtn = document.getElementById('batchRecommendBtn');
+                        var batchUnrecBtn = document.getElementById('batchUnrecommendBtn');
+                        if (batchDelBtn) {
                             if (ids.length > 0) {
-                                batchBtn.textContent = '🗑 删除 (' + ids.length + ')';
-                                batchBtn.style.display = 'inline-flex';
+                                batchDelBtn.textContent = '🗑 删除 (' + ids.length + ')';
+                                batchDelBtn.style.display = 'inline-flex';
                             } else {
-                                batchBtn.style.display = 'none';
+                                batchDelBtn.style.display = 'none';
+                            }
+                        }
+                        if (batchRecBtn) {
+                            if (ids.length > 0) {
+                                batchRecBtn.textContent = '⭐ 推荐 (' + ids.length + ')';
+                                batchRecBtn.style.display = 'inline-flex';
+                            } else {
+                                batchRecBtn.style.display = 'none';
+                            }
+                        }
+                        if (batchUnrecBtn) {
+                            if (ids.length > 0) {
+                                batchUnrecBtn.textContent = '☆ 取消推荐';
+                                batchUnrecBtn.style.display = 'inline-flex';
+                            } else {
+                                batchUnrecBtn.style.display = 'none';
                             }
                         }
                         self._renderSoftwarePage(container);
@@ -2581,5 +2860,6 @@
         window.__APP = App;
         window.__DB = DB;
     </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
