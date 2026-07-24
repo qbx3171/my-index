@@ -1563,9 +1563,9 @@
                     this.invalidateCache();
                 } catch (e) { console.error('批量设置推荐异常:', e); }
             },
-            async addCategoryToCloud(name, parent) {
+            async addCategoryToCloud(name) {
                 try {
-                    var result = await supabaseClient.from('categories').insert({ name: name, parent: parent || null });
+                    var result = await supabaseClient.from('categories').insert({ name: name });
                     if (result.error) console.error('添加分类失败:', result.error);
                     this._categoriesCache = null;
                 } catch (e) { console.error('添加分类异常:', e); }
@@ -1576,22 +1576,6 @@
                     if (result.error) console.error('删除分类失败:', result.error);
                     this._categoriesCache = null;
                 } catch (e) { console.error('删除分类异常:', e); }
-            },
-            async ensureParentColumn() {
-                try {
-                    var result = await supabaseClient.from('categories').select('parent').limit(1);
-                    if (result.error && result.error.message && result.error.message.includes('column "parent" does not exist')) {
-                        console.warn('parent列不存在，尝试添加...');
-                        var alterResult = await supabaseClient.rpc('add_parent_column_to_categories');
-                        if (alterResult.error) {
-                            console.error('自动添加parent列失败，请手动执行: ALTER TABLE categories ADD COLUMN parent TEXT;');
-                        } else {
-                            console.log('parent列添加成功');
-                        }
-                    }
-                } catch (e) {
-                    console.error('检查parent列时出错:', e);
-                }
             },
             getLogs: function() {
                 return this.get('logs') || [];
@@ -1920,7 +1904,6 @@
                     }
                 });
 
-                DB.ensureParentColumn();
                 this.preloadData();
             },
 
@@ -2167,17 +2150,15 @@
                 if (addBtn) {
                     addBtn.addEventListener('click', async function() {
                         var nameInput = document.getElementById('newCategoryName');
-                        var parentSelect = document.getElementById('newCategoryParent');
                         var name = nameInput.value.trim();
-                        var parent = parentSelect.value || null;
                         if (!name) { toast('请输入分类名称', 'error'); return; }
                         var list = await DB.getCategoriesFromCloud();
-                        if (list.some(function(c) { return c.name === name && c.parent === parent; })) {
+                        if (list.some(function(c) { return c.name === name; })) {
                             toast('该分类已存在', 'error');
                             return;
                         }
-                        await DB.addCategoryToCloud(name, parent);
-                        DB.addLog('添加分类', '添加分类: ' + name + (parent ? ' (父级: ' + parent + ')' : ' (主分类)'));
+                        await DB.addCategoryToCloud(name);
+                        DB.addLog('添加分类', '添加分类: ' + name);
                         nameInput.value = '';
                         toast('分类已添加', 'success');
                         self._tabCache['add'] = null;
@@ -2191,13 +2172,6 @@
                 for (var j = 0; j < delBtns.length; j++) {
                     delBtns[j].addEventListener('click', async function() {
                         var cat = this.dataset.cat;
-                        var parent = this.dataset.parent || null;
-                        var allCats = await DB.getCategoriesFromCloud();
-                        var hasChildren = allCats.some(function(c) { return c.parent === cat; });
-                        if (hasChildren) {
-                            toast('该分类下还有子分类，无法删除', 'error');
-                            return;
-                        }
                         var allSoft = await DB.getSoftwareFromCloud();
                         var used = allSoft.some(function(s) { return s.category === cat; });
                         if (used) {
@@ -2478,7 +2452,8 @@
                 var catSet = {};
                 for (var ci = 0; ci < all.length; ci++) {
                     var c = all[ci].category;
-                    if (c && !catSet[c]) { catSet[c] = true; allMainNames.push(c); }
+                    if (c && !catSet[c]) { catSet[c] = true;
+                        allMainNames.push(c); }
                 }
                 allMainNames.sort();
 
@@ -2695,40 +2670,24 @@
                 var cats = await DB.getCategoriesFromCloud();
                 var all = await DB.getSoftwareFromCloud();
                 var self = this;
-                var mainCats = cats.filter(function(c) { return !c.parent; });
-                var subCats = cats.filter(function(c) { return c.parent; });
 
                 var html =
-                    '<h2 class="page-title">⌗ 分类管理</h2><p class="page-sub">管理主分类与子分类</p>';
+                    '<h2 class="page-title">⌗ 分类管理</h2><p class="page-sub">管理分类</p>';
                 html += '<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">';
                 html +=
                     '<input type="text" id="newCategoryName" placeholder="分类名称" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:140px;color:var(--text-primary);min-height:44px;" />';
-                html += '<select id="newCategoryParent" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:44px;flex:0 1 180px;">';
-                html += '<option value="">作为主分类</option>';
-                for (var i = 0; i < mainCats.length; i++) {
-                    html += '<option value="' + mainCats[i].name + '">' + mainCats[i].name + ' 的子分类</option>';
-                }
-                html += '</select>';
                 html += '<button class="btn btn-sm btn-primary" id="addCategoryBtn">⊕ 添加</button></div>';
 
-                html += '<div class="table-wrap"><table><thead><tr><th>分类层级</th><th>软件数</th><th style="width:80px;">操作</th></tr></thead><tbody>';
-                if (mainCats.length === 0 && subCats.length === 0) {
+                html += '<div class="table-wrap"><table><thead><tr><th>分类名称</th><th>软件数</th><th style="width:80px;">操作</th></tr></thead><tbody>';
+                if (cats.length === 0) {
                     html += '<tr class="empty-row"><td colspan="3">暂无分类，请添加</td></tr>';
                 } else {
-                    for (var mi = 0; mi < mainCats.length; mi++) {
-                        var main = mainCats[mi];
-                        var mainCount = all.filter(function(s) { return s.category === main.name; }).length;
-                        var children = subCats.filter(function(c) { return c.parent === main.name; });
-                        html += '<tr><td><strong>' + main.name + ' (主分类)</strong></td><td>' + mainCount +
-                            '</td><td><button class="del-btn" data-cat="' + main.name +
+                    for (var mi = 0; mi < cats.length; mi++) {
+                        var cat = cats[mi];
+                        var count = all.filter(function(s) { return s.category === cat.name; }).length;
+                        html += '<tr><td><strong>' + cat.name + '</strong></td><td>' + count +
+                            '</td><td><button class="del-btn" data-cat="' + cat.name +
                             '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);min-height:30px;">删除</button></td></tr>';
-                        for (var si = 0; si < children.length; si++) {
-                            var sub = children[si];
-                            var subCount = all.filter(function(s) { return s.category === sub.name; }).length;
-                            html += '<tr><td style="padding-left:24px;">└─ ' + sub.name + ' (子分类)</td><td>' + subCount +
-                                '</td><td><button class="del-btn" data-cat="' + sub.name +
-                                '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);min-height:30px;">删除</button></td></tr>';
-                        }
                     }
                 }
                 html += '</tbody></table></div>';
@@ -2764,33 +2723,10 @@
                 var selfRef = this;
 
                 DB.getCategoriesFromCloud().then(function(cats) {
-                    var mainCats = cats.filter(function(c) { return !c.parent; });
-                    var subCats = cats.filter(function(c) { return c.parent; });
                     if (select) {
-                        var grouped = {};
-                        for (var i = 0; i < mainCats.length; i++) {
-                            grouped[mainCats[i].name] = [];
-                        }
-                        for (var j = 0; j < subCats.length; j++) {
-                            var parent = subCats[j].parent;
-                            if (grouped[parent]) {
-                                grouped[parent].push(subCats[j].name);
-                            } else {
-                                grouped[parent] = [subCats[j].name];
-                            }
-                        }
                         var optionsHtml = '';
-                        for (var main in grouped) {
-                            var children = grouped[main];
-                            optionsHtml += '<optgroup label="' + main + '">';
-                            if (children.length === 0) {
-                                optionsHtml += '<option value="' + main + '">' + main + '</option>';
-                            } else {
-                                for (var k = 0; k < children.length; k++) {
-                                    optionsHtml += '<option value="' + children[k] + '">' + children[k] + '</option>';
-                                }
-                            }
-                            optionsHtml += '</optgroup>';
+                        for (var k = 0; k < cats.length; k++) {
+                            optionsHtml += '<option value="' + cats[k].name + '">' + cats[k].name + '</option>';
                         }
                         select.innerHTML = optionsHtml;
                         if (selfRef._editingId) {
