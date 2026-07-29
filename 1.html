@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes" />
     <title>乐哲软件 · 精选高效工具 赋能创作者</title>
-    <meta name="description" content="乐哲软件提供设计、开发、办公、媒体等全品类实用软件下载，每日更新，社区口碑推荐。赋能创作者生态，构建数字未来。" />
+    <meta name="description" content="乐哲软件提供设计、开发、办公、媒体等全品类实用软件下载，每日更新，社区口碑推荐。" />
     <meta name="keywords" content="软件下载,设计工具,开发工具,办公软件,媒体工具,实用工具,乐哲软件,免费软件,Mac软件,Windows软件" />
     <link rel="canonical" href="https://lezhe-soft.com/" />
     <meta name="robots" content="index, follow" />
@@ -827,6 +827,459 @@
             }
             .header-theme-btn {
                 display: flex;
+            }
+        }
+        .auth-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .auth-btn {
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border: 1px solid var(--border-glow);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .auth-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-primary);
+            background: rgba(0, 136, 255, 0.06);
+        }
+        .auth-btn.primary {
+            background: var(--accent-gradient);
+            color: #fff;
+            border-color: transparent;
+        }
+        .auth-btn.primary:hover {
+            box-shadow: 0 4px 20px rgba(0, 136, 255, 0.25);
+            transform: translateY(-1px);
+        }
+        .user-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 12px rgba(0, 136, 255, 0.15);
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        .user-avatar:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-cyan);
+        }
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 220px;
+            background: var(--bg-card-solid);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-glow-strong);
+            box-shadow: var(--shadow-card);
+            padding: 12px 0;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: var(--transition);
+        }
+        .user-dropdown.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .user-dropdown .dropdown-item {
+            padding: 8px 18px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        .user-dropdown .dropdown-item:hover {
+            background: rgba(0, 136, 255, 0.06);
+            color: var(--text-primary);
+        }
+        .user-dropdown .dropdown-item i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .user-dropdown .dropdown-divider {
+            height: 1px;
+            background: var(--border-glow);
+            margin: 6px 14px;
+        }
+        .user-dropdown .user-email {
+            padding: 4px 18px 8px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 400;
+            border-bottom: 1px solid var(--border-glow);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .user-dropdown .user-email i {
+            font-size: 0.8rem;
+        }
+        .user-dropdown .download-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 18px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: rgba(0, 136, 255, 0.04);
+            border-radius: var(--radius-sm);
+            margin: 2px 14px 6px;
+        }
+        .user-dropdown .download-count .count-num {
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-size: 1rem;
+        }
+        .user-dropdown .invite-code-box {
+            padding: 6px 18px 10px;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .user-dropdown .invite-code-box .code {
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-family: monospace;
+            font-size: 0.85rem;
+            background: rgba(0, 136, 255, 0.06);
+            padding: 2px 12px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+        .user-dropdown .invite-code-box .copy-invite {
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .user-dropdown .invite-code-box .copy-invite:hover {
+            background: rgba(0, 136, 255, 0.08);
+        }
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .auth-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .auth-modal {
+            max-width: 400px;
+            width: 100%;
+            background: var(--bg-card-solid);
+            backdrop-filter: blur(32px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glow-strong);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
+            padding: 32px 28px 28px;
+            transform: scale(0.96) translateY(20px);
+            transition: var(--transition);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .auth-overlay.open .auth-modal {
+            transform: scale(1) translateY(0);
+        }
+        .auth-modal .auth-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .auth-modal .auth-title .close-auth {
+            font-size: 1.4rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+        .auth-modal .auth-title .close-auth:hover {
+            background: rgba(0, 0, 0, 0.06);
+            color: var(--text-primary);
+        }
+        .auth-modal .auth-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        .auth-modal .form-group {
+            margin-bottom: 16px;
+        }
+        .auth-modal .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .auth-modal .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-glow);
+            background: var(--bg-primary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+        .auth-modal .form-group input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.10);
+            background: var(--bg-card-solid);
+        }
+        .auth-modal .form-group input::placeholder {
+            color: var(--text-dim);
+        }
+        .auth-modal .form-group .input-hint {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 3px;
+        }
+        .auth-modal .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .auth-modal .form-actions .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+        .auth-modal .form-actions .btn:disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .auth-modal .form-footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 16px;
+        }
+        .auth-modal .form-footer a {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .auth-modal .form-footer a:hover {
+            text-decoration: underline;
+        }
+        .auth-modal .form-error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: none;
+        }
+        .auth-modal .form-error.show {
+            display: block;
+        }
+        .auth-modal .form-success {
+            color: var(--success);
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: none;
+        }
+        .auth-modal .form-success.show {
+            display: block;
+        }
+        .quota-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 350;
+            background: rgba(0, 0, 0, 0.40);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .quota-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .quota-modal {
+            max-width: 420px;
+            width: 100%;
+            background: var(--bg-card-solid);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-glow-strong);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15);
+            padding: 32px 28px 28px;
+            transform: scale(0.96) translateY(20px);
+            transition: var(--transition);
+            text-align: center;
+        }
+        .quota-overlay.open .quota-modal {
+            transform: scale(1) translateY(0);
+        }
+        .quota-modal .quota-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .quota-modal h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+        .quota-modal p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+        .quota-modal .quota-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .quota-modal .quota-actions .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+        }
+        .quota-modal .quota-actions .wechat-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-glow);
+        }
+        .quota-modal .quota-actions .wechat-row .wechat-id {
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-family: monospace;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        .quota-modal .quota-actions .wechat-row .copy-wechat {
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            padding: 2px 10px;
+            border-radius: 4px;
+            background: rgba(0, 136, 255, 0.06);
+            transition: 0.2s;
+        }
+        .quota-modal .quota-actions .wechat-row .copy-wechat:hover {
+            background: rgba(0, 136, 255, 0.12);
+        }
+        .quota-modal .quota-actions .invite-input-row {
+            display: flex;
+            gap: 8px;
+        }
+        .quota-modal .quota-actions .invite-input-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-glow);
+            background: var(--bg-primary);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .quota-modal .quota-actions .invite-input-row input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.10);
+        }
+        .quota-modal .quota-actions .invite-input-row .btn {
+            flex-shrink: 0;
+            width: auto;
+            padding: 10px 20px;
+        }
+        @media (max-width: 640px) {
+            .auth-modal {
+                padding: 24px 18px 20px;
+                max-width: 100%;
+                margin: 0 8px;
+                border-radius: var(--radius-md);
+            }
+            .quota-modal {
+                padding: 24px 18px 20px;
+                margin: 0 8px;
+            }
+            .auth-section .auth-btn {
+                font-size: 0.7rem;
+                padding: 4px 12px;
+            }
+            .user-dropdown {
+                min-width: 200px;
+                right: -10px;
+            }
+            .quota-modal .quota-actions .invite-input-row {
+                flex-direction: column;
+            }
+            .quota-modal .quota-actions .invite-input-row .btn {
+                width: 100%;
             }
         }
         .hero {
@@ -2513,6 +2966,23 @@
                 display: none;
             }
         }
+        .btn-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .btn-loading .btn-spinner {
+            margin-right: 6px;
+        }
     </style>
 </head>
 <body>
@@ -2530,8 +3000,7 @@
                     <i class="fas fa-thumbtack"></i>
                 </button>
             </div>
-            <div class="category-list" id="categoryList">
-            </div>
+            <div class="category-list" id="categoryList"></div>
             <div class="sidebar-bottom">
                 <div class="sidebar-search" id="sidebarSearchWrapper">
                     <div class="search-box-side">
@@ -2565,6 +3034,25 @@
                         <li><a href="#" data-page="list"><i class="fas fa-th-list"></i> 软件库</a></li>
                     </ul>
                     <div style="display:flex;align-items:center;gap:4px;">
+                        <div class="auth-section" id="authSection">
+                            <button class="auth-btn" id="loginBtn" style="display:none;"><i class="fas fa-sign-in-alt"></i> 登录</button>
+                            <button class="auth-btn primary" id="registerBtn" style="display:none;"><i class="fas fa-user-plus"></i> 注册</button>
+                            <div class="user-menu" id="userMenu" style="display:none;">
+                                <div class="user-avatar" id="userAvatar">U</div>
+                                <div class="user-dropdown" id="userDropdown">
+                                    <div class="user-email"><i class="fas fa-envelope"></i> <span id="dropdownEmail">user@email.com</span></div>
+                                    <div class="download-count">
+                                        <i class="fas fa-download"></i> 剩余下载次数：<span class="count-num" id="dropdownCount">5</span>
+                                    </div>
+                                    <div class="invite-code-box">
+                                        <span>📎 邀请码：<span class="code" id="dropdownInviteCode">ABCDEF</span></span>
+                                        <span class="copy-invite" id="copyInviteBtn"><i class="fas fa-copy"></i> 复制</span>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                    <button class="dropdown-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> 退出登录</button>
+                                </div>
+                            </div>
+                        </div>
                         <button class="header-theme-btn" id="headerThemeBtn" aria-label="切换主题">
                             <i class="fas fa-moon"></i>
                         </button>
@@ -2697,6 +3185,106 @@
             </div>
         </div>
     </div>
+    <div class="auth-overlay" id="loginOverlay">
+        <div class="auth-modal">
+            <div class="auth-title">
+                <span>🔐 登录</span>
+                <button class="close-auth" data-close="login"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="auth-sub">登录后即可下载软件，新用户自动获得 5 次下载机会</div>
+            <form id="loginForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="loginEmail">邮箱地址</label>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" placeholder="输入密码" required minlength="6" />
+                </div>
+                <div class="form-error" id="loginError"></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="loginSubmitBtn"><i class="fas fa-sign-in-alt"></i> 登录</button>
+                </div>
+                <div class="form-footer">
+                    还没有账号？<a id="loginToRegister">立即注册</a> &middot; <a id="loginToForgot">忘记密码？</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="auth-overlay" id="registerOverlay">
+        <div class="auth-modal">
+            <div class="auth-title">
+                <span>📝 注册</span>
+                <button class="close-auth" data-close="register"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="auth-sub">注册即送 5 次下载机会，输入邀请码可额外获得 1 次</div>
+            <form id="registerForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="registerEmail">邮箱地址</label>
+                    <input type="email" id="registerEmail" placeholder="your@email.com" required />
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">密码（至少6位）</label>
+                    <input type="password" id="registerPassword" placeholder="设置密码" required minlength="6" />
+                </div>
+                <div class="form-group">
+                    <label for="registerInvite">邀请码（可选）</label>
+                    <input type="text" id="registerInvite" placeholder="输入好友邀请码" style="text-transform:uppercase;letter-spacing:1px;" maxlength="8" />
+                    <div class="input-hint">填写好友邀请码，双方各得 1 次额外下载机会</div>
+                </div>
+                <div class="form-error" id="registerError"></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="registerSubmitBtn"><i class="fas fa-user-plus"></i> 注册</button>
+                </div>
+                <div class="form-footer">
+                    已有账号？<a id="registerToLogin">去登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="auth-overlay" id="forgotOverlay">
+        <div class="auth-modal">
+            <div class="auth-title">
+                <span>🔑 重置密码</span>
+                <button class="close-auth" data-close="forgot"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="auth-sub">输入注册邮箱，我们将发送密码重置链接</div>
+            <form id="forgotForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="forgotEmail">邮箱地址</label>
+                    <input type="email" id="forgotEmail" placeholder="your@email.com" required />
+                </div>
+                <div class="form-error" id="forgotError"></div>
+                <div class="form-success" id="forgotSuccess"></div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="forgotSubmitBtn"><i class="fas fa-paper-plane"></i> 发送重置链接</button>
+                </div>
+                <div class="form-footer">
+                    想起密码了？<a id="forgotToLogin">返回登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="quota-overlay" id="quotaOverlay">
+        <div class="quota-modal">
+            <div class="quota-icon">🚫</div>
+            <h3>下载次数已用完</h3>
+            <p>您已用完本次 5 次下载机会。可通过以下方式继续下载：</p>
+            <div class="quota-actions">
+                <div class="wechat-row">
+                    <span>📱 添加客服微信：</span>
+                    <span class="wechat-id">Win_Mac_123</span>
+                    <span class="copy-wechat" id="copyWechatBtn"><i class="fas fa-copy"></i> 复制</span>
+                </div>
+                <div style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:4px 0;">— 或 —</div>
+                <div class="invite-input-row">
+                    <input type="text" id="quotaInviteInput" placeholder="输入好友邀请码" style="text-transform:uppercase;letter-spacing:1px;" maxlength="8" />
+                    <button class="btn btn-primary" id="quotaInviteBtn"><i class="fas fa-gift"></i> 使用邀请码 +1</button>
+                </div>
+                <button class="btn btn-outline" id="quotaCloseBtn">关闭</button>
+            </div>
+        </div>
+    </div>
     <nav class="mobile-bottom-nav" id="mobileBottomNav">
         <a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a>
         <a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a>
@@ -2707,30 +3295,542 @@
         <a href="#" onclick="shareOn('twitter')" title="分享到Twitter"><i class="fab fa-twitter"></i></a>
         <a href="#" onclick="copyLink()" title="复制链接"><i class="fas fa-link"></i></a>
     </div>
-    <div class="stats-placeholder">
-        <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-            var _hmt = _hmt || [];
-            (function() {
-                var hm = document.createElement("script");
-                hm.src = "https://hm.baidu.com/hm.js?YOUR_BAIDU_ID";
-                var s = document.getElementsByTagName("script")[0];
-                s.parentNode.insertBefore(hm, s);
-            })();
-        </script>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-XXXXXXXX-X"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
-            gtag('config', 'UA-XXXXXXXX-X');
-        </script>
-    </div>
+    <div class="stats-placeholder"></div>
     <script>
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
         var supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         if (!supabaseClient) console.error('Supabase library not loaded.');
+
+        function escapeHTML(str) { if (!str) return ''; var d = document.createElement('div');
+            d.textContent = str; return d.innerHTML; }
+
+        function generateInviteCode() {
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            var code = '';
+            for (var i = 0; i < 6; i++) { code += chars.charAt(Math.floor(Math.random() * chars.length)); }
+            return code;
+        }
+
+        function toast(msg, type) {
+            type = type || 'success';
+            var c = document.getElementById('toastContainer');
+            var el = document.createElement('div');
+            el.className = 'toast ' + type;
+            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' +
+                msg + '<span class="toast-close">✕</span>';
+            c.appendChild(el);
+            el.querySelector('.toast-close').addEventListener('click', function(e) {
+                e.stopPropagation();
+                el.style.animation = 'toastOut 0.3s ease forwards';
+                setTimeout(function() { el.remove(); }, 400);
+            });
+            el.addEventListener('click', function(e) {
+                if (e.target.classList.contains('toast-close')) return;
+                this.style.animation = 'toastOut 0.3s ease forwards';
+                setTimeout(function() { this.remove(); }, 400);
+            });
+            setTimeout(function() {
+                if (el.parentNode) {
+                    el.style.animation = 'toastOut 0.4s ease forwards';
+                    setTimeout(function() { el.remove(); }, 500);
+                }
+            }, 3500);
+        }
+
+        function copyText(text, msg) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(function() { toast(msg || '已复制', 'success'); });
+            } else {
+                var input = document.createElement('input');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                toast(msg || '已复制', 'success');
+            }
+        }
+        var Auth = {
+            currentUser: null,
+            profile: null,
+            session: null,
+            init: function() {
+                var self = this;
+                if (!supabaseClient) return;
+                supabaseClient.auth.onAuthStateChange(function(event, session) {
+                    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                        self.session = session;
+                        if (session && session.user && session.user.id) {
+                            self.currentUser = session.user;
+                            self.loadProfile(session.user.id);
+                        } else {
+                            self.currentUser = null;
+                            self.profile = null;
+                            self.updateUI();
+                        }
+                    } else if (event === 'SIGNED_OUT') {
+                        self.currentUser = null;
+                        self.profile = null;
+                        self.session = null;
+                        self.updateUI();
+                    }
+                });
+                supabaseClient.auth.getSession().then(function(res) {
+                    if (res.data && res.data.session) {
+                        self.session = res.data.session;
+                        self.currentUser = res.data.session.user;
+                        if (self.currentUser && self.currentUser.id) {
+                            self.loadProfile(self.currentUser.id);
+                        } else {
+                            self.updateUI();
+                        }
+                    } else {
+                        self.updateUI();
+                    }
+                });
+            },
+            loadProfile: function(userId) {
+                var self = this;
+                if (!userId) {
+                    self.updateUI();
+                    return;
+                }
+                if (!supabaseClient) return;
+                supabaseClient.from('profiles').select('*').eq('id', userId).maybeSingle().then(function(res) {
+                    if (res.data) {
+                        self.profile = res.data;
+                        self.updateUI();
+                    } else if (res.error && res.error.code !== 'PGRST116') {
+                        console.error('加载profile失败:', res.error);
+                        self.updateUI();
+                    } else {
+                        self.updateUI();
+                    }
+                }).catch(function(err) {
+                    console.error('查询profile异常:', err);
+                    self.updateUI();
+                });
+            },
+            createProfile: async function(userId, email, inviteCode) {
+                if (!supabaseClient) return null;
+                var code = generateInviteCode();
+                var data = {
+                    id: userId,
+                    email: email,
+                    download_count: 5,
+                    invite_code: code,
+                    invited_by: null,
+                    created_at: new Date().toISOString()
+                };
+                if (inviteCode && inviteCode.trim()) {
+                    var invCode = inviteCode.trim().toUpperCase();
+                    var inviter = await supabaseClient.from('profiles').select('id, download_count').eq('invite_code',
+                        invCode).maybeSingle();
+                    if (inviter.data) {
+                        data.invited_by = inviter.data.id;
+                        var newCount = (inviter.data.download_count || 0) + 1;
+                        await supabaseClient.from('profiles').update({ download_count: newCount }).eq('id', inviter.data
+                            .id);
+                        data.download_count = 6;
+                    }
+                }
+                var result = await supabaseClient.from('profiles').insert(data).select().maybeSingle();
+                if (result.data) {
+                    this.profile = result.data;
+                    this.updateUI();
+                }
+                return result.data;
+            },
+            decrementDownload: async function(userId) {
+                if (!supabaseClient || !this.profile) return false;
+                var current = this.profile.download_count || 0;
+                if (current <= 0) return false;
+                var newCount = current - 1;
+                var res = await supabaseClient.from('profiles').update({ download_count: newCount }).eq('id', userId)
+                    .select().maybeSingle();
+                if (res.data) {
+                    this.profile = res.data;
+                    this.updateUI();
+                    return true;
+                }
+                return false;
+            },
+            useInviteCode: async function(code, userId) {
+                if (!supabaseClient || !this.profile) return { success: false, msg: '请先登录' };
+                var invCode = code.trim().toUpperCase();
+                if (invCode === this.profile.invite_code) return { success: false, msg: '不能使用自己的邀请码' };
+                var inviter = await supabaseClient.from('profiles').select('id, download_count, invited_by').eq(
+                    'invite_code', invCode).maybeSingle();
+                if (!inviter.data) return { success: false, msg: '邀请码无效' };
+                if (inviter.data.id === userId) return { success: false, msg: '不能使用自己的邀请码' };
+                if (this.profile.invited_by) return { success: false, msg: '您已经使用过邀请码了' };
+                var newInviterCount = (inviter.data.download_count || 0) + 1;
+                await supabaseClient.from('profiles').update({ download_count: newInviterCount }).eq('id', inviter.data
+                    .id);
+                var newCount = (this.profile.download_count || 0) + 1;
+                var res = await supabaseClient.from('profiles').update({
+                    download_count: newCount,
+                    invited_by: inviter.data.id
+                }).eq('id', userId).select().maybeSingle();
+                if (res.data) {
+                    this.profile = res.data;
+                    this.updateUI();
+                    return { success: true, msg: '邀请码使用成功！获得 1 次下载机会' };
+                }
+                return { success: false, msg: '使用邀请码失败，请重试' };
+            },
+            updateUI: function() {
+                var user = this.currentUser;
+                var profile = this.profile;
+                var loginBtn = document.getElementById('loginBtn');
+                var registerBtn = document.getElementById('registerBtn');
+                var userMenu = document.getElementById('userMenu');
+                var avatar = document.getElementById('userAvatar');
+                var dropdownEmail = document.getElementById('dropdownEmail');
+                var dropdownCount = document.getElementById('dropdownCount');
+                var dropdownInvite = document.getElementById('dropdownInviteCode');
+                if (user && profile) {
+                    loginBtn.style.display = 'none';
+                    registerBtn.style.display = 'none';
+                    userMenu.style.display = 'flex';
+                    avatar.textContent = (user.email || 'U')[0].toUpperCase();
+                    dropdownEmail.textContent = user.email || 'user@email.com';
+                    dropdownCount.textContent = profile.download_count || 0;
+                    dropdownInvite.textContent = profile.invite_code || '------';
+                    if ((profile.download_count || 0) <= 0) {
+                        dropdownCount.style.color = 'var(--danger)';
+                    } else {
+                        dropdownCount.style.color = '';
+                    }
+                } else {
+                    loginBtn.style.display = 'inline-flex';
+                    registerBtn.style.display = 'inline-flex';
+                    userMenu.style.display = 'none';
+                }
+                this.syncDownloadBadge();
+            },
+            syncDownloadBadge: function() {
+                var count = this.profile ? (this.profile.download_count || 0) : 0;
+                var badge = document.querySelector('.download-badge-count');
+                if (badge) badge.textContent = count;
+            },
+            isLoggedIn: function() {
+                return !!this.currentUser && !!this.profile;
+            },
+            getDownloadCount: function() {
+                return this.profile ? (this.profile.download_count || 0) : 0;
+            },
+            getUserId: function() {
+                return this.currentUser ? this.currentUser.id : null;
+            },
+            logout: function() {
+                if (supabaseClient) {
+                    supabaseClient.auth.signOut().then(function() {
+                        toast('已退出登录', 'success');
+                        Auth.updateUI();
+                        document.getElementById('userDropdown').classList.remove('open');
+                    });
+                }
+            }
+        };
+        (function bindAuthUI() {
+            var loginOverlay = document.getElementById('loginOverlay');
+            var loginBtn = document.getElementById('loginBtn');
+            var loginForm = document.getElementById('loginForm');
+            var loginError = document.getElementById('loginError');
+            var loginSubmitBtn = document.getElementById('loginSubmitBtn');
+            var loginToRegister = document.getElementById('loginToRegister');
+            var loginToForgot = document.getElementById('loginToForgot');
+            loginBtn.addEventListener('click', function() { openAuthOverlay('login'); });
+            loginToRegister.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeAuthOverlay('login');
+                setTimeout(function() { openAuthOverlay('register'); }, 200);
+            });
+            loginToForgot.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeAuthOverlay('login');
+                setTimeout(function() { openAuthOverlay('forgot'); }, 200);
+            });
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                loginError.classList.remove('show');
+                loginError.textContent = '';
+                var email = document.getElementById('loginEmail').value.trim();
+                var password = document.getElementById('loginPassword').value;
+                if (!email || !password) { loginError.textContent = '请填写完整信息';
+                    loginError.classList.add('show'); return; }
+                loginSubmitBtn.disabled = true;
+                loginSubmitBtn.innerHTML = '<span class="btn-spinner"></span> 登录中...';
+                try {
+                    var res = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+                    if (res.error) throw res.error;
+                    toast('登录成功！', 'success');
+                    closeAuthOverlay('login');
+                    setTimeout(function() { Auth.updateUI(); }, 300);
+                } catch (err) {
+                    loginError.textContent = err.message || '登录失败，请检查邮箱和密码';
+                    loginError.classList.add('show');
+                }
+                loginSubmitBtn.disabled = false;
+                loginSubmitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登录';
+            });
+            var registerOverlay = document.getElementById('registerOverlay');
+            var registerBtn = document.getElementById('registerBtn');
+            var registerForm = document.getElementById('registerForm');
+            var registerError = document.getElementById('registerError');
+            var registerSubmitBtn = document.getElementById('registerSubmitBtn');
+            var registerToLogin = document.getElementById('registerToLogin');
+            registerBtn.addEventListener('click', function() { openAuthOverlay('register'); });
+            registerToLogin.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeAuthOverlay('register');
+                setTimeout(function() { openAuthOverlay('login'); }, 200);
+            });
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                registerError.classList.remove('show');
+                registerError.textContent = '';
+                var email = document.getElementById('registerEmail').value.trim();
+                var password = document.getElementById('registerPassword').value;
+                var invite = document.getElementById('registerInvite').value.trim();
+                if (!email || !password) { registerError.textContent = '请填写完整信息';
+                    registerError.classList.add('show'); return; }
+                if (password.length < 6) { registerError.textContent = '密码至少6位';
+                    registerError.classList.add('show'); return; }
+                registerSubmitBtn.disabled = true;
+                registerSubmitBtn.innerHTML = '<span class="btn-spinner"></span> 注册中...';
+                try {
+                    var authRes = await supabaseClient.auth.signUp({ email: email, password: password });
+                    if (authRes.error) throw authRes.error;
+                    var user = authRes.data.user;
+                    if (!user) throw new Error('注册失败，请重试');
+                    var profile = await Auth.createProfile(user.id, email, invite);
+                    if (!profile) throw new Error('创建用户资料失败');
+                    toast('注册成功！已获得 ' + (profile.download_count || 5) + ' 次下载机会', 'success');
+                    closeAuthOverlay('register');
+                    Auth.updateUI();
+                    document.getElementById('registerEmail').value = '';
+                    document.getElementById('registerPassword').value = '';
+                    document.getElementById('registerInvite').value = '';
+                } catch (err) {
+                    registerError.textContent = err.message || '注册失败，请重试';
+                    registerError.classList.add('show');
+                }
+                registerSubmitBtn.disabled = false;
+                registerSubmitBtn.innerHTML = '<i class="fas fa-user-plus"></i> 注册';
+            });
+            var forgotOverlay = document.getElementById('forgotOverlay');
+            var forgotForm = document.getElementById('forgotForm');
+            var forgotError = document.getElementById('forgotError');
+            var forgotSuccess = document.getElementById('forgotSuccess');
+            var forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
+            var forgotToLogin = document.getElementById('forgotToLogin');
+            forgotToLogin.addEventListener('click', function(e) {
+                e.preventDefault();
+                closeAuthOverlay('forgot');
+                setTimeout(function() { openAuthOverlay('login'); }, 200);
+            });
+            forgotForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                forgotError.classList.remove('show');
+                forgotSuccess.classList.remove('show');
+                forgotError.textContent = '';
+                forgotSuccess.textContent = '';
+                var email = document.getElementById('forgotEmail').value.trim();
+                if (!email) { forgotError.textContent = '请输入邮箱地址';
+                    forgotError.classList.add('show'); return; }
+                forgotSubmitBtn.disabled = true;
+                forgotSubmitBtn.innerHTML = '<span class="btn-spinner"></span> 发送中...';
+                try {
+                    var res = await supabaseClient.auth.resetPasswordForEmail(email, {
+                        redirectTo: window.location.origin + window.location.pathname + '?reset=true'
+                    });
+                    if (res.error) throw res.error;
+                    forgotSuccess.textContent = '✅ 重置链接已发送至您的邮箱，请查收。';
+                    forgotSuccess.classList.add('show');
+                    toast('重置链接已发送', 'success');
+                    document.getElementById('forgotEmail').value = '';
+                } catch (err) {
+                    forgotError.textContent = err.message || '发送失败，请重试';
+                    forgotError.classList.add('show');
+                }
+                forgotSubmitBtn.disabled = false;
+                forgotSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 发送重置链接';
+            });
+            document.querySelectorAll('.close-auth').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var target = this.dataset.close;
+                    if (target) closeAuthOverlay(target);
+                });
+            });
+            document.querySelectorAll('.auth-overlay').forEach(function(overlay) {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        var id = this.id.replace('Overlay', '');
+                        closeAuthOverlay(id);
+                    }
+                });
+            });
+            var userMenu = document.getElementById('userMenu');
+            var userDropdown = document.getElementById('userDropdown');
+            var logoutBtn = document.getElementById('logoutBtn');
+            userMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('open');
+            });
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('open');
+            });
+            logoutBtn.addEventListener('click', function() {
+                Auth.logout();
+                userDropdown.classList.remove('open');
+            });
+            document.getElementById('copyInviteBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                var code = document.getElementById('dropdownInviteCode').textContent;
+                if (code && code !== '------') {
+                    copyText(code, '邀请码已复制，分享给好友可获得额外下载机会！');
+                } else {
+                    toast('请先登录', 'warning');
+                }
+            });
+            document.getElementById('copyWechatBtn').addEventListener('click', function() {
+                copyText('Win_Mac_123', '客服微信已复制');
+            });
+            document.getElementById('quotaCloseBtn').addEventListener('click', function() {
+                document.getElementById('quotaOverlay').classList.remove('open');
+            });
+            document.getElementById('quotaOverlay').addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('open');
+            });
+            document.getElementById('quotaInviteBtn').addEventListener('click', async function() {
+                var input = document.getElementById('quotaInviteInput');
+                var code = input.value.trim().toUpperCase();
+                if (!code) { toast('请输入邀请码', 'warning'); return; }
+                if (!Auth.isLoggedIn()) { toast('请先登录', 'warning'); return; }
+                var result = await Auth.useInviteCode(code, Auth.getUserId());
+                if (result.success) {
+                    toast(result.msg, 'success');
+                    document.getElementById('quotaOverlay').classList.remove('open');
+                    input.value = '';
+                    Auth.updateUI();
+                } else {
+                    toast(result.msg, 'error');
+                }
+            });
+            document.getElementById('quotaInviteInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault();
+                    document.getElementById('quotaInviteBtn').click(); }
+            });
+
+            function openAuthOverlay(type) {
+                var map = { login: 'loginOverlay', register: 'registerOverlay', forgot: 'forgotOverlay' };
+                var el = document.getElementById(map[type]);
+                if (el) {
+                    el.classList.add('open');
+                    document.body.style.overflow = 'hidden';
+                    var err = el.querySelector('.form-error');
+                    if (err) { err.classList.remove('show');
+                        err.textContent = ''; }
+                    var suc = el.querySelector('.form-success');
+                    if (suc) { suc.classList.remove('show');
+                        suc.textContent = ''; }
+                }
+            }
+
+            function closeAuthOverlay(type) {
+                var map = { login: 'loginOverlay', register: 'registerOverlay', forgot: 'forgotOverlay' };
+                var el = document.getElementById(map[type]);
+                if (el) {
+                    el.classList.remove('open');
+                    document.body.style.overflow = '';
+                }
+            }
+            window.openAuthOverlay = openAuthOverlay;
+            window.closeAuthOverlay = closeAuthOverlay;
+        })();
+        var CACHE_KEY = 'lezhe_software_cache';
+        var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
+
+        function loadCacheFromStorage() {
+            try {
+                var stored = localStorage.getItem(CACHE_KEY);
+                if (stored) {
+                    var data = JSON.parse(stored);
+                    if (data && data.software && data.categories) {
+                        cache.software = data.software;
+                        cache.categories = data.categories;
+                        cache.loaded = true;
+                        cache.lastFetch = data.timestamp || 0;
+                        return true;
+                    }
+                }
+            } catch (_) {}
+            return false;
+        }
+
+        function saveCacheToStorage() {
+            try {
+                var data = { software: cache.software, categories: cache.categories, timestamp: Date.now() };
+                localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+            } catch (_) {}
+        }
+        var DB = {
+            async loadAll(force) {
+                force = force || false;
+                if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) return;
+                try {
+                    var [softRes, catRes] = await Promise.all([
+                        supabaseClient.from('software').select('*').order('created_at', { ascending: false }),
+                        supabaseClient.from('categories').select('name').order('name')
+                    ]);
+                    if (softRes.error) throw softRes.error;
+                    if (catRes.error) throw catRes.error;
+                    cache.software = softRes.data || [];
+                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具',
+                        '办公软件', '媒体工具', '实用工具'
+                    ];
+                    cache.software.forEach(function(s) {
+                        if (!s.screenshots) s.screenshots = [];
+                        if (!s.changelog) s.changelog = '';
+                        if (!s.requirements) s.requirements = '';
+                        if (!s.platforms) s.platforms = [];
+                        if (!s.name || s.name.trim() === '') s.name = '未命名软件';
+                        if (!s.description) s.description = '';
+                        if (!s.icon) s.icon = '📦';
+                        if (!s.version) s.version = '1.0';
+                        if (!s.category) s.category = '未分类';
+                        if (!s.size) s.size = '—';
+                    });
+                    cache.loaded = true;
+                    cache.lastFetch = Date.now();
+                    saveCacheToStorage();
+                    return true;
+                } catch (e) {
+                    console.error('加载数据失败:', e);
+                    if (!cache.loaded) {
+                        cache.software = [];
+                        cache.categories = ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                        cache.loaded = true;
+                    }
+                    return false;
+                }
+            },
+            getSoftware: function() { return cache.software; },
+            getCategories: function() { return cache.categories; },
+            async updateSoftware(soft) {
+                try {
+                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq(
+                        'id', soft.id);
+                    var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
+                    if (idx !== -1) { cache.software[idx].views = soft.views;
+                        cache.software[idx].downloads = soft.downloads; }
+                    saveCacheToStorage();
+                } catch (e) { console.error('更新失败:', e); }
+            }
+        };
         var QUOTES = [
             "生活就像一盒巧克力，你永远不知道下一颗是什么味道。",
             "不积跬步，无以至千里。",
@@ -2777,131 +3877,6 @@
             "面朝大海，春暖花开。",
             "那些杀不死我的，必使我更强大。"
         ];
-        var CACHE_KEY = 'lezhe_software_cache';
-        var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
-
-        function loadCacheFromStorage() {
-            try {
-                var stored = localStorage.getItem(CACHE_KEY);
-                if (stored) {
-                    var data = JSON.parse(stored);
-                    if (data && data.software && data.categories) {
-                        cache.software = data.software;
-                        cache.categories = data.categories;
-                        cache.loaded = true;
-                        cache.lastFetch = data.timestamp || 0;
-                        return true;
-                    }
-                }
-            } catch (_) {}
-            return false;
-        }
-
-        function saveCacheToStorage() {
-            try {
-                var data = {
-                    software: cache.software,
-                    categories: cache.categories,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-            } catch (_) {}
-        }
-        var DB = {
-            async loadAll(force) {
-                force = force || false;
-                if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) return;
-                try {
-                    var [softRes, catRes] = await Promise.all([
-                        supabaseClient.from('software').select('*').order('created_at', { ascending: false }),
-                        supabaseClient.from('categories').select('name').order('name')
-                    ]);
-                    if (softRes.error) throw softRes.error;
-                    if (catRes.error) throw catRes.error;
-                    cache.software = softRes.data || [];
-                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具',
-                        '实用工具'
-                    ];
-                    cache.software.forEach(function(s) {
-                        if (!s.screenshots) s.screenshots = [];
-                        if (!s.changelog) s.changelog = '';
-                        if (!s.requirements) s.requirements = '';
-                        if (!s.platforms) s.platforms = [];
-                        if (!s.name || s.name.trim() === '') s.name = '未命名软件';
-                        if (!s.description) s.description = '';
-                        if (!s.icon) s.icon = '📦';
-                        if (!s.version) s.version = '1.0';
-                        if (!s.category) s.category = '未分类';
-                        if (!s.size) s.size = '—';
-                    });
-                    cache.loaded = true;
-                    cache.lastFetch = Date.now();
-                    saveCacheToStorage();
-                    return true;
-                } catch (e) {
-                    console.error('加载数据失败:', e);
-                    if (!cache.loaded) {
-                        cache.software = [];
-                        cache.categories = ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
-                        cache.loaded = true;
-                    }
-                    return false;
-                }
-            },
-            getSoftware: function() { return cache.software; },
-            getCategories: function() { return cache.categories; },
-            async updateSoftware(soft) {
-                try {
-                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id',
-                        soft.id);
-                    var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
-                    if (idx !== -1) { cache.software[idx].views = soft.views;
-                        cache.software[idx].downloads = soft.downloads; }
-                    saveCacheToStorage();
-                } catch (e) { console.error('更新失败:', e); }
-            }
-        };
-
-        function toast(msg, type) {
-            type = type || 'success';
-            var c = document.getElementById('toastContainer');
-            var el = document.createElement('div');
-            el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' +
-                msg + '<span class="toast-close">✕</span>';
-            c.appendChild(el);
-            el.querySelector('.toast-close').addEventListener('click', function(e) {
-                e.stopPropagation();
-                el.style.animation = 'toastOut 0.3s ease forwards';
-                setTimeout(function() { el.remove(); }, 400);
-            });
-            el.addEventListener('click', function(e) {
-                if (e.target.classList.contains('toast-close')) return;
-                this.style.animation = 'toastOut 0.3s ease forwards';
-                setTimeout(function() { this.remove(); }, 400);
-            });
-            setTimeout(function() {
-                if (el.parentNode) {
-                    el.style.animation = 'toastOut 0.4s ease forwards';
-                    setTimeout(function() { el.remove(); }, 500);
-                }
-            }, 3500);
-        }
-
-        function escapeHTML(str) {
-            if (!str) return '';
-            var div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        function highlightText(text, keyword) {
-            if (!keyword) return escapeHTML(text);
-            var escaped = escapeHTML(text);
-            var kw = escapeHTML(keyword);
-            var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-            return escaped.replace(regex, '<mark>' + kw + '</mark>');
-        }
 
         function getIconEmoji(cat) {
             var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
@@ -2946,7 +3921,6 @@
             searchHistory = [kw, ...searchHistory.filter(function(h) { return h !== kw; })].slice(0, 10);
             localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
         }
-
         var searchDebounceTimer = null;
 
         function showSuggestions(keyword) {
@@ -2969,8 +3943,7 @@
                         if (e.target.classList.contains('remove-history')) {
                             var kw = e.target.dataset.kw;
                             searchHistory = searchHistory.filter(function(h) { return h !== kw; });
-                            localStorage.setItem('lezhe_search_history', JSON.stringify(
-                            searchHistory));
+                            localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
                             showSuggestions('');
                             return;
                         }
@@ -3263,6 +4236,14 @@
                 });
             }
         };
+
+        function highlightText(text, keyword) {
+            if (!keyword) return escapeHTML(text);
+            var escaped = escapeHTML(text);
+            var kw = escapeHTML(keyword);
+            var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            return escaped.replace(regex, '<mark>' + kw + '</mark>');
+        }
         var viewHistory = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
 
         function addViewHistory(softwareId) {
@@ -3389,16 +4370,29 @@
                 dlBtn.disabled = false;
                 dlBtn.onclick = function() {
                     if (this.classList.contains('btn-loading')) return;
+                    if (!Auth.isLoggedIn()) {
+                        toast('请先登录后再下载', 'warning');
+                        openAuthOverlay('login');
+                        return;
+                    }
+                    var count = Auth.getDownloadCount();
+                    if (count <= 0) {
+                        document.getElementById('quotaOverlay').classList.add('open');
+                        return;
+                    }
                     this.classList.add('btn-loading');
                     this.innerHTML = '<span class="btn-spinner"></span> 下载中';
                     if (soft.download_url && soft.download_url.trim()) {
                         window.open(soft.download_url, '_blank');
                         soft.downloads = (soft.downloads || 0) + 1;
                         DB.updateSoftware(soft);
-                        toast('开始下载 ' + soft.name, 'success');
+                        Auth.decrementDownload(Auth.getUserId()).then(function(success) {
+                            if (success) {
+                                toast('下载成功！剩余 ' + Auth.getDownloadCount() + ' 次', 'success');
+                                Auth.updateUI();
+                            }
+                        });
                     } else {
-                        soft.downloads = (soft.downloads || 0) + 1;
-                        DB.updateSoftware(soft);
                         toast('暂无下载链接', 'warning');
                     }
                     setTimeout(function() {
@@ -3513,18 +4507,14 @@
         var isOpen = false;
         var hoverTimeout = null;
 
-        function isMobile() {
-            return window.innerWidth <= 820;
-        }
+        function isMobile() { return window.innerWidth <= 820; }
 
         function openSidebar() {
             if (isOpen) return;
             isOpen = true;
             sidebar.classList.add('open');
             mainContent.classList.add('sidebar-open');
-            if (!isMobile()) {
-                trigger.style.opacity = '0';
-            }
+            if (!isMobile()) { trigger.style.opacity = '0'; }
             if (isMobile()) {
                 overlay.classList.add('active');
                 mobileToggleBtn.classList.add('close-btn');
@@ -3538,9 +4528,7 @@
             isOpen = false;
             sidebar.classList.remove('open');
             mainContent.classList.remove('sidebar-open');
-            if (!isMobile()) {
-                trigger.style.opacity = '0.7';
-            }
+            if (!isMobile()) { trigger.style.opacity = '0.7'; }
             if (isMobile()) {
                 overlay.classList.remove('active');
                 mobileToggleBtn.classList.remove('close-btn');
@@ -3549,11 +4537,8 @@
         }
 
         function toggleSidebar() {
-            if (isOpen) {
-                closeSidebar();
-            } else {
-                openSidebar();
-            }
+            if (isOpen) closeSidebar();
+            else openSidebar();
         }
 
         function toggleLock() {
@@ -3561,42 +4546,30 @@
             lockBtn.classList.toggle('locked', isLocked);
             lockBtn.innerHTML = isLocked ? '<i class="fas fa-thumbtack" style="transform:rotate(45deg);"></i>' :
                 '<i class="fas fa-thumbtack"></i>';
-            if (isLocked && !isOpen && !isMobile()) {
-                openSidebar();
-            }
+            if (isLocked && !isOpen && !isMobile()) { openSidebar(); }
             if (!isLocked && !isMobile()) {
-                setTimeout(function() {
-                    if (!isOpen) return;
-                    closeSidebar();
-                }, 2000);
+                setTimeout(function() { if (!isOpen) return;
+                    closeSidebar(); }, 2000);
             }
             localStorage.setItem('sidebar_locked', String(isLocked));
         }
         if (!isMobile()) {
             trigger.addEventListener('mouseenter', function() {
                 clearTimeout(hoverTimeout);
-                if (!isLocked) {
-                    openSidebar();
-                }
+                if (!isLocked) { openSidebar(); }
             });
             trigger.addEventListener('mouseleave', function() {
                 if (!isLocked) {
-                    hoverTimeout = setTimeout(function() {
-                        closeSidebar();
-                    }, 300);
+                    hoverTimeout = setTimeout(function() { closeSidebar(); }, 300);
                 }
             });
             sidebar.addEventListener('mouseenter', function() {
                 clearTimeout(hoverTimeout);
-                if (!isLocked && !isOpen) {
-                    openSidebar();
-                }
+                if (!isLocked && !isOpen) { openSidebar(); }
             });
             sidebar.addEventListener('mouseleave', function() {
                 if (!isLocked) {
-                    hoverTimeout = setTimeout(function() {
-                        closeSidebar();
-                    }, 400);
+                    hoverTimeout = setTimeout(function() { closeSidebar(); }, 400);
                 }
             });
         }
@@ -3605,22 +4578,12 @@
             mobileToggleBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 if (isOpen) {
-                    if (isLocked && !isMobile()) {
-                        toggleLock();
-                    } else {
-                        closeSidebar();
-                    }
-                } else {
-                    openSidebar();
-                }
+                    if (isLocked && !isMobile()) { toggleLock(); } else { closeSidebar(); }
+                } else { openSidebar(); }
             });
         }
         if (overlay) {
-            overlay.addEventListener('click', function() {
-                if (isMobile()) {
-                    closeSidebar();
-                }
-            });
+            overlay.addEventListener('click', function() { if (isMobile()) closeSidebar(); });
         }
         document.addEventListener('click', function(e) {
             if (isMobile() && isOpen) {
@@ -3687,9 +4650,7 @@
                     document.getElementById('sortSelect').value = savedSort;
                 }
                 var hasCache = loadCacheFromStorage();
-                if (hasCache) {
-                    self.refreshAll();
-                }
+                if (hasCache) { self.refreshAll(); }
                 this._loadDataWithRetry = function() {
                     DB.loadAll(true).then(function(success) {
                         if (success) {
@@ -3706,9 +4667,7 @@
                                     '<div class="error-retry"><div class="icon">⚠</div><h3>数据加载失败</h3><p>请检查网络后重试</p><button class="btn btn-primary" id="retryLoadBtn">重新加载</button></div>';
                                 var retryBtn = document.getElementById('retryLoadBtn');
                                 if (retryBtn) {
-                                    retryBtn.addEventListener('click', function() {
-                                        self._loadDataWithRetry();
-                                    });
+                                    retryBtn.addEventListener('click', function() { self._loadDataWithRetry(); });
                                 }
                             }
                         }
@@ -3717,13 +4676,18 @@
                 this._loadDataWithRetry();
                 setInterval(function() {
                     DB.loadAll(true).then(function(success) {
-                        if (success) {
-                            self.refreshAll();
-                            renderRecentHistory();
-                        }
+                        if (success) { self.refreshAll();
+                            renderRecentHistory(); }
                     });
                 }, 600000);
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
+                    a.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (this.dataset.page === 'home') self.goHome();
+                        else self.goList();
+                    });
+                });
+                document.querySelectorAll('#mobileBottomNav a').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
                         if (this.dataset.page === 'home') self.goHome();
@@ -3790,10 +4754,8 @@
                         self.renderListPage(); }
                 });
                 document.getElementById('jumpPageInput').addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        document.getElementById('jumpPageBtn').click();
-                    }
+                    if (e.key === 'Enter') { e.preventDefault();
+                        document.getElementById('jumpPageBtn').click(); }
                 });
                 document.getElementById('platformFilter').addEventListener('change', function() {
                     self.platformFilter = this.value;
@@ -3806,13 +4768,6 @@
                     currentPage = 1;
                     self.refreshListWithFilters();
                 });
-                document.querySelectorAll('#mobileBottomNav a').forEach(function(a) {
-                    a.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        if (this.dataset.page === 'home') self.goHome();
-                        else self.goList();
-                    });
-                });
                 var backBtn = document.getElementById('backTopBtn');
                 window.addEventListener('scroll', function() {
                     backBtn.classList.toggle('visible', window.pageYOffset > 300);
@@ -3820,8 +4775,7 @@
                 backBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
                 document.addEventListener('click', function(e) {
                     var nav = document.getElementById('navLinks');
-                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
-                    'open');
+                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove('open');
                 });
                 var themeToggle = document.getElementById('themeToggle');
                 var headerThemeBtn = document.getElementById('headerThemeBtn');
@@ -3848,6 +4802,19 @@
                     var current = document.documentElement.getAttribute('data-theme');
                     setTheme(current === 'dark' ? 'light' : 'dark');
                 });
+                Auth.init();
+                var urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('reset') === 'true') {
+                    toast('请查看邮箱，点击重置链接设置新密码', 'success');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+                var softId = urlParams.get('soft');
+                if (softId) {
+                    setTimeout(function() {
+                        var soft = DB.getSoftware().find(function(s) { return s.id === softId; });
+                        if (soft) { Detail.open(soft); }
+                    }, 800);
+                }
             },
             goHome: function() {
                 this.currentPage = 'home';
@@ -3855,8 +4822,7 @@
                 this.searchKeyword = '';
                 document.getElementById('pageHome').classList.remove('hidden');
                 document.getElementById('pageList').classList.add('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
@@ -3870,9 +4836,7 @@
                     b.classList.remove('active');
                     if (b.dataset.cat === 'all') b.classList.add('active');
                 });
-                if (isMobile() && isOpen) {
-                    closeSidebar();
-                }
+                if (isMobile() && isOpen) { closeSidebar(); }
             },
             goList: function(cat) {
                 cat = cat || 'all';
@@ -3880,8 +4844,7 @@
                 this.currentCategory = cat;
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 currentPage = 1;
@@ -3891,16 +4854,13 @@
                 this.updateSidebarHighlight(cat === 'all' ? null : cat);
                 document.getElementById('sidebarSearchWrapper').classList.add('active');
                 document.getElementById('sidebarStats').style.display = 'none';
-                if (isMobile() && isOpen) {
-                    closeSidebar();
-                }
+                if (isMobile() && isOpen) { closeSidebar(); }
                 document.getElementById('filterTags').querySelectorAll('button').forEach(function(b) {
                     b.classList.remove('active');
                     if (b.dataset.cat === cat) b.classList.add('active');
                 });
                 if (cat === 'all') {
-                    document.getElementById('filterTags').querySelector('button[data-cat="all"]').classList.add(
-                        'active');
+                    document.getElementById('filterTags').querySelector('button[data-cat="all"]').classList.add('active');
                 }
             },
             updateSidebarHighlight: function(cat) {
@@ -3961,8 +4921,7 @@
                 this.currentCategory = 'all';
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 currentPage = 1;
                 this.refreshList(keyword);
@@ -3970,9 +4929,7 @@
                 document.querySelector('#mobileBottomNav a[data-page="list"]').classList.add('active');
                 document.getElementById('sidebarSearchWrapper').classList.add('active');
                 document.getElementById('sidebarStats').style.display = 'none';
-                if (isMobile() && isOpen) {
-                    closeSidebar();
-                }
+                if (isMobile() && isOpen) { closeSidebar(); }
                 this.updateSidebarHighlight(null);
                 document.getElementById('filterTags').querySelectorAll('button').forEach(function(b) {
                     b.classList.remove('active');
@@ -4020,10 +4977,8 @@
                         currentPage = 1;
                         self.refreshListWithFilters();
                         self.updateSidebarHighlight(self.currentCategory === 'all' ? null : self
-                        .currentCategory);
-                        if (isMobile() && isOpen) {
-                            closeSidebar();
-                        }
+                            .currentCategory);
+                        if (isMobile() && isOpen) { closeSidebar(); }
                     });
                 });
                 if (keyword) {
@@ -4083,7 +5038,6 @@
                 else this.refreshListWithFilters();
             }
         };
-        document.addEventListener('DOMContentLoaded', function() { App.init(); });
 
         function shareOn(platform) {
             var url = encodeURIComponent(window.location.href);
@@ -4105,25 +5059,15 @@
 
         function copyLinkText(title, url) {
             var text = title + '\n' + url;
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(function() {
-                    toast('已复制标题与链接', 'success');
-                });
-            } else {
-                var input = document.createElement('input');
-                input.value = text;
-                document.body.appendChild(input);
-                input.select();
-                document.execCommand('copy');
-                document.body.removeChild(input);
-                toast('已复制标题与链接', 'success');
-            }
+            copyText(text, '已复制标题与链接');
         }
 
         function copyLink() {
             copyLinkText('乐哲软件 · 精选高效工具', window.location.href);
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            App.init();
+        });
     </script>
-    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
