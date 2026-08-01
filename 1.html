@@ -4365,10 +4365,7 @@
             </div>
             <div class="form-error" id="loginError"></div>
             <div class="actions">
-                <button class="btn btn-primary" id="loginBtn">登 录</button>
-            </div>
-            <div style="margin-top:12px;font-size:0.7rem;color:var(--text-dim);text-align:center;border-top:1px solid var(--border-glow);padding-top:12px;">
-                默认账号：admin &nbsp;|&nbsp; 首次登录自动创建，密码：<code style="background:var(--bg-input);padding:2px 6px;border-radius:4px;">qbx12164811..</code>
+                <button class="btn btn-primary" id="adminLoginBtn">登 录</button>
             </div>
         </div>
     </div>
@@ -4545,7 +4542,7 @@
                             this.showLogin();
                         }
 
-                        var loginBtn = document.getElementById('loginBtn');
+                        var loginBtn = document.getElementById('adminLoginBtn');
                         var loginPass = document.getElementById('loginPass');
                         var adminLogout = document.getElementById('adminLogout');
                         var themeToggle = document.getElementById('themeToggle');
