@@ -202,306 +202,160 @@ input{font-family:inherit;border:none;outline:none;background:none;color:var(--t
 </div>
 
 <script>
-(function() {
-    // -------- 配置 --------
-    var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
-    var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
-
-    // -------- 安全初始化 Supabase （不因加载失败而中断）--------
-    var supabaseClient = null;
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-        try {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch (e) {
-            console.warn('Supabase 初始化失败:', e);
-        }
-    } else {
-        console.warn('Supabase SDK 未加载，注册/登录功能将不可用。');
-    }
-
-    // 即使 supabaseClient 为 null，页面上的弹窗和按钮依然可以工作（只是注册登录会失败）
-    // 我们定义一个安全的代理对象，避免后续调用报错
-    var safeSupabase = {
-        from: function() {
-            return {
-                select: function() {
-                    return {
-                        maybeSingle: function() {
-                            return Promise.resolve({ data: null, error: new Error('Supabase not available') });
-                        }
-                    };
-                },
-                insert: function() {
-                    return {
-                        select: function() {
-                            return {
-                                single: function() {
-                                    return Promise.resolve({ data: null, error: new Error('Supabase not available') });
-                                }
-                            };
-                        }
-                    };
-                },
-                update: function() {
-                    return {
-                        eq: function() {
-                            return Promise.resolve({ error: new Error('Supabase not available') });
-                        }
-                    };
-                },
-                delete: function() {
-                    return {
-                        eq: function() {
-                            return Promise.resolve({ error: new Error('Supabase not available') });
-                        }
-                    };
-                }
-            };
-        }
-    };
-
-    var db = supabaseClient || safeSupabase;
-
-    // -------- 工具函数 --------
-    function toast(msg, type) {
-        type = type || 'success';
-        var c = document.getElementById('toastContainer');
-        var el = document.createElement('div');
-        el.className = 'toast ' + type;
-        el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : '✕') + '</span> ' + msg;
-        c.appendChild(el);
-        setTimeout(function() {
-            el.style.animation = 'toastOut 0.4s ease forwards';
-            setTimeout(function() { el.remove(); }, 500);
-        }, 2800);
-    }
-
-    function hashPwd(p) {
-        var h = 0;
-        for (var i = 0; i < p.length; i++) {
-            var c = p.charCodeAt(i);
-            h = ((h << 5) - h) + c;
-            h = h & h;
-        }
-        return h.toString(16);
-    }
-
-    function generateUserCode() {
-        var num = Math.floor(10000 + Math.random() * 90000);
-        return 'U' + num;
-    }
-
-    // -------- 用户相关函数 --------
-    var currentUser = null;
-
-    async function checkUsernameExists(username) {
-        if (!db.from) return false;
-        var { data, error } = await db.from('users').select('id').eq('username', username).maybeSingle();
-        return !!data;
-    }
-
-    async function registerUser() {
-        var username = document.getElementById('regUsername').value.trim();
-        var password = document.getElementById('regPassword').value;
-        var confirm = document.getElementById('regConfirm').value;
-        var errEl = document.getElementById('regError');
-        var sucEl = document.getElementById('regSuccess');
-        errEl.textContent = '';
-        sucEl.textContent = '';
-
-        if (username.length < 4 || username.length > 16) { errEl.textContent = '用户名需4-16位'; return; }
-        if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(username)) { errEl.textContent = '用户名仅支持字母、数字、下划线、中文'; return; }
-        if (password.length < 6) { errEl.textContent = '密码至少6位'; return; }
-        if (password !== confirm) { errEl.textContent = '两次密码不一致'; return; }
-
-        var exists = await checkUsernameExists(username);
-        if (exists) { errEl.textContent = '用户名已被注册'; return; }
-
-        var userCode = generateUserCode();
-        var { data, error } = await db.from('users').insert({
-            username: username,
-            password: hashPwd(password),
-            user_code: userCode,
-            vip_status: false,
-            vip_expire: null
-        }).select().single();
-
-        if (error) {
-            errEl.textContent = '注册失败：' + error.message;
-            return;
-        }
-        sucEl.textContent = '注册成功！';
-        toast('注册成功，欢迎 ' + username, 'success');
-        setTimeout(function() {
-            sucEl.textContent = '';
-            document.querySelector('[data-tab="login"]').click();
-            document.getElementById('loginUsername').value = username;
-            document.getElementById('loginPassword').value = '';
-        }, 1500);
-    }
-
-    async function loginUser() {
-        var username = document.getElementById('loginUsername').value.trim();
-        var password = document.getElementById('loginPassword').value;
-        var errEl = document.getElementById('loginError');
-        errEl.textContent = '';
-
-        if (!username || !password) { errEl.textContent = '请填写用户名和密码'; return; }
-
-        var { data, error } = await db.from('users').select('*').eq('username', username).maybeSingle();
-        if (error || !data) { errEl.textContent = '用户名或密码错误'; return; }
-        if (data.password !== hashPwd(password)) { errEl.textContent = '用户名或密码错误'; return; }
-
-        currentUser = data;
-        showUserInfo(data);
-        toast('欢迎回来，' + data.username, 'success');
-        document.getElementById('authModal').classList.remove('active');
-    }
-
-    function showUserInfo(user) {
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('registerForm').style.display = 'none';
-        document.getElementById('userInfo').style.display = 'block';
-        document.getElementById('modalTitle').textContent = '👤 我的信息';
-        document.getElementById('userCode').textContent = user.user_code;
-
-        var statusEl = document.getElementById('vipStatusDisplay');
-        if (user.vip_status) {
-            var expireDate = user.vip_expire ? new Date(user.vip_expire) : null;
-            var now = new Date();
-            var daysLeft = expireDate ? Math.ceil((expireDate - now) / (1000 * 60 * 60 * 24)) : 0;
-            if (daysLeft > 0) {
-                statusEl.className = 'vip-status active';
-                statusEl.innerHTML = '<i class="fas fa-crown"></i> ✅ VIP会员 · 剩余 ' + daysLeft + ' 天';
-            } else if (expireDate && daysLeft <= 0) {
-                statusEl.className = 'vip-status inactive';
-                statusEl.innerHTML = '<i class="fas fa-crown"></i> ⚠️ VIP已过期，请联系客服续费';
-            } else {
-                statusEl.className = 'vip-status active';
-                statusEl.innerHTML = '<i class="fas fa-crown"></i> ✅ VIP会员（永久）';
-            }
-        } else {
-            statusEl.className = 'vip-status inactive';
-            statusEl.innerHTML = '<i class="fas fa-user"></i> 当前状态：普通用户';
-        }
-    }
-
-    function showLoginForm() {
-        document.getElementById('loginForm').style.display = 'block';
-        document.getElementById('registerForm').style.display = 'none';
-        document.getElementById('userInfo').style.display = 'none';
-        document.getElementById('modalTitle').textContent = '✦ 登录';
-        document.getElementById('loginError').textContent = '';
-    }
-
-    function showRegisterForm() {
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('registerForm').style.display = 'block';
-        document.getElementById('userInfo').style.display = 'none';
-        document.getElementById('modalTitle').textContent = '✦ 注册';
-        document.getElementById('regError').textContent = '';
-        document.getElementById('regSuccess').textContent = '';
-    }
-
-    // -------- 页面初始化 --------
-    document.addEventListener('DOMContentLoaded', function() {
-        // 主题
-        var theme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', theme);
-        var themeBtn = document.getElementById('themeBtn');
-        themeBtn.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        themeBtn.addEventListener('click', function() {
-            var t = document.documentElement.getAttribute('data-theme');
-            var n = t === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', n);
-            localStorage.setItem('theme', n);
-            this.innerHTML = n === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-        });
-
-        // 所有“立即开通”按钮绑定弹窗
-        document.querySelectorAll('.btn-buy[data-plan]').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                if (this.disabled) return;
-                // 强制显示登录弹窗（无任何前置检查）
-                document.getElementById('authModal').classList.add('active');
-                showLoginForm();
-            });
-        });
-
-        // 关闭弹窗
-        document.getElementById('modalClose').addEventListener('click', function() {
-            document.getElementById('authModal').classList.remove('active');
-        });
-        document.getElementById('authModal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('active');
-        });
-
-        // Tab 切换
-        document.querySelectorAll('.tabs button').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
-                this.classList.add('active');
-                if (this.dataset.tab === 'login') showLoginForm();
-                else showRegisterForm();
-            });
-        });
-
-        // 登录和注册按钮
-        document.getElementById('loginBtn').addEventListener('click', loginUser);
-        document.getElementById('registerBtn').addEventListener('click', registerUser);
-
-        // 回车提交
-        document.getElementById('loginPassword').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') loginUser();
-        });
-        document.getElementById('regConfirm').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') registerUser();
-        });
-
-        // 退出登录
-        document.getElementById('logoutBtn').addEventListener('click', function() {
-            sessionStorage.removeItem('lezhe_vip_user');
-            currentUser = null;
-            document.getElementById('userInfo').style.display = 'none';
-            document.getElementById('modalTitle').textContent = '✦ 登录';
-            showLoginForm();
-            toast('已退出登录', 'success');
-        });
-
-        // 恢复已登录状态
-        var savedUser = sessionStorage.getItem('lezhe_vip_user');
-        if (savedUser) {
-            try {
-                var u = JSON.parse(savedUser);
-                currentUser = u;
-                var now = new Date();
-                if (u.vip_expire) {
-                    var exp = new Date(u.vip_expire);
-                    if (exp > now || !u.vip_expire) {
-                        showUserInfo(u);
-                    }
-                } else if (u.vip_status) {
-                    showUserInfo(u);
-                }
-            } catch (e) {}
-        }
-
-        // ESC键关闭
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.getElementById('authModal').classList.remove('active');
-            }
-        });
-
-        // 返回首页（保留原有历史）
-        document.querySelector('.back-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            window.history.back();
-        });
-    });
-
-    // 暴露登录状态供其他页面使用（可选）
-    window.__vipUser = currentUser;
+(function(){
+var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
+var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+var supabaseClient=null;
+if(typeof supabase!=='undefined'&&supabase.createClient){
+try{supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);}catch(e){console.warn(e);}
+}
+function makeSafeDb(){
+return{
+from:function(){return{
+select:function(){return{
+maybeSingle:function(){return Promise.resolve({data:null,error:new Error('no supabase')});}
+}},
+insert:function(){return{
+select:function(){return{
+single:function(){return Promise.resolve({data:null,error:new Error('no supabase')});}
+}}
+}},
+update:function(){return{
+eq:function(){return Promise.resolve({error:new Error('no supabase')});}
+}},
+delete:function(){return{
+eq:function(){return Promise.resolve({error:new Error('no supabase')});}
+}}
+}};
+}
+var db=supabaseClient||makeSafeDb();
+function toast(msg,type){type=type||'success';var c=document.getElementById('toastContainer');var el=document.createElement('div');el.className='toast '+type;el.innerHTML='<span class="icon">'+(type==='success'?'◆':'✕')+'</span> '+msg;c.appendChild(el);setTimeout(function(){el.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){el.remove();},500);},2800);}
+function hashPwd(p){var h=0;for(var i=0;i<p.length;i++){var c=p.charCodeAt(i);h=((h<<5)-h)+c;h=h&h;}return h.toString(16);}
+function generateUserCode(){var num=Math.floor(10000+Math.random()*90000);return 'U'+num;}
+var currentUser=null;
+async function checkUsernameExists(username){if(!db.from)return false;var {data,error}=await db.from('users').select('id').eq('username',username).maybeSingle();return !!data;}
+async function registerUser(){
+var username=document.getElementById('regUsername').value.trim();
+var password=document.getElementById('regPassword').value;
+var confirm=document.getElementById('regConfirm').value;
+var errEl=document.getElementById('regError');
+var sucEl=document.getElementById('regSuccess');
+errEl.textContent='';sucEl.textContent='';
+if(username.length<4||username.length>16){errEl.textContent='用户名需4-16位';return;}
+if(!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(username)){errEl.textContent='用户名仅支持字母、数字、下划线、中文';return;}
+if(password.length<6){errEl.textContent='密码至少6位';return;}
+if(password!==confirm){errEl.textContent='两次密码不一致';return;}
+var exists=await checkUsernameExists(username);
+if(exists){errEl.textContent='用户名已被注册';return;}
+var userCode=generateUserCode();
+var {data,error}=await db.from('users').insert({username:username,password:hashPwd(password),user_code:userCode,vip_status:false,vip_expire:null}).select().single();
+if(error){errEl.textContent='注册失败：'+error.message;return;}
+sucEl.textContent='注册成功！';
+toast('注册成功，欢迎 '+username,'success');
+setTimeout(function(){sucEl.textContent='';document.querySelector('[data-tab="login"]').click();document.getElementById('loginUsername').value=username;document.getElementById('loginPassword').value='';},1500);
+}
+async function loginUser(){
+var username=document.getElementById('loginUsername').value.trim();
+var password=document.getElementById('loginPassword').value;
+var errEl=document.getElementById('loginError');
+errEl.textContent='';
+if(!username||!password){errEl.textContent='请填写用户名和密码';return;}
+var {data,error}=await db.from('users').select('*').eq('username',username).maybeSingle();
+if(error||!data){errEl.textContent='用户名或密码错误';return;}
+if(data.password!==hashPwd(password)){errEl.textContent='用户名或密码错误';return;}
+currentUser=data;
+showUserInfo(data);
+toast('欢迎回来，'+data.username,'success');
+document.getElementById('authModal').classList.remove('active');
+}
+function showUserInfo(user){
+document.getElementById('loginForm').style.display='none';
+document.getElementById('registerForm').style.display='none';
+document.getElementById('userInfo').style.display='block';
+document.getElementById('modalTitle').textContent='👤 我的信息';
+document.getElementById('userCode').textContent=user.user_code;
+var statusEl=document.getElementById('vipStatusDisplay');
+if(user.vip_status){
+var expireDate=user.vip_expire?new Date(user.vip_expire):null;
+var now=new Date();
+var daysLeft=expireDate?Math.ceil((expireDate-now)/(1000*60*60*24)):0;
+if(daysLeft>0){
+statusEl.className='vip-status active';
+statusEl.innerHTML='<i class="fas fa-crown"></i> ✅ VIP会员 · 剩余 '+daysLeft+' 天';
+}else if(expireDate&&daysLeft<=0){
+statusEl.className='vip-status inactive';
+statusEl.innerHTML='<i class="fas fa-crown"></i> ⚠️ VIP已过期，请联系客服续费';
+}else{
+statusEl.className='vip-status active';
+statusEl.innerHTML='<i class="fas fa-crown"></i> ✅ VIP会员（永久）';
+}
+}else{
+statusEl.className='vip-status inactive';
+statusEl.innerHTML='<i class="fas fa-user"></i> 当前状态：普通用户';
+}
+}
+function showLoginForm(){
+document.getElementById('loginForm').style.display='block';
+document.getElementById('registerForm').style.display='none';
+document.getElementById('userInfo').style.display='none';
+document.getElementById('modalTitle').textContent='✦ 登录';
+document.getElementById('loginError').textContent='';
+}
+function showRegisterForm(){
+document.getElementById('loginForm').style.display='none';
+document.getElementById('registerForm').style.display='block';
+document.getElementById('userInfo').style.display='none';
+document.getElementById('modalTitle').textContent='✦ 注册';
+document.getElementById('regError').textContent='';
+document.getElementById('regSuccess').textContent='';
+}
+document.addEventListener('DOMContentLoaded',function(){
+var theme=localStorage.getItem('theme')||'light';
+document.documentElement.setAttribute('data-theme',theme);
+var themeBtn=document.getElementById('themeBtn');
+themeBtn.innerHTML=theme==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+themeBtn.addEventListener('click',function(){
+var t=document.documentElement.getAttribute('data-theme');
+var n=t==='dark'?'light':'dark';
+document.documentElement.setAttribute('data-theme',n);
+localStorage.setItem('theme',n);
+this.innerHTML=n==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
+});
+document.querySelectorAll('.btn-buy[data-plan]').forEach(function(btn){
+btn.addEventListener('click',function(){
+if(this.disabled)return;
+document.getElementById('authModal').classList.add('active');
+showLoginForm();
+});
+});
+document.getElementById('modalClose').addEventListener('click',function(){document.getElementById('authModal').classList.remove('active');});
+document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
+document.querySelectorAll('.tabs button').forEach(function(btn){
+btn.addEventListener('click',function(){
+document.querySelectorAll('.tabs button').forEach(function(b){b.classList.remove('active');});
+this.classList.add('active');
+if(this.dataset.tab==='login')showLoginForm(); else showRegisterForm();
+});
+});
+document.getElementById('loginBtn').addEventListener('click',loginUser);
+document.getElementById('registerBtn').addEventListener('click',registerUser);
+document.getElementById('loginPassword').addEventListener('keydown',function(e){if(e.key==='Enter')loginUser();});
+document.getElementById('regConfirm').addEventListener('keydown',function(e){if(e.key==='Enter')registerUser();});
+document.getElementById('logoutBtn').addEventListener('click',function(){
+sessionStorage.removeItem('lezhe_vip_user');
+currentUser=null;
+document.getElementById('userInfo').style.display='none';
+document.getElementById('modalTitle').textContent='✦ 登录';
+showLoginForm();
+toast('已退出登录','success');
+});
+var savedUser=sessionStorage.getItem('lezhe_vip_user');
+if(savedUser){
+try{var u=JSON.parse(savedUser);currentUser=u;var now=new Date();if(u.vip_expire){var exp=new Date(u.vip_expire);if(exp>now||!u.vip_expire){showUserInfo(u);}}else if(u.vip_status){showUserInfo(u);}}catch(e){}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.getElementById('authModal').classList.remove('active');}});
+document.querySelector('.back-link').addEventListener('click',function(e){e.preventDefault();window.history.back();});
+});
 })();
 </script>
 </body>
