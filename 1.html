@@ -9,1091 +9,184 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --bg-primary: #080c14;
-            --bg-secondary: #0f172a;
-            --bg-card: rgba(18, 30, 51, 0.78);
-            --bg-card-solid: #121e33;
-            --bg-input: rgba(0, 0, 0, 0.25);
-            --border-glow: rgba(0, 200, 255, 0.15);
-            --border-glow-strong: rgba(0, 200, 255, 0.35);
-            --text-primary: #eef5ff;
-            --text-secondary: #8da4c9;
-            --text-dim: #4a6185;
-            --accent-cyan: #00d4ff;
-            --accent-blue: #3b82f6;
-            --accent-purple: #8b5cf6;
-            --accent-green: #34d399;
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: 'Inter', -apple-system, sans-serif;
-            --max-width: 1200px;
-            --header-height: 64px;
-            --sidebar-width: 210px;
-        }
-        [data-theme="light"] {
-            --bg-primary: #f0f4ff;
-            --bg-secondary: #e8edf8;
-            --bg-card: rgba(255, 255, 255, 0.82);
-            --bg-card-solid: #ffffff;
-            --bg-input: rgba(0, 0, 0, 0.05);
-            --border-glow: rgba(0, 100, 200, 0.15);
-            --border-glow-strong: rgba(0, 100, 200, 0.30);
-            --text-primary: #0a1628;
-            --text-secondary: #3d557a;
-            --text-dim: #7a8aa8;
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.08);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font);
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
-            background-image: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
-        }
-        [data-theme="light"] body {
-            background-image: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
-        }
-        a { text-decoration: none; color: inherit; }
-        button { cursor: pointer; font-family: inherit; border: none; background: none; color: inherit; }
-        input, textarea, select { font-family: inherit; border: none; outline: none; background: none; color: var(--text-primary); }
-        .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
-        .hidden { display: none !important; }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 28px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: var(--transition);
-            border: 1px solid transparent;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            backdrop-filter: blur(8px);
-            border-color: var(--border-glow);
-            min-height: 44px;
-        }
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
-            border-color: var(--accent-cyan);
-        }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            color: #080c14;
-            border-color: transparent;
-            font-weight: 700;
-        }
-        .btn-primary:hover:not(:disabled) {
-            box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
-            transform: translateY(-2px) scale(1.02);
-        }
-        .btn-outline {
-            background: transparent;
-            border-color: var(--border-glow);
-            color: var(--text-secondary);
-        }
-        .btn-outline:hover:not(:disabled) {
-            background: rgba(0, 212, 255, 0.06);
-            border-color: var(--accent-cyan);
-            color: var(--text-primary);
-        }
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-        }
-        .btn-danger:hover:not(:disabled) {
-            background: rgba(239, 68, 68, 0.25);
-            border-color: #ef4444;
-            color: #fff;
-        }
-        .btn-success {
-            background: rgba(52, 211, 153, 0.15);
-            border-color: rgba(52, 211, 153, 0.2);
-            color: var(--accent-green);
-        }
-        .btn-success:hover:not(:disabled) {
-            background: rgba(52, 211, 153, 0.25);
-            border-color: var(--accent-green);
-            color: #fff;
-        }
-        .btn-sm { padding: 6px 18px; font-size: 0.8rem; min-height: 36px; }
-        .btn-xs { padding: 3px 12px; font-size: 0.7rem; border-radius: 50px; min-height: 30px; }
-        .btn-back {
-            background: transparent;
-            border-color: transparent;
-            color: var(--text-secondary);
-            padding: 4px 8px;
-            gap: 4px;
-            min-height: 32px;
-            font-size: 0.85rem;
-        }
-        .btn-back:hover:not(:disabled) {
-            border-color: var(--border-glow);
-            color: var(--text-primary);
-            transform: translateX(-2px);
-            box-shadow: none;
-        }
-        .card {
-            background: var(--bg-card);
-            backdrop-filter: blur(16px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card);
-            transition: var(--transition);
-            overflow: hidden;
-        }
-        .badge {
-            display: inline-block;
-            padding: 2px 14px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            background: rgba(0, 212, 255, 0.1);
-            color: var(--accent-cyan);
-            border: 1px solid rgba(0, 212, 255, 0.15);
-        }
-        .badge-purple {
-            background: rgba(139, 92, 246, 0.12);
-            color: var(--accent-purple);
-            border-color: rgba(139, 92, 246, 0.2);
-        }
-        .badge-green {
-            background: rgba(52, 211, 153, 0.12);
-            color: var(--accent-green);
-            border-color: rgba(52, 211, 153, 0.2);
-        }
-        .badge-dim {
-            background: rgba(255, 255, 255, 0.04);
-            color: var(--text-dim);
-            border-color: rgba(255, 255, 255, 0.06);
-        }
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.12);
-            color: #f87171;
-            border-color: rgba(239, 68, 68, 0.15);
-        }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-        }
-        .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text-primary); }
-        .login-page {
-            display: none;
-            min-height: 100vh;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-primary);
-            padding: 20px;
-            position: relative;
-        }
-        .login-page.active { display: flex; }
-        .login-page .bg-glow {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            pointer-events: none;
-            opacity: 0.12;
-        }
-        .login-page .bg-glow:nth-child(1) { width: 400px; height: 400px; top: -100px; right: -100px; background: var(--accent-cyan); }
-        .login-page .bg-glow:nth-child(2) { width: 300px; height: 300px; bottom: -80px; left: -80px; background: var(--accent-purple); }
-        .login-box {
-            width: 100%;
-            max-width: 380px;
-            padding: 36px 32px;
-            background: var(--bg-card-solid);
-            backdrop-filter: blur(32px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card), 0 0 60px rgba(0, 212, 255, 0.02);
-            position: relative;
-            z-index: 2;
-        }
-        .login-box .login-logo {
-            font-size: 2rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 2px;
-            background: linear-gradient(135deg, #fff 30%, var(--accent-cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        [data-theme="light"] .login-box .login-logo {
-            background: linear-gradient(135deg, #0a1628 30%, var(--accent-blue) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .login-box .login-sub {
-            text-align: center;
-            color: var(--text-secondary);
-            font-weight: 300;
-            margin-bottom: 24px;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-        }
-        .login-box .form-group { margin-bottom: 14px; }
-        .login-box label {
-            display: block;
-            font-size: 0.78rem;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: var(--text-secondary);
-            letter-spacing: 0.5px;
-        }
-        .login-box input {
-            width: 100%;
-            padding: 11px 14px;
-            border-radius: var(--radius-sm);
-            border: 1.5px solid var(--border-glow);
-            background: var(--bg-input);
-            transition: var(--transition);
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            min-height: 48px;
-        }
-        .login-box input:focus {
-            border-color: var(--accent-cyan);
-            background: rgba(0, 0, 0, 0.4);
-        }
-        .login-box .btn {
-            width: 100%;
-            margin-top: 6px;
-            padding: 13px;
-            font-size: 0.95rem;
-            min-height: 52px;
-        }
-        .login-box .login-error {
-            color: #f87171;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 10px;
-            min-height: 22px;
-        }
-        .admin-layout {
-            display: none;
-            min-height: 100vh;
-            background: var(--bg-primary);
-        }
-        .admin-layout.active { display: flex; }
-        .admin-sidebar {
-            width: var(--sidebar-width);
-            background: rgba(12, 20, 35, 0.88);
-            backdrop-filter: blur(24px);
-            border-right: 1px solid var(--border-glow);
-            padding: 24px 14px;
-            flex-shrink: 0;
-            height: 100vh;
-            position: sticky;
-            top: 0;
-            overflow-y: auto;
-            transition: background 0.3s, border-color 0.3s;
-        }
-        [data-theme="light"] .admin-sidebar {
-            background: rgba(240, 244, 255, 0.92);
-            border-right-color: rgba(0, 100, 200, 0.12);
-        }
-        .admin-sidebar .logo-sm {
-            font-size: 1.1rem;
-            font-weight: 700;
-            padding: 0 8px 20px;
-            border-bottom: 1px solid var(--border-glow);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-primary);
-        }
-        .admin-sidebar .logo-sm .mark {
-            font-size: 1.2rem;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .admin-sidebar .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            margin-bottom: 2px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            font-size: 0.9rem;
-            min-height: 44px;
-        }
-        .admin-sidebar .nav-item:hover {
-            background: rgba(0, 212, 255, 0.04);
-            border-color: var(--border-glow);
-            color: var(--text-primary);
-        }
-        .admin-sidebar .nav-item.active {
-            background: rgba(0, 212, 255, 0.06);
-            border-color: var(--border-glow-strong);
-            color: var(--text-primary);
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.03);
-        }
-        .admin-sidebar .nav-item .icon {
-            font-size: 1rem;
-            width: 24px;
-            text-align: center;
-            color: var(--accent-cyan);
-        }
-        .admin-sidebar .logout-btn {
-            margin-top: 28px;
-            border-top: 1px solid var(--border-glow);
-            padding-top: 16px;
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: var(--transition);
-            min-height: 44px;
-        }
-        .admin-sidebar .logout-btn:hover { color: #f87171; }
-        .admin-sidebar .theme-toggle {
-            margin-top: 12px;
-            padding: 8px 14px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-glow);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            background: transparent;
-            min-height: 44px;
-        }
-        .admin-sidebar .theme-toggle:hover {
-            border-color: var(--accent-cyan);
-            color: var(--text-primary);
-        }
-        .admin-main {
-            flex: 1;
-            padding: 28px 36px 60px;
-            overflow-y: auto;
-            max-height: 100vh;
-        }
-        .admin-main .page-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .admin-main .page-title .back-link {
-            font-size: 0.85rem;
-            font-weight: 400;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 10px;
-            border-radius: 50px;
-            border: 1px solid transparent;
-        }
-        .admin-main .page-title .back-link:hover {
-            border-color: var(--border-glow);
-            color: var(--text-primary);
-            transform: translateX(-2px);
-        }
-        .admin-main .page-sub {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            font-weight: 400;
-            font-size: 0.9rem;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 14px;
-            margin-bottom: 28px;
-        }
-        .stat-card {
-            padding: 18px 20px;
-            background: var(--bg-card);
-            backdrop-filter: blur(8px);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card);
-        }
-        .stat-card .num {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .stat-card .label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 2px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .table-wrap {
-            background: var(--bg-card);
-            backdrop-filter: blur(8px);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card);
-            overflow: hidden;
-            margin-top: 6px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            position: relative;
-            min-height: auto;
-        }
-        .table-wrap .loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            gap: 10px;
-        }
-        .table-wrap .loading-overlay .spinner {
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--border-glow);
-            border-top-color: var(--accent-cyan);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .table-wrap table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.82rem;
-            min-width: 500px;
-        }
-        .table-wrap th {
-            text-align: left;
-            padding: 10px 12px;
-            background: rgba(0, 212, 255, 0.03);
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.65rem;
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border-glow);
-            position: sticky;
-            top: 0;
-            background: var(--bg-card);
-            z-index: 1;
-            backdrop-filter: blur(8px);
-            white-space: nowrap;
-            cursor: pointer;
-            user-select: none;
-        }
-        .table-wrap th:hover { color: var(--text-primary); }
-        .table-wrap th .sort-icon { font-size: 0.6rem; margin-left: 4px; opacity: 0.4; }
-        .table-wrap th.active .sort-icon { opacity: 1; }
-        .table-wrap td {
-            padding: 8px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            color: var(--text-primary);
-            vertical-align: middle;
-        }
-        [data-theme="light"] .table-wrap td { border-bottom-color: rgba(0, 0, 0, 0.04); }
-        .table-wrap tr.clickable { cursor: pointer; transition: var(--transition); }
-        .table-wrap tr.clickable:hover { background: rgba(0, 212, 255, 0.03); }
-        .table-wrap td .icon-thumb {
-            width: 32px;
-            height: 32px;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 212, 255, 0.06);
-            font-size: 18px;
-            border: 1px solid rgba(0, 212, 255, 0.06);
-        }
-        .table-wrap td .icon-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .table-wrap td .actions {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .table-wrap td .actions button {
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            transition: var(--transition);
-            border: 1px solid transparent;
-            min-height: 28px;
-        }
-        .table-wrap td .actions .edit-btn {
-            background: rgba(0, 212, 255, 0.08);
-            color: var(--accent-cyan);
-            border-color: rgba(0, 212, 255, 0.1);
-        }
-        .table-wrap td .actions .edit-btn:hover {
-            background: var(--accent-cyan);
-            color: #080c14;
-        }
-        .table-wrap td .actions .del-btn {
-            background: rgba(239, 68, 68, 0.08);
-            color: #f87171;
-            border-color: rgba(239, 68, 68, 0.1);
-        }
-        .table-wrap td .actions .del-btn:hover {
-            background: #ef4444;
-            color: #fff;
-        }
-        .table-wrap td .actions .view-btn {
-            background: rgba(139, 92, 246, 0.08);
-            color: var(--accent-purple);
-            border-color: rgba(139, 92, 246, 0.1);
-        }
-        .table-wrap td .actions .view-btn:hover {
-            background: var(--accent-purple);
-            color: #fff;
-        }
-        .table-wrap .empty-row td {
-            padding: 36px 18px;
-            text-align: center;
-            color: var(--text-dim);
-        }
-        .table-wrap .checkbox-cell {
-            width: 36px;
-            text-align: center;
-        }
-        .table-wrap .checkbox-cell input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent-cyan);
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .admin-form {
-            background: var(--bg-card);
-            backdrop-filter: blur(8px);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-glow);
-            box-shadow: var(--shadow-card);
-            padding: 24px 28px;
-            margin-top: 6px;
-        }
-        .admin-form .form-group { margin-bottom: 16px; }
-        .admin-form label {
-            display: block;
-            font-size: 0.82rem;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: var(--text-secondary);
-        }
-        .admin-form label .required { color: #f87171; margin-left: 2px; }
-        .admin-form input,
-        .admin-form textarea,
-        .admin-form select {
-            width: 100%;
-            padding: 9px 14px;
-            border-radius: var(--radius-sm);
-            border: 1.5px solid var(--border-glow);
-            background: var(--bg-input);
-            transition: var(--transition);
-            font-size: 0.88rem;
-            color: var(--text-primary);
-            min-height: 44px;
-        }
-        .admin-form input:focus,
-        .admin-form textarea:focus,
-        .admin-form select:focus {
-            border-color: var(--accent-cyan);
-            background: rgba(0, 0, 0, 0.4);
-        }
-        .admin-form textarea { min-height: 70px; resize: vertical; }
-        .admin-form .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        .admin-form .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 6px;
-            flex-wrap: wrap;
-        }
-        .admin-form select option { background: #121e33; }
-        [data-theme="light"] .admin-form select option { background: #ffffff; color: #0a1628; }
-        .admin-form .icon-preview {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 6px;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            flex-wrap: wrap;
-        }
-        .admin-form .icon-preview .preview-box {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-glow);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.2);
-            font-size: 22px;
-            flex-shrink: 0;
-        }
-        .admin-form .icon-preview .preview-box img { width: 100%; height: 100%; object-fit: cover; }
-        .admin-form .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            padding-top: 6px;
-        }
-        .admin-form .checkbox-group label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 400;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-        .admin-form .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent-cyan);
-            cursor: pointer;
-            min-height: auto;
-            width: 18px;
-        }
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .toolbar .search-box {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--bg-input);
-            border: 1.5px solid var(--border-glow);
-            border-radius: 50px;
-            padding: 0 14px;
-            transition: var(--transition);
-            flex: 1;
-            min-width: 140px;
-        }
-        .toolbar .search-box:focus-within { border-color: var(--accent-cyan); }
-        .toolbar .search-box input {
-            padding: 8px 4px;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: var(--text-primary);
-            flex: 1;
-            font-size: 0.85rem;
-            min-height: 40px;
-        }
-        .toolbar .search-box .icon { color: var(--text-dim); font-size: 0.9rem; }
-        .toolbar .filter-select {
-            padding: 8px 14px;
-            border-radius: 50px;
-            border: 1.5px solid var(--border-glow);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-size: 0.85rem;
-            min-width: 100px;
-            cursor: pointer;
-            min-height: 44px;
-        }
-        .toolbar .filter-select option { background: var(--bg-card-solid); }
-        [data-theme="light"] .toolbar .filter-select option { background: #fff; color: #0a1628; }
-        .toolbar .btn-group {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .toolbar .selected-info {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            padding: 4px 12px;
-            background: rgba(0, 212, 255, 0.06);
-            border-radius: 50px;
-            border: 1px solid var(--border-glow);
-            white-space: nowrap;
-            min-height: 32px;
-            display: inline-flex;
-            align-items: center;
-        }
-        .pagination {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            border-top: 1px solid var(--border-glow);
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .pagination .info { font-size: 0.8rem; color: var(--text-secondary); }
-        .pagination .pages {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .pagination .pages button {
-            padding: 4px 12px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-glow);
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            transition: var(--transition);
-            min-width: 32px;
-            min-height: 32px;
-        }
-        .pagination .pages button:hover:not(:disabled) {
-            border-color: var(--accent-cyan);
-            color: var(--text-primary);
-        }
-        .pagination .pages button.active {
-            background: var(--accent-cyan);
-            border-color: var(--accent-cyan);
-            color: #080c14;
-            font-weight: 700;
-        }
-        .pagination .pages button:disabled { opacity: 0.3; cursor: not-allowed; }
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            animation: fadeIn 0.25s ease;
-        }
-        .modal-overlay.hidden { display: none !important; }
-        .modal-box {
-            background: var(--bg-card-solid);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card), 0 0 60px rgba(0, 212, 255, 0.05);
-            max-width: 560px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 28px 24px;
-            animation: slideUp 0.3s ease;
-        }
-        .modal-box .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-        .modal-box .modal-header h3 { font-size: 1.15rem; font-weight: 700; }
-        .modal-box .modal-header .close-btn {
-            font-size: 1.5rem;
-            color: var(--text-dim);
-            cursor: pointer;
-            transition: var(--transition);
-            line-height: 1;
-            padding: 4px 8px;
-        }
-        .modal-box .modal-header .close-btn:hover {
-            color: var(--text-primary);
-            transform: rotate(90deg);
-        }
-        .modal-box .modal-body {
-            color: var(--text-secondary);
-            line-height: 1.8;
-        }
-        .modal-box .modal-body .detail-row {
-            display: flex;
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-        .modal-box .modal-body .detail-row .label {
-            width: 72px;
-            flex-shrink: 0;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-        .modal-box .modal-body .detail-row .value {
-            color: var(--text-primary);
-            word-break: break-all;
-            flex: 1;
-        }
-        .modal-box .modal-body .detail-row .value .icon-thumb {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 212, 255, 0.06);
-            font-size: 28px;
-            border: 1px solid rgba(0, 212, 255, 0.06);
-        }
-        .modal-box .modal-body .detail-row .value .icon-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .modal-box .modal-footer {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
-        .toast-container {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-width: 340px;
-            pointer-events: none;
-        }
-        .toast {
-            padding: 12px 20px;
-            border-radius: var(--radius-sm);
-            background: var(--bg-card-solid);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card);
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            transform: translateX(120%);
-            animation: toastIn 0.4s ease forwards;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            pointer-events: auto;
-            min-height: 48px;
-        }
-        .toast.success .icon { color: var(--accent-cyan); }
-        .toast.error .icon { color: #f87171; }
-        .toast .icon { font-size: 1.1rem; }
-        @keyframes toastIn { to { transform: translateX(0); } }
-        @keyframes toastOut { to { transform: translateX(120%); opacity: 0; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .cat-distribution {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding: 4px 0;
-        }
-        .cat-distribution .cat-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.8rem;
-        }
-        .cat-distribution .cat-row .cat-name {
-            min-width: 72px;
-            color: var(--text-secondary);
-            flex-shrink: 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-weight: 500;
-        }
-        .cat-distribution .cat-row .cat-bar-bg {
-            flex: 1;
-            height: 20px;
-            background: var(--bg-input);
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-        .cat-distribution .cat-row .cat-bar {
-            height: 100%;
-            border-radius: 10px;
-            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
-            transition: width 0.6s ease;
-            min-width: 4px;
-        }
-        .cat-distribution .cat-row .cat-count {
-            min-width: 32px;
-            text-align: right;
-            color: var(--text-primary);
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-        .chart-card { padding: 16px 20px; margin-bottom: 18px; }
-        .chart-card .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        .chart-card .chart-header h4 {
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-        @media (max-width: 1024px) {
-            .admin-sidebar { width: 60px; padding: 14px 6px; }
-            .admin-sidebar .logo-sm span,
-            .admin-sidebar .nav-item span:not(.icon),
-            .admin-sidebar .logout-btn span,
-            .admin-sidebar .theme-toggle span { display: none; }
-            .admin-sidebar .logo-sm { justify-content: center; padding: 0 0 14px; font-size: 1.3rem; }
-            .admin-sidebar .nav-item { justify-content: center; padding: 10px; min-height: 44px; }
-            .admin-sidebar .nav-item .icon { font-size: 1.2rem; width: auto; }
-            .admin-sidebar .logout-btn { justify-content: center; padding-top: 12px; margin-top: 16px; min-height: 44px; }
-            .admin-sidebar .theme-toggle { justify-content: center; padding: 6px 10px; min-height: 40px; }
-            .admin-main { padding: 20px 16px 40px; }
-            .admin-form .form-row { grid-template-columns: 1fr; }
-            .modal-box { padding: 20px 16px; }
-        }
-        @media (max-width: 768px) {
-            .admin-layout.active { flex-direction: column; }
-            .admin-sidebar {
-                width: 100%;
-                height: auto;
-                position: sticky;
-                top: 0;
-                flex-direction: row;
-                padding: 8px 12px;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 2px;
-                border-right: none;
-                border-bottom: 1px solid var(--border-glow);
-                overflow-y: visible;
-                z-index: 10;
-                min-height: 52px;
-                align-items: center;
-            }
-            .admin-sidebar .logo-sm { display: none; }
-            .admin-sidebar .nav-item { padding: 6px 12px; font-size: 0.75rem; min-height: 36px; gap: 4px; flex: 0 1 auto; }
-            .admin-sidebar .nav-item .icon { font-size: 0.9rem; width: 20px; }
-            .admin-sidebar .logout-btn { margin-top: 0; border-top: none; padding-top: 0; margin-left: auto; font-size: 0.75rem; min-height: 36px; }
-            .admin-sidebar .theme-toggle { margin-top: 0; font-size: 0.7rem; padding: 4px 10px; min-height: 32px; }
-            .admin-main { max-height: none; padding: 12px 12px 40px; overflow-y: visible; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .stat-card { padding: 12px 14px; }
-            .stat-card .num { font-size: 1.5rem; }
-            .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            .table-wrap table { font-size: 0.75rem; min-width: 480px; }
-            .table-wrap th, .table-wrap td { padding: 6px 10px; }
-            .toolbar { flex-direction: column; align-items: stretch; }
-            .toolbar .search-box { width: 100%; }
-            .toolbar .filter-select { width: 100%; }
-            .pagination { flex-direction: column; align-items: center; padding: 10px 12px; }
-            .pagination .pages { justify-content: center; }
-            .admin-form { padding: 16px 14px; }
-            .admin-form .form-row { grid-template-columns: 1fr; gap: 12px; }
-            .admin-form .form-actions { flex-direction: column; }
-            .admin-form .form-actions .btn { width: 100%; justify-content: center; }
-            .login-box { padding: 24px 18px; margin: 0 12px; }
-            .modal-box { padding: 16px 14px; margin: 0 8px; }
-            .modal-box .modal-body .detail-row { flex-direction: column; gap: 2px; }
-            .modal-box .modal-body .detail-row .label { width: 100%; font-size: 0.75rem; }
-            .modal-box .modal-footer { flex-direction: column; }
-            .modal-box .modal-footer .btn { width: 100%; justify-content: center; }
-            .toast-container { bottom: 16px; right: 16px; max-width: calc(100vw - 32px); }
-            .admin-main .page-title { font-size: 1.3rem; }
-            .admin-main .page-title .back-link { font-size: 0.75rem; padding: 0 6px; }
-        }
-        @media (max-width: 480px) {
-            .admin-sidebar .nav-item { padding: 4px 8px; font-size: 0.7rem; min-height: 32px; }
-            .admin-sidebar .nav-item .icon { font-size: 0.8rem; width: 18px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .stat-card { padding: 10px 12px; }
-            .stat-card .num { font-size: 1.3rem; }
-            .stat-card .label { font-size: 0.65rem; }
-            .admin-main .page-title { font-size: 1.1rem; }
-            .admin-form input, .admin-form textarea, .admin-form select { font-size: 0.82rem; padding: 8px 12px; min-height: 40px; }
-            .table-wrap table { font-size: 0.7rem; min-width: 400px; }
-            .table-wrap th, .table-wrap td { padding: 4px 8px; }
-            .table-wrap td .actions button { font-size: 0.55rem; padding: 2px 8px; min-height: 24px; }
-            .login-box .login-logo { font-size: 1.6rem; }
-            .btn { font-size: 0.82rem; padding: 8px 20px; min-height: 40px; }
-            .btn-sm { font-size: 0.7rem; padding: 4px 14px; min-height: 32px; }
-            .btn-back { font-size: 0.75rem; padding: 2px 6px; min-height: 28px; }
-            .cat-distribution .cat-row { font-size: 0.7rem; gap: 6px; }
-            .cat-distribution .cat-row .cat-name { min-width: 50px; }
-            .cat-distribution .cat-row .cat-bar-bg { height: 16px; }
-            .cat-distribution .cat-row .cat-count { min-width: 24px; font-size: 0.7rem; }
-        }
-        .loading-spinner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px;
-            color: var(--text-dim);
-            gap: 14px;
-        }
-        .loading-spinner .spinner {
-            width: 28px;
-            height: 28px;
-            border: 2px solid var(--border-glow);
-            border-top-color: var(--accent-cyan);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-        }
-        .login-box input[type="password"] { letter-spacing: 0.5px; }
+        :root{--bg-primary:#080c14;--bg-secondary:#0f172a;--bg-card:rgba(18,30,51,0.78);--bg-card-solid:#121e33;--bg-input:rgba(0,0,0,0.25);--border-glow:rgba(0,200,255,0.15);--border-glow-strong:rgba(0,200,255,0.35);--text-primary:#eef5ff;--text-secondary:#8da4c9;--text-dim:#4a6185;--accent-cyan:#00d4ff;--accent-blue:#3b82f6;--accent-purple:#8b5cf6;--accent-green:#34d399;--shadow-card:0 8px 32px rgba(0,0,0,0.6);--radius-lg:20px;--radius-md:12px;--radius-sm:8px;--transition:0.2s cubic-bezier(0.4,0,0.2,1);--font:'Inter',-apple-system,sans-serif;--max-width:1200px;--header-height:64px;--sidebar-width:210px}
+        [data-theme="light"]{--bg-primary:#f0f4ff;--bg-secondary:#e8edf8;--bg-card:rgba(255,255,255,0.82);--bg-card-solid:#ffffff;--bg-input:rgba(0,0,0,0.05);--border-glow:rgba(0,100,200,0.15);--border-glow-strong:rgba(0,100,200,0.30);--text-primary:#0a1628;--text-secondary:#3d557a;--text-dim:#7a8aa8;--shadow-card:0 8px 32px rgba(0,0,0,0.08)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:var(--font);background:var(--bg-primary);color:var(--text-primary);line-height:1.6;min-height:100vh;transition:background 0.3s,color 0.3s;background-image:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,0.05) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(139,92,246,0.04) 0%,transparent 50%)}
+        [data-theme="light"] body{background-image:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,0.03) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(139,92,246,0.02) 0%,transparent 50%)}
+        a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;border:none;background:none;color:inherit}
+        input,textarea,select{font-family:inherit;border:none;outline:none;background:none;color:var(--text-primary)}
+        .container{max-width:var(--max-width);margin:0 auto;padding:0 24px}.hidden{display:none!important}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 28px;border-radius:50px;font-size:0.9rem;font-weight:600;transition:var(--transition);border:1px solid transparent;background:var(--bg-card);color:var(--text-primary);backdrop-filter:blur(8px);border-color:var(--border-glow);min-height:44px}
+        .btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 30px rgba(0,212,255,0.15);border-color:var(--accent-cyan)}
+        .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important}
+        .btn-primary{background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));color:#080c14;border-color:transparent;font-weight:700}
+        .btn-primary:hover:not(:disabled){box-shadow:0 0 40px rgba(0,212,255,0.3);transform:translateY(-2px) scale(1.02)}
+        .btn-outline{background:transparent;border-color:var(--border-glow);color:var(--text-secondary)}
+        .btn-outline:hover:not(:disabled){background:rgba(0,212,255,0.06);border-color:var(--accent-cyan);color:var(--text-primary)}
+        .btn-danger{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.2);color:#f87171}
+        .btn-danger:hover:not(:disabled){background:rgba(239,68,68,0.25);border-color:#ef4444;color:#fff}
+        .btn-success{background:rgba(52,211,153,0.15);border-color:rgba(52,211,153,0.2);color:var(--accent-green)}
+        .btn-success:hover:not(:disabled){background:rgba(52,211,153,0.25);border-color:var(--accent-green);color:#fff}
+        .btn-sm{padding:6px 18px;font-size:0.8rem;min-height:36px}.btn-xs{padding:3px 12px;font-size:0.7rem;border-radius:50px;min-height:30px}
+        .btn-back{background:transparent;border-color:transparent;color:var(--text-secondary);padding:4px 8px;gap:4px;min-height:32px;font-size:0.85rem}
+        .btn-back:hover:not(:disabled){border-color:var(--border-glow);color:var(--text-primary);transform:translateX(-2px);box-shadow:none}
+        .card{background:var(--bg-card);backdrop-filter:blur(16px);border-radius:var(--radius-lg);border:1px solid var(--border-glow);box-shadow:var(--shadow-card);transition:var(--transition);overflow:hidden}
+        .badge{display:inline-block;padding:2px 14px;border-radius:50px;font-size:0.7rem;font-weight:600;text-transform:uppercase;background:rgba(0,212,255,0.1);color:var(--accent-cyan);border:1px solid rgba(0,212,255,0.15)}
+        .badge-purple{background:rgba(139,92,246,0.12);color:var(--accent-purple);border-color:rgba(139,92,246,0.2)}
+        .badge-green{background:rgba(52,211,153,0.12);color:var(--accent-green);border-color:rgba(52,211,153,0.2)}
+        .badge-dim{background:rgba(255,255,255,0.04);color:var(--text-dim);border-color:rgba(255,255,255,0.06)}
+        .badge-danger{background:rgba(239,68,68,0.12);color:#f87171;border-color:rgba(239,68,68,0.15)}
+        .empty-state{text-align:center;padding:60px 20px;color:var(--text-secondary)}
+        .empty-state .icon{font-size:48px;margin-bottom:16px;opacity:0.5}
+        .empty-state h3{font-size:1.2rem;margin-bottom:8px;color:var(--text-primary)}
+        .login-page{display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--bg-primary);padding:20px;position:relative}
+        .login-page.active{display:flex}
+        .login-page .bg-glow{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none;opacity:0.12}
+        .login-page .bg-glow:nth-child(1){width:400px;height:400px;top:-100px;right:-100px;background:var(--accent-cyan)}
+        .login-page .bg-glow:nth-child(2){width:300px;height:300px;bottom:-80px;left:-80px;background:var(--accent-purple)}
+        .login-box{width:100%;max-width:380px;padding:36px 32px;background:var(--bg-card-solid);backdrop-filter:blur(32px);border-radius:var(--radius-lg);border:1px solid var(--border-glow-strong);box-shadow:var(--shadow-card),0 0 60px rgba(0,212,255,0.02);position:relative;z-index:2}
+        .login-box .login-logo{font-size:2rem;font-weight:700;text-align:center;margin-bottom:2px;background:linear-gradient(135deg,#fff 30%,var(--accent-cyan) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        [data-theme="light"] .login-box .login-logo{background:linear-gradient(135deg,#0a1628 30%,var(--accent-blue) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .login-box .login-sub{text-align:center;color:var(--text-secondary);font-weight:300;margin-bottom:24px;font-size:0.85rem;letter-spacing:2px}
+        .login-box .form-group{margin-bottom:14px}
+        .login-box label{display:block;font-size:0.78rem;font-weight:500;margin-bottom:4px;color:var(--text-secondary);letter-spacing:0.5px}
+        .login-box input{width:100%;padding:11px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);transition:var(--transition);font-size:0.9rem;color:var(--text-primary);min-height:48px}
+        .login-box input:focus{border-color:var(--accent-cyan);background:rgba(0,0,0,0.4)}
+        .login-box .btn{width:100%;margin-top:6px;padding:13px;font-size:0.95rem;min-height:52px}
+        .login-box .login-error{color:#f87171;font-size:0.8rem;text-align:center;margin-top:10px;min-height:22px}
+        .admin-layout{display:none;min-height:100vh;background:var(--bg-primary)}
+        .admin-layout.active{display:flex}
+        .admin-sidebar{width:var(--sidebar-width);background:rgba(12,20,35,0.88);backdrop-filter:blur(24px);border-right:1px solid var(--border-glow);padding:24px 14px;flex-shrink:0;height:100vh;position:sticky;top:0;overflow-y:auto;transition:background 0.3s,border-color 0.3s}
+        [data-theme="light"] .admin-sidebar{background:rgba(240,244,255,0.92);border-right-color:rgba(0,100,200,0.12)}
+        .admin-sidebar .logo-sm{font-size:1.1rem;font-weight:700;padding:0 8px 20px;border-bottom:1px solid var(--border-glow);margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--text-primary)}
+        .admin-sidebar .logo-sm .mark{font-size:1.2rem;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .admin-sidebar .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);font-weight:500;color:var(--text-secondary);transition:var(--transition);margin-bottom:2px;cursor:pointer;border:1px solid transparent;font-size:0.9rem;min-height:44px}
+        .admin-sidebar .nav-item:hover{background:rgba(0,212,255,0.04);border-color:var(--border-glow);color:var(--text-primary)}
+        .admin-sidebar .nav-item.active{background:rgba(0,212,255,0.06);border-color:var(--border-glow-strong);color:var(--text-primary);box-shadow:0 0 30px rgba(0,212,255,0.03)}
+        .admin-sidebar .nav-item .icon{font-size:1rem;width:24px;text-align:center;color:var(--accent-cyan)}
+        .admin-sidebar .logout-btn{margin-top:28px;border-top:1px solid var(--border-glow);padding-top:16px;color:var(--text-dim);font-size:0.85rem;display:flex;align-items:center;gap:10px;cursor:pointer;transition:var(--transition);min-height:44px}
+        .admin-sidebar .logout-btn:hover{color:#f87171}
+        .admin-sidebar .theme-toggle{margin-top:12px;padding:8px 14px;border-radius:var(--radius-sm);border:1px solid var(--border-glow);display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--text-secondary);cursor:pointer;transition:var(--transition);background:transparent;min-height:44px}
+        .admin-sidebar .theme-toggle:hover{border-color:var(--accent-cyan);color:var(--text-primary)}
+        .admin-main{flex:1;padding:28px 36px 60px;overflow-y:auto;max-height:100vh}
+        .admin-main .page-title{font-size:1.5rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:2px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+        .admin-main .page-title .back-link{font-size:0.85rem;font-weight:400;color:var(--text-secondary);cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:50px;border:1px solid transparent}
+        .admin-main .page-title .back-link:hover{border-color:var(--border-glow);color:var(--text-primary);transform:translateX(-2px)}
+        .admin-main .page-sub{color:var(--text-secondary);margin-bottom:24px;font-weight:400;font-size:0.9rem}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:28px}
+        .stat-card{padding:18px 20px;background:var(--bg-card);backdrop-filter:blur(8px);border-radius:var(--radius-md);border:1px solid var(--border-glow);box-shadow:var(--shadow-card)}
+        .stat-card .num{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .stat-card .label{font-size:0.75rem;color:var(--text-secondary);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+        .table-wrap{background:var(--bg-card);backdrop-filter:blur(8px);border-radius:var(--radius-md);border:1px solid var(--border-glow);box-shadow:var(--shadow-card);overflow:hidden;margin-top:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative;min-height:auto}
+        .table-wrap .loading-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:2;font-size:0.9rem;color:var(--text-secondary);gap:10px}
+        .table-wrap .loading-overlay .spinner{width:24px;height:24px;border:2px solid var(--border-glow);border-top-color:var(--accent-cyan);border-radius:50%;animation:spin 0.8s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .table-wrap table{width:100%;border-collapse:collapse;font-size:0.82rem;min-width:500px}
+        .table-wrap th{text-align:left;padding:10px 12px;background:rgba(0,212,255,0.03);font-weight:600;color:var(--text-secondary);font-size:0.65rem;letter-spacing:0.8px;text-transform:uppercase;border-bottom:1px solid var(--border-glow);position:sticky;top:0;background:var(--bg-card);z-index:1;backdrop-filter:blur(8px);white-space:nowrap;cursor:pointer;user-select:none}
+        .table-wrap th:hover{color:var(--text-primary)}
+        .table-wrap th .sort-icon{font-size:0.6rem;margin-left:4px;opacity:0.4}
+        .table-wrap th.active .sort-icon{opacity:1}
+        .table-wrap td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.02);color:var(--text-primary);vertical-align:middle}
+        [data-theme="light"] .table-wrap td{border-bottom-color:rgba(0,0,0,0.04)}
+        .table-wrap tr.clickable{cursor:pointer;transition:var(--transition)}
+        .table-wrap tr.clickable:hover{background:rgba(0,212,255,0.03)}
+        .table-wrap td .icon-thumb{width:32px;height:32px;border-radius:var(--radius-sm);overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:rgba(0,212,255,0.06);font-size:18px;border:1px solid rgba(0,212,255,0.06)}
+        .table-wrap td .icon-thumb img{width:100%;height:100%;object-fit:cover}
+        .table-wrap td .actions{display:flex;gap:4px;flex-wrap:wrap}
+        .table-wrap td .actions button{padding:3px 10px;border-radius:50px;font-size:0.6rem;font-weight:600;transition:var(--transition);border:1px solid transparent;min-height:28px}
+        .table-wrap td .actions .edit-btn{background:rgba(0,212,255,0.08);color:var(--accent-cyan);border-color:rgba(0,212,255,0.1)}
+        .table-wrap td .actions .edit-btn:hover{background:var(--accent-cyan);color:#080c14}
+        .table-wrap td .actions .del-btn{background:rgba(239,68,68,0.08);color:#f87171;border-color:rgba(239,68,68,0.1)}
+        .table-wrap td .actions .del-btn:hover{background:#ef4444;color:#fff}
+        .table-wrap td .actions .view-btn{background:rgba(139,92,246,0.08);color:var(--accent-purple);border-color:rgba(139,92,246,0.1)}
+        .table-wrap td .actions .view-btn:hover{background:var(--accent-purple);color:#fff}
+        .table-wrap .empty-row td{padding:36px 18px;text-align:center;color:var(--text-dim)}
+        .table-wrap .checkbox-cell{width:36px;text-align:center}
+        .table-wrap .checkbox-cell input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent-cyan);cursor:pointer;flex-shrink:0}
+        .admin-form{background:var(--bg-card);backdrop-filter:blur(8px);border-radius:var(--radius-md);border:1px solid var(--border-glow);box-shadow:var(--shadow-card);padding:24px 28px;margin-top:6px}
+        .admin-form .form-group{margin-bottom:16px}
+        .admin-form label{display:block;font-size:0.82rem;font-weight:500;margin-bottom:4px;color:var(--text-secondary)}
+        .admin-form label .required{color:#f87171;margin-left:2px}
+        .admin-form input,.admin-form textarea,.admin-form select{width:100%;padding:9px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);transition:var(--transition);font-size:0.88rem;color:var(--text-primary);min-height:44px}
+        .admin-form input:focus,.admin-form textarea:focus,.admin-form select:focus{border-color:var(--accent-cyan);background:rgba(0,0,0,0.4)}
+        .admin-form textarea{min-height:70px;resize:vertical}
+        .admin-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+        .admin-form .form-actions{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap}
+        .admin-form select option{background:#121e33}
+        [data-theme="light"] .admin-form select option{background:#ffffff;color:#0a1628}
+        .admin-form .icon-preview{display:inline-flex;align-items:center;gap:10px;margin-top:6px;font-size:0.8rem;color:var(--text-secondary);flex-wrap:wrap}
+        .admin-form .icon-preview .preview-box{width:40px;height:40px;border-radius:var(--radius-sm);border:1px solid var(--border-glow);overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);font-size:22px;flex-shrink:0}
+        .admin-form .icon-preview .preview-box img{width:100%;height:100%;object-fit:cover}
+        .admin-form .checkbox-group{display:flex;flex-wrap:wrap;gap:16px;padding-top:6px}
+        .admin-form .checkbox-group label{display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer;font-size:0.85rem}
+        .admin-form .checkbox-group input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent-cyan);cursor:pointer;min-height:auto;width:18px}
+        .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px}
+        .toolbar .search-box{display:flex;align-items:center;gap:6px;background:var(--bg-input);border:1.5px solid var(--border-glow);border-radius:50px;padding:0 14px;transition:var(--transition);flex:1;min-width:140px}
+        .toolbar .search-box:focus-within{border-color:var(--accent-cyan)}
+        .toolbar .search-box input{padding:8px 4px;background:transparent;border:none;outline:none;color:var(--text-primary);flex:1;font-size:0.85rem;min-height:40px}
+        .toolbar .search-box .icon{color:var(--text-dim);font-size:0.9rem}
+        .toolbar .filter-select{padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);font-size:0.85rem;min-width:100px;cursor:pointer;min-height:44px}
+        .toolbar .filter-select option{background:var(--bg-card-solid)}
+        [data-theme="light"] .toolbar .filter-select option{background:#fff;color:#0a1628}
+        .toolbar .btn-group{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+        .toolbar .selected-info{font-size:0.75rem;color:var(--text-secondary);padding:4px 12px;background:rgba(0,212,255,0.06);border-radius:50px;border:1px solid var(--border-glow);white-space:nowrap;min-height:32px;display:inline-flex;align-items:center}
+        .pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border-glow);flex-wrap:wrap;gap:8px}
+        .pagination .info{font-size:0.8rem;color:var(--text-secondary)}
+        .pagination .pages{display:flex;gap:4px;flex-wrap:wrap}
+        .pagination .pages button{padding:4px 12px;border-radius:var(--radius-sm);border:1px solid var(--border-glow);background:transparent;color:var(--text-secondary);font-size:0.8rem;transition:var(--transition);min-width:32px;min-height:32px}
+        .pagination .pages button:hover:not(:disabled){border-color:var(--accent-cyan);color:var(--text-primary)}
+        .pagination .pages button.active{background:var(--accent-cyan);border-color:var(--accent-cyan);color:#080c14;font-weight:700}
+        .pagination .pages button:disabled{opacity:0.3;cursor:not-allowed}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn 0.25s ease}
+        .modal-overlay.hidden{display:none!important}
+        .modal-box{background:var(--bg-card-solid);border-radius:var(--radius-lg);border:1px solid var(--border-glow-strong);box-shadow:var(--shadow-card),0 0 60px rgba(0,212,255,0.05);max-width:560px;width:100%;max-height:90vh;overflow-y:auto;padding:28px 24px;animation:slideUp 0.3s ease}
+        .modal-box .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+        .modal-box .modal-header h3{font-size:1.15rem;font-weight:700}
+        .modal-box .modal-header .close-btn{font-size:1.5rem;color:var(--text-dim);cursor:pointer;transition:var(--transition);line-height:1;padding:4px 8px}
+        .modal-box .modal-header .close-btn:hover{color:var(--text-primary);transform:rotate(90deg)}
+        .modal-box .modal-body{color:var(--text-secondary);line-height:1.8}
+        .modal-box .modal-body .detail-row{display:flex;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);flex-wrap:wrap;gap:4px}
+        .modal-box .modal-body .detail-row .label{width:72px;flex-shrink:0;font-weight:500;color:var(--text-secondary)}
+        .modal-box .modal-body .detail-row .value{color:var(--text-primary);word-break:break-all;flex:1}
+        .modal-box .modal-body .detail-row .value .icon-thumb{width:48px;height:48px;border-radius:var(--radius-sm);overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:rgba(0,212,255,0.06);font-size:28px;border:1px solid rgba(0,212,255,0.06)}
+        .modal-box .modal-body .detail-row .value .icon-thumb img{width:100%;height:100%;object-fit:cover}
+        .modal-box .modal-footer{margin-top:20px;display:flex;gap:10px;justify-content:flex-end}
+        .toast-container{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;flex-direction:column;gap:8px;max-width:340px;pointer-events:none}
+        .toast{padding:12px 20px;border-radius:var(--radius-sm);background:var(--bg-card-solid);backdrop-filter:blur(16px);border:1px solid var(--border-glow-strong);box-shadow:var(--shadow-card);font-size:0.85rem;color:var(--text-primary);transform:translateX(120%);animation:toastIn 0.4s ease forwards;display:flex;align-items:center;gap:10px;pointer-events:auto;min-height:48px}
+        .toast.success .icon{color:var(--accent-cyan)}
+        .toast.error .icon{color:#f87171}
+        .toast .icon{font-size:1.1rem}
+        @keyframes toastIn{to{transform:translateX(0)}}
+        @keyframes toastOut{to{transform:translateX(120%);opacity:0}}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .cat-distribution{display:flex;flex-direction:column;gap:6px;padding:4px 0}
+        .cat-distribution .cat-row{display:flex;align-items:center;gap:10px;font-size:0.8rem}
+        .cat-distribution .cat-row .cat-name{min-width:72px;color:var(--text-secondary);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+        .cat-distribution .cat-row .cat-bar-bg{flex:1;height:20px;background:var(--bg-input);border-radius:10px;overflow:hidden;position:relative}
+        .cat-distribution .cat-row .cat-bar{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-blue));transition:width 0.6s ease;min-width:4px}
+        .cat-distribution .cat-row .cat-count{min-width:32px;text-align:right;color:var(--text-primary);font-weight:600;flex-shrink:0}
+        .chart-card{padding:16px 20px;margin-bottom:18px}
+        .chart-card .chart-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+        .chart-card .chart-header h4{font-weight:600;color:var(--text-secondary);font-size:0.85rem}
+        @media(max-width:1024px){.admin-sidebar{width:60px;padding:14px 6px}.admin-sidebar .logo-sm span,.admin-sidebar .nav-item span:not(.icon),.admin-sidebar .logout-btn span,.admin-sidebar .theme-toggle span{display:none}.admin-sidebar .logo-sm{justify-content:center;padding:0 0 14px;font-size:1.3rem}.admin-sidebar .nav-item{justify-content:center;padding:10px;min-height:44px}.admin-sidebar .nav-item .icon{font-size:1.2rem;width:auto}.admin-sidebar .logout-btn{justify-content:center;padding-top:12px;margin-top:16px;min-height:44px}.admin-sidebar .theme-toggle{justify-content:center;padding:6px 10px;min-height:40px}.admin-main{padding:20px 16px 40px}.admin-form .form-row{grid-template-columns:1fr}.modal-box{padding:20px 16px}}
+        @media(max-width:768px){.admin-layout.active{flex-direction:column}.admin-sidebar{width:100%;height:auto;position:sticky;top:0;flex-direction:row;padding:8px 12px;display:flex;flex-wrap:wrap;gap:2px;border-right:none;border-bottom:1px solid var(--border-glow);overflow-y:visible;z-index:10;min-height:52px;align-items:center}.admin-sidebar .logo-sm{display:none}.admin-sidebar .nav-item{padding:6px 12px;font-size:0.75rem;min-height:36px;gap:4px;flex:0 1 auto}.admin-sidebar .nav-item .icon{font-size:0.9rem;width:20px}.admin-sidebar .logout-btn{margin-top:0;border-top:none;padding-top:0;margin-left:auto;font-size:0.75rem;min-height:36px}.admin-sidebar .theme-toggle{margin-top:0;font-size:0.7rem;padding:4px 10px;min-height:32px}.admin-main{max-height:none;padding:12px 12px 40px;overflow-y:visible}.stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}.stat-card{padding:12px 14px}.stat-card .num{font-size:1.5rem}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.table-wrap table{font-size:0.75rem;min-width:480px}.table-wrap th,.table-wrap td{padding:6px 10px}.toolbar{flex-direction:column;align-items:stretch}.toolbar .search-box{width:100%}.toolbar .filter-select{width:100%}.pagination{flex-direction:column;align-items:center;padding:10px 12px}.pagination .pages{justify-content:center}.admin-form{padding:16px 14px}.admin-form .form-row{grid-template-columns:1fr;gap:12px}.admin-form .form-actions{flex-direction:column}.admin-form .form-actions .btn{width:100%;justify-content:center}.login-box{padding:24px 18px;margin:0 12px}.modal-box{padding:16px 14px;margin:0 8px}.modal-box .modal-body .detail-row{flex-direction:column;gap:2px}.modal-box .modal-body .detail-row .label{width:100%;font-size:0.75rem}.modal-box .modal-footer{flex-direction:column}.modal-box .modal-footer .btn{width:100%;justify-content:center}.toast-container{bottom:16px;right:16px;max-width:calc(100vw - 32px)}.admin-main .page-title{font-size:1.3rem}.admin-main .page-title .back-link{font-size:0.75rem;padding:0 6px}}
+        @media(max-width:480px){.admin-sidebar .nav-item{padding:4px 8px;font-size:0.7rem;min-height:32px}.admin-sidebar .nav-item .icon{font-size:0.8rem;width:18px}.stats-grid{grid-template-columns:1fr 1fr;gap:8px}.stat-card{padding:10px 12px}.stat-card .num{font-size:1.3rem}.stat-card .label{font-size:0.65rem}.admin-main .page-title{font-size:1.1rem}.admin-form input,.admin-form textarea,.admin-form select{font-size:0.82rem;padding:8px 12px;min-height:40px}.table-wrap table{font-size:0.7rem;min-width:400px}.table-wrap th,.table-wrap td{padding:4px 8px}.table-wrap td .actions button{font-size:0.55rem;padding:2px 8px;min-height:24px}.login-box .login-logo{font-size:1.6rem}.btn{font-size:0.82rem;padding:8px 20px;min-height:40px}.btn-sm{font-size:0.7rem;padding:4px 14px;min-height:32px}.btn-back{font-size:0.75rem;padding:2px 6px;min-height:28px}.cat-distribution .cat-row{font-size:0.7rem;gap:6px}.cat-distribution .cat-row .cat-name{min-width:50px}.cat-distribution .cat-row .cat-bar-bg{height:16px}.cat-distribution .cat-row .cat-count{min-width:24px;font-size:0.7rem}}
+        .loading-spinner{display:flex;align-items:center;justify-content:center;padding:60px 20px;color:var(--text-dim);gap:14px}
+        .loading-spinner .spinner{width:28px;height:28px;border:2px solid var(--border-glow);border-top-color:var(--accent-cyan);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
+        .login-box input[type="password"]{letter-spacing:0.5px}
     </style>
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
     <div class="login-page active" id="loginPage">
-        <div class="bg-glow"></div>
-        <div class="bg-glow"></div>
+        <div class="bg-glow"></div><div class="bg-glow"></div>
         <div class="login-box">
             <div class="login-logo">◆ 乐哲软件</div>
             <div class="login-sub">管理控制台</div>
-            <div class="form-group">
-                <label>用户标识</label>
-                <input type="text" id="loginUser" value="admin" placeholder="用户名" />
-            </div>
-            <div class="form-group">
-                <label>安全密钥</label>
-                <input type="password" id="loginPass" placeholder="密码" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" />
-            </div>
+            <div class="form-group"><label>用户标识</label><input type="text" id="loginUser" value="admin" placeholder="用户名" /></div>
+            <div class="form-group"><label>安全密钥</label><input type="password" id="loginPass" placeholder="密码" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" /></div>
             <button class="btn btn-primary" id="loginBtn">✦ 进入控制台</button>
             <div class="login-error" id="loginError"></div>
         </div>
@@ -1115,251 +208,168 @@
     </div>
     <div class="modal-overlay hidden" id="detailModal">
         <div class="modal-box">
-            <div class="modal-header">
-                <h3 id="detailTitle">📄 软件详情</h3>
-                <span class="close-btn" id="detailClose">✕</span>
-            </div>
+            <div class="modal-header"><h3 id="detailTitle">📄 软件详情</h3><span class="close-btn" id="detailClose">✕</span></div>
             <div class="modal-body" id="detailBody"></div>
-            <div class="modal-footer">
-                <button class="btn btn-outline btn-sm" id="detailCloseBtn">关闭</button>
-            </div>
+            <div class="modal-footer"><button class="btn btn-outline btn-sm" id="detailCloseBtn">关闭</button></div>
         </div>
     </div>
     <div class="modal-overlay hidden" id="vipModal">
         <div class="modal-box">
-            <div class="modal-header">
-                <h3 id="vipModalTitle">👑 设置VIP</h3>
-                <span class="close-btn" id="vipModalClose">✕</span>
-            </div>
+            <div class="modal-header"><h3 id="vipModalTitle">👑 设置VIP</h3><span class="close-btn" id="vipModalClose">✕</span></div>
             <div class="modal-body" id="vipModalBody"></div>
-            <div class="modal-footer">
-                <button class="btn btn-outline btn-sm" id="vipModalCancel">取消</button>
-                <button class="btn btn-primary btn-sm" id="vipModalSave">保存</button>
-            </div>
+            <div class="modal-footer"><button class="btn btn-outline btn-sm" id="vipModalCancel">取消</button><button class="btn btn-primary btn-sm" id="vipModalSave">保存</button></div>
         </div>
     </div>
-<script>
-    var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
-    var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
-    var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <script>
+        var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
+        var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+        var supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-    var DB = {
-        get: function(key) {
-            try { return JSON.parse(localStorage.getItem('lezhe_' + key)) || null; } catch (e) { return null; }
-        },
-        set: function(key, val) {
-            localStorage.setItem('lezhe_' + key, JSON.stringify(val));
-        },
-        genId: function() {
-            return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-        },
-        _softwareCache: null,
-        _cacheTime: 0,
-        _cacheTTL: 120000,
-        _categoriesCache: null,
-        _categoriesTime: 0,
-        _usersCache: null,
-        _usersTime: 0,
+        var DB={
+            get:function(key){try{return JSON.parse(localStorage.getItem('lezhe_'+key))||null}catch(e){return null}},
+            set:function(key,val){localStorage.setItem('lezhe_'+key,JSON.stringify(val))},
+            genId:function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)},
+            _softwareCache:null,_cacheTime:0,_cacheTTL:120000,_categoriesCache:null,_categoriesTime:0,_usersCache:null,_usersTime:0,
 
-        async getSoftwareFromCloud(force) {
-            force = force || false;
-            var now = Date.now();
-            if (!force && this._softwareCache && (now - this._cacheTime < this._cacheTTL)) {
-                return this._softwareCache;
+            async getSoftwareFromCloud(force){force=force||false;var now=Date.now();if(!force&&this._softwareCache&&(now-this._cacheTime<this._cacheTTL)){return this._softwareCache}try{var result=await supabaseClient.from('software').select('*').order('created_at',{ascending:false});if(result.error){console.error('获取软件失败:',result.error);return this._softwareCache||[]}this._softwareCache=result.data||[];this._cacheTime=now;return this._softwareCache}catch(e){console.error('获取软件异常:',e);return this._softwareCache||[]}},
+            async getCategoriesFromCloud(force){force=force||false;var now=Date.now();if(!force&&this._categoriesCache&&(now-this._categoriesTime<this._cacheTTL)){return this._categoriesCache}try{var result=await supabaseClient.from('categories').select('*').order('name');if(result.error){console.error('获取分类失败:',result.error);return[]}this._categoriesCache=result.data||[];this._categoriesTime=now;return this._categoriesCache}catch(e){console.error('获取分类异常:',e);return[]}},
+            async getUsersFromCloud(force){force=force||false;var now=Date.now();if(!force&&this._usersCache&&(now-this._usersTime<this._cacheTTL)){return this._usersCache}try{var result=await supabaseClient.from('users').select('*').order('created_at',{ascending:false});if(result.error){console.error('获取用户失败:',result.error);return this._usersCache||[]}this._usersCache=result.data||[];this._usersTime=now;return this._usersCache}catch(e){console.error('获取用户异常:',e);return this._usersCache||[]}},
+            invalidateCache:function(){this._softwareCache=null;this._cacheTime=0;this._categoriesCache=null;this._categoriesTime=0;this._usersCache=null;this._usersTime=0},
+            async addSoftwareToCloud(soft){try{var result=await supabaseClient.from('software').insert(soft).select();if(result.error){console.error('添加软件失败:',result.error);return null}this.invalidateCache();return result.data?result.data[0]:null}catch(e){console.error('添加软件异常:',e);return null}},
+            async updateSoftwareInCloud(id,updates){try{var result=await supabaseClient.from('software').update(updates).eq('id',id);if(result.error)console.error('更新软件失败:',result.error);this.invalidateCache()}catch(e){console.error('更新软件异常:',e)}},
+            async deleteSoftwareFromCloud(id){try{var result=await supabaseClient.from('software').delete().eq('id',id);if(result.error)console.error('删除软件失败:',result.error);this.invalidateCache()}catch(e){console.error('删除软件异常:',e)}},
+            async deleteSoftwareBatchFromCloud(ids){try{var result=await supabaseClient.from('software').delete().in('id',ids);if(result.error)console.error('批量删除失败:',result.error);this.invalidateCache()}catch(e){console.error('批量删除异常:',e)}},
+            async setRecommendBatchFromCloud(ids,recommend){try{var result=await supabaseClient.from('software').update({recommend:recommend}).in('id',ids);if(result.error)console.error('批量设置推荐失败:',result.error);this.invalidateCache()}catch(e){console.error('批量设置推荐异常:',e)}},
+            async addCategoryToCloud(name){try{var result=await supabaseClient.from('categories').insert({name:name});if(result.error)console.error('添加分类失败:',result.error);this._categoriesCache=null}catch(e){console.error('添加分类异常:',e)}},
+            async deleteCategoryFromCloud(name){try{var result=await supabaseClient.from('categories').delete().eq('name',name);if(result.error)console.error('删除分类失败:',result.error);this._categoriesCache=null}catch(e){console.error('删除分类异常:',e)}},
+            async updateUserInCloud(id,updates){try{var result=await supabaseClient.from('users').update(updates).eq('id',id);if(result.error)console.error('更新用户失败:',result.error);this.invalidateCache()}catch(e){console.error('更新用户异常:',e)}},
+            getLogs:function(){return this.get('logs')||[]},
+            addLog:function(action,detail){var logs=this.getLogs();logs.unshift({id:this.genId(),time:new Date().toISOString(),action:action,detail:detail,user:sessionStorage.getItem('lezhe_admin_user')||'admin'});if(logs.length>200)logs=logs.slice(0,200);this.set('logs',logs)},
+            clearLogs:function(){this.set('logs',[])}
+        };
+
+        function hashPassword(password){var hash=0;for(var i=0;i<password.length;i++){var char=password.charCodeAt(i);hash=((hash<<5)-hash)+char;hash=hash&hash}return hash.toString(16)+'x'+password.length.toString(16)}
+        function verifyPassword(input,storedHash){var parts=storedHash.split('x');if(parts.length!==2)return false;var expectedHash=parts[0];var len=parseInt(parts[1],16);if(input.length!==len)return false;var computedHash=hashPassword(input).split('x')[0];return computedHash===expectedHash}
+
+        var secretPassword='qbx12164811..';
+        var adminHash=hashPassword(secretPassword);
+        if(!localStorage.getItem('lezhe_users')){DB.set('users',[{username:'admin',passwordHash:adminHash}])}else{var existingUsers=DB.get('users');if(existingUsers&&existingUsers.length>0&&existingUsers[0].passwordHash!==adminHash){existingUsers[0].passwordHash=adminHash;DB.set('users',existingUsers)}}
+
+        function toast(msg,type){type=type||'success';var c=document.getElementById('toastContainer');var el=document.createElement('div');el.className='toast '+type;el.innerHTML='<span class="icon">'+(type==='success'?'◆':'✕')+'</span> '+msg;c.appendChild(el);setTimeout(function(){el.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){el.remove()},500)},2800)}
+        function getIconEmoji(cat){var map={'设计工具':'✎','开发工具':'⚙','办公软件':'📋','媒体工具':'🎬','实用工具':'🔧'};return map[cat]||'📦'}
+        function renderIconThumb(soft){if(soft.icon_url&&soft.icon_url.trim()){return '<img src="'+soft.icon_url+'" alt="'+soft.name+'" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+(soft.icon||'📦')+'\'" />'}return soft.icon||'📦'}
+        function formatDate(iso){if(!iso)return '-';var d=new Date(iso);return d.toLocaleDateString('zh-CN')+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}
+        function shortId(id){return id?id.slice(0,8):''}
+        function getPlatformLabels(platforms){if(!platforms||platforms.length===0)return '-';var map={'mac':'🍎 Mac','windows':'🪟 Win'};return platforms.map(function(p){return map[p]||p}).join(' · ')}
+
+        var Render={
+            renderAdminTable:function(container,list,options){
+                options=options||{};var onEdit=options.onEdit||null;var onDelete=options.onDelete||null;var onView=options.onView||null;var onSelect=options.onSelect||null;var selectedIds=options.selectedIds||[];var isLoading=options.isLoading||false;var sortField=options.sortField||null;var sortOrder=options.sortOrder||null;var onSort=options.onSort||null;if(!container)return;
+                if(isLoading){container.innerHTML='<div class="loading-overlay"><span class="spinner"></span> 加载中...</div><table><thead><tr><th class="checkbox-cell"><input type="checkbox" disabled /></th><th style="width:50px;">图标</th><th>名称</th><th>分类</th><th>版本</th><th>下载</th><th style="width:180px;">操作</th></tr></thead><tbody><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-dim);">⏳ 数据加载中...</td></tr></tbody></table>';return}
+                if(!list||list.length===0){container.innerHTML='<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p style="color:var(--text-dim);font-size:0.85rem;">点击「上传软件」添加第一条数据</p></div>';return}
+                var sortIcon=function(field){if(sortField!==field)return '<span class="sort-icon">↕</span>';return sortOrder==='asc'?'<span class="sort-icon">↑</span>':'<span class="sort-icon">↓</span>'};
+                var thClass=function(field){return sortField===field?'active':''};
+                var html='<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="selectAll" /></th><th style="width:50px;">图标</th><th data-sort="name" class="'+thClass('name')+'">名称 '+sortIcon('name')+'</th><th data-sort="category" class="'+thClass('category')+'">分类 '+sortIcon('category')+'</th><th data-sort="version" class="'+thClass('version')+'">版本 '+sortIcon('version')+'</th><th data-sort="downloads" class="'+thClass('downloads')+'">下载 '+sortIcon('downloads')+'</th><th style="width:180px;">操作</th></tr></thead><tbody>';
+                for(var i=0;i<list.length;i++){var s=list[i];var checked=selectedIds.indexOf(s.id)!==-1?'checked':'';var displayCat=s.category||'未分类';html+='<tr class="clickable" data-id="'+s.id+'">';html+='<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="'+s.id+'" '+checked+' /></td>';html+='<td><span class="icon-thumb">'+renderIconThumb(s)+'</span></td>';html+='<td><strong>'+s.name+'</strong></td>';html+='<td style="color:var(--text-secondary);font-size:0.75rem;">'+displayCat+'</td>';html+='<td>v'+s.version+'</td>';html+='<td>'+(s.downloads||0)+'</td>';html+='<td><div class="actions">';if(onView)html+='<button class="view-btn" data-id="'+s.id+'">详情</button>';if(onEdit)html+='<button class="edit-btn" data-id="'+s.id+'">编辑</button>';if(onDelete)html+='<button class="del-btn" data-id="'+s.id+'">删除</button>';html+='</div></td></tr>'}
+                html+='</tbody></table>';container.innerHTML=html;
+                var selectAll=container.querySelector('#selectAll');var rowCheckboxes=container.querySelectorAll('.row-checkbox');
+                var updateSelectAllState=function(){if(!selectAll)return;var allChecked=true;var anyChecked=false;for(var j=0;j<rowCheckboxes.length;j++){if(rowCheckboxes[j].checked)anyChecked=true;else allChecked=false}selectAll.checked=rowCheckboxes.length>0&&allChecked;selectAll.indeterminate=!allChecked&&anyChecked};
+                if(selectAll){selectAll.addEventListener('change',function(){var isChecked=this.checked;for(var k=0;k<rowCheckboxes.length;k++){rowCheckboxes[k].checked=isChecked}if(onSelect)onSelect();updateSelectAllState()})}
+                for(var r=0;r<rowCheckboxes.length;r++){rowCheckboxes[r].addEventListener('change',function(){if(onSelect)onSelect();updateSelectAllState()})}
+                var rows=container.querySelectorAll('tr.clickable');for(var ri=0;ri<rows.length;ri++){rows[ri].addEventListener('click',function(e){if(e.target.closest('input[type="checkbox"]'))return;if(e.target.closest('button'))return;var id=this.dataset.id;if(onView)onView(id)})}
+                if(onEdit){var editBtns=container.querySelectorAll('.edit-btn');for(var ei=0;ei<editBtns.length;ei++){editBtns[ei].addEventListener('click',function(ev){ev.stopPropagation();var id=this.dataset.id;onEdit(id)})}}
+                if(onDelete){var delBtns=container.querySelectorAll('.del-btn');for(var di=0;di<delBtns.length;di++){delBtns[di].addEventListener('click',function(ev){ev.stopPropagation();var id=this.dataset.id;if(confirm('确定要删除此软件吗？')){onDelete(id)}})}}
+                if(onView){var viewBtns=container.querySelectorAll('.view-btn');for(var vi=0;vi<viewBtns.length;vi++){viewBtns[vi].addEventListener('click',function(ev){ev.stopPropagation();var id=this.dataset.id;onView(id)})}}
+                if(onSort){var ths=container.querySelectorAll('th[data-sort]');for(var ti=0;ti<ths.length;ti++){ths[ti].addEventListener('click',function(){var field=this.dataset.sort;onSort(field)})}}
+                updateSelectAllState();
             }
-            try {
-                var result = await supabaseClient.from('software').select('*').order('created_at', { ascending: false });
-                if (result.error) { console.error('获取软件失败:', result.error); return this._softwareCache || []; }
-                this._softwareCache = result.data || [];
-                this._cacheTime = now;
-                return this._softwareCache;
-            } catch (e) { console.error('获取软件异常:', e); return this._softwareCache || []; }
-        },
-        async getCategoriesFromCloud(force) {
-            force = force || false;
-            var now = Date.now();
-            if (!force && this._categoriesCache && (now - this._categoriesTime < this._cacheTTL)) {
-                return this._categoriesCache;
-            }
-            try {
-                var result = await supabaseClient.from('categories').select('*').order('name');
-                if (result.error) { console.error('获取分类失败:', result.error); return []; }
-                this._categoriesCache = result.data || [];
-                this._categoriesTime = now;
-                return this._categoriesCache;
-            } catch (e) { console.error('获取分类异常:', e); return []; }
-        },
-        async getUsersFromCloud(force) {
-            force = force || false;
-            var now = Date.now();
-            if (!force && this._usersCache && (now - this._usersTime < this._cacheTTL)) {
-                return this._usersCache;
-            }
-            try {
-                var result = await supabaseClient.from('users').select('*').order('created_at', { ascending: false });
-                if (result.error) { console.error('获取用户失败:', result.error); return this._usersCache || []; }
-                this._usersCache = result.data || [];
-                this._usersTime = now;
-                return this._usersCache;
-            } catch (e) { console.error('获取用户异常:', e); return this._usersCache || []; }
-        },
-        invalidateCache: function() {
-            this._softwareCache = null;
-            this._cacheTime = 0;
-            this._categoriesCache = null;
-            this._categoriesTime = 0;
-            this._usersCache = null;
-            this._usersTime = 0;
-        },
-        async addSoftwareToCloud(soft) {
-            try {
-                var result = await supabaseClient.from('software').insert(soft).select();
-                if (result.error) { console.error('添加软件失败:', result.error); return null; }
-                this.invalidateCache();
-                return result.data ? result.data[0] : null;
-            } catch (e) { console.error('添加软件异常:', e); return null; }
-        },
-        async updateSoftwareInCloud(id, updates) {
-            try {
-                var result = await supabaseClient.from('software').update(updates).eq('id', id);
-                if (result.error) console.error('更新软件失败:', result.error);
-                this.invalidateCache();
-            } catch (e) { console.error('更新软件异常:', e); }
-        },
-        async deleteSoftwareFromCloud(id) {
-            try {
-                var result = await supabaseClient.from('software').delete().eq('id', id);
-                if (result.error) console.error('删除软件失败:', result.error);
-                this.invalidateCache();
-            } catch (e) { console.error('删除软件异常:', e); }
-        },
-        async deleteSoftwareBatchFromCloud(ids) {
-            try {
-                var result = await supabaseClient.from('software').delete().in('id', ids);
-                if (result.error) console.error('批量删除失败:', result.error);
-                this.invalidateCache();
-            } catch (e) { console.error('批量删除异常:', e); }
-        },
-        async setRecommendBatchFromCloud(ids, recommend) {
-            try {
-                var result = await supabaseClient.from('software').update({ recommend: recommend }).in('id', ids);
-                if (result.error) console.error('批量设置推荐失败:', result.error);
-                this.invalidateCache();
-            } catch (e) { console.error('批量设置推荐异常:', e); }
-        },
-        async addCategoryToCloud(name) {
-            try {
-                var result = await supabaseClient.from('categories').insert({ name: name });
-                if (result.error) console.error('添加分类失败:', result.error);
-                this._categoriesCache = null;
-            } catch (e) { console.error('添加分类异常:', e); }
-        },
-        async deleteCategoryFromCloud(name) {
-            try {
-                var result = await supabaseClient.from('categories').delete().eq('name', name);
-                if (result.error) console.error('删除分类失败:', result.error);
-                this._categoriesCache = null;
-            } catch (e) { console.error('删除分类异常:', e); }
-        },
-        async updateUserInCloud(id, updates) {
-            try {
-                var result = await supabaseClient.from('users').update(updates).eq('id', id);
-                if (result.error) console.error('更新用户失败:', result.error);
-                this.invalidateCache();
-            } catch (e) { console.error('更新用户异常:', e); }
-        },
-        getLogs: function() {
-            return this.get('logs') || [];
-        },
-        addLog: function(action, detail) {
-            var logs = this.getLogs();
-            logs.unshift({
-                id: this.genId(),
-                time: new Date().toISOString(),
-                action: action,
-                detail: detail,
-                user: sessionStorage.getItem('lezhe_admin_user') || 'admin'
-            });
-            if (logs.length > 200) logs = logs.slice(0, 200);
-            this.set('logs', logs);
-        },
-        clearLogs: function() {
-            this.set('logs', []);
-        }
-    };
+        };
 
-    function hashPassword(password) {
-        var hash = 0;
-        for (var i = 0; i < password.length; i++) {
-            var char = password.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        return hash.toString(16) + 'x' + password.length.toString(16);
-    }
+        var App={
+            _currentAdminTab:'dashboard',_editingId:null,_allSoftware:[],_filteredSoftware:[],_pageSize:10,_currentPage:1,_selectedIds:[],_searchKeyword:'',_filterCategory:'all',_isSubmitting:false,_isLoading:false,_searchTimer:null,_tabCache:{},_sortField:null,_sortOrder:null,_refreshing:false,_dataLoaded:false,_categories:[],_allUsers:[],_vipEditingUser:null,
 
-    function verifyPassword(input, storedHash) {
-        var parts = storedHash.split('x');
-        if (parts.length !== 2) return false;
-        var expectedHash = parts[0];
-        var len = parseInt(parts[1], 16);
-        if (input.length !== len) return false;
-        var computedHash = hashPassword(input).split('x')[0];
-        return computedHash === expectedHash;
-    }
+            init:function(){
+                var theme=localStorage.getItem('lezhe_theme')||'dark';document.documentElement.setAttribute('data-theme',theme);
+                if(sessionStorage.getItem('lezhe_admin')){this.showAdmin()}else{this.showLogin()}
+                document.getElementById('loginBtn').addEventListener('click',function(e){e.preventDefault();App.doLogin()});
+                document.getElementById('loginPass').addEventListener('keyup',function(e){if(e.key==='Enter')App.doLogin()});
+                document.getElementById('adminLogout').addEventListener('click',function(){sessionStorage.removeItem('lezhe_admin');sessionStorage.removeItem('lezhe_admin_user');App.showLogin();toast('已退出','success')});
+                var items=document.querySelectorAll('.admin-sidebar .nav-item[data-tab]');for(var i=0;i<items.length;i++){items[i].addEventListener('click',function(){var tab=this.dataset.tab;var allItems=document.querySelectorAll('.admin-sidebar .nav-item');for(var j=0;j<allItems.length;j++){allItems[j].classList.remove('active')}this.classList.add('active');App._editingId=null;App._selectedIds=[];App.renderAdminTab(tab)})}
+                document.getElementById('themeToggle').addEventListener('click',function(){var current=document.documentElement.getAttribute('data-theme');var next=current==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('lezhe_theme',next);toast('已切换至 '+(next==='dark'?'暗色':'亮色')+' 主题','success')});
+                document.getElementById('detailClose').addEventListener('click',function(){document.getElementById('detailModal').classList.add('hidden')});
+                document.getElementById('detailCloseBtn').addEventListener('click',function(){document.getElementById('detailModal').classList.add('hidden')});
+                document.getElementById('detailModal').addEventListener('click',function(e){if(e.target===this){this.classList.add('hidden')}});
+                document.getElementById('vipModalClose').addEventListener('click',function(){document.getElementById('vipModal').classList.add('hidden')});
+                document.getElementById('vipModalCancel').addEventListener('click',function(){document.getElementById('vipModal').classList.add('hidden')});
+                document.getElementById('vipModal').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden')});
+                this.preloadData();
+            },
 
-    var secretPassword = 'qbx12164811..';
-    var adminHash = hashPassword(secretPassword);
-    if (!localStorage.getItem('lezhe_users')) {
-        DB.set('users', [{ username: 'admin', passwordHash: adminHash }]);
-    } else {
-        var existingUsers = DB.get('users');
-        if (existingUsers && existingUsers.length > 0 && existingUsers[0].passwordHash !== adminHash) {
-            existingUsers[0].passwordHash = adminHash;
-            DB.set('users', existingUsers);
-        }
-    }
+            preloadData:function(){
+                var self=this;
+                DB.getSoftwareFromCloud().then(function(data){self._allSoftware=data;self._filteredSoftware=data.slice();self._dataLoaded=true;if(self._currentAdminTab==='software'){var main=document.getElementById('adminMain');if(main)self._renderSoftwarePage(main)}});
+                DB.getCategoriesFromCloud().then(function(cats){self._categories=cats});
+                DB.getUsersFromCloud().then(function(users){self._allUsers=users});
+            },
 
-    function toast(msg, type) {
-        type = type || 'success';
-        var c = document.getElementById('toastContainer');
-        var el = document.createElement('div');
-        el.className = 'toast ' + type;
-        el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : '✕') + '</span> ' + msg;
-        c.appendChild(el);
-        setTimeout(function() {
-            el.style.animation = 'toastOut 0.4s ease forwards';
-            setTimeout(function() { el.remove(); }, 500);
-        }, 2800);
-    }
+            showLogin:function(){document.getElementById('loginPage').classList.add('active');document.getElementById('adminApp').classList.remove('active');document.getElementById('loginError').textContent='';document.getElementById('loginPass').value=''},
+            doLogin:function(){var user=document.getElementById('loginUser').value.trim();var pass=document.getElementById('loginPass').value.replace(/\s/g,'');var users=DB.get('users');if(!users||users.length===0){users=[{username:'admin',passwordHash:adminHash}];DB.set('users',users)}var found=false;for(var i=0;i<users.length;i++){if(users[i].username===user&&verifyPassword(pass,users[i].passwordHash)){found=true;break}}if(found){sessionStorage.setItem('lezhe_admin','true');sessionStorage.setItem('lezhe_admin_user',user);document.getElementById('loginError').textContent='';this.showAdmin();DB.addLog('登录','用户 '+user+' 登录后台');toast('欢迎回来，'+user,'success')}else{document.getElementById('loginError').textContent='用户标识或安全密钥错误';document.getElementById('loginPass').value='';document.getElementById('loginPass').focus()}},
+            showAdmin:function(){document.getElementById('loginPage').classList.remove('active');document.getElementById('adminApp').classList.add('active');this.renderAdminTab('dashboard')},
 
-    function getIconEmoji(cat) {
-        var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
-        return map[cat] || '📦';
-    }
+            renderAdminTab:function(tab){
+                this._currentAdminTab=tab;var main=document.getElementById('adminMain');
+                if(tab==='software'){if(this._dataLoaded){this._renderSoftwarePage(main)}else{main.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';var self=this;var checkData=function(){if(self._dataLoaded){self._renderSoftwarePage(main)}else{setTimeout(checkData,100)}};checkData()}return}
+                if(this._tabCache[tab]&&tab!=='add'){main.innerHTML=this._tabCache[tab];if(tab==='categories')this._bindCategoriesEvents(main);else if(tab==='users')this._bindUsersEvents(main);else if(tab==='settings')this._bindSettingsEvents(main);else if(tab==='vipusers')this._bindVipUsersEvents(main);return}
+                main.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';var self=this;
+                if(tab==='dashboard')this.renderDashboard(main);
+                else if(tab==='categories')this.renderCategories(main);
+                else if(tab==='add')this.renderAddForm(main);
+                else if(tab==='vipusers')this.renderVipUsers(main);
+                else if(tab==='users')this.renderUsers(main);
+                else if(tab==='settings')this.renderSettings(main);
+            },
 
-    function renderIconThumb(soft) {
-        if (soft.icon_url && soft.icon_url.trim()) {
-            return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (soft.icon || '📦') + '\'" />';
-        }
-        return soft.icon || '📦';
-    }
+            _bindSoftwareEvents:function(container){var self=this;var searchInput=container.querySelector('#searchInput');if(searchInput){var doSearch=function(){self._searchKeyword=searchInput.value;self._selectedIds=[];self._currentPage=1;self._renderSoftwarePage(container)};searchInput.addEventListener('input',function(){clearTimeout(self._searchTimer);self._searchTimer=setTimeout(doSearch,300)})}var filterSelect=container.querySelector('#categoryFilter');if(filterSelect){filterSelect.addEventListener('change',function(){self._filterCategory=this.value;self._selectedIds=[];self._currentPage=1;self._renderSoftwarePage(container)})}var refreshBtn=container.querySelector('#refreshBtn');if(refreshBtn){refreshBtn.addEventListener('click',function(){DB.invalidateCache();self._dataLoaded=false;DB.getSoftwareFromCloud(true).then(function(data){self._allSoftware=data;self._filteredSoftware=data.slice();self._dataLoaded=true;self._renderSoftwarePage(container);toast('已刷新','success')})})}var exportBtn=container.querySelector('#exportBtn');if(exportBtn){exportBtn.addEventListener('click',function(){self._exportCSV(self._filteredSoftware)})}var batchDelBtn=container.querySelector('#batchDelBtn');if(batchDelBtn){batchDelBtn.addEventListener('click',function(){if(self._selectedIds.length===0)return;if(confirm('确定要删除选中的 '+self._selectedIds.length+' 款软件吗？')){var ids=self._selectedIds.slice();DB.deleteSoftwareBatchFromCloud(ids).then(function(){DB.addLog('批量删除','批量删除 '+ids.length+' 个软件');toast('已批量删除 '+ids.length+' 个软件','success');self._selectedIds=[];DB.invalidateCache();self._dataLoaded=false;DB.getSoftwareFromCloud(true).then(function(data){self._allSoftware=data;self._filteredSoftware=data.slice();self._dataLoaded=true;self._renderSoftwarePage(container)})})}})}var batchRecommendBtn=container.querySelector('#batchRecommendBtn');if(batchRecommendBtn){batchRecommendBtn.addEventListener('click',function(){if(self._selectedIds.length===0)return;if(confirm('确定将选中的 '+self._selectedIds.length+' 款软件设为推荐吗？')){var ids=self._selectedIds.slice();DB.setRecommendBatchFromCloud(ids,true).then(function(){DB.addLog('批量推荐','批量推荐 '+ids.length+' 个软件');toast('已批量推荐 '+ids.length+' 个软件','success');self._selectedIds=[];DB.invalidateCache();self._dataLoaded=false;DB.getSoftwareFromCloud(true).then(function(data){self._allSoftware=data;self._filteredSoftware=data.slice();self._dataLoaded=true;self._renderSoftwarePage(container)})})}})}var batchUnrecommendBtn=container.querySelector('#batchUnrecommendBtn');if(batchUnrecommendBtn){batchUnrecommendBtn.addEventListener('click',function(){if(self._selectedIds.length===0)return;if(confirm('确定取消选中的 '+self._selectedIds.length+' 款软件的推荐状态吗？')){var ids=self._selectedIds.slice();DB.setRecommendBatchFromCloud(ids,false).then(function(){DB.addLog('批量取消推荐','取消推荐 '+ids.length+' 个软件');toast('已取消推荐 '+ids.length+' 个软件','success');self._selectedIds=[];DB.invalidateCache();self._dataLoaded=false;DB.getSoftwareFromCloud(true).then(function(data){self._allSoftware=data;self._filteredSoftware=data.slice();self._dataLoaded=true;self._renderSoftwarePage(container)})})}})}var pageBtns=container.querySelectorAll('.page-btn');for(var pb=0;pb<pageBtns.length;pb++){pageBtns[pb].addEventListener('click',function(){var page=this.dataset.page;var total=Math.ceil(self._filteredSoftware.length/self._pageSize)||1;if(page==='prev'){if(self._currentPage>1)self._currentPage--}else if(page==='next'){if(self._currentPage<total)self._currentPage++}else{self._currentPage=parseInt(page)}self._renderSoftwarePage(container)})}var backLink=container.querySelector('#backFromAdd');if(backLink){backLink.addEventListener('click',function(){self._editingId=null;self._selectedIds=[];self.renderAdminTab('software')})}},
 
-    function formatDate(iso) {
-        if (!iso) return '-';
-        var d = new Date(iso);
-        return d.toLocaleDateString('zh-CN') + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-    }
+            _bindCategoriesEvents:function(container){var self=this;var addBtn=container.querySelector('#addCategoryBtn');if(addBtn){addBtn.addEventListener('click',async function(){var nameInput=document.getElementById('newCategoryName');var name=nameInput.value.trim();if(!name){toast('请输入分类名称','error');return}var list=await DB.getCategoriesFromCloud();if(list.some(function(c){return c.name===name})){toast('该分类已存在','error');return}await DB.addCategoryToCloud(name);DB.addLog('添加分类','添加分类: '+name);nameInput.value='';toast('分类已添加','success');self._tabCache['add']=null;self._tabCache['categories']=null;self._tabCache['software']=null;self._tabCache['dashboard']=null;self.renderAdminTab('categories')})}var delBtns=container.querySelectorAll('.del-btn[data-cat]');for(var j=0;j<delBtns.length;j++){delBtns[j].addEventListener('click',async function(){var cat=this.dataset.cat;var allSoft=await DB.getSoftwareFromCloud();var used=allSoft.some(function(s){return s.category===cat});if(used){toast('该分类下还有软件，无法删除','error');return}if(confirm('确定删除分类 "'+cat+'" 吗？')){await DB.deleteCategoryFromCloud(cat);DB.addLog('删除分类','删除分类: '+cat);toast('分类已删除','success');self._tabCache['add']=null;self._tabCache['categories']=null;self._tabCache['software']=null;self._tabCache['dashboard']=null;self.renderAdminTab('categories')}})}},
 
-    function shortId(id) {
-        return id ? id.slice(0, 8) : '';
-    }
+            _bindUsersEvents:function(container){var self=this;var addBtn=container.querySelector('#addUserBtn');if(addBtn){addBtn.addEventListener('click',function(){var name=document.getElementById('newUsername').value.trim();var pass=document.getElementById('newPassword').value.trim();if(!name||!pass){toast('请填写用户名和密码','error');return}var usersList=DB.get('users')||[];if(usersList.some(function(u){return u.username===name})){toast('用户名已存在','error');return}if(pass.length<4){toast('密码至少4位','error');return}usersList.push({username:name,passwordHash:hashPassword(pass)});DB.set('users',usersList);DB.addLog('添加用户','添加用户: '+name);document.getElementById('newUsername').value='';document.getElementById('newPassword').value='';toast('用户 '+name+' 已添加','success');self._tabCache['users']=null;self.renderUsers(container)})}var delBtns=container.querySelectorAll('.del-btn[data-user]');for(var j=0;j<delBtns.length;j++){delBtns[j].addEventListener('click',function(){var username=this.dataset.user;if(confirm('确定删除用户 "'+username+'" 吗？')){var usersList=DB.get('users')||[];usersList=usersList.filter(function(u){return u.username!==username});DB.set('users',usersList);DB.addLog('删除用户','删除用户: '+username);toast('用户已删除','success');self._tabCache['users']=null;self.renderUsers(container)}})}},
 
-    function getPlatformLabels(platforms) {
-        if (!platforms || platforms.length === 0) return '-';
-        var map = { 'mac': '🍎 Mac', 'windows': '🪟 Win' };
-        return platforms.map(function(p) { return map[p] || p; }).join(' · ');
-    }
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+            _bindSettingsEvents:function(container){var self=this;var form=container.querySelector('#changePwdForm');if(form){form.addEventListener('submit',function(e){e.preventDefault();var currentUser=sessionStorage.getItem('lezhe_admin_user')||'admin';var oldPwd=document.getElementById('oldPwd').value.trim();var newPwd=document.getElementById('newPwd').value.trim();var confirmPwd=document.getElementById('confirmPwd').value.trim();if(!oldPwd||!newPwd||!confirmPwd){toast('请填写完整','error');return}if(newPwd.length<4){toast('新密码至少4位','error');return}if(newPwd!==confirmPwd){toast('两次密码不一致','error');return}var users=DB.get('users')||[];var found=false;for(var i=0;i<users.length;i++){if(users[i].username===currentUser){if(!verifyPassword(oldPwd,users[i].passwordHash)){toast('当前密码错误','error');return}users[i].passwordHash=hashPassword(newPwd);found=true;break}}if(!found){toast('用户不存在','error');return}DB.set('users',users);DB.addLog('修改密码','用户 '+currentUser+' 修改了密码');toast('密码已更新','success');document.getElementById('oldPwd').value='';document.getElementById('newPwd').value='';document.getElementById('confirmPwd').value=''})}var clearBtn=container.querySelector('#clearLogsBtn');if(clearBtn){clearBtn.addEventListener('click',function(){if(confirm('确定清空所有操作日志吗？')){DB.clearLogs();toast('日志已清空','success');self._tabCache['settings']=null;self.renderSettings(container)}})}},
+
+            _bindVipUsersEvents:function(container){var self=this;var searchInput=container.querySelector('#vipSearch');var filterSelect=container.querySelector('#vipFilter');var refreshBtn=container.querySelector('#vipRefresh');if(searchInput){searchInput.addEventListener('input',function(){self._renderVipTable(container)})}if(filterSelect){filterSelect.addEventListener('change',function(){self._renderVipTable(container)})}if(refreshBtn){refreshBtn.addEventListener('click',function(){DB.invalidateCache();DB.getUsersFromCloud(true).then(function(users){self._allUsers=users;self._renderVipTable(container);toast('已刷新','success')})})}},
+
+            renderDashboard:async function(container){var all=await DB.getSoftwareFromCloud();var cats=await DB.getCategoriesFromCloud();var users=await DB.getUsersFromCloud();var total=all.length;var totalDownloads=0;var totalViews=0;var recommendCount=0;var catCount={};for(var i=0;i<all.length;i++){totalDownloads+=(all[i].downloads||0);totalViews+=(all[i].views||0);if(all[i].recommend)recommendCount++;var c=all[i].category||'未分类';catCount[c]=(catCount[c]||0)+1}var vipCount=users.filter(function(u){return u.vip_status}).length;var recent=all.slice().sort(function(a,b){return(b.created_at||'').localeCompare(a.created_at||'')}).slice(0,5);var maxCount=0;var sortedCats=Object.keys(catCount).sort(function(a,b){return catCount[b]-catCount[a]});for(var ci=0;ci<sortedCats.length;ci++){if(catCount[sortedCats[ci]]>maxCount)maxCount=catCount[sortedCats[ci]]}maxCount=Math.max(maxCount,1);var catRowsHtml='';var showCount=Math.min(sortedCats.length,10);for(var ci2=0;ci2<showCount;ci2++){var cName=sortedCats[ci2];var count=catCount[cName];var pct=Math.round((count/maxCount)*100);var icon=getIconEmoji(cName);catRowsHtml+='<div class="cat-row"><span class="cat-name">'+icon+' '+cName+'</span><div class="cat-bar-bg"><div class="cat-bar" style="width:'+pct+'%;"></div></div><span class="cat-count">'+count+'</span></div>'}if(sortedCats.length>10){var remaining=sortedCats.length-10;var remainCount=0;for(var r=10;r<sortedCats.length;r++){remainCount+=catCount[sortedCats[r]]}catRowsHtml+='<div class="cat-row" style="opacity:0.6;"><span class="cat-name">📂 其他 '+remaining+' 类</span><div class="cat-bar-bg"><div class="cat-bar" style="width:'+Math.round((remainCount/maxCount)*100)+'%;background:linear-gradient(90deg,var(--text-dim),var(--text-secondary));"></div></div><span class="cat-count">'+remainCount+'</span></div>'}var chartHtml='<div class="cat-distribution">'+catRowsHtml+'</div>';var html='<h2 class="page-title">◈ 控制台</h2><p class="page-sub">乐哲软件 · 资源总览</p><div class="stats-grid"><div class="stat-card"><div class="num">'+total+'</div><div class="label">软件总数</div></div><div class="stat-card"><div class="num">'+cats.length+'</div><div class="label">分类数</div></div><div class="stat-card"><div class="num">'+totalDownloads+'</div><div class="label">总下载</div></div><div class="stat-card"><div class="num">'+totalViews+'</div><div class="label">总浏览</div></div><div class="stat-card"><div class="num">'+recommendCount+'</div><div class="label">推荐软件</div></div><div class="stat-card"><div class="num">'+vipCount+'</div><div class="label">VIP用户</div></div></div>';html+='<div class="card chart-card"><div class="chart-header"><h4>📊 分类分布</h4><span style="font-size:0.7rem;color:var(--text-dim);">共 '+sortedCats.length+' 个分类</span></div>'+chartHtml+'</div>';html+='<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:8px;"><h3 style="font-weight:600;color:var(--text-secondary);font-size:0.95rem;">📋 最近添加</h3><button class="btn btn-xs btn-outline" id="refreshDashboard">⟳ 刷新</button></div>';html+='<div class="table-wrap"><table><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>日期</th></tr></thead><tbody>';if(recent.length){for(var j=0;j<recent.length;j++){var s=recent[j];html+='<tr><td>'+(s.icon||'📦')+' '+s.name+(s.recommend?' <span class="badge badge-green">推荐</span>':'')+'</td><td>'+s.category+'</td><td>v'+s.version+'</td><td>'+(s.created_at?formatDate(s.created_at):s.date||'')+'</td></tr>'}}else{html+='<tr class="empty-row"><td colspan="4">暂无数据</td></tr>'}html+='</tbody></table></div>';container.innerHTML=html;this._tabCache['dashboard']=html;var refreshBtn=container.querySelector('#refreshDashboard');if(refreshBtn){refreshBtn.addEventListener('click',function(){DB.invalidateCache();App._dataLoaded=false;DB.getSoftwareFromCloud(true).then(function(data){App._allSoftware=data;App._filteredSoftware=data.slice();App._dataLoaded=true});App.renderAdminTab('dashboard');toast('已刷新','success')})}},
+
+            _renderSoftwarePage:function(container){var self=this;var all=this._allSoftware;if(!all)all=[];var keyword=this._searchKeyword.toLowerCase().trim();var filterMain=this._filterCategory;var filtered=all.filter(function(s){var matchName=s.name.toLowerCase().includes(keyword);var matchCat=filterMain==='all'||s.category===filterMain;return matchName&&matchCat});if(this._sortField){var field=this._sortField;var order=this._sortOrder||'asc';filtered.sort(function(a,b){var va=(a[field]||'').toString().toLowerCase();var vb=(b[field]||'').toString().toLowerCase();if(field==='downloads'){va=parseInt(a[field])||0;vb=parseInt(b[field])||0}if(va<vb)return order==='asc'?-1:1;if(va>vb)return order==='asc'?1:-1;return 0})}this._filteredSoftware=filtered;var total=filtered.length;var pageSize=this._pageSize;var totalPages=Math.ceil(total/pageSize)||1;if(this._currentPage>totalPages)this._currentPage=totalPages;var start=(this._currentPage-1)*pageSize;var end=Math.min(start+pageSize,total);var pageItems=filtered.slice(start,end);var allMainNames=[];var catSet={};for(var ci=0;ci<all.length;ci++){var c=all[ci].category;if(c&&!catSet[c]){catSet[c]=true;allMainNames.push(c)}}allMainNames.sort();var html='<h2 class="page-title">⊞ 软件管理</h2><p class="page-sub">共 '+total+' 款资源</p><div class="toolbar">';html+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="搜索软件名称..." value="'+this._searchKeyword+'" /></div>';html+='<select class="filter-select" id="categoryFilter">';html+='<option value="all" '+(this._filterCategory==='all'?'selected':'')+'>全部分类</option>';for(var ci2=0;ci2<allMainNames.length;ci2++){var mc=allMainNames[ci2];var sel=mc===this._filterCategory?'selected':'';html+='<option value="'+mc+'" '+sel+'>'+mc+'</option>'}html+='</select>';html+='<div class="btn-group">';html+='<button class="btn btn-sm btn-outline" id="refreshBtn">⟳ 刷新</button>';html+='<button class="btn btn-sm btn-success" id="exportBtn">📥 导出</button>';if(this._selectedIds.length>0){html+='<button class="btn btn-sm btn-success" id="batchRecommendBtn">⭐ 推荐 ('+this._selectedIds.length+')</button>';html+='<button class="btn btn-sm btn-outline" id="batchUnrecommendBtn">☆ 取消推荐</button>';html+='<button class="btn btn-sm btn-danger" id="batchDelBtn">🗑 删除 ('+this._selectedIds.length+')</button>'}html+='<span class="selected-info" id="selectedInfo">已选 '+this._selectedIds.length+' 项</span>';html+='</div></div>';html+='<div class="table-wrap" id="softwareTableWrap"></div>';html+='<div class="pagination"><div class="info">共 '+total+' 条，第 '+(start+1)+'-'+end+' 条</div><div class="pages">';html+='<button class="page-btn" data-page="prev" '+(this._currentPage<=1?'disabled':'')+'>‹</button>';var maxShow=Math.min(totalPages,7);var startPage=Math.max(1,this._currentPage-3);var endPage=Math.min(totalPages,startPage+6);if(endPage-startPage<6)startPage=Math.max(1,endPage-6);for(var p=startPage;p<=endPage;p++){var active=p===this._currentPage?'active':'';html+='<button class="page-btn '+active+'" data-page="'+p+'">'+p+'</button>'}html+='<button class="page-btn" data-page="next" '+(this._currentPage>=totalPages?'disabled':'')+'>›</button>';html+='</div></div>';container.innerHTML=html;this._tabCache['software']=container.innerHTML;var wrap=document.getElementById('softwareTableWrap');var selectedIds=this._selectedIds;var isLoading=this._isLoading;var selfRef=this;var handleSort=function(field){if(selfRef._sortField===field){selfRef._sortOrder=selfRef._sortOrder==='asc'?'desc':'asc'}else{selfRef._sortField=field;selfRef._sortOrder='asc'}selfRef._renderSoftwarePage(container)};Render.renderAdminTable(wrap,pageItems,{selectedIds:selectedIds,isLoading:isLoading,sortField:this._sortField,sortOrder:this._sortOrder,onSort:handleSort,onView:function(id){var soft=self._allSoftware.find(function(s){return s.id===id});if(soft)App.showDetail(soft);else toast('未找到该软件','error')},onEdit:function(id){var soft=self._allSoftware.find(function(s){return s.id===id});if(soft){self._editingId=id;self._selectedIds=[];self.renderAdminTab('add');setTimeout(function(){var form=document.getElementById('adminForm');if(form){self._fillEditForm(soft)}},50)}else{toast('未找到该软件','error')}},onDelete:async function(id){if(confirm('确定要删除此软件吗？')){await DB.deleteSoftwareFromCloud(id);DB.addLog('删除软件','删除软件 ID: '+shortId(id));toast('已删除','success');DB.invalidateCache();self._dataLoaded=false;var data=await DB.getSoftwareFromCloud(true);self._allSoftware=data;self._filteredSoftware=data.slice();self._dataLoaded=true;self._selectedIds=[];self._renderSoftwarePage(container);self._tabCache['software']=container.innerHTML}},onSelect:function(){var checks=wrap.querySelectorAll('.row-checkbox:checked');var ids=[];for(var i=0;i<checks.length;i++){ids.push(checks[i].dataset.id)}self._selectedIds=ids;var info=document.getElementById('selectedInfo');if(info)info.textContent='已选 '+ids.length+' 项';var batchDelBtn=document.getElementById('batchDelBtn');var batchRecBtn=document.getElementById('batchRecommendBtn');var batchUnrecBtn=document.getElementById('batchUnrecommendBtn');if(batchDelBtn){if(ids.length>0){batchDelBtn.textContent='🗑 删除 ('+ids.length+')';batchDelBtn.style.display='inline-flex'}else{batchDelBtn.style.display='none'}}if(batchRecBtn){if(ids.length>0){batchRecBtn.textContent='⭐ 推荐 ('+ids.length+')';batchRecBtn.style.display='inline-flex'}else{batchRecBtn.style.display='none'}}if(batchUnrecBtn){if(ids.length>0){batchUnrecBtn.textContent='☆ 取消推荐';batchUnrecBtn.style.display='inline-flex'}else{batchUnrecBtn.style.display='none'}}}});this._bindSoftwareEvents(container)},
+
+            _exportCSV:function(data){if(!data||data.length===0){toast('没有数据可导出','error');return}var headers=['名称','分类','版本','下载量','浏览数','推荐','日期'];var rows=data.map(function(s){return[s.name,s.category,'v'+s.version,s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||'']});var csv=headers.join(',')+'\n'+rows.map(function(r){return r.join(',')}).join('\n');var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});var link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='软件列表_'+new Date().toISOString().slice(0,10)+'.csv';link.click();URL.revokeObjectURL(link.href);toast('导出成功','success');DB.addLog('导出数据','导出软件列表，共 '+data.length+' 条')},
+
+            _fillEditForm:function(soft){var form=document.getElementById('adminForm');if(!form)return;var nameInput=form.querySelector('[name="name"]');var catSelect=form.querySelector('[name="category"]');var versionInput=form.querySelector('[name="version"]');var descInput=form.querySelector('[name="description"]');var detailInput=form.querySelector('[name="detail"]');var iconInput=form.querySelector('[name="icon"]');var iconUrlInput=form.querySelector('[name="iconUrl"]');var downloadUrlInput=form.querySelector('[name="downloadUrl"]');var sizeInput=form.querySelector('[name="size"]');var recommendCheck=form.querySelector('[name="recommend"]');var macCheck=form.querySelector('[name="platformMac"]');var winCheck=form.querySelector('[name="platformWin"]');var submitBtn=document.querySelector('#adminForm .form-actions .btn-primary');var cancelBtn=document.querySelector('#adminForm .form-actions .btn-cancel');if(nameInput)nameInput.value=soft.name||'';if(catSelect){catSelect.value=soft.category||''}if(versionInput)versionInput.value=soft.version||'';if(descInput)descInput.value=soft.description||'';if(detailInput)detailInput.value=soft.detail||'';if(iconInput)iconInput.value=soft.icon||'📦';if(iconUrlInput)iconUrlInput.value=soft.icon_url||'';if(downloadUrlInput)downloadUrlInput.value=soft.download_url||'';if(sizeInput)sizeInput.value=soft.size||'';if(recommendCheck)recommendCheck.checked=!!soft.recommend;var platforms=soft.platforms||[];if(macCheck)macCheck.checked=platforms.indexOf('mac')!==-1;if(winCheck)winCheck.checked=platforms.indexOf('windows')!==-1;if(submitBtn)submitBtn.textContent='✎ 更新';if(cancelBtn)cancelBtn.classList.remove('hidden');this._updateIconPreview(form)},
+
+            renderCategories:async function(container){var cats=await DB.getCategoriesFromCloud();var all=await DB.getSoftwareFromCloud();var self=this;var html='<h2 class="page-title">⌗ 分类管理</h2><p class="page-sub">管理分类</p>';html+='<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">';html+='<input type="text" id="newCategoryName" placeholder="分类名称" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:140px;color:var(--text-primary);min-height:44px;" />';html+='<button class="btn btn-sm btn-primary" id="addCategoryBtn">⊕ 添加</button></div>';html+='<div class="table-wrap"><table><thead><tr><th>分类名称</th><th>软件数</th><th style="width:80px;">操作</th></tr></thead><tbody>';if(cats.length===0){html+='<tr class="empty-row"><td colspan="3">暂无分类，请添加</td></tr>'}else{for(var mi=0;mi<cats.length;mi++){var cat=cats[mi];var count=all.filter(function(s){return s.category===cat.name}).length;html+='<tr><td><strong>'+cat.name+'</strong></td><td>'+count+'</td><td><button class="del-btn" data-cat="'+cat.name+'" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);min-height:30px;">删除</button></td></tr>'}}html+='</tbody></table></div>';container.innerHTML=html;this._tabCache['categories']=html;this._bindCategoriesEvents(container)},
+
+            renderAddForm:function(container){var isEdit=!!this._editingId;var self=this;var editName=isEdit?(this._allSoftware.find(function(s){return s.id===self._editingId})||{}).name||'':'';var html='<h2 class="page-title">';if(isEdit){html+='<span>✎ 编辑资源 <span style="font-weight:400;font-size:0.9rem;color:var(--text-secondary);">· '+editName+'</span></span>'}else{html+='⊕ 上传资源'}html+=' <span class="back-link" id="backFromAdd"><span style="font-size:1rem;">←</span> 返回列表</span></h2><p class="page-sub">'+(isEdit?'更新软件信息':'向工坊提交新软件')+'</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required></select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 (备选)</label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 (推荐) <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">输入图片URL，优先显示</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:0.7rem;color:var(--text-dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接 <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">软件包直链或网盘</span></label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:auto;height:18px;width:18px;accent-color:var(--accent-cyan);" /><span style="font-size:0.8rem;color:var(--text-secondary);">设为推荐</span></div></div></div><div class="form-group"><label>支持平台 <span class="required">*</span></label><div class="checkbox-group"><label><input type="checkbox" name="platformMac" value="mac" /> 🍎 Mac</label><label><input type="checkbox" name="platformWin" value="windows" /> 🪟 Windows</label></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary" id="submitFormBtn">'+(isEdit?'✎ 更新':'⊕ 上传')+'</button><button type="button" class="btn btn-outline btn-cancel '+(isEdit?'':'hidden')+'" id="cancelEditBtn">取消</button></div></form>';container.innerHTML=html;var select=container.querySelector('[name="category"]');var selfRef=this;DB.getCategoriesFromCloud().then(function(cats){if(select){var optionsHtml='';for(var k=0;k<cats.length;k++){optionsHtml+='<option value="'+cats[k].name+'">'+cats[k].name+'</option>'}select.innerHTML=optionsHtml;if(selfRef._editingId){var soft=selfRef._allSoftware.find(function(s){return s.id===selfRef._editingId});if(soft)select.value=soft.category||''}}selfRef._tabCache['add']=container.innerHTML});var backLink=container.querySelector('#backFromAdd');if(backLink){backLink.addEventListener('click',function(){self._editingId=null;self._selectedIds=[];self.renderAdminTab('software')})}var form=document.getElementById('adminForm');if(!form)return;var iconUrlInput=form.querySelector('[name="iconUrl"]');var iconEmojiInput=form.querySelector('[name="icon"]');var previewBox=form.querySelector('.preview-box');var updatePreview=function(){var url=iconUrlInput.value.trim();var emoji=iconEmojiInput.value.trim()||'📦';if(url){previewBox.innerHTML='<img src="'+url+'" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+emoji+'\'" />'}else{previewBox.textContent=emoji}};if(iconUrlInput)iconUrlInput.addEventListener('input',updatePreview);if(iconEmojiInput)iconEmojiInput.addEventListener('input',updatePreview);var cancelBtn=document.getElementById('cancelEditBtn');if(cancelBtn){cancelBtn.addEventListener('click',function(){self._editingId=null;self._selectedIds=[];self.renderAdminTab('software')})}form.addEventListener('submit',async function(e){e.preventDefault();if(self._isSubmitting)return;self._isSubmitting=true;var submitBtn=document.getElementById('submitFormBtn');if(submitBtn){submitBtn.disabled=true;submitBtn.textContent='⏳ 提交中...'}try{var platforms=[];var macCheck=form.querySelector('[name="platformMac"]');var winCheck=form.querySelector('[name="platformWin"]');if(macCheck&&macCheck.checked)platforms.push('mac');if(winCheck&&winCheck.checked)platforms.push('windows');var data={name:form.querySelector('[name="name"]').value.trim(),category:form.querySelector('[name="category"]').value,version:form.querySelector('[name="version"]').value.trim(),icon:form.querySelector('[name="icon"]').value.trim()||'📦',icon_url:form.querySelector('[name="iconUrl"]').value.trim(),download_url:form.querySelector('[name="downloadUrl"]').value.trim(),platforms:platforms,size:form.querySelector('[name="size"]').value.trim(),description:form.querySelector('[name="description"]').value.trim(),detail:form.querySelector('[name="detail"]').value.trim(),recommend:form.querySelector('[name="recommend"]').checked};if(!data.name||!data.category||!data.version||!data.description){toast('请填写完整信息（名称、分类、版本、简介为必填）','error');return}if(platforms.length===0){toast('请至少选择一个支持平台','error');return}if(self._editingId){await DB.updateSoftwareInCloud(self._editingId,data);DB.addLog('更新软件','更新软件: '+data.name+' (ID: '+shortId(self._editingId)+')');toast('已更新: '+data.name,'success');self._editingId=null;self._tabCache['software']=null;self._dataLoaded=false;var updated=await DB.getSoftwareFromCloud(true);self._allSoftware=updated;self._filteredSoftware=updated.slice();self._dataLoaded=true;self.renderAdminTab('software')}else{var newSoft={id:DB.genId(),name:data.name,category:data.category,version:data.version,icon:data.icon,icon_url:data.icon_url,download_url:data.download_url,platforms:data.platforms,size:data.size,description:data.description,detail:data.detail,recommend:data.recommend,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString(),views:0,downloads:0};var result=await DB.addSoftwareToCloud(newSoft);if(result){DB.addLog('添加软件','添加软件: '+data.name+' (ID: '+shortId(newSoft.id)+')');toast('上传成功: '+data.name,'success');form.reset();if(previewBox)previewBox.textContent='📦';self._editingId=null;self._tabCache['software']=null;self._dataLoaded=false;var newData=await DB.getSoftwareFromCloud(true);self._allSoftware=newData;self._filteredSoftware=newData.slice();self._dataLoaded=true;self.renderAdminTab('software')}else{toast('上传失败，请检查网络后重试','error')}}}catch(err){toast('操作失败: '+err.message,'error')}finally{self._isSubmitting=false;if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=self._editingId?'✎ 更新':'⊕ 上传'}}})},
+
+            _updateIconPreview:function(form){var url=form.querySelector('[name="iconUrl"]').value.trim();var preview=form.querySelector('.preview-box');var emoji=form.querySelector('[name="icon"]').value.trim()||'📦';if(url){preview.innerHTML='<img src="'+url+'" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+emoji+'\'" />'}else{preview.textContent=emoji}},
+
+            renderVipUsers:async function(container){var self=this;var users=await DB.getUsersFromCloud();this._allUsers=users;var html='<h2 class="page-title">👑 会员管理</h2><p class="page-sub">管理注册用户和VIP权限</p>';html+='<div class="toolbar">';html+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="vipSearch" placeholder="搜索用户名或用户ID..." /></div>';html+='<select class="filter-select" id="vipFilter"><option value="all">全部用户</option><option value="vip">VIP会员</option><option value="normal">普通用户</option></select>';html+='<button class="btn btn-sm btn-outline" id="vipRefresh">⟳ 刷新</button>';html+='</div>';html+='<div class="table-wrap"><table><thead><tr><th>用户ID</th><th>用户名</th><th>注册时间</th><th>VIP状态</th><th>到期时间</th><th style="width:220px;">操作</th></tr></thead><tbody id="vipTableBody">';html+='</tbody></table></div>';container.innerHTML=html;this._tabCache['vipusers']=html;this._bindVipUsersEvents(container);this._renderVipTable(container)},
+
+            _renderVipTable:function(container){var self=this;var users=this._allUsers||[];var searchInput=container.querySelector('#vipSearch');var filterSelect=container.querySelector('#vipFilter');var kw=searchInput?searchInput.value.toLowerCase().trim():'';var filter=filterSelect?filterSelect.value:'all';var filtered=users.filter(function(u){var matchKw=u.username.toLowerCase().includes(kw)||(u.user_code||'').toLowerCase().includes(kw);var matchFilter=filter==='all'||(filter==='vip'&&u.vip_status)||(filter==='normal'&&!u.vip_status);return matchKw&&matchFilter});var tbody=container.querySelector('#vipTableBody');if(!tbody)return;if(filtered.length===0){tbody.innerHTML='<tr class="empty-row"><td colspan="6">暂无匹配用户</td></tr>';return}var html='';for(var i=0;i<filtered.length;i++){var u=filtered[i];var isVip=!!u.vip_status;var expire=u.vip_expire?formatDate(u.vip_expire):'-';var statusBadge=isVip?'<span class="badge badge-green">✅ VIP</span>':'<span class="badge badge-dim">普通用户</span>';var expireDate=u.vip_expire?new Date(u.vip_expire):null;var now=new Date();var daysLeft=expireDate?Math.ceil((expireDate-now)/(1000*60*60*24)):0;if(isVip&&expireDate&&daysLeft<0){statusBadge='<span class="badge badge-danger">⚠️ 已过期</span>'}html+='<tr data-id="'+u.id+'">';html+='<td><strong style="color:var(--accent-cyan);font-family:monospace;">'+(u.user_code||'-')+'</strong></td>';html+='<td>'+u.username+'</td>';html+='<td>'+formatDate(u.created_at)+'</td>';html+='<td>'+statusBadge+'</td>';html+='<td>'+expire+'</td>';html+='<td><div class="actions"><button class="edit-btn vip-set-btn" data-id="'+u.id+'" data-username="'+u.username+'" data-code="'+(u.user_code||'')+'" data-vip="'+u.vip_status+'" data-expire="'+(u.vip_expire||'')+'">设置VIP</button></div></td>';html+='</tr>'}tbody.innerHTML=html;tbody.querySelectorAll('.vip-set-btn').forEach(function(btn){btn.addEventListener('click',function(){var id=this.dataset.id;var username=this.dataset.username;var code=this.dataset.code;var vip=this.dataset.vip==='true';var expire=this.dataset.expire||'';App._openVipModal(id,username,code,vip,expire)})})},
+
+            _openVipModal:function(id,username,code,isVip,expire){this._vipEditingUser={id:id,username:username,code:code,isVip:isVip,expire:expire};var modal=document.getElementById('vipModal');var title=document.getElementById('vipModalTitle');title.textContent='👑 设置VIP · '+username+' ('+code+')';var body=document.getElementById('vipModalBody');var today=new Date().toISOString().slice(0,10);var expireVal=expire||'';body.innerHTML='<div class="detail-row"><div class="label">用户ID</div><div class="value"><strong style="color:var(--accent-cyan);font-family:monospace;">'+code+'</strong></div></div><div class="detail-row"><div class="label">用户名</div><div class="value">'+username+'</div></div><div class="detail-row"><div class="label">当前状态</div><div class="value">'+(isVip?'<span class="badge badge-green">✅ VIP</span>':'<span class="badge badge-dim">普通用户</span>')+'</div></div><div style="margin-top:14px;"><div class="form-group"><label><input type="checkbox" id="vipEnable" '+(isVip?'checked':'')+' /> 开通VIP权限</label></div></div><div class="form-group"><label>VIP到期时间</label><input type="date" id="vipExpire" value="'+expireVal+'" min="'+today+'" /></div><div style="font-size:0.75rem;color:var(--text-dim);margin-top:4px;">留空表示永久有效</div>';modal.classList.remove('hidden');document.getElementById('vipModalSave').onclick=function(){App._saveVipSettings()}},
+
+            _saveVipSettings:function(){var user=this._vipEditingUser;if(!user){toast('操作异常，请重试','error');return}var enable=document.getElementById('vipEnable').checked;var expire=document.getElementById('vipExpire').value;var updates={vip_status:enable};if(expire){updates.vip_expire=expire+'T23:59:59.000Z'}else{updates.vip_expire=null}DB.updateUserInCloud(user.id,updates).then(function(){DB.addLog('设置VIP','用户 '+user.username+' ('+user.code+') VIP状态: '+(enable?'开通':'取消')+(expire?' 到期: '+expire:''));toast('VIP设置已保存','success');document.getElementById('vipModal').classList.add('hidden');DB.invalidateCache();DB.getUsersFromCloud(true).then(function(users){App._allUsers=users;if(App._currentAdminTab==='vipusers'){var main=document.getElementById('adminMain');App.renderVipUsers(main)}})}).catch(function(e){toast('保存失败: '+e.message,'error')})},
+
+            renderUsers:function(container){var users=DB.get('users')||[];var currentUser=sessionStorage.getItem('lezhe_admin_user')||'admin';var html='<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理后台账号</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="newUsername" placeholder="新用户名" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:120px;color:var(--text-primary);min-height:44px;" /><input type="password" id="newPassword" placeholder="密码 (至少4位)" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:120px;color:var(--text-primary);min-height:44px;" /><button class="btn btn-sm btn-primary" id="addUserBtn">⊕ 添加用户</button></div><div class="table-wrap"><table><thead><tr><th>用户名</th><th>角色</th><th style="width:120px;">操作</th></tr></thead><tbody>';if(users.length===0){html+='<tr class="empty-row"><td colspan="3">暂无用户</td></tr>'}else{for(var i=0;i<users.length;i++){var u=users[i];var isSelf=u.username===currentUser;html+='<tr><td>'+u.username+(isSelf?' <span class="badge badge-green">当前</span>':'')+'</td><td>管理员</td><td>';if(!isSelf){html+='<button class="del-btn" data-user="'+u.username+'" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.1);min-height:30px;">删除</button>'}else{html+='<span style="color:var(--text-dim);font-size:0.7rem;">不可删除</span>'}html+='</td></tr>'}}html+='</tbody></table></div>';container.innerHTML=html;this._tabCache['users']=html;this._bindUsersEvents(container)},
+
+            renderSettings:function(container){var currentUser=sessionStorage.getItem('lezhe_admin_user')||'admin';var logs=DB.getLogs();var html='<h2 class="page-title">⚙ 系统设置</h2><p class="page-sub">管理配置与操作日志</p>';html+='<div class="card" style="padding:24px 28px;margin-bottom:20px;"><h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;">🔑 修改密码</h3><form id="changePwdForm"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;"><input type="password" id="oldPwd" placeholder="当前密码" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:44px;" /><input type="password" id="newPwd" placeholder="新密码 (至少4位)" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:44px;" /><input type="password" id="confirmPwd" placeholder="确认新密码" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:44px;" /></div><button type="submit" class="btn btn-sm btn-primary">更新密码</button></form></div>';html+='<div class="card" style="padding:24px 28px;"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;"><h3 style="font-size:1rem;font-weight:600;">📋 操作日志 ('+logs.length+')</h3><div><button class="btn btn-xs btn-outline" id="clearLogsBtn">清空日志</button></div></div>';if(logs.length===0){html+='<div style="color:var(--text-dim);text-align:center;padding:20px 0;">暂无操作记录</div>'}else{html+='<div style="max-height:300px;overflow-y:auto;font-size:0.8rem;"><table style="width:100%;border-collapse:collapse;">';html+='<thead><tr><th style="text-align:left;padding:4px 8px;color:var(--text-secondary);font-weight:600;">时间</th><th style="text-align:left;padding:4px 8px;color:var(--text-secondary);font-weight:600;">用户</th><th style="text-align:left;padding:4px 8px;color:var(--text-secondary);font-weight:600;">操作</th><th style="text-align:left;padding:4px 8px;color:var(--text-secondary);font-weight:600;">详情</th></tr></thead><tbody>';for(var i=0;i<Math.min(logs.length,100);i++){var log=logs[i];html+='<tr><td style="padding:4px 8px;white-space:nowrap;">'+formatDate(log.time)+'</td><td style="padding:4px 8px;">'+log.user+'</td><td style="padding:4px 8px;">'+log.action+'</td><td style="padding:4px 8px;color:var(--text-secondary);">'+log.detail+'</td></tr>'}html+='</tbody></table></div>'}html+='</div>';container.innerHTML=html;this._tabCache['settings']=html;this._bindSettingsEvents(container)},
+
+            showDetail:function(soft){var modal=document.getElementById('detailModal');var title=document.getElementById('detailTitle');var body=document.getElementById('detailBody');title.textContent='📄 '+soft.name;var platforms=soft.platforms||[];var platformStr=getPlatformLabels(platforms);body.innerHTML='<div class="detail-row"><div class="label">图标</div><div class="value"><span class="icon-thumb">'+renderIconThumb(soft)+'</span></div></div><div class="detail-row"><div class="label">名称</div><div class="value">'+soft.name+'</div></div><div class="detail-row"><div class="label">分类</div><div class="value">'+soft.category+'</div></div><div class="detail-row"><div class="label">版本</div><div class="value">v'+soft.version+'</div></div><div class="detail-row"><div class="label">平台</div><div class="value">'+platformStr+'</div></div><div class="detail-row"><div class="label">大小</div><div class="value">'+(soft.size||'-')+'</div></div><div class="detail-row"><div class="label">下载</div><div class="value">'+(soft.downloads||0)+' 次</div></div><div class="detail-row"><div class="label">浏览</div><div class="value">'+(soft.views||0)+' 次</div></div><div class="detail-row"><div class="label">推荐</div><div class="value">'+(soft.recommend?'✅ 是':'❌ 否')+'</div></div><div class="detail-row"><div class="label">简介</div><div class="value">'+(soft.description||'-')+'</div></div><div class="detail-row"><div class="label">详情</div><div class="value">'+(soft.detail||'-')+'</div></div><div class="detail-row"><div class="label">下载链接</div><div class="value">'+(soft.download_url?'<a href="'+soft.download_url+'" target="_blank" style="color:var(--accent-cyan);word-break:break-all;">'+soft.download_url+'</a>':'-')+'</div></div><div class="detail-row"><div class="label">创建时间</div><div class="value">'+(soft.created_at?formatDate(soft.created_at):soft.date||'-')+'</div></div><div class="detail-row"><div class="label">ID</div><div class="value" style="font-size:0.7rem;color:var(--text-dim);">'+soft.id+'</div></div>';modal.classList.remove('hidden')}
+        };
+
+        document.addEventListener('DOMContentLoaded',function(){App.init()});
+        window.__APP=App;window.__DB=DB;
+    </script>
 </body>
 </html>
