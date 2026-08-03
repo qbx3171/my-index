@@ -8,10 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<!-- 使用更稳定的 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
-/* 样式不变，省略（与之前完全一致） */
 :root{--bg-primary:#f0f4fa;--bg-secondary:#e6ecf5;--bg-card:rgba(255,255,255,0.72);--bg-card-solid:#ffffff;--border-glow:rgba(0,120,255,0.18);--border-glow-strong:rgba(0,120,255,0.35);--text-primary:#0f1a2e;--text-secondary:#3d5068;--text-dim:#7a8ca3;--accent-cyan:#0077ff;--accent-blue:#0055cc;--accent-purple:#6c5ce7;--accent-gradient:linear-gradient(135deg,#0077ff,#6c5ce7);--shadow-card:0 8px 32px rgba(0,20,40,0.08);--radius-lg:20px;--radius-md:12px;--radius-sm:8px;--transition:0.3s cubic-bezier(0.2,0,0,1);--font:'Inter',-apple-system,sans-serif;--max-width:860px;--header-height:64px;--success:#27ae60;--danger:#e74c3c;--warning:#f39c12}
 [data-theme="dark"]{--bg-primary:#0f172a;--bg-secondary:#1e293b;--bg-card:rgba(30,41,59,0.75);--bg-card-solid:#1e293b;--border-glow:rgba(99,160,255,0.12);--border-glow-strong:rgba(99,160,255,0.25);--text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-dim:#64748b;--shadow-card:0 8px 32px rgba(0,0,0,0.25)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -123,49 +121,16 @@ input{font-family:inherit;border:none;outline:none;background:none;color:var(--t
 <p>享受高速下载、无限制访问等专属特权</p>
 </div>
 <div class="price-grid">
-<div class="price-card free">
-<div class="plan-name">普通用户</div>
-<div class="plan-price"><span class="currency">¥</span>0</div>
-<div class="plan-duration">无限时</div>
-<div class="plan-features"><span>📦 网盘下载</span><span>📄 每日 3 次</span></div>
-<button class="btn-buy" disabled>当前</button>
-</div>
-<div class="price-card recommended">
-<span class="badge-rec">推荐</span>
-<div class="plan-name">月付会员</div>
-<div class="plan-price"><span class="currency">¥</span>10</div>
-<div class="plan-duration">一个月</div>
-<div class="plan-features"><span>⚡ 高速下载</span><span>📄 无限次数</span><span>🚀 优先体验</span></div>
-<button class="btn-buy" data-plan="month">立即开通</button>
-</div>
-<div class="price-card">
-<div class="plan-name">季付会员</div>
-<div class="plan-price"><span class="currency">¥</span>25</div>
-<div class="plan-duration">三个月</div>
-<div class="plan-features"><span>⚡ 高速下载</span><span>📄 无限次数</span><span>🚀 优先体验</span><span>🎁 赠送 7 天</span></div>
-<button class="btn-buy" data-plan="season">立即开通</button>
-</div>
-<div class="price-card">
-<div class="plan-name">年付会员</div>
-<div class="plan-price"><span class="currency">¥</span>90</div>
-<div class="plan-duration">一年</div>
-<div class="plan-features"><span>⚡ 高速下载</span><span>📄 无限次数</span><span>🚀 优先体验</span><span>🎁 赠送 30 天</span><span>👑 专属标识</span></div>
-<button class="btn-buy" data-plan="year">立即开通</button>
-</div>
+<div class="price-card free"><div class="plan-name">普通用户</div><div class="plan-price"><span class="currency">¥</span>0</div><div class="plan-duration">无限时</div><div class="plan-features"><span>📦 网盘下载</span><span>📄 每日 3 次</span></div><button class="btn-buy" disabled>当前</button></div>
+<div class="price-card recommended"><span class="badge-rec">推荐</span><div class="plan-name">月付会员</div><div class="plan-price"><span class="currency">¥</span>10</div><div class="plan-duration">一个月</div><div class="plan-features"><span>⚡ 高速下载</span><span>📄 无限次数</span><span>🚀 优先体验</span></div><button class="btn-buy" data-plan="month">立即开通</button></div>
+<div class="price-card"><div class="plan-name">季付会员</div><div class="plan-price"><span class="currency">¥</span>25</div><div class="plan-duration">三个月</div><div class="plan-features"><span>⚡ 高速下载</span><span>📄 无限次数</span><span>🚀 优先体验</span><span>🎁 赠送 7 天</span></div><button class="btn-buy" data-plan="season">立即开通</button></div>
+<div class="price-card"><div class="plan-name">年付会员</div><div class="plan-price"><span class="currency">¥</span>90</div><div class="plan-duration">一年</div><div class="plan-features"><span>⚡ 高速下载</span><span>📄 无限次数</span><span>🚀 优先体验</span><span>🎁 赠送 30 天</span><span>👑 专属标识</span></div><button class="btn-buy" data-plan="year">立即开通</button></div>
 </div>
 <div class="section-card">
 <h3><i class="fas fa-cloud-download-alt"></i> 下载方式</h3>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:6px 0 4px;">
-<div style="background:var(--bg-primary);border-radius:var(--radius-sm);padding:14px 16px;text-align:center;border:1px solid var(--border-glow);">
-<div style="font-size:2rem;margin-bottom:4px;">☁️</div>
-<div style="font-weight:600;font-size:0.85rem;color:var(--text-primary);">百度网盘</div>
-<div style="font-size:0.7rem;color:var(--text-dim);">免费用户</div>
-</div>
-<div style="background:var(--bg-primary);border-radius:var(--radius-sm);padding:14px 16px;text-align:center;border:1px solid var(--accent-cyan);box-shadow:0 0 0 1px var(--accent-cyan);">
-<div style="font-size:2rem;margin-bottom:4px;">⚡</div>
-<div style="font-weight:600;font-size:0.85rem;color:var(--accent-cyan);">不限速网盘</div>
-<div style="font-size:0.7rem;color:var(--text-dim);">VIP 专属</div>
-</div>
+<div style="background:var(--bg-primary);border-radius:var(--radius-sm);padding:14px 16px;text-align:center;border:1px solid var(--border-glow);"><div style="font-size:2rem;margin-bottom:4px;">☁️</div><div style="font-weight:600;font-size:0.85rem;color:var(--text-primary);">百度网盘</div><div style="font-size:0.7rem;color:var(--text-dim);">免费用户</div></div>
+<div style="background:var(--bg-primary);border-radius:var(--radius-sm);padding:14px 16px;text-align:center;border:1px solid var(--accent-cyan);box-shadow:0 0 0 1px var(--accent-cyan);"><div style="font-size:2rem;margin-bottom:4px;">⚡</div><div style="font-weight:600;font-size:0.85rem;color:var(--accent-cyan);">不限速网盘</div><div style="font-size:0.7rem;color:var(--text-dim);">VIP 专属</div></div>
 </div>
 </div>
 <div class="section-card">
@@ -195,10 +160,9 @@ input{font-family:inherit;border:none;outline:none;background:none;color:var(--t
 2. 本站VIP为自愿开通，仅仅是开通高速下载权限，不开会员也可以使用网盘下载。<br>
 3. 请勿随意网络传播本站会员下载地址，如果有分享给别人的行为，一经发现，取消会员权限。
 </div>
-<footer style="text-align:center;padding:24px 0 8px;font-size:0.7rem;color:var(--text-dim);border-top:1px solid var(--border-glow);margin-top:12px;">
-&copy; 2026 乐哲软件 &middot; 精选高效工具，赋能创作者
-</footer>
+<footer style="text-align:center;padding:24px 0 8px;font-size:0.7rem;color:var(--text-dim);border-top:1px solid var(--border-glow);margin-top:12px;">&copy; 2026 乐哲软件 &middot; 精选高效工具，赋能创作者</footer>
 </div>
+
 <div class="modal-overlay" id="authModal">
 <div class="modal-box">
 <div class="modal-header">
@@ -236,166 +200,308 @@ input{font-family:inherit;border:none;outline:none;background:none;color:var(--t
 </div>
 </div>
 </div>
-<script>
-(function(){
-var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
-var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 
-// 检查 supabase 是否加载成功
-if (typeof supabase === 'undefined' || !supabase.createClient) {
-    console.error('Supabase SDK 加载失败，请检查网络连接。');
-    // 即使没有 Supabase，弹窗依然可以显示，只是注册登录会失败
-    // 我们定义一个假的 supabase 对象以防止后续代码报错
-    window.supabase = {
-        createClient: function() {
+<script>
+(function() {
+    // -------- 配置 --------
+    var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
+    var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+
+    // -------- 安全初始化 Supabase （不因加载失败而中断）--------
+    var supabaseClient = null;
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (e) {
+            console.warn('Supabase 初始化失败:', e);
+        }
+    } else {
+        console.warn('Supabase SDK 未加载，注册/登录功能将不可用。');
+    }
+
+    // 即使 supabaseClient 为 null，页面上的弹窗和按钮依然可以工作（只是注册登录会失败）
+    // 我们定义一个安全的代理对象，避免后续调用报错
+    var safeSupabase = {
+        from: function() {
             return {
-                from: function() { return { select: function() { return { maybeSingle: function() { return Promise.resolve({ data: null, error: null }); } }; }, insert: function() { return { select: function() { return { single: function() { return Promise.resolve({ data: null, error: { message: 'Supabase not loaded' } }); } }; } }; } };
-            }
+                select: function() {
+                    return {
+                        maybeSingle: function() {
+                            return Promise.resolve({ data: null, error: new Error('Supabase not available') });
+                        }
+                    };
+                },
+                insert: function() {
+                    return {
+                        select: function() {
+                            return {
+                                single: function() {
+                                    return Promise.resolve({ data: null, error: new Error('Supabase not available') });
+                                }
+                            };
+                        }
+                    };
+                },
+                update: function() {
+                    return {
+                        eq: function() {
+                            return Promise.resolve({ error: new Error('Supabase not available') });
+                        }
+                    };
+                },
+                delete: function() {
+                    return {
+                        eq: function() {
+                            return Promise.resolve({ error: new Error('Supabase not available') });
+                        }
+                    };
+                }
+            };
         }
     };
-}
 
-var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-var currentUser = null;
+    var db = supabaseClient || safeSupabase;
 
-function toast(msg,type){type=type||'success';var c=document.getElementById('toastContainer');var el=document.createElement('div');el.className='toast '+type;el.innerHTML='<span class="icon">'+(type==='success'?'◆':'✕')+'</span> '+msg;c.appendChild(el);setTimeout(function(){el.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){el.remove()},500)},2800);}
+    // -------- 工具函数 --------
+    function toast(msg, type) {
+        type = type || 'success';
+        var c = document.getElementById('toastContainer');
+        var el = document.createElement('div');
+        el.className = 'toast ' + type;
+        el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : '✕') + '</span> ' + msg;
+        c.appendChild(el);
+        setTimeout(function() {
+            el.style.animation = 'toastOut 0.4s ease forwards';
+            setTimeout(function() { el.remove(); }, 500);
+        }, 2800);
+    }
 
-function hashPwd(p){var h=0;for(var i=0;i<p.length;i++){var c=p.charCodeAt(i);h=((h<<5)-h)+c;h=h&h;}return h.toString(16);}
+    function hashPwd(p) {
+        var h = 0;
+        for (var i = 0; i < p.length; i++) {
+            var c = p.charCodeAt(i);
+            h = ((h << 5) - h) + c;
+            h = h & h;
+        }
+        return h.toString(16);
+    }
 
-function generateUserCode(){var num=Math.floor(10000+Math.random()*90000);return 'U'+num;}
+    function generateUserCode() {
+        var num = Math.floor(10000 + Math.random() * 90000);
+        return 'U' + num;
+    }
 
-async function checkUsernameExists(username){var {data,error}=await supabaseClient.from('users').select('id').eq('username',username).maybeSingle();return !!data;}
+    // -------- 用户相关函数 --------
+    var currentUser = null;
 
-async function registerUser(){
-var username=document.getElementById('regUsername').value.trim();
-var password=document.getElementById('regPassword').value;
-var confirm=document.getElementById('regConfirm').value;
-var errEl=document.getElementById('regError');
-var sucEl=document.getElementById('regSuccess');
-errEl.textContent='';sucEl.textContent='';
-if(username.length<4||username.length>16){errEl.textContent='用户名需4-16位';return;}
-if(!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(username)){errEl.textContent='用户名仅支持字母、数字、下划线、中文';return;}
-if(password.length<6){errEl.textContent='密码至少6位';return;}
-if(password!==confirm){errEl.textContent='两次密码不一致';return;}
-var exists=await checkUsernameExists(username);
-if(exists){errEl.textContent='用户名已被注册';return;}
-var userCode=generateUserCode();
-var {data,error}=await supabaseClient.from('users').insert({username:username,password:hashPwd(password),user_code:userCode,vip_status:false,vip_expire:null}).select().single();
-if(error){errEl.textContent='注册失败：'+error.message;return;}
-sucEl.textContent='注册成功！';
-toast('注册成功，欢迎 '+username,'success');
-setTimeout(function(){sucEl.textContent='';document.querySelector('[data-tab="login"]').click();document.getElementById('loginUsername').value=username;document.getElementById('loginPassword').value='';},1500);
-}
+    async function checkUsernameExists(username) {
+        if (!db.from) return false;
+        var { data, error } = await db.from('users').select('id').eq('username', username).maybeSingle();
+        return !!data;
+    }
 
-async function loginUser(){
-var username=document.getElementById('loginUsername').value.trim();
-var password=document.getElementById('loginPassword').value;
-var errEl=document.getElementById('loginError');
-errEl.textContent='';
-if(!username||!password){errEl.textContent='请填写用户名和密码';return;}
-var {data,error}=await supabaseClient.from('users').select('*').eq('username',username).maybeSingle();
-if(error||!data){errEl.textContent='用户名或密码错误';return;}
-if(data.password!==hashPwd(password)){errEl.textContent='用户名或密码错误';return;}
-currentUser=data;
-showUserInfo(data);
-toast('欢迎回来，'+data.username,'success');
-document.getElementById('authModal').classList.remove('active');
-}
+    async function registerUser() {
+        var username = document.getElementById('regUsername').value.trim();
+        var password = document.getElementById('regPassword').value;
+        var confirm = document.getElementById('regConfirm').value;
+        var errEl = document.getElementById('regError');
+        var sucEl = document.getElementById('regSuccess');
+        errEl.textContent = '';
+        sucEl.textContent = '';
 
-function showUserInfo(user){
-document.getElementById('loginForm').style.display='none';
-document.getElementById('registerForm').style.display='none';
-document.getElementById('userInfo').style.display='block';
-document.getElementById('modalTitle').textContent='👤 我的信息';
-document.getElementById('userCode').textContent=user.user_code;
-var statusEl=document.getElementById('vipStatusDisplay');
-if(user.vip_status){
-var expireDate=user.vip_expire?new Date(user.vip_expire):null;
-var now=new Date();
-var daysLeft=expireDate?Math.ceil((expireDate-now)/(1000*60*60*24)):0;
-if(daysLeft>0){
-statusEl.className='vip-status active';
-statusEl.innerHTML='<i class="fas fa-crown"></i> ✅ VIP会员 · 剩余 '+daysLeft+' 天';
-}else if(expireDate&&daysLeft<=0){
-statusEl.className='vip-status inactive';
-statusEl.innerHTML='<i class="fas fa-crown"></i> ⚠️ VIP已过期，请联系客服续费';
-}else{
-statusEl.className='vip-status active';
-statusEl.innerHTML='<i class="fas fa-crown"></i> ✅ VIP会员（永久）';
-}
-}else{
-statusEl.className='vip-status inactive';
-statusEl.innerHTML='<i class="fas fa-user"></i> 当前状态：普通用户';
-}
-}
+        if (username.length < 4 || username.length > 16) { errEl.textContent = '用户名需4-16位'; return; }
+        if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(username)) { errEl.textContent = '用户名仅支持字母、数字、下划线、中文'; return; }
+        if (password.length < 6) { errEl.textContent = '密码至少6位'; return; }
+        if (password !== confirm) { errEl.textContent = '两次密码不一致'; return; }
 
-function showLoginForm(){
-document.getElementById('loginForm').style.display='block';
-document.getElementById('registerForm').style.display='none';
-document.getElementById('userInfo').style.display='none';
-document.getElementById('modalTitle').textContent='✦ 登录';
-document.getElementById('loginError').textContent='';
-}
+        var exists = await checkUsernameExists(username);
+        if (exists) { errEl.textContent = '用户名已被注册'; return; }
 
-function showRegisterForm(){
-document.getElementById('loginForm').style.display='none';
-document.getElementById('registerForm').style.display='block';
-document.getElementById('userInfo').style.display='none';
-document.getElementById('modalTitle').textContent='✦ 注册';
-document.getElementById('regError').textContent='';
-document.getElementById('regSuccess').textContent='';
-}
+        var userCode = generateUserCode();
+        var { data, error } = await db.from('users').insert({
+            username: username,
+            password: hashPwd(password),
+            user_code: userCode,
+            vip_status: false,
+            vip_expire: null
+        }).select().single();
 
-document.addEventListener('DOMContentLoaded',function(){
-var theme=localStorage.getItem('theme')||'light';
-document.documentElement.setAttribute('data-theme',theme);
-document.getElementById('themeBtn').innerHTML=theme==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
-document.getElementById('themeBtn').addEventListener('click',function(){
-var t=document.documentElement.getAttribute('data-theme');
-var n=t==='dark'?'light':'dark';
-document.documentElement.setAttribute('data-theme',n);
-localStorage.setItem('theme',n);
-this.innerHTML=n==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
-});
+        if (error) {
+            errEl.textContent = '注册失败：' + error.message;
+            return;
+        }
+        sucEl.textContent = '注册成功！';
+        toast('注册成功，欢迎 ' + username, 'success');
+        setTimeout(function() {
+            sucEl.textContent = '';
+            document.querySelector('[data-tab="login"]').click();
+            document.getElementById('loginUsername').value = username;
+            document.getElementById('loginPassword').value = '';
+        }, 1500);
+    }
 
-document.querySelectorAll('.btn-buy[data-plan]').forEach(function(btn){
-btn.addEventListener('click',function(){
-if(this.disabled)return;
-document.getElementById('authModal').classList.add('active');
-showLoginForm();
-});
-});
+    async function loginUser() {
+        var username = document.getElementById('loginUsername').value.trim();
+        var password = document.getElementById('loginPassword').value;
+        var errEl = document.getElementById('loginError');
+        errEl.textContent = '';
 
-document.getElementById('modalClose').addEventListener('click',function(){document.getElementById('authModal').classList.remove('active');});
-document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
-document.querySelectorAll('.tabs button').forEach(function(btn){
-btn.addEventListener('click',function(){
-document.querySelectorAll('.tabs button').forEach(function(b){b.classList.remove('active');});
-this.classList.add('active');
-if(this.dataset.tab==='login')showLoginForm(); else showRegisterForm();
-});
-});
-document.getElementById('loginBtn').addEventListener('click',loginUser);
-document.getElementById('registerBtn').addEventListener('click',registerUser);
-document.getElementById('loginPassword').addEventListener('keydown',function(e){if(e.key==='Enter')loginUser();});
-document.getElementById('regConfirm').addEventListener('keydown',function(e){if(e.key==='Enter')registerUser();});
-document.getElementById('logoutBtn').addEventListener('click',function(){
-sessionStorage.removeItem('lezhe_vip_user');
-currentUser=null;
-document.getElementById('userInfo').style.display='none';
-document.getElementById('modalTitle').textContent='✦ 登录';
-showLoginForm();
-toast('已退出登录','success');
-});
+        if (!username || !password) { errEl.textContent = '请填写用户名和密码'; return; }
 
-var savedUser=sessionStorage.getItem('lezhe_vip_user');
-if(savedUser){
-try{var u=JSON.parse(savedUser);currentUser=u;var now=new Date();if(u.vip_expire){var exp=new Date(u.vip_expire);if(exp>now||!u.vip_expire){showUserInfo(u);}}else if(u.vip_status){showUserInfo(u);}}catch(e){}
-}
+        var { data, error } = await db.from('users').select('*').eq('username', username).maybeSingle();
+        if (error || !data) { errEl.textContent = '用户名或密码错误'; return; }
+        if (data.password !== hashPwd(password)) { errEl.textContent = '用户名或密码错误'; return; }
 
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.getElementById('authModal').classList.remove('active');}});
-document.querySelector('.back-link').addEventListener('click',function(e){e.preventDefault();window.history.back();});
-});
+        currentUser = data;
+        showUserInfo(data);
+        toast('欢迎回来，' + data.username, 'success');
+        document.getElementById('authModal').classList.remove('active');
+    }
+
+    function showUserInfo(user) {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'block';
+        document.getElementById('modalTitle').textContent = '👤 我的信息';
+        document.getElementById('userCode').textContent = user.user_code;
+
+        var statusEl = document.getElementById('vipStatusDisplay');
+        if (user.vip_status) {
+            var expireDate = user.vip_expire ? new Date(user.vip_expire) : null;
+            var now = new Date();
+            var daysLeft = expireDate ? Math.ceil((expireDate - now) / (1000 * 60 * 60 * 24)) : 0;
+            if (daysLeft > 0) {
+                statusEl.className = 'vip-status active';
+                statusEl.innerHTML = '<i class="fas fa-crown"></i> ✅ VIP会员 · 剩余 ' + daysLeft + ' 天';
+            } else if (expireDate && daysLeft <= 0) {
+                statusEl.className = 'vip-status inactive';
+                statusEl.innerHTML = '<i class="fas fa-crown"></i> ⚠️ VIP已过期，请联系客服续费';
+            } else {
+                statusEl.className = 'vip-status active';
+                statusEl.innerHTML = '<i class="fas fa-crown"></i> ✅ VIP会员（永久）';
+            }
+        } else {
+            statusEl.className = 'vip-status inactive';
+            statusEl.innerHTML = '<i class="fas fa-user"></i> 当前状态：普通用户';
+        }
+    }
+
+    function showLoginForm() {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'none';
+        document.getElementById('modalTitle').textContent = '✦ 登录';
+        document.getElementById('loginError').textContent = '';
+    }
+
+    function showRegisterForm() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('userInfo').style.display = 'none';
+        document.getElementById('modalTitle').textContent = '✦ 注册';
+        document.getElementById('regError').textContent = '';
+        document.getElementById('regSuccess').textContent = '';
+    }
+
+    // -------- 页面初始化 --------
+    document.addEventListener('DOMContentLoaded', function() {
+        // 主题
+        var theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        var themeBtn = document.getElementById('themeBtn');
+        themeBtn.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        themeBtn.addEventListener('click', function() {
+            var t = document.documentElement.getAttribute('data-theme');
+            var n = t === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', n);
+            localStorage.setItem('theme', n);
+            this.innerHTML = n === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // 所有“立即开通”按钮绑定弹窗
+        document.querySelectorAll('.btn-buy[data-plan]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (this.disabled) return;
+                // 强制显示登录弹窗（无任何前置检查）
+                document.getElementById('authModal').classList.add('active');
+                showLoginForm();
+            });
+        });
+
+        // 关闭弹窗
+        document.getElementById('modalClose').addEventListener('click', function() {
+            document.getElementById('authModal').classList.remove('active');
+        });
+        document.getElementById('authModal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('active');
+        });
+
+        // Tab 切换
+        document.querySelectorAll('.tabs button').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                if (this.dataset.tab === 'login') showLoginForm();
+                else showRegisterForm();
+            });
+        });
+
+        // 登录和注册按钮
+        document.getElementById('loginBtn').addEventListener('click', loginUser);
+        document.getElementById('registerBtn').addEventListener('click', registerUser);
+
+        // 回车提交
+        document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') loginUser();
+        });
+        document.getElementById('regConfirm').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') registerUser();
+        });
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            sessionStorage.removeItem('lezhe_vip_user');
+            currentUser = null;
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('modalTitle').textContent = '✦ 登录';
+            showLoginForm();
+            toast('已退出登录', 'success');
+        });
+
+        // 恢复已登录状态
+        var savedUser = sessionStorage.getItem('lezhe_vip_user');
+        if (savedUser) {
+            try {
+                var u = JSON.parse(savedUser);
+                currentUser = u;
+                var now = new Date();
+                if (u.vip_expire) {
+                    var exp = new Date(u.vip_expire);
+                    if (exp > now || !u.vip_expire) {
+                        showUserInfo(u);
+                    }
+                } else if (u.vip_status) {
+                    showUserInfo(u);
+                }
+            } catch (e) {}
+        }
+
+        // ESC键关闭
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('authModal').classList.remove('active');
+            }
+        });
+
+        // 返回首页（保留原有历史）
+        document.querySelector('.back-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.history.back();
+        });
+    });
+
+    // 暴露登录状态供其他页面使用（可选）
+    window.__vipUser = currentUser;
 })();
 </script>
 </body>
