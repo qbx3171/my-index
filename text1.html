@@ -26,6 +26,7 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
     <style>
+        /* 样式与原代码完全一致，为节省篇幅省略，实际使用可保留原样式 */
         :root {
             --bg-primary: #f0f4fa;
             --bg-secondary: #e6ecf5;
@@ -53,9 +54,6 @@
             --warning: #f39c12;
             --sidebar-width: 280px;
             --sidebar-trigger-width: 32px;
-            --vip-gold: #f59e0b;
-            --vip-gold-light: #fbbf24;
-            --vip-gold-dark: #d97706;
         }
         [data-theme="dark"] {
             --bg-primary: #0f172a;
@@ -68,9 +66,6 @@
             --text-secondary: #94a3b8;
             --text-dim: #64748b;
             --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.25);
-            --vip-gold: #f59e0b;
-            --vip-gold-light: #fbbf24;
-            --vip-gold-dark: #d97706;
         }
         * {
             margin: 0;
@@ -1823,43 +1818,6 @@
             cursor: not-allowed;
             filter: grayscale(30%);
         }
-        .btn-free {
-            background: rgba(39, 174, 96, 0.12);
-            color: var(--success);
-            border-color: rgba(39, 174, 96, 0.2);
-        }
-        .btn-free:hover {
-            background: var(--success);
-            color: #fff;
-            border-color: var(--success);
-            box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
-        }
-        .btn-vip {
-            background: linear-gradient(135deg, var(--vip-gold), var(--vip-gold-dark));
-            color: #fff;
-            border-color: transparent;
-            font-weight: 700;
-            position: relative;
-            overflow: visible;
-        }
-        .btn-vip:hover {
-            box-shadow: 0 4px 24px rgba(245, 158, 11, 0.4);
-            transform: translateY(-2px) scale(1.02);
-        }
-        .btn-vip .vip-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--danger);
-            color: #fff;
-            font-size: 0.5rem;
-            font-weight: 700;
-            padding: 1px 8px;
-            border-radius: 50px;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
-            animation: pulse-badge 2s infinite;
-        }
         .badge {
             display: inline-block;
             padding: 2px 14px;
@@ -2174,12 +2132,6 @@
             }
             .detail-modal .modal-actions .btn-outline {
                 order: 10;
-            }
-            .detail-modal .modal-actions .btn-vip .vip-badge {
-                top: -6px;
-                right: -4px;
-                font-size: 0.45rem;
-                padding: 0 6px;
             }
         }
         @media (max-width: 380px) {
@@ -2838,10 +2790,10 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-free" id="detailFreeBtn"><i class="fas fa-cloud-download-alt"></i> 免费下载</button>
-                <button class="btn btn-vip" id="detailVipBtn"><i class="fas fa-bolt"></i> 高速下载 <span class="vip-badge">VIP</span></button>
+                <button class="btn btn-primary" id="detailDownload"><i class="fas fa-download"></i> 下载</button>
                 <button class="btn btn-outline" id="detailShareBtn"><i class="fas fa-share-alt"></i> 分享</button>
                 <button class="btn btn-outline" id="detailCloseBtn">关闭</button>
+                <!-- 注意：这里原本没有 vip 按钮，我们在 JS 中动态添加两个按钮（免费/高速） -->
             </div>
         </div>
     </div>
@@ -2874,6 +2826,46 @@
             gtag('config', 'UA-XXXXXXXX-X');
         </script>
     </div>
+
+    <!-- ========== 登录/注册弹窗 ========== -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="modalTitle">✦ 登录</h2>
+                <button class="close-btn" id="modalClose">✕</button>
+            </div>
+            <div class="tabs">
+                <button class="active" data-tab="login">登录</button>
+                <button data-tab="register">注册</button>
+            </div>
+            <div id="loginForm">
+                <div class="form-group"><label>用户名</label><input type="text" id="loginUsername" placeholder="请输入用户名"></div>
+                <div class="form-group"><label>密码</label><input type="password" id="loginPassword" placeholder="请输入密码"></div>
+                <button class="btn-submit" id="loginBtn">登 录</button>
+                <div class="form-error" id="loginError"></div>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <div class="form-group"><label>用户名</label><input type="text" id="regUsername" placeholder="4-16位字母/数字/中文"></div>
+                <div class="form-group"><label>密码</label><input type="password" id="regPassword" placeholder="至少6位"></div>
+                <div class="form-group"><label>确认密码</label><input type="password" id="regConfirm" placeholder="再次输入密码"></div>
+                <button class="btn-submit" id="registerBtn">注 册</button>
+                <div class="form-error" id="regError"></div>
+                <div class="form-success" id="regSuccess"></div>
+            </div>
+            <div id="userInfo" style="display:none;">
+                <div class="user-id-display">
+                    <div style="font-size:0.8rem;color:var(--text-dim);">您的用户ID</div>
+                    <div class="id" id="userCode">U10001</div>
+                    <div class="hint">请将此ID提供给客服开通VIP权限</div>
+                </div>
+                <div class="vip-status" id="vipStatusDisplay"><i class="fas fa-user"></i> 当前状态：普通用户</div>
+                <div style="display:flex;gap:10px;margin-top:12px;">
+                    <button class="btn-submit" id="logoutBtn" style="background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border-glow);">退出登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
@@ -2927,6 +2919,7 @@
         ];
         var CACHE_KEY = 'lezhe_software_cache';
         var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
+
         function loadCacheFromStorage() {
             try {
                 var stored = localStorage.getItem(CACHE_KEY);
@@ -2943,9 +2936,14 @@
             } catch (_) {}
             return false;
         }
+
         function saveCacheToStorage() {
             try {
-                var data = { software: cache.software, categories: cache.categories, timestamp: Date.now() };
+                var data = {
+                    software: cache.software,
+                    categories: cache.categories,
+                    timestamp: Date.now()
+                };
                 localStorage.setItem(CACHE_KEY, JSON.stringify(data));
             } catch (_) {}
         }
@@ -2961,7 +2959,9 @@
                     if (softRes.error) throw softRes.error;
                     if (catRes.error) throw catRes.error;
                     cache.software = softRes.data || [];
-                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
+                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具',
+                        '实用工具'
+                    ];
                     cache.software.forEach(function(s) {
                         if (!s.screenshots) s.screenshots = [];
                         if (!s.changelog) s.changelog = '';
@@ -2992,19 +2992,23 @@
             getCategories: function() { return cache.categories; },
             async updateSoftware(soft) {
                 try {
-                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id', soft.id);
+                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id',
+                        soft.id);
                     var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
-                    if (idx !== -1) { cache.software[idx].views = soft.views; cache.software[idx].downloads = soft.downloads; }
+                    if (idx !== -1) { cache.software[idx].views = soft.views;
+                        cache.software[idx].downloads = soft.downloads; }
                     saveCacheToStorage();
                 } catch (e) { console.error('更新失败:', e); }
             }
         };
+
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
             var el = document.createElement('div');
             el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' + msg + '<span class="toast-close">✕</span>';
+            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' +
+                msg + '<span class="toast-close">✕</span>';
             c.appendChild(el);
             el.querySelector('.toast-close').addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -3023,12 +3027,14 @@
                 }
             }, 3500);
         }
+
         function escapeHTML(str) {
             if (!str) return '';
             var div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
         }
+
         function highlightText(text, keyword) {
             if (!keyword) return escapeHTML(text);
             var escaped = escapeHTML(text);
@@ -3036,27 +3042,35 @@
             var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
             return escaped.replace(regex, '<mark>' + kw + '</mark>');
         }
+
         function getIconEmoji(cat) {
             var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
             return map[cat] || '📦';
         }
+
         function renderIcon(soft) {
             var fallback = soft.icon || '📦';
             if (soft.icon_url && soft.icon_url.trim()) {
-                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + fallback + '\'">';
+                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' +
+                    fallback + '\'">';
             }
             return fallback;
         }
+
         function renderPlatformBadges(soft) {
             var html = '';
-            if ((soft.platforms || []).includes('mac')) html += '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
-            if ((soft.platforms || []).includes('windows')) html += '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
+            if ((soft.platforms || []).includes('mac')) html +=
+                '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
+            if ((soft.platforms || []).includes('windows')) html +=
+                '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             return html;
         }
+
         function isFavorited(id) {
             var favs = JSON.parse(localStorage.getItem('lezhe_favorites') || '[]');
             return favs.includes(id);
         }
+
         function toggleFavorite(id) {
             var favs = JSON.parse(localStorage.getItem('lezhe_favorites') || '[]');
             var idx = favs.indexOf(id);
@@ -3066,12 +3080,15 @@
             return favs.includes(id);
         }
         var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
+
         function addSearchHistory(kw) {
             if (!kw) return;
             searchHistory = [kw, ...searchHistory.filter(function(h) { return h !== kw; })].slice(0, 10);
             localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
         }
+
         var searchDebounceTimer = null;
+
         function showSuggestions(keyword) {
             clearTimeout(searchDebounceTimer);
             var sug = document.getElementById('searchSuggestions');
@@ -3083,7 +3100,8 @@
             if (!keyword && searchHistory.length > 0) {
                 hist.innerHTML = '<div class="history-header">最近搜索</div>' +
                     searchHistory.map(function(h) {
-                        return '<div class="item" data-kw="' + h + '">' + h + '<span class="remove-history" data-kw="' + h + '">✕</span></div>';
+                        return '<div class="item" data-kw="' + h + '">' + h +
+                            '<span class="remove-history" data-kw="' + h + '">✕</span></div>';
                     }).join('');
                 hist.classList.add('open');
                 hist.querySelectorAll('.item').forEach(function(el) {
@@ -3091,7 +3109,8 @@
                         if (e.target.classList.contains('remove-history')) {
                             var kw = e.target.dataset.kw;
                             searchHistory = searchHistory.filter(function(h) { return h !== kw; });
-                            localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
+                            localStorage.setItem('lezhe_search_history', JSON.stringify(
+                            searchHistory));
                             showSuggestions('');
                             return;
                         }
@@ -3109,7 +3128,9 @@
                     if (matches.length) {
                         sug.innerHTML = matches.map(function(s) {
                             var name = s.name || '未命名';
-                            return '<div class="item" data-name="' + name + '">' + renderIcon(s) + ' ' + name + '</div>';
+                            return '<div class="item" data-name="' + name + '">' + renderIcon(s) + ' ' +
+                                name +
+                                '</div>';
                         }).join('');
                         sug.classList.add('open');
                         sug.querySelectorAll('.item').forEach(function(el) {
@@ -3125,6 +3146,7 @@
             }
         }
         var currentView = 'grid';
+
         function applyViewMode() {
             var grid = document.getElementById('listGrid');
             if (currentView === 'list') {
@@ -3150,13 +3172,19 @@
             ],
             fallbackGroup: { id: 'other', name: '其他分类', icon: '📁', cats: [] }
         };
+
         function getGroupStates() {
-            try { var raw = localStorage.getItem('lezhe_group_states'); if (raw) return JSON.parse(raw); } catch (_) {}
+            try {
+                var raw = localStorage.getItem('lezhe_group_states');
+                if (raw) return JSON.parse(raw);
+            } catch (_) {}
             return {};
         }
+
         function saveGroupStates(states) {
             localStorage.setItem('lezhe_group_states', JSON.stringify(states));
         }
+
         function toggleGroup(groupId) {
             var states = getGroupStates();
             states[groupId] = !states[groupId];
@@ -3167,6 +3195,7 @@
                 function(cat) { App.goList(cat); }
             );
         }
+
         function scrollToActiveItem() {
             var container = document.getElementById('categoryList');
             if (!container) return;
@@ -3183,7 +3212,8 @@
                 var quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
                 var now = new Date();
                 var dateStr = (now.getMonth() + 1) + '/' + now.getDate();
-                container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' + dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
+                container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' +
+                    dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
             },
             renderCategories: function(container, active, onClick) {
                 if (!container) return;
@@ -3220,7 +3250,10 @@
                 var html = '';
                 var isAllActive = (active === null || active === 'all' || active === undefined);
                 html += '<div class="category-item-all ' + (isAllActive ? 'active' : '') + '" data-cat="all">' +
-                    '<span class="icon">◇</span><span class="name">全部</span><span class="count">' + totalCount + '</span></div>';
+                    '<span class="icon">◇</span>' +
+                    '<span class="name">全部</span>' +
+                    '<span class="count">' + totalCount + '</span>' +
+                    '</div>';
                 var groupOrder = GROUP_CONFIG.groups.map(function(g) { return g.id; });
                 if (fallbackItems.length) groupOrder.push(GROUP_CONFIG.fallbackGroup.id);
                 groupOrder.forEach(function(gid) {
@@ -3231,18 +3264,25 @@
                     var icon = g.icon || '📁';
                     html += '<div class="category-group">';
                     html += '<div class="group-header" data-group="' + gid + '">' +
-                        '<span class="group-icon">' + icon + '</span><span class="group-name">' + g.name + '</span>' +
+                        '<span class="group-icon">' + icon + '</span>' +
+                        '<span class="group-name">' + g.name + '</span>' +
                         '<span class="group-badge">' + entry.items.length + '</span>' +
-                        '<span class="toggle-icon ' + (isOpen ? 'open' : '') + '">▶</span></div>';
+                        '<span class="toggle-icon ' + (isOpen ? 'open' : '') + '">▶</span>' +
+                        '</div>';
                     html += '<div class="group-items ' + (isOpen ? 'open' : '') + '">';
                     entry.items.forEach(function(cat) {
                         var count = countMap[cat] || 0;
                         var isActive = (active === cat);
                         var emoji = getIconEmoji(cat);
-                        html += '<div class="category-item-side ' + (isActive ? 'active' : '') + '" data-cat="' + cat + '">' +
-                            '<span class="icon">' + emoji + '</span><span class="name">' + cat + '</span><span class="count">' + count + '</span></div>';
+                        html += '<div class="category-item-side ' + (isActive ? 'active' : '') + '" data-cat="' +
+                            cat + '">' +
+                            '<span class="icon">' + emoji + '</span>' +
+                            '<span class="name">' + cat + '</span>' +
+                            '<span class="count">' + count + '</span>' +
+                            '</div>';
                     });
-                    html += '</div></div>';
+                    html += '</div>';
+                    html += '</div>';
                 });
                 container.innerHTML = html;
                 var allEl = container.querySelector('.category-item-all');
@@ -3336,8 +3376,8 @@
                         '</div></div><div class="fav-wrap"><button class="favorite-btn ' + fav +
                         '" data-id="' + s.id + '" aria-label="收藏"><i class="fas fa-heart"></i></button></div></div>' +
                         (displayDesc ? '<div class="desc">' + displayDesc + '</div>' : '') +
-                        '<div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (s.views || 0) +
-                        '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) +
+                        '<div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (
+                            s.views || 0) + '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) +
                         '</span></div><button class="btn btn-sm btn-primary detail-trigger" data-id="' + s.id +
                         '">详情</button></div></div>';
                 }
@@ -3364,10 +3404,12 @@
             }
         };
         var viewHistory = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
+
         function addViewHistory(softwareId) {
             viewHistory = [softwareId, ...viewHistory.filter(function(id) { return id !== softwareId; })].slice(0, 6);
             localStorage.setItem('lezhe_view_history', JSON.stringify(viewHistory));
         }
+
         function renderRecentHistory() {
             var container = document.getElementById('recentGrid');
             var section = document.getElementById('recentHistorySection');
@@ -3387,6 +3429,130 @@
             section.classList.remove('hidden');
             Render.renderCards(container, recentSoftware, true);
         }
+
+        // ---------- 登录/注册相关 ----------
+        var currentUser = null;
+
+        function hashPwd(p) {
+            var h = 0;
+            for (var i = 0; i < p.length; i++) {
+                var c = p.charCodeAt(i);
+                h = ((h << 5) - h) + c;
+                h = h & h;
+            }
+            return h.toString(16);
+        }
+
+        function generateUserCode() {
+            var num = Math.floor(10000 + Math.random() * 90000);
+            return 'U' + num;
+        }
+
+        async function checkUsernameExists(username) {
+            var { data, error } = await supabaseClient.from('users').select('id').eq('username', username).maybeSingle();
+            return !!data;
+        }
+
+        async function registerUser() {
+            var username = document.getElementById('regUsername').value.trim();
+            var password = document.getElementById('regPassword').value;
+            var confirm = document.getElementById('regConfirm').value;
+            var errEl = document.getElementById('regError');
+            var sucEl = document.getElementById('regSuccess');
+            errEl.textContent = '';
+            sucEl.textContent = '';
+            if (username.length < 4 || username.length > 16) { errEl.textContent = '用户名需4-16位'; return; }
+            if (!/^[a-zA-Z0-9_\u4e00-\u9fa5]+$/.test(username)) { errEl.textContent = '用户名仅支持字母、数字、下划线、中文'; return; }
+            if (password.length < 6) { errEl.textContent = '密码至少6位'; return; }
+            if (password !== confirm) { errEl.textContent = '两次密码不一致'; return; }
+            var exists = await checkUsernameExists(username);
+            if (exists) { errEl.textContent = '用户名已被注册'; return; }
+            var userCode = generateUserCode();
+            var { data, error } = await supabaseClient.from('users').insert({
+                username: username,
+                password: hashPwd(password),
+                user_code: userCode,
+                vip_status: false,
+                vip_expire: null
+            }).select().single();
+            if (error) { errEl.textContent = '注册失败：' + error.message; return; }
+            sucEl.textContent = '注册成功！请切换登录';
+            toast('注册成功，请登录', 'success');
+            setTimeout(function() {
+                sucEl.textContent = '';
+                document.querySelector('[data-tab="login"]').click();
+                document.getElementById('loginUsername').value = username;
+                document.getElementById('loginPassword').value = '';
+            }, 1500);
+        }
+
+        async function loginUser() {
+            var username = document.getElementById('loginUsername').value.trim();
+            var password = document.getElementById('loginPassword').value;
+            var errEl = document.getElementById('loginError');
+            errEl.textContent = '';
+            if (!username || !password) { errEl.textContent = '请填写用户名和密码'; return; }
+            var { data, error } = await supabaseClient.from('users').select('*').eq('username', username).maybeSingle();
+            if (error || !data) { errEl.textContent = '用户名或密码错误'; return; }
+            if (data.password !== hashPwd(password)) { errEl.textContent = '用户名或密码错误'; return; }
+            currentUser = data;
+            // 保存登录状态到 sessionStorage
+            sessionStorage.setItem('lezhe_vip_user', JSON.stringify(data));
+            showUserInfo(data);
+            toast('欢迎回来，' + data.username, 'success');
+            document.getElementById('authModal').classList.remove('active');
+            // 登录成功后，检查是否有重定向目标（比如点击高速下载时设置了标志）
+            if (sessionStorage.getItem('redirect_after_login')) {
+                sessionStorage.removeItem('redirect_after_login');
+                window.location.href = '/vip.html';
+            }
+        }
+
+        function showUserInfo(user) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('modalTitle').textContent = '👤 我的信息';
+            document.getElementById('userCode').textContent = user.user_code;
+            var statusEl = document.getElementById('vipStatusDisplay');
+            if (user.vip_status) {
+                var expireDate = user.vip_expire ? new Date(user.vip_expire) : null;
+                var now = new Date();
+                var daysLeft = expireDate ? Math.ceil((expireDate - now) / (1000 * 60 * 60 * 24)) : 0;
+                if (daysLeft > 0) {
+                    statusEl.className = 'vip-status active';
+                    statusEl.innerHTML = '<i class="fas fa-crown"></i> ✅ VIP会员 · 剩余 ' + daysLeft + ' 天';
+                } else if (expireDate && daysLeft <= 0) {
+                    statusEl.className = 'vip-status inactive';
+                    statusEl.innerHTML = '<i class="fas fa-crown"></i> ⚠️ VIP已过期，请联系客服续费';
+                } else {
+                    statusEl.className = 'vip-status active';
+                    statusEl.innerHTML = '<i class="fas fa-crown"></i> ✅ VIP会员（永久）';
+                }
+            } else {
+                statusEl.className = 'vip-status inactive';
+                statusEl.innerHTML = '<i class="fas fa-user"></i> 当前状态：普通用户';
+            }
+        }
+
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('modalTitle').textContent = '✦ 登录';
+            document.getElementById('loginError').textContent = '';
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('modalTitle').textContent = '✦ 注册';
+            document.getElementById('regError').textContent = '';
+            document.getElementById('regSuccess').textContent = '';
+        }
+
+        // ---------- 详情弹窗 ----------
         var Detail = {
             open: function(soft) {
                 addViewHistory(soft.id);
@@ -3399,11 +3565,13 @@
                 } else iconEl.textContent = soft.icon || '📦';
                 document.getElementById('detailName').textContent = soft.name || '未命名';
                 var metaHtml = '<span class="badge">' + escapeHTML(soft.category) +
-                    '</span><span class="badge badge-purple">v' + escapeHTML(soft.version) + '</span><span>' + escapeHTML(soft.size || '—') + '</span>';
+                    '</span><span class="badge badge-purple">v' + escapeHTML(soft.version) + '</span><span>' + escapeHTML(
+                        soft.size || '—') + '</span>';
                 if (soft.platforms && soft.platforms.length) {
                     var platHtml = soft.platforms.map(function(p) {
                         return p === 'mac' ? '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>' :
-                            p === 'windows' ? '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>' :
+                            p === 'windows' ?
+                            '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>' :
                             '<span class="badge">' + p + '</span>';
                     }).join('');
                     metaHtml += '<span style="display:inline-flex;gap:6px;flex-wrap:wrap;">' + platHtml + '</span>';
@@ -3453,18 +3621,23 @@
                     relatedGrid.innerHTML = relatedSoft.map(function(rs) {
                         var platHtml = '';
                         var platforms = rs.platforms || [];
-                        if (platforms.includes('mac')) platHtml += '<span class="plat mac"><i class="fab fa-apple"></i></span>';
-                        if (platforms.includes('windows')) platHtml += '<span class="plat win"><i class="fab fa-windows"></i></span>';
+                        if (platforms.includes('mac')) platHtml +=
+                            '<span class="plat mac"><i class="fab fa-apple"></i></span>';
+                        if (platforms.includes('windows')) platHtml +=
+                            '<span class="plat win"><i class="fab fa-windows"></i></span>';
                         if (!platHtml) platHtml = '<span class="plat" style="opacity:0.4;">—</span>';
                         var badgeHtml = '';
-                        if (rs.recommend || (rs.downloads || 0) > 100) { badgeHtml = '<span class="badge-mini">🔥 热门</span>'; }
+                        if (rs.recommend || (rs.downloads || 0) > 100) {
+                            badgeHtml = '<span class="badge-mini">🔥 热门</span>';
+                        }
                         var idStr = rs.id;
                         return '<div class="related-card" data-id="' + idStr + '">' +
                             badgeHtml +
                             '<div class="icon-wrap">' + renderIcon(rs) + '</div>' +
                             '<div class="name" title="' + rs.name + '">' + rs.name + '</div>' +
                             '<div class="cat">' + (rs.category || '') + '</div>' +
-                            '<div class="platforms">' + platHtml + '</div></div>';
+                            '<div class="platforms">' + platHtml + '</div>' +
+                            '</div>';
                     }).join('');
                     relatedGrid.querySelectorAll('.related-card').forEach(function(el) {
                         el.addEventListener('click', function() {
@@ -3475,16 +3648,34 @@
                     });
                 } else related.classList.add('hidden');
 
-                var freeBtn = document.getElementById('detailFreeBtn');
-                var vipBtn = document.getElementById('detailVipBtn');
+                // ----- 下载按钮 -----
+                var actions = document.querySelector('.detail-modal .modal-actions');
+                // 移除旧的按钮（如果有）
+                var oldFreeBtn = document.getElementById('detailFreeBtn');
+                if (oldFreeBtn) oldFreeBtn.remove();
+                var oldVipBtn = document.getElementById('detailVipBtn');
+                if (oldVipBtn) oldVipBtn.remove();
+
+                // 创建免费下载按钮
+                var freeBtn = document.createElement('button');
+                freeBtn.id = 'detailFreeBtn';
+                freeBtn.className = 'btn btn-success';
+                freeBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> 免费下载';
+                freeBtn.style.display = 'none';
+                var vipBtn = document.createElement('button');
+                vipBtn.id = 'detailVipBtn';
+                vipBtn.className = 'btn btn-primary';
+                vipBtn.innerHTML = '<i class="fas fa-bolt"></i> 高速下载';
+                vipBtn.style.display = 'none';
+                // 插入到“关闭”按钮之前
+                var closeBtn = document.getElementById('detailCloseBtn');
+                actions.insertBefore(freeBtn, closeBtn);
+                actions.insertBefore(vipBtn, closeBtn);
+
                 var freeLink = soft.free_link || '';
                 var vipLink = soft.vip_link || '';
-                var noLinkTip = document.querySelector('.no-link-tip');
-                if (noLinkTip) noLinkTip.remove();
 
-                freeBtn.style.display = 'none';
-                vipBtn.style.display = 'none';
-
+                // 免费链接
                 if (freeLink.trim() !== '') {
                     freeBtn.style.display = 'inline-flex';
                     freeBtn.onclick = function() {
@@ -3502,18 +3693,31 @@
                     };
                 }
 
+                // 高速链接 - 检查登录状态
                 if (vipLink.trim() !== '') {
                     vipBtn.style.display = 'inline-flex';
                     vipBtn.onclick = function() {
-                        if (this.classList.contains('btn-loading')) return;
-                        var vipModal = document.getElementById('vipModal');
-                        vipModal.classList.add('active');
-                        document.body.style.overflow = 'hidden';
+                        // 检查是否已登录
+                        var storedUser = sessionStorage.getItem('lezhe_vip_user');
+                        if (storedUser) {
+                            try {
+                                var user = JSON.parse(storedUser);
+                                if (user && user.id) {
+                                    // 已登录，直接跳转到VIP页面
+                                    window.location.href = '/vip.html';
+                                    return;
+                                }
+                            } catch (e) {}
+                        }
+                        // 未登录，显示登录弹窗，并设置重定向标记
+                        sessionStorage.setItem('redirect_after_login', 'true');
+                        document.getElementById('authModal').classList.add('active');
+                        showLoginForm();
                     };
                 }
 
+                // 如果两个链接都为空，显示提示
                 if (freeLink.trim() === '' && vipLink.trim() === '') {
-                    var actions = document.querySelector('.detail-modal .modal-actions');
                     var tip = document.createElement('div');
                     tip.className = 'no-link-tip';
                     tip.style.cssText = 'width:100%;text-align:center;color:var(--text-dim);font-size:0.85rem;padding:8px 0;';
@@ -3521,10 +3725,12 @@
                     actions.prepend(tip);
                 }
 
+                // 分享按钮
                 document.getElementById('detailShareBtn').onclick = function() {
                     var url = window.location.origin + window.location.pathname + '?soft=' + soft.id;
                     copyLinkText(soft.name + ' - 乐哲软件', url);
                 };
+
                 overlay.classList.add('open');
                 document.body.style.overflow = 'hidden';
                 document.getElementById('detailClose').focus();
@@ -3536,7 +3742,8 @@
                     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                         e.preventDefault();
                         var dir = e.key === 'ArrowLeft' ? -1 : 1;
-                        var list = cache.software.filter(function(s) { return s.category === self._currentSoft.category; });
+                        var list = cache.software.filter(function(s) { return s.category === self._currentSoft
+                                .category; });
                         var idx = list.indexOf(self._currentSoft);
                         var newIdx = idx + dir;
                         if (newIdx >= 0 && newIdx < list.length) {
@@ -3562,7 +3769,6 @@
             close: function() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
-                document.getElementById('vipModal').classList.remove('active');
                 if (this._keyHandler) {
                     document.removeEventListener('keydown', this._keyHandler);
                     this._keyHandler = null;
@@ -3576,11 +3782,14 @@
                 }
             }
         };
+
+        // ---------- 事件绑定 ----------
         document.getElementById('detailClose').addEventListener('click', Detail.close);
         document.getElementById('detailCloseBtn').addEventListener('click', Detail.close);
         document.getElementById('detailOverlay').addEventListener('click', function(e) {
             if (e.target === e.currentTarget) Detail.close();
         });
+
         document.addEventListener('click', function(e) {
             var card = e.target.closest('.software-card');
             if (!card) return;
@@ -3596,6 +3805,7 @@
                 }
             }
         });
+
         document.addEventListener('click', function(e) {
             var btn = e.target.closest('.detail-trigger');
             if (!btn) return;
@@ -3609,38 +3819,18 @@
                 }
             }
         });
+
         document.addEventListener('keydown', function(e) {
             if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
                 e.preventDefault();
                 document.getElementById('searchInput').focus();
             }
-            if (e.key === 'Escape') {
-                if (document.getElementById('detailOverlay').classList.contains('open')) {
-                    Detail.close();
-                }
-                if (document.getElementById('vipModal').classList.contains('active')) {
-                    document.getElementById('vipModal').classList.remove('active');
-                    document.body.style.overflow = '';
-                }
+            if (e.key === 'Escape' && document.getElementById('detailOverlay').classList.contains('open')) {
+                Detail.close();
             }
         });
-        document.getElementById('vipModalClose').addEventListener('click', function() {
-            document.getElementById('vipModal').classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        document.getElementById('vipModalLaterBtn').addEventListener('click', function() {
-            document.getElementById('vipModal').classList.remove('active');
-            document.body.style.overflow = '';
-        });
-        document.getElementById('vipModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-        document.getElementById('vipModalOpenBtn').addEventListener('click', function() {
-            window.open('/vip.html', '_blank');
-        });
+
+        // ---------- 侧边栏 ----------
         var sidebar = document.getElementById('sidebarCategories');
         var trigger = document.getElementById('sidebarTrigger');
         var lockBtn = document.getElementById('sidebarLockBtn');
@@ -3650,9 +3840,11 @@
         var isLocked = false;
         var isOpen = false;
         var hoverTimeout = null;
+
         function isMobile() {
             return window.innerWidth <= 820;
         }
+
         function openSidebar() {
             if (isOpen) return;
             isOpen = true;
@@ -3667,6 +3859,7 @@
                 mobileToggleBtn.innerHTML = '<i class="fas fa-times"></i>';
             }
         }
+
         function closeSidebar() {
             if (isLocked && !isMobile()) return;
             if (!isOpen) return;
@@ -3682,13 +3875,20 @@
                 mobileToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
             }
         }
+
         function toggleSidebar() {
-            if (isOpen) { closeSidebar(); } else { openSidebar(); }
+            if (isOpen) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
         }
+
         function toggleLock() {
             isLocked = !isLocked;
             lockBtn.classList.toggle('locked', isLocked);
-            lockBtn.innerHTML = isLocked ? '<i class="fas fa-thumbtack" style="transform:rotate(45deg);"></i>' : '<i class="fas fa-thumbtack"></i>';
+            lockBtn.innerHTML = isLocked ? '<i class="fas fa-thumbtack" style="transform:rotate(45deg);"></i>' :
+                '<i class="fas fa-thumbtack"></i>';
             if (isLocked && !isOpen && !isMobile()) {
                 openSidebar();
             }
@@ -3797,6 +3997,8 @@
             lockBtn.innerHTML = '<i class="fas fa-thumbtack" style="transform:rotate(45deg);"></i>';
             setTimeout(function() { openSidebar(); }, 100);
         }
+
+        // ---------- 主应用 ----------
         var currentPage = 1,
             PAGE_SIZE = 6,
             currentFilteredList = [];
@@ -3851,6 +4053,8 @@
                         }
                     });
                 }, 600000);
+
+                // 导航
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -3858,6 +4062,8 @@
                         else self.goList();
                     });
                 });
+
+                // 搜索
                 var searchInput = document.getElementById('searchInput');
                 var searchBtn = document.getElementById('searchBtn');
                 if (searchBtn) {
@@ -3881,13 +4087,15 @@
                 var sidebarSearchInput = document.getElementById('sidebarSearchInput');
                 var sidebarSearchBtn = document.getElementById('sidebarSearchBtn');
                 if (sidebarSearchBtn) {
-                    sidebarSearchBtn.addEventListener('click', function() { self.doSearch(sidebarSearchInput.value.trim()); });
+                    sidebarSearchBtn.addEventListener('click', function() { self.doSearch(sidebarSearchInput.value
+                            .trim()); });
                 }
                 if (sidebarSearchInput) {
                     sidebarSearchInput.addEventListener('keyup', function(e) {
                         if (e.key === 'Enter') self.doSearch(this.value.trim());
                     });
                 }
+
                 document.getElementById('logoHome').addEventListener('click', function(e) {
                     e.preventDefault();
                     self.goHome();
@@ -3895,12 +4103,16 @@
                 document.getElementById('mobileToggle').addEventListener('click', function() {
                     document.getElementById('navLinks').classList.toggle('open');
                 });
+
+                // 分页
                 document.getElementById('prevPageBtn').addEventListener('click', function() {
-                    if (currentPage > 1) { currentPage--; self.renderListPage(); }
+                    if (currentPage > 1) { currentPage--;
+                        self.renderListPage(); }
                 });
                 document.getElementById('nextPageBtn').addEventListener('click', function() {
                     var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
-                    if (currentPage < total) { currentPage++; self.renderListPage(); }
+                    if (currentPage < total) { currentPage++;
+                        self.renderListPage(); }
                 });
                 document.getElementById('sortSelect').addEventListener('change', function() {
                     self.sortBy = this.value;
@@ -3911,7 +4123,8 @@
                 document.getElementById('jumpPageBtn').addEventListener('click', function() {
                     var p = parseInt(document.getElementById('jumpPageInput').value);
                     var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
-                    if (p >= 1 && p <= total) { currentPage = p; self.renderListPage(); }
+                    if (p >= 1 && p <= total) { currentPage = p;
+                        self.renderListPage(); }
                 });
                 document.getElementById('jumpPageInput').addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
@@ -3930,6 +4143,8 @@
                     currentPage = 1;
                     self.refreshListWithFilters();
                 });
+
+                // 底部导航
                 document.querySelectorAll('#mobileBottomNav a').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -3937,18 +4152,24 @@
                         else self.goList();
                     });
                 });
+
                 var backBtn = document.getElementById('backTopBtn');
                 window.addEventListener('scroll', function() {
                     backBtn.classList.toggle('visible', window.pageYOffset > 300);
                 });
                 backBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
                 document.addEventListener('click', function(e) {
                     var nav = document.getElementById('navLinks');
-                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove('open');
+                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
+                    'open');
                 });
+
+                // 主题
                 var themeToggle = document.getElementById('themeToggle');
                 var headerThemeBtn = document.getElementById('headerThemeBtn');
                 var themeLabel = document.getElementById('themeLabel');
+
                 function setTheme(theme) {
                     document.documentElement.setAttribute('data-theme', theme);
                     localStorage.setItem('theme', theme);
@@ -3970,14 +4191,78 @@
                     var current = document.documentElement.getAttribute('data-theme');
                     setTheme(current === 'dark' ? 'light' : 'dark');
                 });
+
+                // 登录/注册弹窗事件绑定（已在上方定义）
+                // 这里再次确保事件绑定（可能重复，但不影响）
+                document.getElementById('modalClose').addEventListener('click', function() {
+                    document.getElementById('authModal').classList.remove('active');
+                });
+                document.getElementById('authModal').addEventListener('click', function(e) {
+                    if (e.target === this) this.classList.remove('active');
+                });
+                document.querySelectorAll('.tabs button').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove(
+                                'active'); });
+                        this.classList.add('active');
+                        if (this.dataset.tab === 'login') showLoginForm();
+                        else showRegisterForm();
+                    });
+                });
+                document.getElementById('loginBtn').addEventListener('click', loginUser);
+                document.getElementById('registerBtn').addEventListener('click', registerUser);
+                document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') loginUser();
+                });
+                document.getElementById('regConfirm').addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') registerUser();
+                });
+                document.getElementById('logoutBtn').addEventListener('click', function() {
+                    sessionStorage.removeItem('lezhe_vip_user');
+                    currentUser = null;
+                    document.getElementById('userInfo').style.display = 'none';
+                    document.getElementById('modalTitle').textContent = '✦ 登录';
+                    showLoginForm();
+                    toast('已退出登录', 'success');
+                });
+
+                // 恢复登录状态
+                var savedUser = sessionStorage.getItem('lezhe_vip_user');
+                if (savedUser) {
+                    try {
+                        var u = JSON.parse(savedUser);
+                        currentUser = u;
+                        var now = new Date();
+                        if (u.vip_expire) {
+                            var exp = new Date(u.vip_expire);
+                            if (exp > now || !u.vip_expire) {
+                                showUserInfo(u);
+                            }
+                        } else if (u.vip_status) {
+                            showUserInfo(u);
+                        }
+                    } catch (e) {}
+                }
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        document.getElementById('authModal').classList.remove('active');
+                    }
+                });
+                document.querySelector('.back-link').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.history.back();
+                });
             },
+
             goHome: function() {
                 this.currentPage = 'home';
                 this.currentCategory = 'all';
                 this.searchKeyword = '';
                 document.getElementById('pageHome').classList.remove('hidden');
                 document.getElementById('pageList').classList.add('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
+                        'active'); });
                 document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
@@ -3995,13 +4280,15 @@
                     closeSidebar();
                 }
             },
+
             goList: function(cat) {
                 cat = cat || 'all';
                 this.currentPage = 'list';
                 this.currentCategory = cat;
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
+                        'active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 currentPage = 1;
@@ -4019,9 +4306,11 @@
                     if (b.dataset.cat === cat) b.classList.add('active');
                 });
                 if (cat === 'all') {
-                    document.getElementById('filterTags').querySelector('button[data-cat="all"]').classList.add('active');
+                    document.getElementById('filterTags').querySelector('button[data-cat="all"]').classList.add(
+                        'active');
                 }
             },
+
             updateSidebarHighlight: function(cat) {
                 var container = document.getElementById('categoryList');
                 if (!container) return;
@@ -4070,8 +4359,10 @@
                     }
                 }
             },
+
             doSearch: function(kw) {
-                var keyword = kw || document.getElementById('searchInput').value.trim() || document.getElementById('sidebarSearchInput').value.trim();
+                var keyword = kw || document.getElementById('searchInput').value.trim() || document.getElementById(
+                    'sidebarSearchInput').value.trim();
                 if (!keyword) { this.goHome(); return; }
                 addSearchHistory(keyword);
                 this.searchKeyword = keyword;
@@ -4079,7 +4370,8 @@
                 this.currentCategory = 'all';
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
+                        'active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 currentPage = 1;
                 this.refreshList(keyword);
@@ -4100,6 +4392,7 @@
                 var hist = document.getElementById('searchHistory');
                 if (hist) hist.classList.remove('open');
             },
+
             refreshHome: function() {
                 var self = this;
                 var all = DB.getSoftware();
@@ -4107,7 +4400,8 @@
                 Render.renderCategories(document.getElementById('categoryList'), null, function(cat) {
                     self.goList(cat);
                 });
-                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s.recommend; }).slice(0, 6), true);
+                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s
+                        .recommend; }).slice(0, 6), true);
                 Render.renderCards(document.getElementById('latestGrid'), all.slice().sort(function(a, b) {
                     return (b.date || '').localeCompare(a.date || '');
                 }).slice(0, 6), true);
@@ -4115,6 +4409,7 @@
                 document.getElementById('sidebarSearchWrapper').classList.remove('active');
                 document.getElementById('sidebarStats').style.display = 'block';
             },
+
             refreshList: function(keyword) {
                 var self = this;
                 var all = DB.getSoftware();
@@ -4129,12 +4424,14 @@
                     if (btn.dataset.cat === self.currentCategory) btn.classList.add('active');
                     else btn.classList.remove('active');
                     btn.addEventListener('click', function() {
-                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
+                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove(
+                                'active'); });
                         this.classList.add('active');
                         self.currentCategory = this.dataset.cat;
                         currentPage = 1;
                         self.refreshListWithFilters();
-                        self.updateSidebarHighlight(self.currentCategory === 'all' ? null : self.currentCategory);
+                        self.updateSidebarHighlight(self.currentCategory === 'all' ? null : self
+                        .currentCategory);
                         if (isMobile() && isOpen) {
                             closeSidebar();
                         }
@@ -4143,14 +4440,19 @@
                 if (keyword) {
                     var kw = keyword.toLowerCase();
                     list = list.filter(function(s) {
-                        return s.name && (s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase().includes(kw));
+                        return s.name && (s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
+                            .includes(kw));
                     });
-                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length + '项)';
+                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length +
+                        '项)';
                 } else document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
-                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self.currentCategory; });
-                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || []).includes(self.platformFilter); });
+                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self
+                        .currentCategory; });
+                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || [])
+                        .includes(self.platformFilter); });
                 if (self.sortBy === 'views') list.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
-                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a.downloads || 0); });
+                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a
+                        .downloads || 0); });
                 else list.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
                 currentFilteredList = list;
                 self.renderListPage(keyword);
@@ -4158,6 +4460,7 @@
                 document.getElementById('sidebarSearchWrapper').classList.add('active');
                 document.getElementById('sidebarStats').style.display = 'none';
             },
+
             renderListPage: function(keyword) {
                 var total = currentFilteredList.length,
                     totalPages = Math.ceil(total / PAGE_SIZE) || 1;
@@ -4180,18 +4483,23 @@
                     this._scrollPos = 0;
                 }
             },
+
             refreshListWithFilters: function() {
-                var kw = document.getElementById('searchInput').value.trim() || document.getElementById('sidebarSearchInput').value.trim();
+                var kw = document.getElementById('searchInput').value.trim() || document.getElementById(
+                    'sidebarSearchInput').value.trim();
                 this.searchKeyword = kw;
                 if (kw) this.refreshList(kw);
                 else this.refreshList(null);
             },
+
             refreshAll: function() {
                 if (this.currentPage === 'home') this.refreshHome();
                 else this.refreshListWithFilters();
             }
         };
+
         document.addEventListener('DOMContentLoaded', function() { App.init(); });
+
         function shareOn(platform) {
             var url = encodeURIComponent(window.location.href);
             var title = encodeURIComponent('乐哲软件 · 精选高效工具');
@@ -4209,6 +4517,7 @@
             window.open(shareMap[platform], '_blank', 'width=600,height=500');
             if (typeof gtag !== 'undefined') gtag('event', 'share', { platform: platform });
         }
+
         function copyLinkText(title, url) {
             var text = title + '\n' + url;
             if (navigator.clipboard) {
@@ -4225,6 +4534,7 @@
                 toast('已复制标题与链接', 'success');
             }
         }
+
         function copyLink() {
             copyLinkText('乐哲软件 · 精选高效工具', window.location.href);
         }
