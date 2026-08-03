@@ -8,8 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<!-- 使用更稳定的 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
+/* 样式不变，省略（与之前完全一致） */
 :root{--bg-primary:#f0f4fa;--bg-secondary:#e6ecf5;--bg-card:rgba(255,255,255,0.72);--bg-card-solid:#ffffff;--border-glow:rgba(0,120,255,0.18);--border-glow-strong:rgba(0,120,255,0.35);--text-primary:#0f1a2e;--text-secondary:#3d5068;--text-dim:#7a8ca3;--accent-cyan:#0077ff;--accent-blue:#0055cc;--accent-purple:#6c5ce7;--accent-gradient:linear-gradient(135deg,#0077ff,#6c5ce7);--shadow-card:0 8px 32px rgba(0,20,40,0.08);--radius-lg:20px;--radius-md:12px;--radius-sm:8px;--transition:0.3s cubic-bezier(0.2,0,0,1);--font:'Inter',-apple-system,sans-serif;--max-width:860px;--header-height:64px;--success:#27ae60;--danger:#e74c3c;--warning:#f39c12}
 [data-theme="dark"]{--bg-primary:#0f172a;--bg-secondary:#1e293b;--bg-card:rgba(30,41,59,0.75);--bg-card-solid:#1e293b;--border-glow:rgba(99,160,255,0.12);--border-glow-strong:rgba(99,160,255,0.25);--text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-dim:#64748b;--shadow-card:0 8px 32px rgba(0,0,0,0.25)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -236,10 +238,25 @@ input{font-family:inherit;border:none;outline:none;background:none;color:var(--t
 </div>
 <script>
 (function(){
-var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
-var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
-var supabase=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-var currentUser=null;
+var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+
+// 检查 supabase 是否加载成功
+if (typeof supabase === 'undefined' || !supabase.createClient) {
+    console.error('Supabase SDK 加载失败，请检查网络连接。');
+    // 即使没有 Supabase，弹窗依然可以显示，只是注册登录会失败
+    // 我们定义一个假的 supabase 对象以防止后续代码报错
+    window.supabase = {
+        createClient: function() {
+            return {
+                from: function() { return { select: function() { return { maybeSingle: function() { return Promise.resolve({ data: null, error: null }); } }; }, insert: function() { return { select: function() { return { single: function() { return Promise.resolve({ data: null, error: { message: 'Supabase not loaded' } }); } }; } }; } };
+            }
+        }
+    };
+}
+
+var supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var currentUser = null;
 
 function toast(msg,type){type=type||'success';var c=document.getElementById('toastContainer');var el=document.createElement('div');el.className='toast '+type;el.innerHTML='<span class="icon">'+(type==='success'?'◆':'✕')+'</span> '+msg;c.appendChild(el);setTimeout(function(){el.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){el.remove()},500)},2800);}
 
@@ -247,7 +264,7 @@ function hashPwd(p){var h=0;for(var i=0;i<p.length;i++){var c=p.charCodeAt(i);h=
 
 function generateUserCode(){var num=Math.floor(10000+Math.random()*90000);return 'U'+num;}
 
-async function checkUsernameExists(username){var {data,error}=await supabase.from('users').select('id').eq('username',username).maybeSingle();return !!data;}
+async function checkUsernameExists(username){var {data,error}=await supabaseClient.from('users').select('id').eq('username',username).maybeSingle();return !!data;}
 
 async function registerUser(){
 var username=document.getElementById('regUsername').value.trim();
@@ -263,7 +280,7 @@ if(password!==confirm){errEl.textContent='两次密码不一致';return;}
 var exists=await checkUsernameExists(username);
 if(exists){errEl.textContent='用户名已被注册';return;}
 var userCode=generateUserCode();
-var {data,error}=await supabase.from('users').insert({username:username,password:hashPwd(password),user_code:userCode,vip_status:false,vip_expire:null}).select().single();
+var {data,error}=await supabaseClient.from('users').insert({username:username,password:hashPwd(password),user_code:userCode,vip_status:false,vip_expire:null}).select().single();
 if(error){errEl.textContent='注册失败：'+error.message;return;}
 sucEl.textContent='注册成功！';
 toast('注册成功，欢迎 '+username,'success');
@@ -276,7 +293,7 @@ var password=document.getElementById('loginPassword').value;
 var errEl=document.getElementById('loginError');
 errEl.textContent='';
 if(!username||!password){errEl.textContent='请填写用户名和密码';return;}
-var {data,error}=await supabase.from('users').select('*').eq('username',username).maybeSingle();
+var {data,error}=await supabaseClient.from('users').select('*').eq('username',username).maybeSingle();
 if(error||!data){errEl.textContent='用户名或密码错误';return;}
 if(data.password!==hashPwd(password)){errEl.textContent='用户名或密码错误';return;}
 currentUser=data;
