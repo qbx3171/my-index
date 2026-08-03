@@ -340,17 +340,15 @@ document.documentElement.setAttribute('data-theme',n);
 localStorage.setItem('theme',n);
 this.innerHTML=n==='dark'?'<i class="fas fa-sun"></i>':'<i class="fas fa-moon"></i>';
 });
+
 document.querySelectorAll('.btn-buy[data-plan]').forEach(function(btn){
 btn.addEventListener('click',function(){
 if(this.disabled)return;
-var sessionUser=sessionStorage.getItem('lezhe_vip_user');
-if(sessionUser){
-try{var user=JSON.parse(sessionUser);if(user.vip_status){toast('您已是会员，无需重复开通','warning');return;}}catch(e){}
-}
 document.getElementById('authModal').classList.add('active');
 showLoginForm();
 });
 });
+
 document.getElementById('modalClose').addEventListener('click',function(){document.getElementById('authModal').classList.remove('active');});
 document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});
 document.querySelectorAll('.tabs button').forEach(function(btn){
@@ -372,10 +370,12 @@ document.getElementById('modalTitle').textContent='✦ 登录';
 showLoginForm();
 toast('已退出登录','success');
 });
+
 var savedUser=sessionStorage.getItem('lezhe_vip_user');
 if(savedUser){
 try{var u=JSON.parse(savedUser);currentUser=u;var now=new Date();if(u.vip_expire){var exp=new Date(u.vip_expire);if(exp>now||!u.vip_expire){showUserInfo(u);}}else if(u.vip_status){showUserInfo(u);}}catch(e){}
 }
+
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.getElementById('authModal').classList.remove('active');}});
 document.querySelector('.back-link').addEventListener('click',function(e){e.preventDefault();window.history.back();});
 });
