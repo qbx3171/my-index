@@ -3151,6 +3151,7 @@
                 force = force || false;
                 if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) return;
                 try {
+                    if (!supabaseClient) throw new Error('Supabase client not available');
                     var [softRes, catRes] = await Promise.all([
                         supabaseClient.from('software').select('*').order('created_at', { ascending: false }),
                         supabaseClient.from('categories').select('name').order('name')
@@ -3189,6 +3190,7 @@
             getCategories: function() { return cache.categories; },
             async updateSoftware(soft) {
                 try {
+                    if (!supabaseClient) return;
                     await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id', soft.id);
                     var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
                     if (idx !== -1) { cache.software[idx].views = soft.views; cache.software[idx].downloads = soft.downloads; }
@@ -3603,12 +3605,13 @@
         }
 
         async function checkUsernameExists(username) {
+            if (!supabaseClient) return false;
             var { data, error } = await supabaseClient.from('users').select('id').eq('username', username).maybeSingle();
             return !!data;
         }
 
         async function checkEmailExists(email) {
-            if (!email) return false;
+            if (!supabaseClient || !email) return false;
             var { data, error } = await supabaseClient.from('users').select('id').eq('email', email).maybeSingle();
             return !!data;
         }
@@ -3633,6 +3636,7 @@
                 if (emailExists) { errEl.textContent = '邮箱已被使用'; return; }
             }
             var userCode = generateUserCode();
+            if (!supabaseClient) { errEl.textContent = '数据库连接失败，请稍后重试'; return; }
             var { data, error } = await supabaseClient.from('users').insert({
                 username: username,
                 email: email || null,
@@ -3658,6 +3662,7 @@
             var errEl = document.getElementById('loginError');
             errEl.textContent = '';
             if (!username || !password) { errEl.textContent = '请填写用户名和密码'; return; }
+            if (!supabaseClient) { errEl.textContent = '数据库连接失败，请稍后重试'; return; }
             var { data, error } = await supabaseClient.from('users').select('*').eq('username', username).maybeSingle();
             if (error || !data) { errEl.textContent = '用户名或密码错误'; return; }
             if (data.password !== hashPwd(password)) { errEl.textContent = '用户名或密码错误'; return; }
@@ -3757,6 +3762,7 @@
             errEl.textContent = '';
             sucEl.textContent = '';
             if (!input) { errEl.textContent = '请输入用户名或邮箱'; return; }
+            if (!supabaseClient) { errEl.textContent = '数据库连接失败'; return; }
             var { data, error } = await supabaseClient.from('users')
                 .select('username, email')
                 .or('username.eq.' + input + ',email.eq.' + input)
@@ -3790,6 +3796,7 @@
             var user = currentUser;
             if (!user) { errEl.textContent = '请先登录'; return; }
             if (hashPwd(oldPwd) !== user.password) { errEl.textContent = '当前密码错误'; return; }
+            if (!supabaseClient) { errEl.textContent = '数据库连接失败'; return; }
             var { error } = await supabaseClient.from('users')
                 .update({ password: hashPwd(newPwd) })
                 .eq('id', user.id);
