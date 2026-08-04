@@ -26,7 +26,6 @@
     <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
     <style>
-        /* 样式与原代码完全一致，为节省篇幅省略，实际使用可保留原样式 */
         :root {
             --bg-primary: #f0f4fa;
             --bg-secondary: #e6ecf5;
@@ -54,6 +53,9 @@
             --warning: #f39c12;
             --sidebar-width: 280px;
             --sidebar-trigger-width: 32px;
+            --vip-gold: #f59e0b;
+            --vip-gold-light: #fbbf24;
+            --vip-gold-dark: #d97706;
         }
         [data-theme="dark"] {
             --bg-primary: #0f172a;
@@ -66,6 +68,9 @@
             --text-secondary: #94a3b8;
             --text-dim: #64748b;
             --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.25);
+            --vip-gold: #f59e0b;
+            --vip-gold-light: #fbbf24;
+            --vip-gold-dark: #d97706;
         }
         * {
             margin: 0;
@@ -1818,6 +1823,43 @@
             cursor: not-allowed;
             filter: grayscale(30%);
         }
+        .btn-free {
+            background: rgba(39, 174, 96, 0.12);
+            color: var(--success);
+            border-color: rgba(39, 174, 96, 0.2);
+        }
+        .btn-free:hover {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+            box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
+        }
+        .btn-vip {
+            background: linear-gradient(135deg, var(--vip-gold), var(--vip-gold-dark));
+            color: #fff;
+            border-color: transparent;
+            font-weight: 700;
+            position: relative;
+            overflow: visible;
+        }
+        .btn-vip:hover {
+            box-shadow: 0 4px 24px rgba(245, 158, 11, 0.4);
+            transform: translateY(-2px) scale(1.02);
+        }
+        .btn-vip .vip-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 0.5rem;
+            font-weight: 700;
+            padding: 1px 8px;
+            border-radius: 50px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+            animation: pulse-badge 2s infinite;
+        }
         .badge {
             display: inline-block;
             padding: 2px 14px;
@@ -2132,6 +2174,12 @@
             }
             .detail-modal .modal-actions .btn-outline {
                 order: 10;
+            }
+            .detail-modal .modal-actions .btn-vip .vip-badge {
+                top: -6px;
+                right: -4px;
+                font-size: 0.45rem;
+                padding: 0 6px;
             }
         }
         @media (max-width: 380px) {
@@ -2600,6 +2648,125 @@
             color: var(--text-primary);
             transform: rotate(90deg);
         }
+
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .user-dropdown .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--bg-card-solid);
+            border: 1px solid var(--border-glow);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-card);
+            min-width: 180px;
+            z-index: 999;
+            display: none;
+            padding: 8px 0;
+        }
+        .user-dropdown .dropdown-menu.open {
+            display: block;
+        }
+        .user-dropdown .dropdown-menu .menu-item {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-dropdown .dropdown-menu .menu-item:hover {
+            background: rgba(0, 136, 255, 0.06);
+            color: var(--text-primary);
+        }
+        .user-dropdown .dropdown-menu .menu-item.danger {
+            color: var(--danger);
+        }
+        .user-dropdown .dropdown-menu .menu-item.danger:hover {
+            background: rgba(231, 76, 60, 0.08);
+        }
+        .user-dropdown .dropdown-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 50px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .user-dropdown .dropdown-toggle:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 136, 255, 0.04);
+        }
+        .user-dropdown .dropdown-toggle .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+        .modal-box .forgot-pwd-link {
+            display: block;
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            margin-top: 4px;
+            text-decoration: underline;
+        }
+        .modal-box .forgot-pwd-link:hover {
+            color: var(--accent-purple);
+        }
+        .modal-box .back-to-login {
+            display: block;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .modal-box .back-to-login:hover {
+            color: var(--accent-purple);
+        }
+        .change-pwd-form .form-group {
+            margin-bottom: 14px;
+        }
+        .change-pwd-form .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        .change-pwd-form .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border-glow);
+            background: var(--bg-input);
+            transition: 0.2s;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            min-height: 44px;
+        }
+        .change-pwd-form .form-group input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 0, 0, 0.04);
+        }
     </style>
 </head>
 <body>
@@ -2663,7 +2830,23 @@
                         <li><a href="#" class="active" data-page="home"><i class="fas fa-home"></i> 首页</a></li>
                         <li><a href="#" data-page="list"><i class="fas fa-th-list"></i> 软件库</a></li>
                     </ul>
-                    <div style="display:flex;align-items:center;gap:4px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div id="userArea">
+                            <button class="btn btn-sm btn-outline" id="loginRegisterBtn" style="display:inline-flex;">登录/注册</button>
+                            <div class="user-dropdown hidden" id="userDropdown">
+                                <div class="dropdown-toggle" id="userToggle">
+                                    <span class="avatar" id="userAvatar">U</span>
+                                    <span id="userNameDisplay">用户</span>
+                                    <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i>
+                                </div>
+                                <div class="dropdown-menu" id="userMenu">
+                                    <div class="menu-item" data-action="info"><i class="fas fa-user-circle"></i> 我的信息</div>
+                                    <div class="menu-item" data-action="vip"><i class="fas fa-crown"></i> 我的VIP</div>
+                                    <div class="menu-item" data-action="change-pwd"><i class="fas fa-key"></i> 修改密码</div>
+                                    <div class="menu-item danger" data-action="logout"><i class="fas fa-sign-out-alt"></i> 退出登录</div>
+                                </div>
+                            </div>
+                        </div>
                         <button class="header-theme-btn" id="headerThemeBtn" aria-label="切换主题">
                             <i class="fas fa-moon"></i>
                         </button>
@@ -2790,10 +2973,10 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-primary" id="detailDownload"><i class="fas fa-download"></i> 下载</button>
+                <button class="btn btn-free" id="detailFreeBtn"><i class="fas fa-cloud-download-alt"></i> 免费下载</button>
+                <button class="btn btn-vip" id="detailVipBtn"><i class="fas fa-bolt"></i> 高速下载 <span class="vip-badge">VIP</span></button>
                 <button class="btn btn-outline" id="detailShareBtn"><i class="fas fa-share-alt"></i> 分享</button>
                 <button class="btn btn-outline" id="detailCloseBtn">关闭</button>
-                <!-- 注意：这里原本没有 vip 按钮，我们在 JS 中动态添加两个按钮（免费/高速） -->
             </div>
         </div>
     </div>
@@ -2827,30 +3010,40 @@
         </script>
     </div>
 
-    <!-- ========== 登录/注册弹窗 ========== -->
     <div class="modal-overlay" id="authModal">
         <div class="modal-box">
             <div class="modal-header">
                 <h2 id="modalTitle">✦ 登录</h2>
                 <button class="close-btn" id="modalClose">✕</button>
             </div>
-            <div class="tabs">
-                <button class="active" data-tab="login">登录</button>
-                <button data-tab="register">注册</button>
+            <div id="authMain">
+                <div class="tabs">
+                    <button class="active" data-tab="login">登录</button>
+                    <button data-tab="register">注册</button>
+                </div>
+                <div id="loginForm">
+                    <div class="form-group"><label>用户名</label><input type="text" id="loginUsername" placeholder="请输入用户名"></div>
+                    <div class="form-group"><label>密码</label><input type="password" id="loginPassword" placeholder="请输入密码"></div>
+                    <button class="btn-submit" id="loginBtn">登 录</button>
+                    <div class="forgot-pwd-link" id="forgotPwdLink">忘记密码？</div>
+                    <div class="form-error" id="loginError"></div>
+                </div>
+                <div id="registerForm" style="display:none;">
+                    <div class="form-group"><label>用户名</label><input type="text" id="regUsername" placeholder="4-16位字母/数字/中文"></div>
+                    <div class="form-group"><label>邮箱 (可选)</label><input type="email" id="regEmail" placeholder="用于找回密码"></div>
+                    <div class="form-group"><label>密码</label><input type="password" id="regPassword" placeholder="至少6位"></div>
+                    <div class="form-group"><label>确认密码</label><input type="password" id="regConfirm" placeholder="再次输入密码"></div>
+                    <button class="btn-submit" id="registerBtn">注 册</button>
+                    <div class="form-error" id="regError"></div>
+                    <div class="form-success" id="regSuccess"></div>
+                </div>
             </div>
-            <div id="loginForm">
-                <div class="form-group"><label>用户名</label><input type="text" id="loginUsername" placeholder="请输入用户名"></div>
-                <div class="form-group"><label>密码</label><input type="password" id="loginPassword" placeholder="请输入密码"></div>
-                <button class="btn-submit" id="loginBtn">登 录</button>
-                <div class="form-error" id="loginError"></div>
-            </div>
-            <div id="registerForm" style="display:none;">
-                <div class="form-group"><label>用户名</label><input type="text" id="regUsername" placeholder="4-16位字母/数字/中文"></div>
-                <div class="form-group"><label>密码</label><input type="password" id="regPassword" placeholder="至少6位"></div>
-                <div class="form-group"><label>确认密码</label><input type="password" id="regConfirm" placeholder="再次输入密码"></div>
-                <button class="btn-submit" id="registerBtn">注 册</button>
-                <div class="form-error" id="regError"></div>
-                <div class="form-success" id="regSuccess"></div>
+            <div id="forgotPwdForm" style="display:none;">
+                <div class="form-group"><label>用户名或邮箱</label><input type="text" id="forgotInput" placeholder="请输入用户名或邮箱"></div>
+                <button class="btn-submit" id="forgotBtn">发送重置请求</button>
+                <div class="back-to-login" id="backToLogin">← 返回登录</div>
+                <div class="form-error" id="forgotError"></div>
+                <div class="form-success" id="forgotSuccess"></div>
             </div>
             <div id="userInfo" style="display:none;">
                 <div class="user-id-display">
@@ -2859,9 +3052,21 @@
                     <div class="hint">请将此ID提供给客服开通VIP权限</div>
                 </div>
                 <div class="vip-status" id="vipStatusDisplay"><i class="fas fa-user"></i> 当前状态：普通用户</div>
-                <div style="display:flex;gap:10px;margin-top:12px;">
+                <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+                    <button class="btn-submit" id="changePwdBtn" style="background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border-glow);">修改密码</button>
+                    <button class="btn-submit" id="myVipBtn" style="background:var(--accent-gradient);color:#fff;">我的VIP</button>
                     <button class="btn-submit" id="logoutBtn" style="background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border-glow);">退出登录</button>
                 </div>
+            </div>
+            <div id="changePwdForm" style="display:none;">
+                <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:12px;">修改密码</h3>
+                <div class="form-group"><label>当前密码</label><input type="password" id="oldPwdInput" placeholder="输入当前密码"></div>
+                <div class="form-group"><label>新密码</label><input type="password" id="newPwdInput" placeholder="至少6位"></div>
+                <div class="form-group"><label>确认新密码</label><input type="password" id="confirmPwdInput" placeholder="再次输入新密码"></div>
+                <button class="btn-submit" id="changePwdSubmit">确认修改</button>
+                <div class="back-to-login" id="backToUserInfo">← 返回</div>
+                <div class="form-error" id="changePwdError"></div>
+                <div class="form-success" id="changePwdSuccess"></div>
             </div>
         </div>
     </div>
@@ -2919,7 +3124,6 @@
         ];
         var CACHE_KEY = 'lezhe_software_cache';
         var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
-
         function loadCacheFromStorage() {
             try {
                 var stored = localStorage.getItem(CACHE_KEY);
@@ -2936,14 +3140,9 @@
             } catch (_) {}
             return false;
         }
-
         function saveCacheToStorage() {
             try {
-                var data = {
-                    software: cache.software,
-                    categories: cache.categories,
-                    timestamp: Date.now()
-                };
+                var data = { software: cache.software, categories: cache.categories, timestamp: Date.now() };
                 localStorage.setItem(CACHE_KEY, JSON.stringify(data));
             } catch (_) {}
         }
@@ -2959,9 +3158,7 @@
                     if (softRes.error) throw softRes.error;
                     if (catRes.error) throw catRes.error;
                     cache.software = softRes.data || [];
-                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具',
-                        '实用工具'
-                    ];
+                    cache.categories = catRes.data.map(function(item) { return item.name; }) || ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
                     cache.software.forEach(function(s) {
                         if (!s.screenshots) s.screenshots = [];
                         if (!s.changelog) s.changelog = '';
@@ -2992,23 +3189,19 @@
             getCategories: function() { return cache.categories; },
             async updateSoftware(soft) {
                 try {
-                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id',
-                        soft.id);
+                    await supabaseClient.from('software').update({ views: soft.views, downloads: soft.downloads }).eq('id', soft.id);
                     var idx = cache.software.findIndex(function(s) { return s.id === soft.id; });
-                    if (idx !== -1) { cache.software[idx].views = soft.views;
-                        cache.software[idx].downloads = soft.downloads; }
+                    if (idx !== -1) { cache.software[idx].views = soft.views; cache.software[idx].downloads = soft.downloads; }
                     saveCacheToStorage();
                 } catch (e) { console.error('更新失败:', e); }
             }
         };
-
         function toast(msg, type) {
             type = type || 'success';
             var c = document.getElementById('toastContainer');
             var el = document.createElement('div');
             el.className = 'toast ' + type;
-            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' +
-                msg + '<span class="toast-close">✕</span>';
+            el.innerHTML = '<span class="icon">' + (type === 'success' ? '◆' : (type === 'error' ? '✕' : '⚠')) + '</span> ' + msg + '<span class="toast-close">✕</span>';
             c.appendChild(el);
             el.querySelector('.toast-close').addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -3027,14 +3220,12 @@
                 }
             }, 3500);
         }
-
         function escapeHTML(str) {
             if (!str) return '';
             var div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
         }
-
         function highlightText(text, keyword) {
             if (!keyword) return escapeHTML(text);
             var escaped = escapeHTML(text);
@@ -3042,35 +3233,27 @@
             var regex = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
             return escaped.replace(regex, '<mark>' + kw + '</mark>');
         }
-
         function getIconEmoji(cat) {
             var map = { '设计工具': '✎', '开发工具': '⚙', '办公软件': '📋', '媒体工具': '🎬', '实用工具': '🔧' };
             return map[cat] || '📦';
         }
-
         function renderIcon(soft) {
             var fallback = soft.icon || '📦';
             if (soft.icon_url && soft.icon_url.trim()) {
-                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' +
-                    fallback + '\'">';
+                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + fallback + '\'">';
             }
             return fallback;
         }
-
         function renderPlatformBadges(soft) {
             var html = '';
-            if ((soft.platforms || []).includes('mac')) html +=
-                '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
-            if ((soft.platforms || []).includes('windows')) html +=
-                '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
+            if ((soft.platforms || []).includes('mac')) html += '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';
+            if ((soft.platforms || []).includes('windows')) html += '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';
             return html;
         }
-
         function isFavorited(id) {
             var favs = JSON.parse(localStorage.getItem('lezhe_favorites') || '[]');
             return favs.includes(id);
         }
-
         function toggleFavorite(id) {
             var favs = JSON.parse(localStorage.getItem('lezhe_favorites') || '[]');
             var idx = favs.indexOf(id);
@@ -3080,15 +3263,12 @@
             return favs.includes(id);
         }
         var searchHistory = JSON.parse(localStorage.getItem('lezhe_search_history') || '[]');
-
         function addSearchHistory(kw) {
             if (!kw) return;
             searchHistory = [kw, ...searchHistory.filter(function(h) { return h !== kw; })].slice(0, 10);
             localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
         }
-
         var searchDebounceTimer = null;
-
         function showSuggestions(keyword) {
             clearTimeout(searchDebounceTimer);
             var sug = document.getElementById('searchSuggestions');
@@ -3100,8 +3280,7 @@
             if (!keyword && searchHistory.length > 0) {
                 hist.innerHTML = '<div class="history-header">最近搜索</div>' +
                     searchHistory.map(function(h) {
-                        return '<div class="item" data-kw="' + h + '">' + h +
-                            '<span class="remove-history" data-kw="' + h + '">✕</span></div>';
+                        return '<div class="item" data-kw="' + h + '">' + h + '<span class="remove-history" data-kw="' + h + '">✕</span></div>';
                     }).join('');
                 hist.classList.add('open');
                 hist.querySelectorAll('.item').forEach(function(el) {
@@ -3109,8 +3288,7 @@
                         if (e.target.classList.contains('remove-history')) {
                             var kw = e.target.dataset.kw;
                             searchHistory = searchHistory.filter(function(h) { return h !== kw; });
-                            localStorage.setItem('lezhe_search_history', JSON.stringify(
-                            searchHistory));
+                            localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
                             showSuggestions('');
                             return;
                         }
@@ -3128,9 +3306,7 @@
                     if (matches.length) {
                         sug.innerHTML = matches.map(function(s) {
                             var name = s.name || '未命名';
-                            return '<div class="item" data-name="' + name + '">' + renderIcon(s) + ' ' +
-                                name +
-                                '</div>';
+                            return '<div class="item" data-name="' + name + '">' + renderIcon(s) + ' ' + name + '</div>';
                         }).join('');
                         sug.classList.add('open');
                         sug.querySelectorAll('.item').forEach(function(el) {
@@ -3146,7 +3322,6 @@
             }
         }
         var currentView = 'grid';
-
         function applyViewMode() {
             var grid = document.getElementById('listGrid');
             if (currentView === 'list') {
@@ -3172,19 +3347,13 @@
             ],
             fallbackGroup: { id: 'other', name: '其他分类', icon: '📁', cats: [] }
         };
-
         function getGroupStates() {
-            try {
-                var raw = localStorage.getItem('lezhe_group_states');
-                if (raw) return JSON.parse(raw);
-            } catch (_) {}
+            try { var raw = localStorage.getItem('lezhe_group_states'); if (raw) return JSON.parse(raw); } catch (_) {}
             return {};
         }
-
         function saveGroupStates(states) {
             localStorage.setItem('lezhe_group_states', JSON.stringify(states));
         }
-
         function toggleGroup(groupId) {
             var states = getGroupStates();
             states[groupId] = !states[groupId];
@@ -3195,7 +3364,6 @@
                 function(cat) { App.goList(cat); }
             );
         }
-
         function scrollToActiveItem() {
             var container = document.getElementById('categoryList');
             if (!container) return;
@@ -3212,8 +3380,7 @@
                 var quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
                 var now = new Date();
                 var dateStr = (now.getMonth() + 1) + '/' + now.getDate();
-                container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' +
-                    dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
+                container.innerHTML = '<div class="announcement-item"><span class="dot">◆</span><span class="time">' + dateStr + '</span><span class="text">🌸 ' + quote + '</span><span class="badge-new">今日</span></div>';
             },
             renderCategories: function(container, active, onClick) {
                 if (!container) return;
@@ -3250,10 +3417,7 @@
                 var html = '';
                 var isAllActive = (active === null || active === 'all' || active === undefined);
                 html += '<div class="category-item-all ' + (isAllActive ? 'active' : '') + '" data-cat="all">' +
-                    '<span class="icon">◇</span>' +
-                    '<span class="name">全部</span>' +
-                    '<span class="count">' + totalCount + '</span>' +
-                    '</div>';
+                    '<span class="icon">◇</span><span class="name">全部</span><span class="count">' + totalCount + '</span></div>';
                 var groupOrder = GROUP_CONFIG.groups.map(function(g) { return g.id; });
                 if (fallbackItems.length) groupOrder.push(GROUP_CONFIG.fallbackGroup.id);
                 groupOrder.forEach(function(gid) {
@@ -3264,25 +3428,18 @@
                     var icon = g.icon || '📁';
                     html += '<div class="category-group">';
                     html += '<div class="group-header" data-group="' + gid + '">' +
-                        '<span class="group-icon">' + icon + '</span>' +
-                        '<span class="group-name">' + g.name + '</span>' +
+                        '<span class="group-icon">' + icon + '</span><span class="group-name">' + g.name + '</span>' +
                         '<span class="group-badge">' + entry.items.length + '</span>' +
-                        '<span class="toggle-icon ' + (isOpen ? 'open' : '') + '">▶</span>' +
-                        '</div>';
+                        '<span class="toggle-icon ' + (isOpen ? 'open' : '') + '">▶</span></div>';
                     html += '<div class="group-items ' + (isOpen ? 'open' : '') + '">';
                     entry.items.forEach(function(cat) {
                         var count = countMap[cat] || 0;
                         var isActive = (active === cat);
                         var emoji = getIconEmoji(cat);
-                        html += '<div class="category-item-side ' + (isActive ? 'active' : '') + '" data-cat="' +
-                            cat + '">' +
-                            '<span class="icon">' + emoji + '</span>' +
-                            '<span class="name">' + cat + '</span>' +
-                            '<span class="count">' + count + '</span>' +
-                            '</div>';
+                        html += '<div class="category-item-side ' + (isActive ? 'active' : '') + '" data-cat="' + cat + '">' +
+                            '<span class="icon">' + emoji + '</span><span class="name">' + cat + '</span><span class="count">' + count + '</span></div>';
                     });
-                    html += '</div>';
-                    html += '</div>';
+                    html += '</div></div>';
                 });
                 container.innerHTML = html;
                 var allEl = container.querySelector('.category-item-all');
@@ -3376,8 +3533,8 @@
                         '</div></div><div class="fav-wrap"><button class="favorite-btn ' + fav +
                         '" data-id="' + s.id + '" aria-label="收藏"><i class="fas fa-heart"></i></button></div></div>' +
                         (displayDesc ? '<div class="desc">' + displayDesc + '</div>' : '') +
-                        '<div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (
-                            s.views || 0) + '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) +
+                        '<div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> ' + (s.views || 0) +
+                        '</span><span><i class="fas fa-download"></i> ' + (s.downloads || 0) +
                         '</span></div><button class="btn btn-sm btn-primary detail-trigger" data-id="' + s.id +
                         '">详情</button></div></div>';
                 }
@@ -3404,12 +3561,10 @@
             }
         };
         var viewHistory = JSON.parse(localStorage.getItem('lezhe_view_history') || '[]');
-
         function addViewHistory(softwareId) {
             viewHistory = [softwareId, ...viewHistory.filter(function(id) { return id !== softwareId; })].slice(0, 6);
             localStorage.setItem('lezhe_view_history', JSON.stringify(viewHistory));
         }
-
         function renderRecentHistory() {
             var container = document.getElementById('recentGrid');
             var section = document.getElementById('recentHistorySection');
@@ -3430,7 +3585,6 @@
             Render.renderCards(container, recentSoftware, true);
         }
 
-        // ---------- 登录/注册相关 ----------
         var currentUser = null;
 
         function hashPwd(p) {
@@ -3453,8 +3607,15 @@
             return !!data;
         }
 
+        async function checkEmailExists(email) {
+            if (!email) return false;
+            var { data, error } = await supabaseClient.from('users').select('id').eq('email', email).maybeSingle();
+            return !!data;
+        }
+
         async function registerUser() {
             var username = document.getElementById('regUsername').value.trim();
+            var email = document.getElementById('regEmail').value.trim();
             var password = document.getElementById('regPassword').value;
             var confirm = document.getElementById('regConfirm').value;
             var errEl = document.getElementById('regError');
@@ -3467,16 +3628,21 @@
             if (password !== confirm) { errEl.textContent = '两次密码不一致'; return; }
             var exists = await checkUsernameExists(username);
             if (exists) { errEl.textContent = '用户名已被注册'; return; }
+            if (email) {
+                var emailExists = await checkEmailExists(email);
+                if (emailExists) { errEl.textContent = '邮箱已被使用'; return; }
+            }
             var userCode = generateUserCode();
             var { data, error } = await supabaseClient.from('users').insert({
                 username: username,
+                email: email || null,
                 password: hashPwd(password),
                 user_code: userCode,
                 vip_status: false,
                 vip_expire: null
             }).select().single();
             if (error) { errEl.textContent = '注册失败：' + error.message; return; }
-            sucEl.textContent = '注册成功！请切换登录';
+            sucEl.textContent = '注册成功！请登录';
             toast('注册成功，请登录', 'success');
             setTimeout(function() {
                 sucEl.textContent = '';
@@ -3496,12 +3662,11 @@
             if (error || !data) { errEl.textContent = '用户名或密码错误'; return; }
             if (data.password !== hashPwd(password)) { errEl.textContent = '用户名或密码错误'; return; }
             currentUser = data;
-            // 保存登录状态到 sessionStorage
             sessionStorage.setItem('lezhe_vip_user', JSON.stringify(data));
             showUserInfo(data);
             toast('欢迎回来，' + data.username, 'success');
             document.getElementById('authModal').classList.remove('active');
-            // 登录成功后，检查是否有重定向目标（比如点击高速下载时设置了标志）
+            updateUserUI();
             if (sessionStorage.getItem('redirect_after_login')) {
                 sessionStorage.removeItem('redirect_after_login');
                 window.location.href = '/vip.html';
@@ -3511,7 +3676,10 @@
         function showUserInfo(user) {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotPwdForm').style.display = 'none';
+            document.getElementById('changePwdForm').style.display = 'none';
             document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('authMain').style.display = 'none';
             document.getElementById('modalTitle').textContent = '👤 我的信息';
             document.getElementById('userCode').textContent = user.user_code;
             var statusEl = document.getElementById('vipStatusDisplay');
@@ -3536,23 +3704,140 @@
         }
 
         function showLoginForm() {
+            document.getElementById('authMain').style.display = 'block';
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotPwdForm').style.display = 'none';
+            document.getElementById('changePwdForm').style.display = 'none';
             document.getElementById('userInfo').style.display = 'none';
             document.getElementById('modalTitle').textContent = '✦ 登录';
             document.getElementById('loginError').textContent = '';
         }
 
         function showRegisterForm() {
+            document.getElementById('authMain').style.display = 'block';
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('forgotPwdForm').style.display = 'none';
+            document.getElementById('changePwdForm').style.display = 'none';
             document.getElementById('userInfo').style.display = 'none';
             document.getElementById('modalTitle').textContent = '✦ 注册';
             document.getElementById('regError').textContent = '';
             document.getElementById('regSuccess').textContent = '';
         }
 
-        // ---------- 详情弹窗 ----------
+        function showForgotPwd() {
+            document.getElementById('authMain').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotPwdForm').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('changePwdForm').style.display = 'none';
+            document.getElementById('modalTitle').textContent = '✦ 找回密码';
+            document.getElementById('forgotError').textContent = '';
+            document.getElementById('forgotSuccess').textContent = '';
+        }
+
+        function showChangePwd() {
+            document.getElementById('authMain').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('forgotPwdForm').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('changePwdForm').style.display = 'block';
+            document.getElementById('modalTitle').textContent = '✦ 修改密码';
+            document.getElementById('changePwdError').textContent = '';
+            document.getElementById('changePwdSuccess').textContent = '';
+        }
+
+        async function forgotPassword() {
+            var input = document.getElementById('forgotInput').value.trim();
+            var errEl = document.getElementById('forgotError');
+            var sucEl = document.getElementById('forgotSuccess');
+            errEl.textContent = '';
+            sucEl.textContent = '';
+            if (!input) { errEl.textContent = '请输入用户名或邮箱'; return; }
+            var { data, error } = await supabaseClient.from('users')
+                .select('username, email')
+                .or('username.eq.' + input + ',email.eq.' + input)
+                .maybeSingle();
+            if (error || !data) {
+                errEl.textContent = '未找到该用户，请确认输入正确';
+                return;
+            }
+            sucEl.innerHTML = '重置链接已发送至您的邮箱（如果已绑定）。<br>若未收到，请联系客服 <strong>QQ: 150772520</strong> 协助重置。';
+            if (data.email) {
+                try {
+                    var { error: resetError } = await supabaseClient.auth.resetPasswordForEmail(data.email, {
+                        redirectTo: window.location.origin + '/reset-password.html'
+                    });
+                    if (resetError) console.warn('重置邮件发送失败:', resetError);
+                } catch (e) {}
+            }
+        }
+
+        async function changePassword() {
+            var oldPwd = document.getElementById('oldPwdInput').value;
+            var newPwd = document.getElementById('newPwdInput').value;
+            var confirmPwd = document.getElementById('confirmPwdInput').value;
+            var errEl = document.getElementById('changePwdError');
+            var sucEl = document.getElementById('changePwdSuccess');
+            errEl.textContent = '';
+            sucEl.textContent = '';
+            if (!oldPwd || !newPwd || !confirmPwd) { errEl.textContent = '请填写完整'; return; }
+            if (newPwd.length < 6) { errEl.textContent = '新密码至少6位'; return; }
+            if (newPwd !== confirmPwd) { errEl.textContent = '两次密码不一致'; return; }
+            var user = currentUser;
+            if (!user) { errEl.textContent = '请先登录'; return; }
+            if (hashPwd(oldPwd) !== user.password) { errEl.textContent = '当前密码错误'; return; }
+            var { error } = await supabaseClient.from('users')
+                .update({ password: hashPwd(newPwd) })
+                .eq('id', user.id);
+            if (error) { errEl.textContent = '修改失败：' + error.message; return; }
+            sucEl.textContent = '密码修改成功！请重新登录。';
+            user.password = hashPwd(newPwd);
+            sessionStorage.setItem('lezhe_vip_user', JSON.stringify(user));
+            toast('密码已更新', 'success');
+            setTimeout(function() {
+                logoutUser();
+            }, 1500);
+        }
+
+        function logoutUser() {
+            sessionStorage.removeItem('lezhe_vip_user');
+            currentUser = null;
+            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('authMain').style.display = 'block';
+            document.getElementById('changePwdForm').style.display = 'none';
+            document.getElementById('forgotPwdForm').style.display = 'none';
+            document.getElementById('modalTitle').textContent = '✦ 登录';
+            showLoginForm();
+            updateUserUI();
+            toast('已退出登录', 'success');
+        }
+
+        function updateUserUI() {
+            var saved = sessionStorage.getItem('lezhe_vip_user');
+            var loginBtn = document.getElementById('loginRegisterBtn');
+            var dropdown = document.getElementById('userDropdown');
+            var userNameDisplay = document.getElementById('userNameDisplay');
+            var avatar = document.getElementById('userAvatar');
+            if (saved) {
+                try {
+                    var user = JSON.parse(saved);
+                    loginBtn.style.display = 'none';
+                    dropdown.classList.remove('hidden');
+                    userNameDisplay.textContent = user.username;
+                    avatar.textContent = user.username.charAt(0).toUpperCase();
+                    currentUser = user;
+                } catch (e) {}
+            } else {
+                loginBtn.style.display = 'inline-flex';
+                dropdown.classList.add('hidden');
+                currentUser = null;
+            }
+        }
+
         var Detail = {
             open: function(soft) {
                 addViewHistory(soft.id);
@@ -3565,13 +3850,11 @@
                 } else iconEl.textContent = soft.icon || '📦';
                 document.getElementById('detailName').textContent = soft.name || '未命名';
                 var metaHtml = '<span class="badge">' + escapeHTML(soft.category) +
-                    '</span><span class="badge badge-purple">v' + escapeHTML(soft.version) + '</span><span>' + escapeHTML(
-                        soft.size || '—') + '</span>';
+                    '</span><span class="badge badge-purple">v' + escapeHTML(soft.version) + '</span><span>' + escapeHTML(soft.size || '—') + '</span>';
                 if (soft.platforms && soft.platforms.length) {
                     var platHtml = soft.platforms.map(function(p) {
                         return p === 'mac' ? '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>' :
-                            p === 'windows' ?
-                            '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>' :
+                            p === 'windows' ? '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>' :
                             '<span class="badge">' + p + '</span>';
                     }).join('');
                     metaHtml += '<span style="display:inline-flex;gap:6px;flex-wrap:wrap;">' + platHtml + '</span>';
@@ -3621,23 +3904,18 @@
                     relatedGrid.innerHTML = relatedSoft.map(function(rs) {
                         var platHtml = '';
                         var platforms = rs.platforms || [];
-                        if (platforms.includes('mac')) platHtml +=
-                            '<span class="plat mac"><i class="fab fa-apple"></i></span>';
-                        if (platforms.includes('windows')) platHtml +=
-                            '<span class="plat win"><i class="fab fa-windows"></i></span>';
+                        if (platforms.includes('mac')) platHtml += '<span class="plat mac"><i class="fab fa-apple"></i></span>';
+                        if (platforms.includes('windows')) platHtml += '<span class="plat win"><i class="fab fa-windows"></i></span>';
                         if (!platHtml) platHtml = '<span class="plat" style="opacity:0.4;">—</span>';
                         var badgeHtml = '';
-                        if (rs.recommend || (rs.downloads || 0) > 100) {
-                            badgeHtml = '<span class="badge-mini">🔥 热门</span>';
-                        }
+                        if (rs.recommend || (rs.downloads || 0) > 100) { badgeHtml = '<span class="badge-mini">🔥 热门</span>'; }
                         var idStr = rs.id;
                         return '<div class="related-card" data-id="' + idStr + '">' +
                             badgeHtml +
                             '<div class="icon-wrap">' + renderIcon(rs) + '</div>' +
                             '<div class="name" title="' + rs.name + '">' + rs.name + '</div>' +
                             '<div class="cat">' + (rs.category || '') + '</div>' +
-                            '<div class="platforms">' + platHtml + '</div>' +
-                            '</div>';
+                            '<div class="platforms">' + platHtml + '</div></div>';
                     }).join('');
                     relatedGrid.querySelectorAll('.related-card').forEach(function(el) {
                         el.addEventListener('click', function() {
@@ -3648,34 +3926,16 @@
                     });
                 } else related.classList.add('hidden');
 
-                // ----- 下载按钮 -----
-                var actions = document.querySelector('.detail-modal .modal-actions');
-                // 移除旧的按钮（如果有）
-                var oldFreeBtn = document.getElementById('detailFreeBtn');
-                if (oldFreeBtn) oldFreeBtn.remove();
-                var oldVipBtn = document.getElementById('detailVipBtn');
-                if (oldVipBtn) oldVipBtn.remove();
-
-                // 创建免费下载按钮
-                var freeBtn = document.createElement('button');
-                freeBtn.id = 'detailFreeBtn';
-                freeBtn.className = 'btn btn-success';
-                freeBtn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> 免费下载';
-                freeBtn.style.display = 'none';
-                var vipBtn = document.createElement('button');
-                vipBtn.id = 'detailVipBtn';
-                vipBtn.className = 'btn btn-primary';
-                vipBtn.innerHTML = '<i class="fas fa-bolt"></i> 高速下载';
-                vipBtn.style.display = 'none';
-                // 插入到“关闭”按钮之前
-                var closeBtn = document.getElementById('detailCloseBtn');
-                actions.insertBefore(freeBtn, closeBtn);
-                actions.insertBefore(vipBtn, closeBtn);
-
+                var freeBtn = document.getElementById('detailFreeBtn');
+                var vipBtn = document.getElementById('detailVipBtn');
                 var freeLink = soft.free_link || '';
                 var vipLink = soft.vip_link || '';
+                var noLinkTip = document.querySelector('.no-link-tip');
+                if (noLinkTip) noLinkTip.remove();
 
-                // 免费链接
+                freeBtn.style.display = 'none';
+                vipBtn.style.display = 'none';
+
                 if (freeLink.trim() !== '') {
                     freeBtn.style.display = 'inline-flex';
                     freeBtn.onclick = function() {
@@ -3693,31 +3953,28 @@
                     };
                 }
 
-                // 高速链接 - 检查登录状态
                 if (vipLink.trim() !== '') {
                     vipBtn.style.display = 'inline-flex';
                     vipBtn.onclick = function() {
-                        // 检查是否已登录
+                        if (this.classList.contains('btn-loading')) return;
                         var storedUser = sessionStorage.getItem('lezhe_vip_user');
                         if (storedUser) {
                             try {
                                 var user = JSON.parse(storedUser);
                                 if (user && user.id) {
-                                    // 已登录，直接跳转到VIP页面
                                     window.location.href = '/vip.html';
                                     return;
                                 }
                             } catch (e) {}
                         }
-                        // 未登录，显示登录弹窗，并设置重定向标记
                         sessionStorage.setItem('redirect_after_login', 'true');
                         document.getElementById('authModal').classList.add('active');
                         showLoginForm();
                     };
                 }
 
-                // 如果两个链接都为空，显示提示
                 if (freeLink.trim() === '' && vipLink.trim() === '') {
+                    var actions = document.querySelector('.detail-modal .modal-actions');
                     var tip = document.createElement('div');
                     tip.className = 'no-link-tip';
                     tip.style.cssText = 'width:100%;text-align:center;color:var(--text-dim);font-size:0.85rem;padding:8px 0;';
@@ -3725,12 +3982,10 @@
                     actions.prepend(tip);
                 }
 
-                // 分享按钮
                 document.getElementById('detailShareBtn').onclick = function() {
                     var url = window.location.origin + window.location.pathname + '?soft=' + soft.id;
                     copyLinkText(soft.name + ' - 乐哲软件', url);
                 };
-
                 overlay.classList.add('open');
                 document.body.style.overflow = 'hidden';
                 document.getElementById('detailClose').focus();
@@ -3742,8 +3997,7 @@
                     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
                         e.preventDefault();
                         var dir = e.key === 'ArrowLeft' ? -1 : 1;
-                        var list = cache.software.filter(function(s) { return s.category === self._currentSoft
-                                .category; });
+                        var list = cache.software.filter(function(s) { return s.category === self._currentSoft.category; });
                         var idx = list.indexOf(self._currentSoft);
                         var newIdx = idx + dir;
                         if (newIdx >= 0 && newIdx < list.length) {
@@ -3769,6 +4023,7 @@
             close: function() {
                 document.getElementById('detailOverlay').classList.remove('open');
                 document.body.style.overflow = '';
+                document.getElementById('vipModal').classList.remove('active');
                 if (this._keyHandler) {
                     document.removeEventListener('keydown', this._keyHandler);
                     this._keyHandler = null;
@@ -3782,14 +4037,11 @@
                 }
             }
         };
-
-        // ---------- 事件绑定 ----------
         document.getElementById('detailClose').addEventListener('click', Detail.close);
         document.getElementById('detailCloseBtn').addEventListener('click', Detail.close);
         document.getElementById('detailOverlay').addEventListener('click', function(e) {
             if (e.target === e.currentTarget) Detail.close();
         });
-
         document.addEventListener('click', function(e) {
             var card = e.target.closest('.software-card');
             if (!card) return;
@@ -3805,7 +4057,6 @@
                 }
             }
         });
-
         document.addEventListener('click', function(e) {
             var btn = e.target.closest('.detail-trigger');
             if (!btn) return;
@@ -3819,18 +4070,39 @@
                 }
             }
         });
-
         document.addEventListener('keydown', function(e) {
             if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
                 e.preventDefault();
                 document.getElementById('searchInput').focus();
             }
-            if (e.key === 'Escape' && document.getElementById('detailOverlay').classList.contains('open')) {
-                Detail.close();
+            if (e.key === 'Escape') {
+                if (document.getElementById('detailOverlay').classList.contains('open')) {
+                    Detail.close();
+                }
+                if (document.getElementById('vipModal').classList.contains('active')) {
+                    document.getElementById('vipModal').classList.remove('active');
+                    document.body.style.overflow = '';
+                }
             }
         });
+        document.getElementById('vipModalClose').addEventListener('click', function() {
+            document.getElementById('vipModal').classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        document.getElementById('vipModalLaterBtn').addEventListener('click', function() {
+            document.getElementById('vipModal').classList.remove('active');
+            document.body.style.overflow = '';
+        });
+        document.getElementById('vipModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        document.getElementById('vipModalOpenBtn').addEventListener('click', function() {
+            window.open('/vip.html', '_blank');
+        });
 
-        // ---------- 侧边栏 ----------
         var sidebar = document.getElementById('sidebarCategories');
         var trigger = document.getElementById('sidebarTrigger');
         var lockBtn = document.getElementById('sidebarLockBtn');
@@ -3840,11 +4112,9 @@
         var isLocked = false;
         var isOpen = false;
         var hoverTimeout = null;
-
         function isMobile() {
             return window.innerWidth <= 820;
         }
-
         function openSidebar() {
             if (isOpen) return;
             isOpen = true;
@@ -3859,7 +4129,6 @@
                 mobileToggleBtn.innerHTML = '<i class="fas fa-times"></i>';
             }
         }
-
         function closeSidebar() {
             if (isLocked && !isMobile()) return;
             if (!isOpen) return;
@@ -3875,20 +4144,13 @@
                 mobileToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
             }
         }
-
         function toggleSidebar() {
-            if (isOpen) {
-                closeSidebar();
-            } else {
-                openSidebar();
-            }
+            if (isOpen) { closeSidebar(); } else { openSidebar(); }
         }
-
         function toggleLock() {
             isLocked = !isLocked;
             lockBtn.classList.toggle('locked', isLocked);
-            lockBtn.innerHTML = isLocked ? '<i class="fas fa-thumbtack" style="transform:rotate(45deg);"></i>' :
-                '<i class="fas fa-thumbtack"></i>';
+            lockBtn.innerHTML = isLocked ? '<i class="fas fa-thumbtack" style="transform:rotate(45deg);"></i>' : '<i class="fas fa-thumbtack"></i>';
             if (isLocked && !isOpen && !isMobile()) {
                 openSidebar();
             }
@@ -3998,7 +4260,6 @@
             setTimeout(function() { openSidebar(); }, 100);
         }
 
-        // ---------- 主应用 ----------
         var currentPage = 1,
             PAGE_SIZE = 6,
             currentFilteredList = [];
@@ -4054,7 +4315,6 @@
                     });
                 }, 600000);
 
-                // 导航
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -4063,7 +4323,87 @@
                     });
                 });
 
-                // 搜索
+                document.getElementById('loginRegisterBtn').addEventListener('click', function() {
+                    document.getElementById('authModal').classList.add('active');
+                    showLoginForm();
+                });
+
+                document.getElementById('forgotPwdLink').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showForgotPwd();
+                });
+                document.getElementById('backToLogin').addEventListener('click', function() {
+                    showLoginForm();
+                });
+                document.getElementById('forgotBtn').addEventListener('click', forgotPassword);
+
+                document.getElementById('changePwdBtn').addEventListener('click', function() {
+                    showChangePwd();
+                });
+                document.getElementById('backToUserInfo').addEventListener('click', function() {
+                    if (currentUser) {
+                        showUserInfo(currentUser);
+                    } else {
+                        showLoginForm();
+                    }
+                });
+                document.getElementById('changePwdSubmit').addEventListener('click', changePassword);
+
+                document.getElementById('myVipBtn').addEventListener('click', function() {
+                    window.location.href = '/vip.html';
+                });
+
+                document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+
+                document.getElementById('userToggle').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var menu = document.getElementById('userMenu');
+                    menu.classList.toggle('open');
+                });
+                document.querySelectorAll('#userMenu .menu-item').forEach(function(item) {
+                    item.addEventListener('click', function(e) {
+                        var action = this.dataset.action;
+                        var menu = document.getElementById('userMenu');
+                        menu.classList.remove('open');
+                        switch (action) {
+                            case 'info':
+                                if (currentUser) {
+                                    document.getElementById('authModal').classList.add('active');
+                                    showUserInfo(currentUser);
+                                }
+                                break;
+                            case 'vip':
+                                window.location.href = '/vip.html';
+                                break;
+                            case 'change-pwd':
+                                if (currentUser) {
+                                    document.getElementById('authModal').classList.add('active');
+                                    showChangePwd();
+                                }
+                                break;
+                            case 'logout':
+                                logoutUser();
+                                break;
+                        }
+                    });
+                });
+                document.addEventListener('click', function(e) {
+                    var dropdown = document.getElementById('userDropdown');
+                    if (!dropdown.contains(e.target)) {
+                        document.getElementById('userMenu').classList.remove('open');
+                    }
+                });
+
+                updateUserUI();
+
+                var savedUser = sessionStorage.getItem('lezhe_vip_user');
+                if (savedUser) {
+                    try {
+                        var u = JSON.parse(savedUser);
+                        currentUser = u;
+                    } catch (e) {}
+                }
+
                 var searchInput = document.getElementById('searchInput');
                 var searchBtn = document.getElementById('searchBtn');
                 if (searchBtn) {
@@ -4087,8 +4427,7 @@
                 var sidebarSearchInput = document.getElementById('sidebarSearchInput');
                 var sidebarSearchBtn = document.getElementById('sidebarSearchBtn');
                 if (sidebarSearchBtn) {
-                    sidebarSearchBtn.addEventListener('click', function() { self.doSearch(sidebarSearchInput.value
-                            .trim()); });
+                    sidebarSearchBtn.addEventListener('click', function() { self.doSearch(sidebarSearchInput.value.trim()); });
                 }
                 if (sidebarSearchInput) {
                     sidebarSearchInput.addEventListener('keyup', function(e) {
@@ -4104,15 +4443,12 @@
                     document.getElementById('navLinks').classList.toggle('open');
                 });
 
-                // 分页
                 document.getElementById('prevPageBtn').addEventListener('click', function() {
-                    if (currentPage > 1) { currentPage--;
-                        self.renderListPage(); }
+                    if (currentPage > 1) { currentPage--; self.renderListPage(); }
                 });
                 document.getElementById('nextPageBtn').addEventListener('click', function() {
                     var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
-                    if (currentPage < total) { currentPage++;
-                        self.renderListPage(); }
+                    if (currentPage < total) { currentPage++; self.renderListPage(); }
                 });
                 document.getElementById('sortSelect').addEventListener('change', function() {
                     self.sortBy = this.value;
@@ -4123,8 +4459,7 @@
                 document.getElementById('jumpPageBtn').addEventListener('click', function() {
                     var p = parseInt(document.getElementById('jumpPageInput').value);
                     var total = Math.ceil(currentFilteredList.length / PAGE_SIZE);
-                    if (p >= 1 && p <= total) { currentPage = p;
-                        self.renderListPage(); }
+                    if (p >= 1 && p <= total) { currentPage = p; self.renderListPage(); }
                 });
                 document.getElementById('jumpPageInput').addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') {
@@ -4144,7 +4479,6 @@
                     self.refreshListWithFilters();
                 });
 
-                // 底部导航
                 document.querySelectorAll('#mobileBottomNav a').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -4161,15 +4495,12 @@
 
                 document.addEventListener('click', function(e) {
                     var nav = document.getElementById('navLinks');
-                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
-                    'open');
+                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove('open');
                 });
 
-                // 主题
                 var themeToggle = document.getElementById('themeToggle');
                 var headerThemeBtn = document.getElementById('headerThemeBtn');
                 var themeLabel = document.getElementById('themeLabel');
-
                 function setTheme(theme) {
                     document.documentElement.setAttribute('data-theme', theme);
                     localStorage.setItem('theme', theme);
@@ -4192,8 +4523,6 @@
                     setTheme(current === 'dark' ? 'light' : 'dark');
                 });
 
-                // 登录/注册弹窗事件绑定（已在上方定义）
-                // 这里再次确保事件绑定（可能重复，但不影响）
                 document.getElementById('modalClose').addEventListener('click', function() {
                     document.getElementById('authModal').classList.remove('active');
                 });
@@ -4202,8 +4531,7 @@
                 });
                 document.querySelectorAll('.tabs button').forEach(function(btn) {
                     btn.addEventListener('click', function() {
-                        document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove(
-                                'active'); });
+                        document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
                         this.classList.add('active');
                         if (this.dataset.tab === 'login') showLoginForm();
                         else showRegisterForm();
@@ -4217,32 +4545,6 @@
                 document.getElementById('regConfirm').addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') registerUser();
                 });
-                document.getElementById('logoutBtn').addEventListener('click', function() {
-                    sessionStorage.removeItem('lezhe_vip_user');
-                    currentUser = null;
-                    document.getElementById('userInfo').style.display = 'none';
-                    document.getElementById('modalTitle').textContent = '✦ 登录';
-                    showLoginForm();
-                    toast('已退出登录', 'success');
-                });
-
-                // 恢复登录状态
-                var savedUser = sessionStorage.getItem('lezhe_vip_user');
-                if (savedUser) {
-                    try {
-                        var u = JSON.parse(savedUser);
-                        currentUser = u;
-                        var now = new Date();
-                        if (u.vip_expire) {
-                            var exp = new Date(u.vip_expire);
-                            if (exp > now || !u.vip_expire) {
-                                showUserInfo(u);
-                            }
-                        } else if (u.vip_status) {
-                            showUserInfo(u);
-                        }
-                    } catch (e) {}
-                }
 
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
@@ -4254,15 +4556,13 @@
                     window.history.back();
                 });
             },
-
             goHome: function() {
                 this.currentPage = 'home';
                 this.currentCategory = 'all';
                 this.searchKeyword = '';
                 document.getElementById('pageHome').classList.remove('hidden');
                 document.getElementById('pageList').classList.add('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="home"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 this.refreshHome();
@@ -4280,15 +4580,13 @@
                     closeSidebar();
                 }
             },
-
             goList: function(cat) {
                 cat = cat || 'all';
                 this.currentPage = 'list';
                 this.currentCategory = cat;
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 document.getElementById('navLinks').classList.remove('open');
                 currentPage = 1;
@@ -4306,11 +4604,9 @@
                     if (b.dataset.cat === cat) b.classList.add('active');
                 });
                 if (cat === 'all') {
-                    document.getElementById('filterTags').querySelector('button[data-cat="all"]').classList.add(
-                        'active');
+                    document.getElementById('filterTags').querySelector('button[data-cat="all"]').classList.add('active');
                 }
             },
-
             updateSidebarHighlight: function(cat) {
                 var container = document.getElementById('categoryList');
                 if (!container) return;
@@ -4359,10 +4655,8 @@
                     }
                 }
             },
-
             doSearch: function(kw) {
-                var keyword = kw || document.getElementById('searchInput').value.trim() || document.getElementById(
-                    'sidebarSearchInput').value.trim();
+                var keyword = kw || document.getElementById('searchInput').value.trim() || document.getElementById('sidebarSearchInput').value.trim();
                 if (!keyword) { this.goHome(); return; }
                 addSearchHistory(keyword);
                 this.searchKeyword = keyword;
@@ -4370,8 +4664,7 @@
                 this.currentCategory = 'all';
                 document.getElementById('pageHome').classList.add('hidden');
                 document.getElementById('pageList').classList.remove('hidden');
-                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove(
-                        'active'); });
+                document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); });
                 document.querySelector('.nav-links a[data-page="list"]').classList.add('active');
                 currentPage = 1;
                 this.refreshList(keyword);
@@ -4392,7 +4685,6 @@
                 var hist = document.getElementById('searchHistory');
                 if (hist) hist.classList.remove('open');
             },
-
             refreshHome: function() {
                 var self = this;
                 var all = DB.getSoftware();
@@ -4400,8 +4692,7 @@
                 Render.renderCategories(document.getElementById('categoryList'), null, function(cat) {
                     self.goList(cat);
                 });
-                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s
-                        .recommend; }).slice(0, 6), true);
+                Render.renderCards(document.getElementById('recommendGrid'), all.filter(function(s) { return s.recommend; }).slice(0, 6), true);
                 Render.renderCards(document.getElementById('latestGrid'), all.slice().sort(function(a, b) {
                     return (b.date || '').localeCompare(a.date || '');
                 }).slice(0, 6), true);
@@ -4409,7 +4700,6 @@
                 document.getElementById('sidebarSearchWrapper').classList.remove('active');
                 document.getElementById('sidebarStats').style.display = 'block';
             },
-
             refreshList: function(keyword) {
                 var self = this;
                 var all = DB.getSoftware();
@@ -4424,14 +4714,12 @@
                     if (btn.dataset.cat === self.currentCategory) btn.classList.add('active');
                     else btn.classList.remove('active');
                     btn.addEventListener('click', function() {
-                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove(
-                                'active'); });
+                        filterContainer.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
                         this.classList.add('active');
                         self.currentCategory = this.dataset.cat;
                         currentPage = 1;
                         self.refreshListWithFilters();
-                        self.updateSidebarHighlight(self.currentCategory === 'all' ? null : self
-                        .currentCategory);
+                        self.updateSidebarHighlight(self.currentCategory === 'all' ? null : self.currentCategory);
                         if (isMobile() && isOpen) {
                             closeSidebar();
                         }
@@ -4440,19 +4728,14 @@
                 if (keyword) {
                     var kw = keyword.toLowerCase();
                     list = list.filter(function(s) {
-                        return s.name && (s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase()
-                            .includes(kw));
+                        return s.name && (s.name.toLowerCase().includes(kw) || (s.description || '').toLowerCase().includes(kw));
                     });
-                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length +
-                        '项)';
+                    document.getElementById('listSub').textContent = '搜索结果: "' + keyword + '" (' + list.length + '项)';
                 } else document.getElementById('listSub').textContent = '全部软件 (' + list.length + '项)';
-                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self
-                        .currentCategory; });
-                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || [])
-                        .includes(self.platformFilter); });
+                if (self.currentCategory !== 'all') list = list.filter(function(s) { return s.category === self.currentCategory; });
+                if (self.platformFilter !== 'all') list = list.filter(function(s) { return (s.platforms || []).includes(self.platformFilter); });
                 if (self.sortBy === 'views') list.sort(function(a, b) { return (b.views || 0) - (a.views || 0); });
-                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a
-                        .downloads || 0); });
+                else if (self.sortBy === 'downloads') list.sort(function(a, b) { return (b.downloads || 0) - (a.downloads || 0); });
                 else list.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
                 currentFilteredList = list;
                 self.renderListPage(keyword);
@@ -4460,7 +4743,6 @@
                 document.getElementById('sidebarSearchWrapper').classList.add('active');
                 document.getElementById('sidebarStats').style.display = 'none';
             },
-
             renderListPage: function(keyword) {
                 var total = currentFilteredList.length,
                     totalPages = Math.ceil(total / PAGE_SIZE) || 1;
@@ -4483,21 +4765,17 @@
                     this._scrollPos = 0;
                 }
             },
-
             refreshListWithFilters: function() {
-                var kw = document.getElementById('searchInput').value.trim() || document.getElementById(
-                    'sidebarSearchInput').value.trim();
+                var kw = document.getElementById('searchInput').value.trim() || document.getElementById('sidebarSearchInput').value.trim();
                 this.searchKeyword = kw;
                 if (kw) this.refreshList(kw);
                 else this.refreshList(null);
             },
-
             refreshAll: function() {
                 if (this.currentPage === 'home') this.refreshHome();
                 else this.refreshListWithFilters();
             }
         };
-
         document.addEventListener('DOMContentLoaded', function() { App.init(); });
 
         function shareOn(platform) {
@@ -4517,7 +4795,6 @@
             window.open(shareMap[platform], '_blank', 'width=600,height=500');
             if (typeof gtag !== 'undefined') gtag('event', 'share', { platform: platform });
         }
-
         function copyLinkText(title, url) {
             var text = title + '\n' + url;
             if (navigator.clipboard) {
@@ -4534,7 +4811,6 @@
                 toast('已复制标题与链接', 'success');
             }
         }
-
         function copyLink() {
             copyLinkText('乐哲软件 · 精选高效工具', window.location.href);
         }
