@@ -19,6 +19,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <script src="https://unpkg.com/@supabase/supabase-js@2">
     </script>
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?7c4cdf686933dffe5ce56765b3d298ec";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    <script>
+        (function() {
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            } else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
     <style>
         :root {
             --bg-primary: #f0f4fa;
@@ -1043,7 +1065,7 @@
         }
         .stack-wrapper {
             position: relative;
-            height: 280px;
+            height: 300px;
             margin: 0;
             width: 100%;
             touch-action: pan-y;
@@ -1171,26 +1193,12 @@
         }
         .stack-card .card-desc {
             flex: 1;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-secondary);
             line-height: 1.5;
             margin: 2px 0 4px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
             min-height: 0;
             opacity: 0.85;
-            scrollbar-width: thin;
-            max-height: 52px;
-        }
-        .stack-card .card-desc::-webkit-scrollbar {
-            width: 3px;
-        }
-        .stack-card .card-desc::-webkit-scrollbar-thumb {
-            background: rgba(0, 119, 255, 0.2);
-            border-radius: 4px;
-        }
-        .stack-card .card-desc::-webkit-scrollbar-track {
-            background: transparent;
         }
         .stack-card .card-footer-row {
             display: flex;
@@ -1409,7 +1417,7 @@
         }
         @media (max-width: 768px) {
             .stack-wrapper {
-                height: 250px;
+                height: 270px;
             }
             .stack-card {
                 padding: 8px 10px 6px;
@@ -1435,7 +1443,10 @@
             }
             .stack-card .card-desc {
                 font-size: 0.66rem;
-                max-height: 42px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
             .stack-card .card-footer-row .badge-platforms .badge {
                 font-size: 0.48rem;
@@ -1497,10 +1508,34 @@
             .today-header .today-count {
                 font-size: 0.65rem;
             }
+            .share-float {
+                bottom: 100px;
+                right: 10px;
+            }
+            .share-float a {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
         }
-        @media (max-width: 480px) {
+        @media (max-width: 640px) {
+            .today-header .section-title {
+                font-size: 1rem;
+                flex: 1 1 100%;
+                margin-bottom: 2px;
+            }
+            .today-header .live-badge {
+                font-size: 0.5rem;
+                padding: 1px 8px;
+            }
+            .today-header .today-count {
+                font-size: 0.6rem;
+            }
+            .today-header {
+                gap: 4px 8px;
+            }
             .stack-wrapper {
-                height: 220px;
+                height: 240px;
             }
             .stack-card {
                 padding: 6px 8px 4px;
@@ -1524,8 +1559,11 @@
                 font-size: 0.45rem;
             }
             .stack-card .card-desc {
-                font-size: 0.58rem;
-                max-height: 34px;
+                font-size: 0.6rem;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
             .stack-card .card-footer-row .badge-platforms .badge {
                 font-size: 0.42rem;
@@ -1572,6 +1610,99 @@
             .stack-controls {
                 gap: 10px;
                 margin-top: 4px;
+            }
+            .share-float {
+                bottom: 90px;
+                right: 8px;
+            }
+            .share-float a {
+                width: 28px;
+                height: 28px;
+                font-size: 0.7rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .stack-wrapper {
+                height: 220px;
+            }
+            .stack-card {
+                padding: 4px 6px 3px;
+            }
+            .stack-card .card-icon {
+                width: 22px;
+                height: 22px;
+                font-size: 11px;
+            }
+            .stack-card .card-title .name {
+                font-size: 0.68rem;
+            }
+            .stack-card .card-title .meta .cat-tag {
+                font-size: 0.4rem;
+                padding: 0 3px;
+            }
+            .stack-card .card-title .meta .version {
+                font-size: 0.4rem;
+            }
+            .stack-card .card-title .meta .size {
+                font-size: 0.4rem;
+            }
+            .stack-card .card-desc {
+                font-size: 0.52rem;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .stack-card .card-footer-row .badge-platforms .badge {
+                font-size: 0.38rem;
+                padding: 0 3px;
+                line-height: 1.3;
+            }
+            .stack-card .card-footer-row .stats-info {
+                font-size: 0.38rem;
+                gap: 3px;
+            }
+            .stack-card .card-footer-row .time-ago {
+                font-size: 0.38rem;
+            }
+            .stack-controls .ctrl-btn {
+                width: 20px;
+                height: 20px;
+                font-size: 0.55rem;
+            }
+            .stack-controls .stack-counter {
+                font-size: 0.55rem;
+                min-width: 28px;
+            }
+            .stack-controls .stack-dots .dot {
+                width: 3px;
+                height: 3px;
+            }
+            .stack-controls .stack-dots .dot.active {
+                width: 8px;
+            }
+            .stack-controls {
+                gap: 8px;
+                margin-top: 3px;
+            }
+            .today-header .section-title {
+                font-size: 0.9rem;
+            }
+            .today-header .live-badge {
+                font-size: 0.45rem;
+                padding: 0 6px;
+            }
+            .today-header .today-count {
+                font-size: 0.55rem;
+            }
+            .share-float {
+                bottom: 80px;
+                right: 6px;
+            }
+            .share-float a {
+                width: 24px;
+                height: 24px;
+                font-size: 0.6rem;
             }
         }
         .section-title {
@@ -2154,39 +2285,6 @@
                 opacity: 0;
             }
         }
-        .back-top {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            left: auto;
-            z-index: 50;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--bg-card-solid);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card);
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-        }
-        .back-top.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .back-top:hover {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-            transform: scale(1.05);
-        }
         .mobile-bottom-nav {
             display: none;
             position: fixed;
@@ -2228,22 +2326,6 @@
             }
             body {
                 padding-bottom: 60px;
-            }
-            .back-top {
-                bottom: 70px;
-                right: 16px;
-                width: 36px;
-                height: 36px;
-                font-size: 0.9rem;
-            }
-            .share-float {
-                bottom: 140px;
-                right: 10px;
-            }
-            .share-float a {
-                width: 36px;
-                height: 36px;
-                font-size: 0.9rem;
             }
             .software-grid {
                 gap: 12px;
@@ -2962,7 +3044,6 @@
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
-    <button class="back-top" id="backTopBtn" aria-label="回到顶部"><i class="fas fa-arrow-up"></i></button>
 
     <div class="app-layout">
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -3221,6 +3302,9 @@
                     <a href="https://www.zhihu.com" target="_blank" rel="noopener">知乎</a>
                 </div>
                 <div class="disclaimer">免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。</div>
+                <div style="margin-top:12px; display:flex; justify-content:center; align-items:center;">
+                    <script id="_wauliu">var _wau = _wau || []; _wau.push(["dynamic", "i43je91mj7", "liu", "00a1e6ffffff", "small"]);</script><script async src="//waust.at/d.js"></script>
+                </div>
             </footer>
         </main>
     </div>
@@ -3259,6 +3343,7 @@
         <a href="#" onclick="shareOn('weibo')" title="分享到微博"><i class="fab fa-weibo"></i></a>
         <a href="#" onclick="shareOn('twitter')" title="分享到Twitter"><i class="fab fa-twitter"></i></a>
         <a href="#" onclick="copyLink()" title="复制链接"><i class="fas fa-link"></i></a>
+        <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" title="回到顶部"><i class="fas fa-arrow-up"></i></a>
     </div>
 
     <div class="stats-placeholder">
@@ -3390,10 +3475,33 @@
                 localStorage.setItem(CACHE_KEY, JSON.stringify(data));
             } catch (_) {}
         }
+
+        function getCachedData() {
+            if (cache.loaded && cache.software.length > 0) {
+                return { software: cache.software, categories: cache.categories };
+            }
+            var stored = localStorage.getItem(CACHE_KEY);
+            if (stored) {
+                try {
+                    var data = JSON.parse(stored);
+                    if (data && data.software && data.categories) {
+                        cache.software = data.software;
+                        cache.categories = data.categories;
+                        cache.loaded = true;
+                        cache.lastFetch = data.timestamp || 0;
+                        return { software: cache.software, categories: cache.categories };
+                    }
+                } catch (_) {}
+            }
+            return null;
+        }
+
         var DB = {
             async loadAll(force) {
                 force = force || false;
-                if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) return;
+                if (cache.loaded && !force && (Date.now() - cache.lastFetch < 600000)) {
+                    return { software: cache.software, categories: cache.categories };
+                }
                 try {
                     var [softRes, catRes] = await Promise.all([
                         supabaseClient.from('software').select('*').order('created_at', { ascending: false }),
@@ -3420,15 +3528,13 @@
                     cache.loaded = true;
                     cache.lastFetch = Date.now();
                     saveCacheToStorage();
-                    return true;
+                    return { software: cache.software, categories: cache.categories };
                 } catch (e) {
                     console.error('加载数据失败:', e);
-                    if (!cache.loaded) {
-                        cache.software = [];
-                        cache.categories = ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'];
-                        cache.loaded = true;
+                    if (cache.loaded) {
+                        return { software: cache.software, categories: cache.categories };
                     }
-                    return false;
+                    return { software: [], categories: ['设计工具', '开发工具', '办公软件', '媒体工具', '实用工具'] };
                 }
             },
             getSoftware: function() { return cache.software; },
@@ -4464,43 +4570,20 @@
                     self.sortBy = savedSort;
                     document.getElementById('sortSelect').value = savedSort;
                 }
-                var hasCache = loadCacheFromStorage();
-                if (hasCache) {
+                var cached = getCachedData();
+                if (cached) {
                     self.refreshAll();
+                    DB.loadAll(true).then(function() {
+                        self.refreshAll();
+                        renderRecentHistory();
+                    });
+                } else {
+                    DB.loadAll().then(function() {
+                        self.refreshAll();
+                        renderRecentHistory();
+                    });
                 }
-                this._loadDataWithRetry = function() {
-                    DB.loadAll(true).then(function(success) {
-                        if (success) {
-                            self.refreshAll();
-                            renderRecentHistory();
-                            var errContainer = document.getElementById('listGrid');
-                            if (errContainer && errContainer.querySelector('.error-retry')) {
-                                errContainer.innerHTML = '';
-                            }
-                        } else {
-                            var grid = document.getElementById('listGrid');
-                            if (grid) {
-                                grid.innerHTML =
-                                    '<div class="error-retry"><div class="icon">⚠</div><h3>数据加载失败</h3><p>请检查网络后重试</p><button class="btn btn-primary" id="retryLoadBtn">重新加载</button></div>';
-                                var retryBtn = document.getElementById('retryLoadBtn');
-                                if (retryBtn) {
-                                    retryBtn.addEventListener('click', function() {
-                                        self._loadDataWithRetry();
-                                    });
-                                }
-                            }
-                        }
-                    });
-                };
-                this._loadDataWithRetry();
-                setInterval(function() {
-                    DB.loadAll(true).then(function(success) {
-                        if (success) {
-                            self.refreshAll();
-                            renderRecentHistory();
-                        }
-                    });
-                }, 600000);
+
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) {
                     a.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -4591,16 +4674,6 @@
                         if (this.dataset.page === 'home') self.goHome();
                         else self.goList();
                     });
-                });
-                var backBtn = document.getElementById('backTopBtn');
-                window.addEventListener('scroll', function() {
-                    backBtn.classList.toggle('visible', window.pageYOffset > 300);
-                });
-                backBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-                document.addEventListener('click', function(e) {
-                    var nav = document.getElementById('navLinks');
-                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
-                        'open');
                 });
                 var themeToggle = document.getElementById('themeToggle');
                 var headerThemeBtn = document.getElementById('headerThemeBtn');
