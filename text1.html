@@ -1517,14 +1517,6 @@
                 height: 32px;
                 font-size: 0.8rem;
             }
-            .back-top {
-                bottom: 16px;
-                right: 16px;
-                width: 36px;
-                height: 36px;
-                font-size: 0.9rem;
-                z-index: 101;
-            }
         }
         @media (max-width: 640px) {
             .today-header .section-title {
@@ -1628,14 +1620,6 @@
                 height: 28px;
                 font-size: 0.7rem;
             }
-            .back-top {
-                bottom: 14px;
-                right: 14px;
-                width: 32px;
-                height: 32px;
-                font-size: 0.8rem;
-                z-index: 101;
-            }
         }
         @media (max-width: 480px) {
             .stack-wrapper {
@@ -1719,14 +1703,6 @@
                 width: 24px;
                 height: 24px;
                 font-size: 0.6rem;
-            }
-            .back-top {
-                bottom: 12px;
-                right: 12px;
-                width: 28px;
-                height: 28px;
-                font-size: 0.7rem;
-                z-index: 101;
             }
         }
         .section-title {
@@ -2308,39 +2284,6 @@
                 transform: translateX(120%);
                 opacity: 0;
             }
-        }
-        .back-top {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            left: auto;
-            z-index: 50;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--bg-card-solid);
-            border: 1px solid var(--border-glow-strong);
-            box-shadow: var(--shadow-card);
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-        }
-        .back-top.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .back-top:hover {
-            background: var(--accent-gradient);
-            color: #fff;
-            border-color: transparent;
-            transform: scale(1.05);
         }
         .mobile-bottom-nav {
             display: none;
@@ -3101,7 +3044,6 @@
 </head>
 <body>
     <div class="toast-container" id="toastContainer"></div>
-    <button class="back-top" id="backTopBtn" aria-label="回到顶部"><i class="fas fa-arrow-up"></i></button>
 
     <div class="app-layout">
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -3401,6 +3343,7 @@
         <a href="#" onclick="shareOn('weibo')" title="分享到微博"><i class="fab fa-weibo"></i></a>
         <a href="#" onclick="shareOn('twitter')" title="分享到Twitter"><i class="fab fa-twitter"></i></a>
         <a href="#" onclick="copyLink()" title="复制链接"><i class="fas fa-link"></i></a>
+        <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" title="回到顶部"><i class="fas fa-arrow-up"></i></a>
     </div>
 
     <div class="stats-placeholder">
@@ -4731,16 +4674,6 @@
                         if (this.dataset.page === 'home') self.goHome();
                         else self.goList();
                     });
-                });
-                var backBtn = document.getElementById('backTopBtn');
-                window.addEventListener('scroll', function() {
-                    backBtn.classList.toggle('visible', window.pageYOffset > 300);
-                });
-                backBtn.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
-                document.addEventListener('click', function(e) {
-                    var nav = document.getElementById('navLinks');
-                    if (nav.classList.contains('open') && !e.target.closest('.header')) nav.classList.remove(
-                        'open');
                 });
                 var themeToggle = document.getElementById('themeToggle');
                 var headerThemeBtn = document.getElementById('headerThemeBtn');
