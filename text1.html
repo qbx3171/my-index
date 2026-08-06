@@ -1065,7 +1065,7 @@
         }
         .stack-wrapper {
             position: relative;
-            height: 280px;
+            height: 300px;
             margin: 0;
             width: 100%;
             touch-action: pan-y;
@@ -1193,26 +1193,12 @@
         }
         .stack-card .card-desc {
             flex: 1;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-secondary);
             line-height: 1.5;
             margin: 2px 0 4px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
             min-height: 0;
             opacity: 0.85;
-            scrollbar-width: thin;
-            max-height: 52px;
-        }
-        .stack-card .card-desc::-webkit-scrollbar {
-            width: 3px;
-        }
-        .stack-card .card-desc::-webkit-scrollbar-thumb {
-            background: rgba(0, 119, 255, 0.2);
-            border-radius: 4px;
-        }
-        .stack-card .card-desc::-webkit-scrollbar-track {
-            background: transparent;
         }
         .stack-card .card-footer-row {
             display: flex;
@@ -1431,7 +1417,7 @@
         }
         @media (max-width: 768px) {
             .stack-wrapper {
-                height: 250px;
+                height: 270px;
             }
             .stack-card {
                 padding: 8px 10px 6px;
@@ -1457,7 +1443,6 @@
             }
             .stack-card .card-desc {
                 font-size: 0.66rem;
-                max-height: 42px;
             }
             .stack-card .card-footer-row .badge-platforms .badge {
                 font-size: 0.48rem;
@@ -1522,7 +1507,7 @@
         }
         @media (max-width: 480px) {
             .stack-wrapper {
-                height: 220px;
+                height: 240px;
             }
             .stack-card {
                 padding: 6px 8px 4px;
@@ -1546,8 +1531,7 @@
                 font-size: 0.45rem;
             }
             .stack-card .card-desc {
-                font-size: 0.58rem;
-                max-height: 34px;
+                font-size: 0.6rem;
             }
             .stack-card .card-footer-row .badge-platforms .badge {
                 font-size: 0.42rem;
