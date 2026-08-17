@@ -4188,7 +4188,7 @@
             </div>
             <footer class="footer">
                 <div class="brand">◆ 乐哲软件</div>
-                <p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a></p>
+                <p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection#d894bd82b0bd8bb7beac98b7adacb4b7b7b3f6bbb7b5"><span class="__cf_email__" data-cfemail="8ac6efd0e2efd9e5ecfecae5fffee6e5e5e1a4e9e5e7">[email&#160;protected]</span></a></p>
                 <div class="links"><span>友情链接：</span><a href="https://github.com" target="_blank" rel="noopener">GitHub</a> | <a href="https://www.v2ex.com" target="_blank" rel="noopener">V2EX</a> | <a href="https://www.oschina.net" target="_blank" rel="noopener">开源中国</a> | <a href="https://www.csdn.net" target="_blank" rel="noopener">CSDN</a> | <a href="https://www.zhihu.com" target="_blank" rel="noopener">知乎</a></div>
                 <div class="disclaimer">免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。</div>
             </footer>
@@ -4203,7 +4203,7 @@
     <div class="modal-overlay" id="questionModal"><div class="modal-box"><button class="close-btn" id="questionModalClose">&times;</button><h3>提出你的问题</h3><div class="form-group"><label>问题标题</label><input type="text" id="qTitle" placeholder="简明扼要的问题" /></div><div class="form-group"><label>详细描述</label><textarea id="qBody" rows="5" placeholder="问题背景、期望的答案等..."></textarea></div><div class="form-group"><label>分类</label><select id="qCategory"><option value="设计">设计</option><option value="开发">开发</option><option value="办公">办公</option><option value="媒体">媒体</option><option value="实用">实用</option></select></div><div class="form-actions"><button class="btn btn-outline" id="qCancel">取消</button><button class="btn btn-primary" id="qSubmit">提交问题</button></div></div></div>
     <div class="modal-overlay" id="answerModal"><div class="modal-box"><button class="close-btn" id="answerModalClose">&times;</button><h3>你的回答</h3><div class="form-group"><label>回答内容</label><textarea id="aBody" rows="5" placeholder="写你的回答..."></textarea></div><div class="form-actions"><button class="btn btn-outline" id="aCancel">取消</button><button class="btn btn-primary" id="aSubmit">提交回答</button></div></div></div>
     <div class="modal-overlay" id="submitSoftwareModal"><div class="modal-box"><button class="close-btn" id="submitSoftwareModalClose">&times;</button><h3><i class="fas fa-rocket"></i> 开发者入驻 · 提交软件</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:12px;">提交后我们将审核，通过后立即上架。</p><div class="form-group"><label>软件名称 *</label><input type="text" id="subName" placeholder="例如：Photoshop 2026" /></div><div class="form-group"><label>分类 *</label><select id="subCategory"><option value="设计工具">设计工具</option><option value="开发工具">开发工具</option><option value="办公软件">办公软件</option><option value="媒体工具">媒体工具</option><option value="实用工具">实用工具</option></select></div><div class="form-group"><label>版本</label><input type="text" id="subVersion" placeholder="1.0" /></div><div class="form-group"><label>描述</label><textarea id="subDesc" rows="3" placeholder="软件简介..."></textarea></div><div class="form-group"><label>平台 (多个用逗号分隔)</label><input type="text" id="subPlatforms" placeholder="mac,windows" /></div><div class="form-group"><label>下载链接</label><input type="url" id="subDownloadUrl" placeholder="https://example.com/download" /></div><div class="form-group"><label>图标 URL</label><input type="url" id="subIconUrl" placeholder="https://example.com/icon.png" /></div><div class="form-group"><label>您的联系方式 (邮箱或微信)</label><input type="text" id="subContact" placeholder="用于审核沟通" /></div><div class="form-actions"><button class="btn btn-outline" id="subCancel">取消</button><button class="btn btn-primary" id="subSubmit">提交审核</button></div></div></div>
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
         var supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -4940,7 +4940,7 @@
                             document.getElementById('tutorialDetailTitle').textContent = tut.title;
                             document.getElementById('tutorialDetailMeta').textContent = tut.category +
                                 ' · ' + timeAgo(tut.created_at);
-                            document.getElementById('tutorialDetailContent').textContent = tut.content;
+                            document.getElementById('tutorialDetailContent').innerHTML = tut.content;
                             var videos = [];
                             try {
                                 if (tut.videos) videos = typeof tut.videos === 'string' ? JSON.parse(tut
@@ -5779,5 +5779,6 @@
 
         function copyLink() { copyLinkText('乐哲软件 · 精选高效工具', window.location.href); }
     </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
