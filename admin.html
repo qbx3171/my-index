@@ -347,7 +347,7 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
                     <button class="tool-btn primary" id="insertImageBtn"><i class="fas fa-image"></i> 插入图片</button>
                     <button class="tool-btn" id="insertBrBtn"><i class="fas fa-arrow-down"></i> 换行</button>
                     <button class="tool-btn" id="previewContentBtn"><i class="fas fa-eye"></i> 预览</button>
-                    <span style="font-size:.65rem;color:var(--text-dim);margin-left:auto;">图片会以 <img> 标签形式嵌入，支持URL</span>
+                    <span style="font-size:.65rem;color:var(--text-dim);margin-left:auto;">图片会以 &lt;img&gt; 标签形式嵌入，支持URL</span>
                 </div>
                 <textarea id="tutEditContent" rows="8" placeholder="详细教程内容，可插入图片..."></textarea>
                 <div class="content-hint">💡 提示：您可以在内容中直接粘贴 HTML 视频代码（如 iframe），或使用「插入图片」按钮添加图片链接。图片显示示例：<br><code>&lt;img src=&quot;https://example.com/pic.jpg&quot; alt=&quot;描述&quot; /&gt;</code></div>
@@ -428,7 +428,7 @@ var DB = {
         if (!supabaseClient) { return []; }
         force = force || false;
         var now = Date.now();
-        if (!force && this._categoriesCache && (now - this._categoriesTime < this._cacheTTL)) {
+        if (!force && this._categoriesCache && (now - this._cacheTime < this._cacheTTL)) {
             return this._categoriesCache;
         }
         try {
@@ -1394,6 +1394,7 @@ var App = {
     _draftKeyword: '',
     _isDraftPublish: false,
     _autoExtractEnabled: true,
+    _autoSaveInterval: null,
 
     init: function() {
         var self = this;
@@ -1451,12 +1452,20 @@ var App = {
         });
         document.getElementById('tutEditClose').addEventListener('click', function() {
             document.getElementById('tutEditModal').classList.add('hidden');
+            self._stopAutoSave();
+            self._autoSaveDraft();
         });
         document.getElementById('tutEditCancel').addEventListener('click', function() {
             document.getElementById('tutEditModal').classList.add('hidden');
+            self._stopAutoSave();
+            self._autoSaveDraft();
         });
         document.getElementById('tutEditModal').addEventListener('click', function(e) {
-            if (e.target === this) this.classList.add('hidden');
+            if (e.target === this) {
+                this.classList.add('hidden');
+                self._stopAutoSave();
+                self._autoSaveDraft();
+            }
         });
         document.querySelectorAll('#categorySelectWrapper .cat-option').forEach(function(el) {
             el.addEventListener('click', function() {
@@ -1580,6 +1589,50 @@ var App = {
         this.preloadData();
     },
 
+    _startAutoSave: function() {
+        this._stopAutoSave();
+        var self = this;
+        this._autoSaveInterval = setInterval(function() {
+            self._autoSaveDraft();
+        }, 10000);
+    },
+
+    _stopAutoSave: function() {
+        if (this._autoSaveInterval) {
+            clearInterval(this._autoSaveInterval);
+            this._autoSaveInterval = null;
+        }
+    },
+
+    _autoSaveDraft: function() {
+        var title = document.getElementById('tutEditTitle').value.trim();
+        var content = document.getElementById('tutEditContent').value.trim();
+        if (!title && !content) return;
+        var summary = document.getElementById('tutEditSummary').value.trim();
+        var category = document.getElementById('tutEditCategory').value;
+        var cover = document.getElementById('tutEditCover').value.trim();
+        var videos = this._videoList.slice();
+        var images = this._imageList.slice();
+        var draftId = this._tutorialEditId || DB.genId();
+        var draftData = {
+            id: draftId,
+            title: title,
+            summary: summary,
+            category: category,
+            content: content,
+            videos: JSON.stringify(videos),
+            images: JSON.stringify(images),
+            cover: cover || (images.length > 0 ? images[0] : ''),
+            updated_at: new Date().toISOString()
+        };
+        try {
+            saveDraft(draftData);
+            if (!this._tutorialEditId) this._tutorialEditId = draftId;
+        } catch (e) {
+            console.warn('自动保存草稿失败:', e);
+        }
+    },
+
     _extractAndAddVideo: function(url) {
         var self = this;
         var statusEl = document.getElementById('coverExtractStatus');
@@ -1615,6 +1668,7 @@ var App = {
                     toast('未能提取封面，请手动输入', 'warning');
                     document.getElementById('tutEditCover').focus();
                 }
+                self._autoSaveDraft();
             })
             .catch(function(err) {
                 console.error('封面提取失败:', err);
@@ -1625,6 +1679,7 @@ var App = {
                 statusEl.innerHTML = '❌ 提取失败: ' + (err.message || '未知错误') + ' — 请在上方「封面图」输入框中手动粘贴图片链接，或点击「手动输入」按钮后粘贴';
                 toast('封面提取失败: ' + err.message + '，请手动输入封面', 'error');
                 document.getElementById('tutEditCover').focus();
+                self._autoSaveDraft();
             });
     },
 
@@ -1649,6 +1704,7 @@ var App = {
                     toast('未能提取封面，请手动输入', 'warning');
                     document.getElementById('tutEditCover').focus();
                 }
+                self._autoSaveDraft();
             })
             .catch(function(err) {
                 console.error('封面提取失败:', err);
@@ -1656,6 +1712,7 @@ var App = {
                 statusEl.innerHTML = '❌ 提取失败: ' + (err.message || '未知错误') + ' — 请在上方「封面图」输入框中手动粘贴图片链接，或点击「手动输入」按钮后粘贴';
                 toast('封面提取失败: ' + err.message + '，请手动输入封面', 'error');
                 document.getElementById('tutEditCover').focus();
+                self._autoSaveDraft();
             });
     },
 
@@ -1682,6 +1739,7 @@ var App = {
                 var idx = parseInt(this.dataset.idx);
                 self._videoList.splice(idx, 1);
                 self._renderMediaLists();
+                self._autoSaveDraft();
             });
         });
         imageContainer.querySelectorAll('.remove-media').forEach(function(el) {
@@ -1689,6 +1747,7 @@ var App = {
                 var idx = parseInt(this.dataset.idx);
                 self._imageList.splice(idx, 1);
                 self._renderMediaLists();
+                self._autoSaveDraft();
             });
         });
     },
@@ -1737,6 +1796,7 @@ var App = {
                 toast('草稿保存失败，请检查浏览器存储', 'error');
             }
             document.getElementById('tutEditModal').classList.add('hidden');
+            self._stopAutoSave();
             self._videoList = [];
             self._imageList = [];
             self._renderMediaLists();
@@ -1756,12 +1816,19 @@ var App = {
                     } else {
                         toast('更新成功', 'success');
                         document.getElementById('tutEditModal').classList.add('hidden');
+                        self._stopAutoSave();
                         self._videoList = [];
                         self._imageList = [];
                         self._renderMediaLists();
                         DB.getTutorialsFromCloud(true).then(function(data) {
                             self._tutorials = data;
-                            self.renderTutorials(document.getElementById('adminMain'));
+                            if (self._currentAdminTab === 'tutorials') {
+                                self.renderTutorials(document.getElementById('adminMain'));
+                            } else if (self._currentAdminTab === 'drafts') {
+                                self.renderDrafts(document.getElementById('adminMain'));
+                            } else {
+                                self.renderAdminTab('tutorials');
+                            }
                         });
                     }
                 })
@@ -1793,12 +1860,19 @@ var App = {
                         self._isDraftPublish = false;
                     }
                     document.getElementById('tutEditModal').classList.add('hidden');
+                    self._stopAutoSave();
                     self._videoList = [];
                     self._imageList = [];
                     self._renderMediaLists();
                     DB.getTutorialsFromCloud(true).then(function(data) {
                         self._tutorials = data;
-                        self.renderTutorials(document.getElementById('adminMain'));
+                        if (self._currentAdminTab === 'tutorials') {
+                            self.renderTutorials(document.getElementById('adminMain'));
+                        } else if (self._currentAdminTab === 'drafts') {
+                            self.renderDrafts(document.getElementById('adminMain'));
+                        } else {
+                            self.renderAdminTab('tutorials');
+                        }
                     });
                 }
             })
@@ -2951,6 +3025,7 @@ var App = {
                     statusEl.innerHTML = '💡 输入视频链接后点击「提取封面」或「添加」自动提取';
                     document.getElementById('contentPreviewArea').classList.add('hidden');
                     document.getElementById('previewContentBtn').textContent = '预览';
+                    selfRef._startAutoSave();
                 }
             });
         });
@@ -3038,6 +3113,7 @@ var App = {
                 statusEl.innerHTML = '💡 输入视频链接后点击「提取封面」或「添加」自动提取';
                 document.getElementById('contentPreviewArea').classList.add('hidden');
                 document.getElementById('previewContentBtn').textContent = '预览';
+                self._startAutoSave();
             });
         }
         var pageBtns = container.querySelectorAll('.tut-page-btn');
@@ -3671,6 +3747,7 @@ var App = {
                     statusEl.innerHTML = '💡 输入视频链接后点击「提取封面」或「添加」自动提取';
                     document.getElementById('contentPreviewArea').classList.add('hidden');
                     document.getElementById('previewContentBtn').textContent = '预览';
+                    self._startAutoSave();
                 }
             });
         });
@@ -3713,6 +3790,7 @@ var App = {
                     statusEl.innerHTML = '💡 输入视频链接后点击「提取封面」或「添加」自动提取';
                     document.getElementById('contentPreviewArea').classList.add('hidden');
                     document.getElementById('previewContentBtn').textContent = '预览';
+                    self._startAutoSave();
                 }
             });
         });
