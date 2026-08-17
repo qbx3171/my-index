@@ -205,7 +205,7 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 .admin-form .checkbox-group{display:flex;flex-wrap:wrap;gap:18px;padding-top:4px}
 .admin-form .checkbox-group label{display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer;font-size:.85rem}
 .admin-form .checkbox-group input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent-cyan);cursor:pointer;min-height:auto;width:18px}
-#tutEditModal .modal-box{max-width:640px;padding:28px 32px 24px}
+#tutEditModal .modal-box{max-width:740px;padding:28px 32px 24px}
 #tutEditModal .modal-header h3{font-size:1.2rem;display:flex;align-items:center;gap:8px}
 #tutEditModal .modal-header h3::before{content:'✎';color:var(--accent-cyan)}
 #tutEditModal .modal-body .form-group{margin-bottom:14px}
@@ -213,7 +213,7 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 #tutEditModal .modal-body label .hint{font-weight:400;font-size:.7rem;color:var(--text-dim);margin-left:4px}
 #tutEditModal .modal-body input,#tutEditModal .modal-body textarea,#tutEditModal .modal-body select{width:100%;padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);transition:var(--transition);font-size:.85rem;color:var(--text-primary);min-height:40px}
 #tutEditModal .modal-body input:focus,#tutEditModal .modal-body textarea:focus,#tutEditModal .modal-body select:focus{border-color:var(--accent-cyan);background:rgba(13,124,255,0.03);box-shadow:0 0 0 3px rgba(13,124,255,0.06)}
-#tutEditModal .modal-body textarea{min-height:80px;resize:vertical}
+#tutEditModal .modal-body textarea{min-height:120px;resize:vertical;font-family:monospace;font-size:.85rem;line-height:1.7;white-space:pre-wrap}
 #tutEditModal .modal-body select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238899b0' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px 8px;padding-right:40px;cursor:pointer}
 #tutEditModal .modal-body select option{background:var(--bg-card-solid);color:var(--text-primary);padding:6px 10px}
 #tutEditModal .modal-body .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -239,6 +239,11 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 #tutEditModal .modal-body .media-list .media-item.video-item{border-color:rgba(13,124,255,0.15)}
 #tutEditModal .modal-body .media-list .media-item.image-item{border-color:rgba(11,158,90,0.15)}
 #tutEditModal .modal-body .content-hint{font-size:.75rem;color:var(--text-dim);padding:6px 12px;background:rgba(13,124,255,0.03);border-radius:var(--radius-sm);border-left:3px solid var(--accent-cyan);margin-top:4px}
+#tutEditModal .modal-body .content-toolbar{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0;border-bottom:1px solid var(--border-glow);margin-bottom:6px}
+#tutEditModal .modal-body .content-toolbar .tool-btn{padding:4px 12px;border-radius:50px;font-size:.7rem;font-weight:500;background:var(--bg-input);border:1px solid var(--border-glow);transition:var(--transition);color:var(--text-secondary);min-height:28px}
+#tutEditModal .modal-body .content-toolbar .tool-btn:hover{border-color:var(--accent-cyan);color:var(--text-primary);background:rgba(13,124,255,0.04)}
+#tutEditModal .modal-body .content-toolbar .tool-btn.primary{background:var(--accent-cyan);color:#fff;border-color:var(--accent-cyan)}
+#tutEditModal .modal-body .content-toolbar .tool-btn.primary:hover{background:var(--accent-blue);border-color:var(--accent-blue)}
 #tutEditModal .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-glow)}
 #tutEditModal .modal-footer .btn{min-width:90px;padding:8px 20px;font-size:.85rem}
 .draft-badge{background:var(--accent-orange);color:#fff;font-size:.55rem;padding:0 8px;border-radius:50px;line-height:1.6;margin-left:6px}
@@ -263,9 +268,12 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 .video-link-card .vurl{color:var(--text-dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .video-link-card .vbadge{font-size:.55rem;padding:0 6px;border-radius:50px;background:rgba(13,124,255,0.10);color:var(--accent-cyan)}
 .video-link-card .vbadge.blocked{background:rgba(239,68,68,0.10);color:var(--accent-red)}
+.tut-content-preview{background:var(--bg-input);border-radius:var(--radius-sm);padding:12px 16px;margin-top:6px;max-height:200px;overflow-y:auto;font-size:.85rem;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.tut-content-preview img{max-width:100%;height:auto;border-radius:4px;margin:4px 0;border:1px solid var(--border-glow)}
+.tut-content-preview a{color:var(--accent-cyan);text-decoration:underline}
 @media (max-width:1024px){.admin-sidebar{width:60px;padding:14px 6px}.admin-sidebar .logo-sm span,.admin-sidebar .nav-item span:not(.icon),.admin-sidebar .logout-btn span,.admin-sidebar .theme-toggle span{display:none}.admin-sidebar .logo-sm{justify-content:center;padding:0 0 12px;font-size:1.2rem}.admin-sidebar .nav-item{justify-content:center;padding:8px;min-height:40px}.admin-sidebar .nav-item .icon{font-size:1.1rem;width:auto}.admin-sidebar .logout-btn{justify-content:center;padding-top:10px;margin-top:12px;min-height:38px}.admin-sidebar .theme-toggle{justify-content:center;padding:4px 8px;min-height:34px}.admin-main{padding:16px 16px 40px}.admin-form .form-row{grid-template-columns:1fr;gap:12px}.tutorial-card-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}#tutEditModal .modal-box{padding:20px 18px}#tutEditModal .modal-body .form-row{grid-template-columns:1fr;gap:10px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}}
-@media (max-width:768px){.admin-layout.active{flex-direction:column}.admin-sidebar{width:100%;height:auto;position:sticky;top:0;flex-direction:row;padding:6px 10px;display:flex;flex-wrap:wrap;gap:2px;border-right:none;border-bottom:1px solid var(--border-glow);overflow-y:visible;z-index:10;min-height:48px;align-items:center}.admin-sidebar .logo-sm{display:none}.admin-sidebar .nav-item{padding:4px 10px;font-size:.7rem;min-height:32px;gap:4px;flex:0 1 auto}.admin-sidebar .nav-item .icon{font-size:.85rem;width:18px}.admin-sidebar .logout-btn{margin-top:0;border-top:none;padding-top:0;margin-left:auto;font-size:.7rem;min-height:32px}.admin-sidebar .theme-toggle{margin-top:0;font-size:.65rem;padding:2px 8px;min-height:30px}.admin-main{max-height:none;padding:12px 12px 40px;overflow-y:visible}.stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}.stat-card{padding:10px 14px}.stat-card .num{font-size:1.3rem}.table-wrap{overflow-x:auto}.table-wrap table{font-size:.72rem;min-width:420px}.table-wrap th,.table-wrap td{padding:5px 10px}.toolbar{flex-direction:column;align-items:stretch}.toolbar .search-box{width:100%}.pagination{flex-direction:column;align-items:center;padding:8px 12px}.pagination .pages{justify-content:center}.login-box{padding:20px 16px;margin:0 8px}.modal-box{padding:16px 14px;margin:0 6px}.modal-box .modal-body .detail-row{flex-direction:column;gap:2px}.modal-box .modal-body .detail-row .label{width:100%;font-size:.7rem}.modal-box .modal-footer{flex-direction:column}.modal-box .modal-footer .btn{width:100%;justify-content:center}.toast-container{bottom:16px;right:16px;max-width:calc(100vw - 32px)}.admin-main .page-title{font-size:1.2rem}.admin-form{padding:16px 14px}.admin-form .form-row{grid-template-columns:1fr;gap:10px}.tutorial-card-grid{grid-template-columns:1fr 1fr;gap:10px}#tutEditModal .modal-box{padding:16px 12px}#tutEditModal .modal-body .form-row{grid-template-columns:1fr;gap:8px}#tutEditModal .modal-body .category-select-wrapper .cat-option{font-size:.7rem;padding:3px 10px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}}
-@media (max-width:480px){.admin-sidebar .nav-item{padding:3px 6px;font-size:.6rem;min-height:28px}.admin-sidebar .nav-item .icon{font-size:.75rem;width:16px}.stats-grid{grid-template-columns:1fr 1fr;gap:6px}.stat-card{padding:8px 10px}.stat-card .num{font-size:1.1rem}.stat-card .label{font-size:.6rem}.admin-main .page-title{font-size:1rem}.admin-form{padding:12px 10px}.admin-form .form-row{grid-template-columns:1fr;gap:8px}.table-wrap table{font-size:.65rem;min-width:360px}.table-wrap th,.table-wrap td{padding:4px 6px}.table-wrap td .actions button{font-size:.5rem;padding:1px 6px;min-height:22px}.login-box .login-logo{font-size:1.4rem}.btn{font-size:.78rem;padding:6px 16px;min-height:36px}.btn-sm{font-size:.65rem;padding:3px 10px;min-height:28px}.tutorial-card-grid{grid-template-columns:1fr;gap:8px}.tutorial-card .card-cover{height:100px}.tutorial-card .card-body{padding:10px 12px 8px}.tutorial-card .card-body .title{font-size:.85rem}.tutorial-card .card-body .summary{font-size:.72rem}#tutEditModal .modal-body .media-input-group{flex-direction:column}#tutEditModal .modal-body .media-input-group input{width:100%}#tutEditModal .modal-body .category-select-wrapper .cat-option{font-size:.65rem;padding:2px 8px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}}
+@media (max-width:768px){.admin-layout.active{flex-direction:column}.admin-sidebar{width:100%;height:auto;position:sticky;top:0;flex-direction:row;padding:6px 10px;display:flex;flex-wrap:wrap;gap:2px;border-right:none;border-bottom:1px solid var(--border-glow);overflow-y:visible;z-index:10;min-height:48px;align-items:center}.admin-sidebar .logo-sm{display:none}.admin-sidebar .nav-item{padding:4px 10px;font-size:.7rem;min-height:32px;gap:4px;flex:0 1 auto}.admin-sidebar .nav-item .icon{font-size:.85rem;width:18px}.admin-sidebar .logout-btn{margin-top:0;border-top:none;padding-top:0;margin-left:auto;font-size:.7rem;min-height:32px}.admin-sidebar .theme-toggle{margin-top:0;font-size:.65rem;padding:2px 8px;min-height:30px}.admin-main{max-height:none;padding:12px 12px 40px;overflow-y:visible}.stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}.stat-card{padding:10px 14px}.stat-card .num{font-size:1.3rem}.table-wrap{overflow-x:auto}.table-wrap table{font-size:.72rem;min-width:420px}.table-wrap th,.table-wrap td{padding:5px 10px}.toolbar{flex-direction:column;align-items:stretch}.toolbar .search-box{width:100%}.pagination{flex-direction:column;align-items:center;padding:8px 12px}.pagination .pages{justify-content:center}.login-box{padding:20px 16px;margin:0 8px}.modal-box{padding:16px 14px;margin:0 6px}.modal-box .modal-body .detail-row{flex-direction:column;gap:2px}.modal-box .modal-body .detail-row .label{width:100%;font-size:.7rem}.modal-box .modal-footer{flex-direction:column}.modal-box .modal-footer .btn{width:100%;justify-content:center}.toast-container{bottom:16px;right:16px;max-width:calc(100vw - 32px)}.admin-main .page-title{font-size:1.2rem}.admin-form{padding:16px 14px}.admin-form .form-row{grid-template-columns:1fr;gap:10px}.tutorial-card-grid{grid-template-columns:1fr 1fr;gap:10px}#tutEditModal .modal-box{padding:16px 12px}#tutEditModal .modal-body .form-row{grid-template-columns:1fr;gap:8px}#tutEditModal .modal-body .category-select-wrapper .cat-option{font-size:.7rem;padding:3px 10px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}#tutEditModal .modal-body .content-toolbar .tool-btn{font-size:.6rem;padding:2px 8px}}
+@media (max-width:480px){.admin-sidebar .nav-item{padding:3px 6px;font-size:.6rem;min-height:28px}.admin-sidebar .nav-item .icon{font-size:.75rem;width:16px}.stats-grid{grid-template-columns:1fr 1fr;gap:6px}.stat-card{padding:8px 10px}.stat-card .num{font-size:1.1rem}.stat-card .label{font-size:.6rem}.admin-main .page-title{font-size:1rem}.admin-form{padding:12px 10px}.admin-form .form-row{grid-template-columns:1fr;gap:8px}.table-wrap table{font-size:.65rem;min-width:360px}.table-wrap th,.table-wrap td{padding:4px 6px}.table-wrap td .actions button{font-size:.5rem;padding:1px 6px;min-height:22px}.login-box .login-logo{font-size:1.4rem}.btn{font-size:.78rem;padding:6px 16px;min-height:36px}.btn-sm{font-size:.65rem;padding:3px 10px;min-height:28px}.tutorial-card-grid{grid-template-columns:1fr;gap:8px}.tutorial-card .card-cover{height:100px}.tutorial-card .card-body{padding:10px 12px 8px}.tutorial-card .card-body .title{font-size:.85rem}.tutorial-card .card-body .summary{font-size:.72rem}#tutEditModal .modal-body .media-input-group{flex-direction:column}#tutEditModal .modal-body .media-input-group input{width:100%}#tutEditModal .modal-body .category-select-wrapper .cat-option{font-size:.65rem;padding:2px 8px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}#tutEditModal .modal-body .content-toolbar .tool-btn{font-size:.55rem;padding:1px 6px}}
 </style>
 </head>
 <body>
@@ -333,7 +341,18 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
                     💡 <strong>如果自动提取失败</strong>，请在上方输入框中手动粘贴封面图片链接（可在视频页面右键点击封面图，选择「复制图片地址」），或使用 sm.ms、imgur 等图床服务上传后粘贴链接。
                 </div>
             </div>
-            <div class="form-group"><label>内容 <span class="hint">· 支持 HTML / Markdown，可直接嵌入视频（iframe）</span></label><textarea id="tutEditContent" rows="6" placeholder="详细教程内容..."></textarea><div class="content-hint">💡 提示：您可以在内容中直接粘贴 HTML 视频代码（如 iframe），或在上面“视频链接”中添加视频，系统会自动展示。</div></div>
+            <div class="form-group">
+                <label>内容 <span class="hint">· 支持图文混排，点击下方按钮插入图片</span></label>
+                <div class="content-toolbar">
+                    <button class="tool-btn primary" id="insertImageBtn"><i class="fas fa-image"></i> 插入图片</button>
+                    <button class="tool-btn" id="insertBrBtn"><i class="fas fa-arrow-down"></i> 换行</button>
+                    <button class="tool-btn" id="previewContentBtn"><i class="fas fa-eye"></i> 预览</button>
+                    <span style="font-size:.65rem;color:var(--text-dim);margin-left:auto;">图片会以 <img> 标签形式嵌入，支持URL</span>
+                </div>
+                <textarea id="tutEditContent" rows="8" placeholder="详细教程内容，可插入图片..."></textarea>
+                <div class="content-hint">💡 提示：您可以在内容中直接粘贴 HTML 视频代码（如 iframe），或使用「插入图片」按钮添加图片链接。图片显示示例：<br><code>&lt;img src=&quot;https://example.com/pic.jpg&quot; alt=&quot;描述&quot; /&gt;</code></div>
+                <div id="contentPreviewArea" class="tut-content-preview hidden"></div>
+            </div>
         </div>
         <div class="modal-footer"><button class="btn btn-outline" id="tutEditCancel">取消</button><button class="btn btn-primary" id="tutSubmitBtn">发布</button></div>
     </div>
@@ -1155,6 +1174,61 @@ function extractVideoCover(url) {
     });
 }
 
+function sanitizeHTML(html) {
+    if (!html) return '';
+    var allowedTags = ['p','br','strong','em','u','s','blockquote','code','pre','ul','ol','li','h1','h2','h3','h4','h5','h6','img','a','span','div','hr','table','thead','tbody','tr','td','th','iframe','figure','figcaption'];
+    var div = document.createElement('div');
+    div.innerHTML = html;
+    function walk(node) {
+        if (node.nodeType === 1) {
+            var tag = node.tagName.toLowerCase();
+            if (allowedTags.indexOf(tag) === -1) {
+                var parent = node.parentNode;
+                while (node.childNodes.length > 0) {
+                    parent.insertBefore(node.childNodes[0], node);
+                }
+                parent.removeChild(node);
+                return;
+            }
+            var attrs = node.attributes;
+            for (var i = attrs.length - 1; i >= 0; i--) {
+                var attr = attrs[i];
+                var name = attr.name.toLowerCase();
+                if (name === 'src' || name === 'href' || name === 'alt' || name === 'title' || name === 'class' || name === 'style' || name === 'target' || name === 'width' || name === 'height') {
+                    if (name === 'src' || name === 'href') {
+                        var val = attr.value;
+                        if (!val.startsWith('http://') && !val.startsWith('https://') && !val.startsWith('data:') && !val.startsWith('//')) {
+                            node.removeAttribute(name);
+                        }
+                    }
+                } else {
+                    node.removeAttribute(name);
+                }
+            }
+        }
+        var children = node.childNodes;
+        for (var j = children.length - 1; j >= 0; j--) {
+            walk(children[j]);
+        }
+    }
+    walk(div);
+    return div.innerHTML;
+}
+
+function insertTextAtCursor(text) {
+    var textarea = document.getElementById('tutEditContent');
+    if (!textarea) return;
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var val = textarea.value;
+    var before = val.substring(0, start);
+    var after = val.substring(end);
+    textarea.value = before + text + after;
+    var newCursor = start + text.length;
+    textarea.selectionStart = textarea.selectionEnd = newCursor;
+    textarea.focus();
+}
+
 var Render = {
     renderAdminTable: function(container, list, options) {
         options = options || {};
@@ -1474,6 +1548,35 @@ var App = {
                 previewText.style.color = 'var(--text-dim)';
             }
         });
+
+        document.getElementById('insertImageBtn').addEventListener('click', function() {
+            var url = prompt('请输入图片链接 (支持 http/https 或 data: 图片)', 'https://example.com/image.jpg');
+            if (url && url.trim()) {
+                var alt = prompt('请输入图片描述 (可选)', '图片');
+                var altText = alt ? alt : '图片';
+                var imgTag = '<img src="' + url.trim() + '" alt="' + altText + '" style="max-width:100%;border-radius:6px;margin:6px 0;" />';
+                insertTextAtCursor(imgTag);
+                toast('已插入图片', 'success');
+            }
+        });
+        document.getElementById('insertBrBtn').addEventListener('click', function() {
+            insertTextAtCursor('\n');
+            toast('已插入换行', 'success');
+        });
+        document.getElementById('previewContentBtn').addEventListener('click', function() {
+            var content = document.getElementById('tutEditContent').value;
+            var previewArea = document.getElementById('contentPreviewArea');
+            if (previewArea.classList.contains('hidden')) {
+                previewArea.classList.remove('hidden');
+                var sanitized = sanitizeHTML(content);
+                previewArea.innerHTML = sanitized || '<span style="color:var(--text-dim);">内容为空</span>';
+                this.textContent = '隐藏预览';
+            } else {
+                previewArea.classList.add('hidden');
+                this.textContent = '预览';
+            }
+        });
+
         this.preloadData();
     },
 
@@ -2846,6 +2949,8 @@ var App = {
                     var statusEl = document.getElementById('coverExtractStatus');
                     statusEl.className = 'cover-extract-status';
                     statusEl.innerHTML = '💡 输入视频链接后点击「提取封面」或「添加」自动提取';
+                    document.getElementById('contentPreviewArea').classList.add('hidden');
+                    document.getElementById('previewContentBtn').textContent = '预览';
                 }
             });
         });
@@ -2931,6 +3036,8 @@ var App = {
                 var statusEl = document.getElementById('coverExtractStatus');
                 statusEl.className = 'cover-extract-status';
                 statusEl.innerHTML = '💡 输入视频链接后点击「提取封面」或「添加」自动提取';
+                document.getElementById('contentPreviewArea').classList.add('hidden');
+                document.getElementById('previewContentBtn').textContent = '预览';
             });
         }
         var pageBtns = container.querySelectorAll('.tut-page-btn');
@@ -3025,12 +3132,13 @@ var App = {
         if (tut.cover) {
             coverHtml = '<img src="' + tut.cover + '" style="max-width:100%;max-height:200px;border-radius:6px;margin:4px;border:1px solid var(--border-glow);" onerror="this.style.display=\'none\'" />';
         }
+        var contentHtml = tut.content ? sanitizeHTML(tut.content) : '';
         body.innerHTML = '<div class="detail-row"><div class="label">标题</div><div class="value">' + escapeHTML(tut.title || '') + '</div></div>' +
             '<div class="detail-row"><div class="label">分类</div><div class="value"><span class="category-tag ' + catClass + '">' + catLabel + '</span></div></div>' +
             '<div class="detail-row"><div class="label">摘要</div><div class="value">' + escapeHTML(tut.summary || '') + '</div></div>' +
             (videosHtml ? '<div class="detail-row"><div class="label">视频</div><div class="value">' + videosHtml + '</div></div>' : '') +
             (coverHtml ? '<div class="detail-row"><div class="label">封面图片</div><div class="value">' + coverHtml + '</div></div>' : '') +
-            '<div class="detail-row"><div class="label">内容</div><div class="value" style="white-space:pre-wrap;max-height:200px;overflow-y:auto;">' + escapeHTML(tut.content || '') + '</div></div>' +
+            '<div class="detail-row"><div class="label">内容</div><div class="value" style="white-space:pre-wrap;max-height:300px;overflow-y:auto;line-height:1.8;">' + contentHtml + '</div></div>' +
             '<div class="detail-row"><div class="label">点赞</div><div class="value">' + (tut.likes || 0) + '</div></div>' +
             '<div class="detail-row"><div class="label">创建</div><div class="value">' + (tut.created_at ? formatDate(tut.created_at) : '-') + '</div></div>';
         modal.classList.remove('hidden');
@@ -3561,6 +3669,8 @@ var App = {
                     var statusEl = document.getElementById('coverExtractStatus');
                     statusEl.className = 'cover-extract-status';
                     statusEl.innerHTML = '💡 输入视频链接后点击「提取封面」或「添加」自动提取';
+                    document.getElementById('contentPreviewArea').classList.add('hidden');
+                    document.getElementById('previewContentBtn').textContent = '预览';
                 }
             });
         });
@@ -3601,6 +3711,8 @@ var App = {
                     var statusEl = document.getElementById('coverExtractStatus');
                     statusEl.className = 'cover-extract-status';
                     statusEl.innerHTML = '💡 输入视频链接后点击「提取封面」或「添加」自动提取';
+                    document.getElementById('contentPreviewArea').classList.add('hidden');
+                    document.getElementById('previewContentBtn').textContent = '预览';
                 }
             });
         });
@@ -3692,5 +3804,6 @@ document.addEventListener('DOMContentLoaded', function() {
 window.__APP = App;
 window.__DB = DB;
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
