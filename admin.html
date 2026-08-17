@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <style>
 :root{--bg-primary:#f5f7fb;--bg-secondary:#eef1f7;--bg-card:rgba(255,255,255,0.85);--bg-card-solid:#ffffff;--bg-input:rgba(0,0,0,0.04);--border-glow:rgba(0,100,200,0.12);--border-glow-strong:rgba(0,100,200,0.25);--text-primary:#1a2332;--text-secondary:#4a5a72;--text-dim:#8899b0;--accent-cyan:#0d7cff;--accent-blue:#2b5cf6;--accent-purple:#7c3aed;--accent-green:#0b9e5a;--accent-orange:#f59e0b;--accent-red:#ef4444;--accent-pink:#ec4899;--shadow-card:0 2px 12px rgba(0,0,0,0.06);--radius-lg:16px;--radius-md:10px;--radius-sm:6px;--transition:0.2s cubic-bezier(0.4,0,0.2,1);--font:'Inter',-apple-system,sans-serif;--max-width:1200px;--header-height:64px;--sidebar-width:210px}
 [data-theme="dark"]{--bg-primary:#0c1425;--bg-secondary:#111d33;--bg-card:rgba(18,30,51,0.78);--bg-card-solid:#162033;--bg-input:rgba(0,0,0,0.25);--border-glow:rgba(0,200,255,0.12);--border-glow-strong:rgba(0,200,255,0.28);--text-primary:#eef5ff;--text-secondary:#8da4c9;--text-dim:#4a6185;--accent-cyan:#00d4ff;--accent-blue:#3b82f6;--accent-purple:#8b5cf6;--accent-green:#34d399;--accent-orange:#f59e0b;--accent-red:#f87171;--accent-pink:#ec4899;--shadow-card:0 8px 32px rgba(0,0,0,0.4)}
@@ -205,15 +207,14 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 .admin-form .checkbox-group{display:flex;flex-wrap:wrap;gap:18px;padding-top:4px}
 .admin-form .checkbox-group label{display:flex;align-items:center;gap:6px;font-weight:400;cursor:pointer;font-size:.85rem}
 .admin-form .checkbox-group input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent-cyan);cursor:pointer;min-height:auto;width:18px}
-#tutEditModal .modal-box{max-width:740px;padding:28px 32px 24px}
+#tutEditModal .modal-box{max-width:780px;padding:28px 32px 24px}
 #tutEditModal .modal-header h3{font-size:1.2rem;display:flex;align-items:center;gap:8px}
 #tutEditModal .modal-header h3::before{content:'✎';color:var(--accent-cyan)}
 #tutEditModal .modal-body .form-group{margin-bottom:14px}
 #tutEditModal .modal-body label{display:block;font-size:.8rem;font-weight:600;color:var(--text-secondary);margin-bottom:3px}
 #tutEditModal .modal-body label .hint{font-weight:400;font-size:.7rem;color:var(--text-dim);margin-left:4px}
-#tutEditModal .modal-body input,#tutEditModal .modal-body textarea,#tutEditModal .modal-body select{width:100%;padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);transition:var(--transition);font-size:.85rem;color:var(--text-primary);min-height:40px}
-#tutEditModal .modal-body input:focus,#tutEditModal .modal-body textarea:focus,#tutEditModal .modal-body select:focus{border-color:var(--accent-cyan);background:rgba(13,124,255,0.03);box-shadow:0 0 0 3px rgba(13,124,255,0.06)}
-#tutEditModal .modal-body textarea{min-height:120px;resize:vertical;font-family:monospace;font-size:.85rem;line-height:1.7;white-space:pre-wrap}
+#tutEditModal .modal-body input,#tutEditModal .modal-body select{width:100%;padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);transition:var(--transition);font-size:.85rem;color:var(--text-primary);min-height:40px}
+#tutEditModal .modal-body input:focus,#tutEditModal .modal-body select:focus{border-color:var(--accent-cyan);background:rgba(13,124,255,0.03);box-shadow:0 0 0 3px rgba(13,124,255,0.06)}
 #tutEditModal .modal-body select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238899b0' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px 8px;padding-right:40px;cursor:pointer}
 #tutEditModal .modal-body select option{background:var(--bg-card-solid);color:var(--text-primary);padding:6px 10px}
 #tutEditModal .modal-body .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -244,6 +245,18 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 #tutEditModal .modal-body .content-toolbar .tool-btn:hover{border-color:var(--accent-cyan);color:var(--text-primary);background:rgba(13,124,255,0.04)}
 #tutEditModal .modal-body .content-toolbar .tool-btn.primary{background:var(--accent-cyan);color:#fff;border-color:var(--accent-cyan)}
 #tutEditModal .modal-body .content-toolbar .tool-btn.primary:hover{background:var(--accent-blue);border-color:var(--accent-blue)}
+#tutEditModal .modal-body .ql-container{min-height:180px;font-size:.9rem;line-height:1.7;background:var(--bg-input);border-radius:0 0 var(--radius-sm) var(--radius-sm)}
+#tutEditModal .modal-body .ql-toolbar{background:var(--bg-card);border:1.5px solid var(--border-glow);border-bottom:none;border-radius:var(--radius-sm) var(--radius-sm) 0 0}
+[data-theme="dark"] #tutEditModal .modal-body .ql-toolbar{background:var(--bg-card-solid)}
+#tutEditModal .modal-body .ql-editor{min-height:180px;padding:12px 14px;color:var(--text-primary);font-size:.9rem}
+#tutEditModal .modal-body .ql-editor.ql-blank::before{color:var(--text-dim);font-style:italic;left:14px;right:14px}
+#tutEditModal .modal-body .ql-toolbar button{color:var(--text-secondary)}
+#tutEditModal .modal-body .ql-toolbar button:hover{color:var(--text-primary)}
+#tutEditModal .modal-body .ql-toolbar .ql-picker-label{color:var(--text-secondary)}
+#tutEditModal .modal-body .ql-toolbar .ql-picker-item{color:var(--text-primary)}
+#tutEditModal .modal-body .ql-snow .ql-stroke{stroke:var(--text-secondary)}
+#tutEditModal .modal-body .ql-snow .ql-fill{fill:var(--text-secondary)}
+#tutEditModal .modal-body .ql-snow .ql-picker-options{background:var(--bg-card-solid);border-color:var(--border-glow)}
 #tutEditModal .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-glow)}
 #tutEditModal .modal-footer .btn{min-width:90px;padding:8px 20px;font-size:.85rem}
 .draft-badge{background:var(--accent-orange);color:#fff;font-size:.55rem;padding:0 8px;border-radius:50px;line-height:1.6;margin-left:6px}
@@ -268,12 +281,20 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 .video-link-card .vurl{color:var(--text-dim);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .video-link-card .vbadge{font-size:.55rem;padding:0 6px;border-radius:50px;background:rgba(13,124,255,0.10);color:var(--accent-cyan)}
 .video-link-card .vbadge.blocked{background:rgba(239,68,68,0.10);color:var(--accent-red)}
-.tut-content-preview{background:var(--bg-input);border-radius:var(--radius-sm);padding:12px 16px;margin-top:6px;max-height:200px;overflow-y:auto;font-size:.85rem;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.tut-content-preview{background:var(--bg-input);border-radius:var(--radius-sm);padding:12px 16px;margin-top:6px;max-height:200px;overflow-y:auto;font-size:.85rem;line-height:1.8;word-break:break-word}
 .tut-content-preview img{max-width:100%;height:auto;border-radius:4px;margin:4px 0;border:1px solid var(--border-glow)}
 .tut-content-preview a{color:var(--accent-cyan);text-decoration:underline}
+.ql-font-宋体{font-family:'宋体',SimSun,serif}
+.ql-font-黑体{font-family:'黑体',SimHei,sans-serif}
+.ql-font-微软雅黑{font-family:'微软雅黑','Microsoft YaHei',sans-serif}
+.ql-font-楷体{font-family:'楷体',KaiTi,serif}
+.ql-font-仿宋{font-family:'仿宋',FangSong,serif}
+.ql-font-Arial{font-family:Arial,sans-serif}
+.ql-font-Times\ New\ Roman{font-family:'Times New Roman',serif}
+.ql-font-Georgia{font-family:Georgia,serif}
 @media (max-width:1024px){.admin-sidebar{width:60px;padding:14px 6px}.admin-sidebar .logo-sm span,.admin-sidebar .nav-item span:not(.icon),.admin-sidebar .logout-btn span,.admin-sidebar .theme-toggle span{display:none}.admin-sidebar .logo-sm{justify-content:center;padding:0 0 12px;font-size:1.2rem}.admin-sidebar .nav-item{justify-content:center;padding:8px;min-height:40px}.admin-sidebar .nav-item .icon{font-size:1.1rem;width:auto}.admin-sidebar .logout-btn{justify-content:center;padding-top:10px;margin-top:12px;min-height:38px}.admin-sidebar .theme-toggle{justify-content:center;padding:4px 8px;min-height:34px}.admin-main{padding:16px 16px 40px}.admin-form .form-row{grid-template-columns:1fr;gap:12px}.tutorial-card-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}#tutEditModal .modal-box{padding:20px 18px}#tutEditModal .modal-body .form-row{grid-template-columns:1fr;gap:10px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}}
-@media (max-width:768px){.admin-layout.active{flex-direction:column}.admin-sidebar{width:100%;height:auto;position:sticky;top:0;flex-direction:row;padding:6px 10px;display:flex;flex-wrap:wrap;gap:2px;border-right:none;border-bottom:1px solid var(--border-glow);overflow-y:visible;z-index:10;min-height:48px;align-items:center}.admin-sidebar .logo-sm{display:none}.admin-sidebar .nav-item{padding:4px 10px;font-size:.7rem;min-height:32px;gap:4px;flex:0 1 auto}.admin-sidebar .nav-item .icon{font-size:.85rem;width:18px}.admin-sidebar .logout-btn{margin-top:0;border-top:none;padding-top:0;margin-left:auto;font-size:.7rem;min-height:32px}.admin-sidebar .theme-toggle{margin-top:0;font-size:.65rem;padding:2px 8px;min-height:30px}.admin-main{max-height:none;padding:12px 12px 40px;overflow-y:visible}.stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}.stat-card{padding:10px 14px}.stat-card .num{font-size:1.3rem}.table-wrap{overflow-x:auto}.table-wrap table{font-size:.72rem;min-width:420px}.table-wrap th,.table-wrap td{padding:5px 10px}.toolbar{flex-direction:column;align-items:stretch}.toolbar .search-box{width:100%}.pagination{flex-direction:column;align-items:center;padding:8px 12px}.pagination .pages{justify-content:center}.login-box{padding:20px 16px;margin:0 8px}.modal-box{padding:16px 14px;margin:0 6px}.modal-box .modal-body .detail-row{flex-direction:column;gap:2px}.modal-box .modal-body .detail-row .label{width:100%;font-size:.7rem}.modal-box .modal-footer{flex-direction:column}.modal-box .modal-footer .btn{width:100%;justify-content:center}.toast-container{bottom:16px;right:16px;max-width:calc(100vw - 32px)}.admin-main .page-title{font-size:1.2rem}.admin-form{padding:16px 14px}.admin-form .form-row{grid-template-columns:1fr;gap:10px}.tutorial-card-grid{grid-template-columns:1fr 1fr;gap:10px}#tutEditModal .modal-box{padding:16px 12px}#tutEditModal .modal-body .form-row{grid-template-columns:1fr;gap:8px}#tutEditModal .modal-body .category-select-wrapper .cat-option{font-size:.7rem;padding:3px 10px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}#tutEditModal .modal-body .content-toolbar .tool-btn{font-size:.6rem;padding:2px 8px}}
-@media (max-width:480px){.admin-sidebar .nav-item{padding:3px 6px;font-size:.6rem;min-height:28px}.admin-sidebar .nav-item .icon{font-size:.75rem;width:16px}.stats-grid{grid-template-columns:1fr 1fr;gap:6px}.stat-card{padding:8px 10px}.stat-card .num{font-size:1.1rem}.stat-card .label{font-size:.6rem}.admin-main .page-title{font-size:1rem}.admin-form{padding:12px 10px}.admin-form .form-row{grid-template-columns:1fr;gap:8px}.table-wrap table{font-size:.65rem;min-width:360px}.table-wrap th,.table-wrap td{padding:4px 6px}.table-wrap td .actions button{font-size:.5rem;padding:1px 6px;min-height:22px}.login-box .login-logo{font-size:1.4rem}.btn{font-size:.78rem;padding:6px 16px;min-height:36px}.btn-sm{font-size:.65rem;padding:3px 10px;min-height:28px}.tutorial-card-grid{grid-template-columns:1fr;gap:8px}.tutorial-card .card-cover{height:100px}.tutorial-card .card-body{padding:10px 12px 8px}.tutorial-card .card-body .title{font-size:.85rem}.tutorial-card .card-body .summary{font-size:.72rem}#tutEditModal .modal-body .media-input-group{flex-direction:column}#tutEditModal .modal-body .media-input-group input{width:100%}#tutEditModal .modal-body .category-select-wrapper .cat-option{font-size:.65rem;padding:2px 8px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}#tutEditModal .modal-body .content-toolbar .tool-btn{font-size:.55rem;padding:1px 6px}}
+@media (max-width:768px){.admin-layout.active{flex-direction:column}.admin-sidebar{width:100%;height:auto;position:sticky;top:0;flex-direction:row;padding:6px 10px;display:flex;flex-wrap:wrap;gap:2px;border-right:none;border-bottom:1px solid var(--border-glow);overflow-y:visible;z-index:10;min-height:48px;align-items:center}.admin-sidebar .logo-sm{display:none}.admin-sidebar .nav-item{padding:4px 10px;font-size:.7rem;min-height:32px;gap:4px;flex:0 1 auto}.admin-sidebar .nav-item .icon{font-size:.85rem;width:18px}.admin-sidebar .logout-btn{margin-top:0;border-top:none;padding-top:0;margin-left:auto;font-size:.7rem;min-height:32px}.admin-sidebar .theme-toggle{margin-top:0;font-size:.65rem;padding:2px 8px;min-height:30px}.admin-main{max-height:none;padding:12px 12px 40px;overflow-y:visible}.stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}.stat-card{padding:10px 14px}.stat-card .num{font-size:1.3rem}.table-wrap{overflow-x:auto}.table-wrap table{font-size:.72rem;min-width:420px}.table-wrap th,.table-wrap td{padding:5px 10px}.toolbar{flex-direction:column;align-items:stretch}.toolbar .search-box{width:100%}.pagination{flex-direction:column;align-items:center;padding:8px 12px}.pagination .pages{justify-content:center}.login-box{padding:20px 16px;margin:0 8px}.modal-box{padding:16px 14px;margin:0 6px}.modal-box .modal-body .detail-row{flex-direction:column;gap:2px}.modal-box .modal-body .detail-row .label{width:100%;font-size:.7rem}.modal-box .modal-footer{flex-direction:column}.modal-box .modal-footer .btn{width:100%;justify-content:center}.toast-container{bottom:16px;right:16px;max-width:calc(100vw - 32px)}.admin-main .page-title{font-size:1.2rem}.admin-form{padding:16px 14px}.admin-form .form-row{grid-template-columns:1fr;gap:10px}.tutorial-card-grid{grid-template-columns:1fr 1fr;gap:10px}#tutEditModal .modal-box{padding:16px 12px}#tutEditModal .modal-body .form-row{grid-template-columns:1fr;gap:8px}#tutEditModal .modal-body .category-select-wrapper .cat-option{font-size:.7rem;padding:3px 10px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}#tutEditModal .modal-body .content-toolbar .tool-btn{font-size:.6rem;padding:2px 8px}#tutEditModal .modal-body .ql-container{min-height:140px}#tutEditModal .modal-body .ql-editor{min-height:140px}}
+@media (max-width:480px){.admin-sidebar .nav-item{padding:3px 6px;font-size:.6rem;min-height:28px}.admin-sidebar .nav-item .icon{font-size:.75rem;width:16px}.stats-grid{grid-template-columns:1fr 1fr;gap:6px}.stat-card{padding:8px 10px}.stat-card .num{font-size:1.1rem}.stat-card .label{font-size:.6rem}.admin-main .page-title{font-size:1rem}.admin-form{padding:12px 10px}.admin-form .form-row{grid-template-columns:1fr;gap:8px}.table-wrap table{font-size:.65rem;min-width:360px}.table-wrap th,.table-wrap td{padding:4px 6px}.table-wrap td .actions button{font-size:.5rem;padding:1px 6px;min-height:22px}.login-box .login-logo{font-size:1.4rem}.btn{font-size:.78rem;padding:6px 16px;min-height:36px}.btn-sm{font-size:.65rem;padding:3px 10px;min-height:28px}.tutorial-card-grid{grid-template-columns:1fr;gap:8px}.tutorial-card .card-cover{height:100px}.tutorial-card .card-body{padding:10px 12px 8px}.tutorial-card .card-body .title{font-size:.85rem}.tutorial-card .card-body .summary{font-size:.72rem}#tutEditModal .modal-body .media-input-group{flex-direction:column}#tutEditModal .modal-body .media-input-group input{width:100%}#tutEditModal .modal-body .category-select-wrapper .cat-option{font-size:.65rem;padding:2px 8px}.cover-input-wrapper{flex-direction:column;align-items:stretch}.cover-input-wrapper input{min-width:auto}#tutEditModal .modal-body .content-toolbar .tool-btn{font-size:.55rem;padding:1px 6px}#tutEditModal .modal-body .ql-container{min-height:120px}#tutEditModal .modal-body .ql-editor{min-height:120px}}
 </style>
 </head>
 <body>
@@ -342,15 +363,15 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
                 </div>
             </div>
             <div class="form-group">
-                <label>内容 <span class="hint">· 支持图文混排，点击下方按钮插入图片</span></label>
+                <label>内容 <span class="hint">· 富文本编辑，支持排版</span></label>
                 <div class="content-toolbar">
-                    <button class="tool-btn primary" id="insertImageBtn"><i class="fas fa-image"></i> 插入图片</button>
+                    <button class="tool-btn" id="insertImageBtn"><i class="fas fa-image"></i> 插入图片</button>
                     <button class="tool-btn" id="insertBrBtn"><i class="fas fa-arrow-down"></i> 换行</button>
                     <button class="tool-btn" id="previewContentBtn"><i class="fas fa-eye"></i> 预览</button>
-                    <span style="font-size:.65rem;color:var(--text-dim);margin-left:auto;">图片会以 &lt;img&gt; 标签形式嵌入，支持URL</span>
+                    <span style="font-size:.65rem;color:var(--text-dim);margin-left:auto;">使用工具栏进行排版，预览实时同步</span>
                 </div>
-                <textarea id="tutEditContent" rows="8" placeholder="详细教程内容，可插入图片..."></textarea>
-                <div class="content-hint">💡 提示：您可以在内容中直接粘贴 HTML 视频代码（如 iframe），或使用「插入图片」按钮添加图片链接。图片显示示例：<br><code>&lt;img src=&quot;https://example.com/pic.jpg&quot; alt=&quot;描述&quot; /&gt;</code></div>
+                <div id="quillEditor" style="height:220px;margin-bottom:6px;"></div>
+                <div class="content-hint">💡 提示：您可以在内容中直接粘贴 HTML 视频代码（如 iframe），或使用「插入图片」按钮添加图片链接。</div>
                 <div id="contentPreviewArea" class="tut-content-preview hidden"></div>
             </div>
         </div>
@@ -362,6 +383,8 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 var supabaseClient = null;
+var quill = null;
+
 (function loadSupabase() {
     var cdnList = [
         'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
@@ -1215,20 +1238,6 @@ function sanitizeHTML(html) {
     return div.innerHTML;
 }
 
-function insertTextAtCursor(text) {
-    var textarea = document.getElementById('tutEditContent');
-    if (!textarea) return;
-    var start = textarea.selectionStart;
-    var end = textarea.selectionEnd;
-    var val = textarea.value;
-    var before = val.substring(0, start);
-    var after = val.substring(end);
-    textarea.value = before + text + after;
-    var newCursor = start + text.length;
-    textarea.selectionStart = textarea.selectionEnd = newCursor;
-    textarea.focus();
-}
-
 var Render = {
     renderAdminTable: function(container, list, options) {
         options = options || {};
@@ -1558,25 +1567,61 @@ var App = {
             }
         });
 
+        var fontList = ['宋体', '黑体', '微软雅黑', '楷体', '仿宋', 'Arial', 'Times New Roman', 'Georgia'];
+        var Font = Quill.import('formats/font');
+        Font.whitelist = fontList;
+        Quill.register(Font, true);
+
+        quill = new Quill('#quillEditor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    [{ 'font': fontList }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'align': [] }],
+                    ['blockquote', 'code-block'],
+                    ['link', 'image', 'video'],
+                    ['clean']
+                ]
+            },
+            placeholder: '输入教程内容...'
+        });
+
+        quill.on('text-change', function() {
+            var content = quill.root.innerHTML;
+            var previewArea = document.getElementById('contentPreviewArea');
+            if (!previewArea.classList.contains('hidden')) {
+                var sanitized = sanitizeHTML(content);
+                previewArea.innerHTML = sanitized || '<span style="color:var(--text-dim);">内容为空</span>';
+            }
+        });
+
         document.getElementById('insertImageBtn').addEventListener('click', function() {
             var url = prompt('请输入图片链接 (支持 http/https 或 data: 图片)', 'https://example.com/image.jpg');
             if (url && url.trim()) {
                 var alt = prompt('请输入图片描述 (可选)', '图片');
                 var altText = alt ? alt : '图片';
-                var imgTag = '<img src="' + url.trim() + '" alt="' + altText + '" style="max-width:100%;border-radius:6px;margin:6px 0;" />';
-                insertTextAtCursor(imgTag);
+                var range = quill.getSelection(true);
+                quill.insertEmbed(range.index, 'image', url);
                 toast('已插入图片', 'success');
             }
         });
         document.getElementById('insertBrBtn').addEventListener('click', function() {
-            insertTextAtCursor('\n');
+            var range = quill.getSelection(true);
+            quill.insertText(range.index, '\n', 'user');
             toast('已插入换行', 'success');
         });
         document.getElementById('previewContentBtn').addEventListener('click', function() {
-            var content = document.getElementById('tutEditContent').value;
             var previewArea = document.getElementById('contentPreviewArea');
             if (previewArea.classList.contains('hidden')) {
                 previewArea.classList.remove('hidden');
+                var content = quill.root.innerHTML;
                 var sanitized = sanitizeHTML(content);
                 previewArea.innerHTML = sanitized || '<span style="color:var(--text-dim);">内容为空</span>';
                 this.textContent = '隐藏预览';
@@ -1605,8 +1650,9 @@ var App = {
     },
 
     _autoSaveDraft: function() {
+        if (!quill) return;
         var title = document.getElementById('tutEditTitle').value.trim();
-        var content = document.getElementById('tutEditContent').value.trim();
+        var content = quill.root.innerHTML.trim();
         if (!title && !content) return;
         var summary = document.getElementById('tutEditSummary').value.trim();
         var category = document.getElementById('tutEditCategory').value;
@@ -1757,7 +1803,7 @@ var App = {
         var title = document.getElementById('tutEditTitle').value.trim();
         var summary = document.getElementById('tutEditSummary').value.trim();
         var category = document.getElementById('tutEditCategory').value;
-        var content = document.getElementById('tutEditContent').value.trim();
+        var content = quill.root.innerHTML.trim();
         var cover = document.getElementById('tutEditCover').value.trim();
         if (!title || !content) {
             toast('标题和内容不能为空', 'warning');
@@ -1820,16 +1866,8 @@ var App = {
                         self._videoList = [];
                         self._imageList = [];
                         self._renderMediaLists();
-                        DB.getTutorialsFromCloud(true).then(function(data) {
-                            self._tutorials = data;
-                            if (self._currentAdminTab === 'tutorials') {
-                                self.renderTutorials(document.getElementById('adminMain'));
-                            } else if (self._currentAdminTab === 'drafts') {
-                                self.renderDrafts(document.getElementById('adminMain'));
-                            } else {
-                                self.renderAdminTab('tutorials');
-                            }
-                        });
+                        // 刷新当前tab
+                        self.renderAdminTab(self._currentAdminTab);
                     }
                 })
                 .catch(function(err) {
@@ -1864,16 +1902,8 @@ var App = {
                     self._videoList = [];
                     self._imageList = [];
                     self._renderMediaLists();
-                    DB.getTutorialsFromCloud(true).then(function(data) {
-                        self._tutorials = data;
-                        if (self._currentAdminTab === 'tutorials') {
-                            self.renderTutorials(document.getElementById('adminMain'));
-                        } else if (self._currentAdminTab === 'drafts') {
-                            self.renderDrafts(document.getElementById('adminMain'));
-                        } else {
-                            self.renderAdminTab('tutorials');
-                        }
-                    });
+                    // 刷新当前tab
+                    self.renderAdminTab(self._currentAdminTab);
                 }
             })
             .catch(function(err) {
@@ -1970,14 +2000,21 @@ var App = {
             }
             return;
         }
-        if (this._tabCache[tab] && tab !== 'add') {
+        // 教程和草稿每次都重新加载，不使用缓存
+        if (tab === 'tutorials') {
+            this.renderTutorials(main);
+            return;
+        }
+        if (tab === 'drafts') {
+            this.renderDrafts(main);
+            return;
+        }
+        if (this._tabCache[tab]) {
             main.innerHTML = this._tabCache[tab];
             if (tab === 'categories') this._bindCategoriesEvents(main);
             else if (tab === 'users') this._bindUsersEvents(main);
             else if (tab === 'settings') this._bindSettingsEvents(main);
-            else if (tab === 'tutorials') this._bindTutorialEvents(main);
             else if (tab === 'qa') this._bindQAEvents(main);
-            else if (tab === 'drafts') this._bindDraftEvents(main);
             return;
         }
         main.innerHTML = '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
@@ -1987,9 +2024,7 @@ var App = {
         else if (tab === 'add') this.renderAddForm(main);
         else if (tab === 'users') this.renderUsers(main);
         else if (tab === 'settings') this.renderSettings(main);
-        else if (tab === 'tutorials') this.renderTutorials(main);
         else if (tab === 'qa') this.renderQA(main);
-        else if (tab === 'drafts') this.renderDrafts(main);
     },
 
     renderDashboard: async function(container) {
@@ -2838,9 +2873,11 @@ var App = {
         }
     },
 
-    renderTutorials: function(container) {
-        var self = this;
+    renderTutorials: async function(container) {
         if (!container) container = document.getElementById('adminMain');
+        container.innerHTML = '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
+        var data = await DB.getTutorialsFromCloud(true);
+        this._tutorials = data;
         var filtered = this._getFilteredTutorials();
         var total = filtered.length;
         var pageSize = this._pageSize;
@@ -2873,7 +2910,6 @@ var App = {
         html += '<button class="tut-page-btn" data-page="next" ' + (this._currentPage >= totalPages ? 'disabled' : '') + '>›</button>';
         html += '</div></div>';
         container.innerHTML = html;
-        this._tabCache['tutorials'] = container.innerHTML;
         var grid = document.getElementById('tutCardGrid');
         this._renderTutorialCards(grid, pageItems);
         this._bindTutorialEvents(container);
@@ -2898,6 +2934,8 @@ var App = {
                 }
             });
         }
+        // 缓存此tab内容用于其他tab切换，但教程每次都会重新加载，所以不缓存
+        this._tabCache['tutorials'] = container.innerHTML;
     },
 
     _renderTutorialCards: function(container, items) {
@@ -3009,7 +3047,9 @@ var App = {
                     document.getElementById('tutEditTitle').value = item.title || '';
                     document.getElementById('tutEditSummary').value = item.summary || '';
                     document.getElementById('tutEditCategory').value = item.category || '设计';
-                    document.getElementById('tutEditContent').value = item.content || '';
+                    if (quill) {
+                        quill.root.innerHTML = item.content || '';
+                    }
                     document.getElementById('tutVideoInput').value = '';
                     document.getElementById('tutImageInput').value = '';
                     document.getElementById('tutEditCover').value = item.cover || '';
@@ -3074,13 +3114,8 @@ var App = {
         var refreshBtn = container.querySelector('#tutRefreshBtn');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', function() {
-                DB.invalidateCache();
-                DB.getTutorialsFromCloud(true).then(function(data) {
-                    self._tutorials = data;
-                    self._tutorialKeyword = '';
-                    self.renderTutorials(container);
-                    toast('已刷新', 'success');
-                });
+                self.renderTutorials(container);
+                toast('已刷新', 'success');
             });
         }
         var newBtn = container.querySelector('#tutNewBtn');
@@ -3095,7 +3130,9 @@ var App = {
                 document.getElementById('tutEditTitle').value = '';
                 document.getElementById('tutEditSummary').value = '';
                 document.getElementById('tutEditCategory').value = '设计';
-                document.getElementById('tutEditContent').value = '';
+                if (quill) {
+                    quill.root.innerHTML = '';
+                }
                 document.getElementById('tutVideoInput').value = '';
                 document.getElementById('tutImageInput').value = '';
                 document.getElementById('tutEditCover').value = '';
@@ -3623,7 +3660,6 @@ var App = {
         html += '<button class="draft-page-btn" data-page="next" ' + (this._currentPage >= totalPages ? 'disabled' : '') + '>›</button>';
         html += '</div></div>';
         container.innerHTML = html;
-        this._tabCache['drafts'] = container.innerHTML;
         var grid = document.getElementById('draftCardGrid');
         this._renderDraftCards(grid, pageItems);
         this._bindDraftEvents(container);
@@ -3644,6 +3680,7 @@ var App = {
                 }
             });
         }
+        this._tabCache['drafts'] = container.innerHTML;
     },
 
     _renderDraftCards: function(container, items) {
@@ -3731,7 +3768,9 @@ var App = {
                     document.getElementById('tutEditTitle').value = draft.title || '';
                     document.getElementById('tutEditSummary').value = draft.summary || '';
                     document.getElementById('tutEditCategory').value = draft.category || '设计';
-                    document.getElementById('tutEditContent').value = draft.content || '';
+                    if (quill) {
+                        quill.root.innerHTML = draft.content || '';
+                    }
                     document.getElementById('tutVideoInput').value = '';
                     document.getElementById('tutImageInput').value = '';
                     document.getElementById('tutEditCover').value = draft.cover || '';
@@ -3773,7 +3812,9 @@ var App = {
                     document.getElementById('tutEditTitle').value = draft.title || '';
                     document.getElementById('tutEditSummary').value = draft.summary || '';
                     document.getElementById('tutEditCategory').value = draft.category || '设计';
-                    document.getElementById('tutEditContent').value = draft.content || '';
+                    if (quill) {
+                        quill.root.innerHTML = draft.content || '';
+                    }
                     document.getElementById('tutVideoInput').value = '';
                     document.getElementById('tutImageInput').value = '';
                     document.getElementById('tutEditCover').value = draft.cover || '';
