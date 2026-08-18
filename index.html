@@ -3992,84 +3992,101 @@
             font-size: .9rem
         }
     }
+
+    /* ===== 教程详情弹窗极致优化 ===== */
     #tutorialDetailModal .modal-box {
-        max-width: 800px;
-        padding: 0
+        max-width: 820px;
+        max-height: 92vh;
+        overflow-y: auto;
+        padding: 0;
+        background: var(--bg-card-solid);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0,119,255,0.2) transparent;
     }
-    #tutorialDetailModal .modal-box .close-btn {
-        position: sticky;
-        top: 12px;
-        right: 12px;
-        z-index: 10;
-        float: right;
-        background: rgba(0, 0, 0, 0.5);
-        color: #fff;
-        border-radius: 50%;
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2rem;
-        border: none;
-        cursor: pointer;
-        backdrop-filter: blur(4px);
-        margin: 8px 8px 0 0
+    #tutorialDetailModal .modal-box::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
     }
-    #tutorialDetailModal .modal-box .close-btn:hover {
-        background: rgba(0, 0, 0, 0.8)
+    #tutorialDetailModal .modal-box::-webkit-scrollbar-track {
+        background: transparent;
     }
-    #tutorialDetailVideos {
-        padding: 12px 16px 0
+    #tutorialDetailModal .modal-box::-webkit-scrollbar-thumb {
+        background: rgba(0,119,255,0.25);
+        border-radius: 8px;
     }
-    #tutorialDetailVideos iframe {
-        border-radius: 8px
+    #tutorialDetailModal .modal-box::-webkit-scrollbar-thumb:hover {
+        background: rgba(0,119,255,0.4);
     }
+
     #tutorialDetailContent {
-        padding: 12px 16px 20px
+        padding: 20px 28px 28px;
+        font-size: 1rem;
+        line-height: 1.8;
+        color: var(--text-secondary);
+        white-space: normal;
+        word-wrap: break-word;
+        overflow: visible;
     }
-    #tutorialDetailModal .modal-box h3 {
-        padding: 0 16px;
-        margin-top: 8px
+    #tutorialDetailContent img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin: 18px 0;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        display: block;
     }
-    #tutorialDetailModal .meta {
-        padding: 0 16px
+    #tutorialDetailContent h2, 
+    #tutorialDetailContent h3, 
+    #tutorialDetailContent h4 {
+        margin: 1.4em 0 0.6em;
+        font-weight: 600;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
     }
-    @media (max-width:640px) {
-        #tutorialDetailModal .modal-box {
-            max-width: 100%;
-            border-radius: var(--radius-md) var(--radius-md) 0 0
-        }
-        #tutorialDetailVideos {
-            padding: 8px 10px 0
-        }
-        #tutorialDetailContent {
-            padding: 8px 10px 12px;
-            font-size: .85rem
-        }
-        #tutorialDetailModal .modal-box h3 {
-            font-size: 1.05rem
-        }
-        #tutorialDetailModal .modal-box .close-btn {
-            width: 30px;
-            height: 30px;
-            font-size: 1rem;
-            top: 8px;
-            right: 8px;
-            margin: 4px 4px 0 0
-        }
+    #tutorialDetailContent h2 { font-size: 1.5rem; }
+    #tutorialDetailContent h3 { font-size: 1.25rem; }
+    #tutorialDetailContent h4 { font-size: 1.1rem; }
+    #tutorialDetailContent p {
+        margin: 0.8em 0;
     }
-    @media (max-width:480px) {
-        #tutorialDetailContent {
-            font-size: .8rem
-        }
-        #tutorialDetailModal .modal-box h3 {
-            font-size: .9rem
-        }
-        #tutorialDetailVideos iframe {
-            height: 180px
-        }
+    #tutorialDetailContent ul, 
+    #tutorialDetailContent ol {
+        padding-left: 1.8em;
+        margin: 0.6em 0;
     }
+    #tutorialDetailContent blockquote {
+        border-left: 4px solid var(--accent-cyan);
+        background: var(--bg-primary);
+        padding: 0.8em 1.2em;
+        margin: 1em 0;
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        color: var(--text-secondary);
+    }
+    #tutorialDetailContent code {
+        background: var(--bg-secondary);
+        padding: 0.2em 0.6em;
+        border-radius: 4px;
+        font-size: 0.9em;
+        color: var(--accent-purple);
+    }
+    #tutorialDetailContent pre {
+        background: var(--bg-secondary);
+        padding: 1em;
+        border-radius: var(--radius-sm);
+        overflow-x: auto;
+        font-size: 0.9em;
+        line-height: 1.6;
+    }
+    #tutorialDetailContent a {
+        color: var(--accent-cyan);
+        text-decoration: underline;
+    }
+    #tutorialDetailContent a:hover {
+        opacity: 0.8;
+    }
+
     .video-card-item {
         transition: transform 0.2s, box-shadow 0.2s
     }
@@ -4198,7 +4215,7 @@
     <nav class="mobile-bottom-nav" id="mobileBottomNav"><a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a><a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a><a href="#" data-page="tutorials"><i class="fas fa-book"></i><span>教程</span></a><a href="#" data-page="qa"><i class="fas fa-comments"></i><span>问答</span></a></nav>
     <div class="share-float" id="shareFloat"><a href="#" onclick="shareOn('wechat')" title="分享到微信"><i class="fab fa-weixin"></i></a><a href="#" onclick="shareOn('weibo')" title="分享到微博"><i class="fab fa-weibo"></i></a><a href="#" onclick="shareOn('twitter')" title="分享到Twitter"><i class="fab fa-twitter"></i></a><a href="#" onclick="copyLink()" title="复制链接"><i class="fas fa-link"></i></a><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" title="回到顶部"><i class="fas fa-arrow-up"></i></a></div>
     <div class="modal-overlay" id="adminModal"><div class="modal-box"><button class="close-btn" id="adminModalClose">&times;</button><h3>管理员登录</h3><div class="form-group"><label>请输入管理密码</label><input type="password" id="adminPassword" placeholder="请输入密码" /></div><div class="form-actions"><button class="btn btn-outline" id="adminCancel">取消</button><button class="btn btn-primary" id="adminLoginBtn">登录</button></div></div></div>
-    <div class="modal-overlay" id="tutorialDetailModal"><div class="modal-box" style="padding:0;max-width:900px;max-height:95vh;overflow-y:auto;"><button class="close-btn" id="tutorialDetailClose" style="position:sticky;top:12px;right:12px;z-index:10;float:right;background:rgba(0,0,0,0.5);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:none;cursor:pointer;backdrop-filter:blur(4px);margin:8px 8px 0 0;">&times;</button><div style="padding:0 24px 8px;border-bottom:1px solid var(--border-glow);"><h3 id="tutorialDetailTitle" style="margin:8px 0 4px;font-size:1.5rem;font-weight:700;letter-spacing:-0.3px;">教程标题</h3><div class="meta" style="font-size:.8rem;color:var(--text-dim);display:flex;gap:12px;flex-wrap:wrap;padding-bottom:8px;" id="tutorialDetailMeta"></div></div><div id="tutorialDetailVideos" style="padding:16px 24px 0;"></div><div id="tutorialDetailContent" style="font-size:.95rem;line-height:1.9;white-space:pre-wrap;padding:16px 24px 24px;color:var(--text-secondary);"></div><div class="form-actions" style="padding:8px 24px 20px;border-top:1px solid var(--border-glow);"><button class="btn btn-outline" id="tutorialDetailCloseBtn">关闭</button></div></div></div>
+    <div class="modal-overlay" id="tutorialDetailModal"><div class="modal-box" style="padding:0;max-width:900px;"><button class="close-btn" id="tutorialDetailClose" style="position:sticky;top:12px;right:12px;z-index:10;float:right;background:rgba(0,0,0,0.5);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:none;cursor:pointer;backdrop-filter:blur(4px);margin:8px 8px 0 0;">&times;</button><div style="padding:0 24px 8px;border-bottom:1px solid var(--border-glow);"><h3 id="tutorialDetailTitle" style="margin:8px 0 4px;font-size:1.5rem;font-weight:700;letter-spacing:-0.3px;">教程标题</h3><div class="meta" style="font-size:.8rem;color:var(--text-dim);display:flex;gap:12px;flex-wrap:wrap;padding-bottom:8px;" id="tutorialDetailMeta"></div></div><div id="tutorialDetailVideos" style="padding:16px 24px 0;"></div><div id="tutorialDetailContent"></div><div class="form-actions" style="padding:8px 24px 20px;border-top:1px solid var(--border-glow);"><button class="btn btn-outline" id="tutorialDetailCloseBtn">关闭</button></div></div></div>
     <div class="modal-overlay" id="tutorialModal"><div class="modal-box"><button class="close-btn" id="tutorialModalClose">&times;</button><h3>发布新教程</h3><div class="form-group"><label>标题</label><input type="text" id="tutTitle" placeholder="例如：Photoshop 快速抠图技巧" /></div><div class="form-group"><label>摘要</label><input type="text" id="tutSummary" placeholder="一句话简介" /></div><div class="form-group"><label>分类</label><select id="tutCategory"><option value="设计">设计</option><option value="开发">开发</option><option value="办公">办公</option><option value="媒体">媒体</option><option value="实用">实用</option></select></div><div class="form-group"><label>内容 (支持 Markdown)</label><textarea id="tutContent" rows="6" placeholder="详细教程内容..."></textarea></div><div class="form-group"><label>封面图 URL</label><input type="text" id="tutCover" placeholder="https://example.com/cover.jpg" /></div><div class="form-group"><label>视频链接 (多个用逗号分隔)</label><input type="text" id="tutVideos" placeholder="https://youtube.com/xxx, https://bilibili.com/xxx" /></div><div class="form-actions"><button class="btn btn-outline" id="tutCancel">取消</button><button class="btn btn-primary" id="tutSubmit">发布</button></div></div></div>
     <div class="modal-overlay" id="questionModal"><div class="modal-box"><button class="close-btn" id="questionModalClose">&times;</button><h3>提出你的问题</h3><div class="form-group"><label>问题标题</label><input type="text" id="qTitle" placeholder="简明扼要的问题" /></div><div class="form-group"><label>详细描述</label><textarea id="qBody" rows="5" placeholder="问题背景、期望的答案等..."></textarea></div><div class="form-group"><label>分类</label><select id="qCategory"><option value="设计">设计</option><option value="开发">开发</option><option value="办公">办公</option><option value="媒体">媒体</option><option value="实用">实用</option></select></div><div class="form-actions"><button class="btn btn-outline" id="qCancel">取消</button><button class="btn btn-primary" id="qSubmit">提交问题</button></div></div></div>
     <div class="modal-overlay" id="answerModal"><div class="modal-box"><button class="close-btn" id="answerModalClose">&times;</button><h3>你的回答</h3><div class="form-group"><label>回答内容</label><textarea id="aBody" rows="5" placeholder="写你的回答..."></textarea></div><div class="form-actions"><button class="btn btn-outline" id="aCancel">取消</button><button class="btn btn-primary" id="aSubmit">提交回答</button></div></div></div>
@@ -4940,7 +4957,7 @@
                                 '</span><span>·</span><span><i class="far fa-heart"></i> ' + (tut.likes ||
                                     0) + '</span>';
                             var content = tut.content || '';
-                            document.getElementById('tutorialDetailContent').textContent = content;
+                            document.getElementById('tutorialDetailContent').innerHTML = content;
                             var videos2 = [];
                             try {
                                 if (tut.videos) videos2 = typeof tut.videos === 'string' ? JSON.parse(tut
