@@ -4166,8 +4166,8 @@
                 </section>
                 <section id="pageTutorials" class="hidden page-section">
                     <div class="container" style="max-width:var(--max-width);padding:0 16px;">
-                        <div class="section-header"><h2><i class="fas fa-book-open"></i> 使用教程 · 博客</h2></div>
-                        <div id="tutorialList" class="card-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;"></div>
+                        <div class="section-header"><h2><i class="fas fa-book-open"></i> 使用教程 · 博客</h2><button class="btn btn-primary" id="newTutorialBtn" style="display:none;"><i class="fas fa-plus"></i> 发布教程</button></div>
+                        <div id="tutorialList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px;margin-top:8px;"></div>
                     </div>
                 </section>
                 <section id="pageQA" class="hidden page-section">
@@ -4198,8 +4198,8 @@
     <nav class="mobile-bottom-nav" id="mobileBottomNav"><a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a><a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a><a href="#" data-page="tutorials"><i class="fas fa-book"></i><span>教程</span></a><a href="#" data-page="qa"><i class="fas fa-comments"></i><span>问答</span></a></nav>
     <div class="share-float" id="shareFloat"><a href="#" onclick="shareOn('wechat')" title="分享到微信"><i class="fab fa-weixin"></i></a><a href="#" onclick="shareOn('weibo')" title="分享到微博"><i class="fab fa-weibo"></i></a><a href="#" onclick="shareOn('twitter')" title="分享到Twitter"><i class="fab fa-twitter"></i></a><a href="#" onclick="copyLink()" title="复制链接"><i class="fas fa-link"></i></a><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" title="回到顶部"><i class="fas fa-arrow-up"></i></a></div>
     <div class="modal-overlay" id="adminModal"><div class="modal-box"><button class="close-btn" id="adminModalClose">&times;</button><h3>管理员登录</h3><div class="form-group"><label>请输入管理密码</label><input type="password" id="adminPassword" placeholder="请输入密码" /></div><div class="form-actions"><button class="btn btn-outline" id="adminCancel">取消</button><button class="btn btn-primary" id="adminLoginBtn">登录</button></div></div></div>
-    <div class="modal-overlay" id="tutorialDetailModal"><div class="modal-box" style="padding:0;max-width:900px;"><button class="close-btn" id="tutorialDetailClose" style="position:sticky;top:12px;right:12px;z-index:10;float:right;background:rgba(0,0,0,0.5);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:none;cursor:pointer;backdrop-filter:blur(4px);margin:8px 8px 0 0;">&times;</button><div style="padding:0 16px 8px;"><h3 id="tutorialDetailTitle" style="margin:4px 0 2px;">教程标题</h3><div class="meta" style="font-size:.8rem;color:var(--text-dim);" id="tutorialDetailMeta"></div></div><div id="tutorialDetailVideos" style="padding:0 16px;"></div><div id="tutorialDetailContent" style="font-size:.95rem;line-height:1.8;white-space:pre-wrap;padding:12px 16px 20px;"></div><div class="form-actions" style="padding:8px 16px 16px;"><button class="btn btn-outline" id="tutorialDetailCloseBtn">关闭</button></div></div></div>
-    <div class="modal-overlay" id="tutorialModal"><div class="modal-box"><button class="close-btn" id="tutorialModalClose">&times;</button><h3>发布新教程</h3><div class="form-group"><label>标题</label><input type="text" id="tutTitle" placeholder="例如：Photoshop 快速抠图技巧" /></div><div class="form-group"><label>摘要</label><input type="text" id="tutSummary" placeholder="一句话简介" /></div><div class="form-group"><label>分类</label><select id="tutCategory"><option value="设计">设计</option><option value="开发">开发</option><option value="办公">办公</option><option value="媒体">媒体</option><option value="实用">实用</option></select></div><div class="form-group"><label>内容 (支持 Markdown)</label><textarea id="tutContent" rows="6" placeholder="详细教程内容..."></textarea></div><div class="form-group"><label>封面图 URL</label><input type="text" id="tutCover" placeholder="https://example.com/cover.jpg" /></div><div class="form-actions"><button class="btn btn-outline" id="tutCancel">取消</button><button class="btn btn-primary" id="tutSubmit">发布</button></div></div></div>
+    <div class="modal-overlay" id="tutorialDetailModal"><div class="modal-box" style="padding:0;max-width:900px;max-height:95vh;overflow-y:auto;"><button class="close-btn" id="tutorialDetailClose" style="position:sticky;top:12px;right:12px;z-index:10;float:right;background:rgba(0,0,0,0.5);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:none;cursor:pointer;backdrop-filter:blur(4px);margin:8px 8px 0 0;">&times;</button><div style="padding:0 24px 8px;border-bottom:1px solid var(--border-glow);"><h3 id="tutorialDetailTitle" style="margin:8px 0 4px;font-size:1.5rem;font-weight:700;letter-spacing:-0.3px;">教程标题</h3><div class="meta" style="font-size:.8rem;color:var(--text-dim);display:flex;gap:12px;flex-wrap:wrap;padding-bottom:8px;" id="tutorialDetailMeta"></div></div><div id="tutorialDetailVideos" style="padding:16px 24px 0;"></div><div id="tutorialDetailContent" style="font-size:.95rem;line-height:1.9;white-space:pre-wrap;padding:16px 24px 24px;color:var(--text-secondary);"></div><div class="form-actions" style="padding:8px 24px 20px;border-top:1px solid var(--border-glow);"><button class="btn btn-outline" id="tutorialDetailCloseBtn">关闭</button></div></div></div>
+    <div class="modal-overlay" id="tutorialModal"><div class="modal-box"><button class="close-btn" id="tutorialModalClose">&times;</button><h3>发布新教程</h3><div class="form-group"><label>标题</label><input type="text" id="tutTitle" placeholder="例如：Photoshop 快速抠图技巧" /></div><div class="form-group"><label>摘要</label><input type="text" id="tutSummary" placeholder="一句话简介" /></div><div class="form-group"><label>分类</label><select id="tutCategory"><option value="设计">设计</option><option value="开发">开发</option><option value="办公">办公</option><option value="媒体">媒体</option><option value="实用">实用</option></select></div><div class="form-group"><label>内容 (支持 Markdown)</label><textarea id="tutContent" rows="6" placeholder="详细教程内容..."></textarea></div><div class="form-group"><label>封面图 URL</label><input type="text" id="tutCover" placeholder="https://example.com/cover.jpg" /></div><div class="form-group"><label>视频链接 (多个用逗号分隔)</label><input type="text" id="tutVideos" placeholder="https://youtube.com/xxx, https://bilibili.com/xxx" /></div><div class="form-actions"><button class="btn btn-outline" id="tutCancel">取消</button><button class="btn btn-primary" id="tutSubmit">发布</button></div></div></div>
     <div class="modal-overlay" id="questionModal"><div class="modal-box"><button class="close-btn" id="questionModalClose">&times;</button><h3>提出你的问题</h3><div class="form-group"><label>问题标题</label><input type="text" id="qTitle" placeholder="简明扼要的问题" /></div><div class="form-group"><label>详细描述</label><textarea id="qBody" rows="5" placeholder="问题背景、期望的答案等..."></textarea></div><div class="form-group"><label>分类</label><select id="qCategory"><option value="设计">设计</option><option value="开发">开发</option><option value="办公">办公</option><option value="媒体">媒体</option><option value="实用">实用</option></select></div><div class="form-actions"><button class="btn btn-outline" id="qCancel">取消</button><button class="btn btn-primary" id="qSubmit">提交问题</button></div></div></div>
     <div class="modal-overlay" id="answerModal"><div class="modal-box"><button class="close-btn" id="answerModalClose">&times;</button><h3>你的回答</h3><div class="form-group"><label>回答内容</label><textarea id="aBody" rows="5" placeholder="写你的回答..."></textarea></div><div class="form-actions"><button class="btn btn-outline" id="aCancel">取消</button><button class="btn btn-primary" id="aSubmit">提交回答</button></div></div></div>
     <div class="modal-overlay" id="submitSoftwareModal"><div class="modal-box"><button class="close-btn" id="submitSoftwareModalClose">&times;</button><h3><i class="fas fa-rocket"></i> 开发者入驻 · 提交软件</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:12px;">提交后我们将审核，通过后立即上架。</p><div class="form-group"><label>软件名称 *</label><input type="text" id="subName" placeholder="例如：Photoshop 2026" /></div><div class="form-group"><label>分类 *</label><select id="subCategory"><option value="设计工具">设计工具</option><option value="开发工具">开发工具</option><option value="办公软件">办公软件</option><option value="媒体工具">媒体工具</option><option value="实用工具">实用工具</option></select></div><div class="form-group"><label>版本</label><input type="text" id="subVersion" placeholder="1.0" /></div><div class="form-group"><label>描述</label><textarea id="subDesc" rows="3" placeholder="软件简介..."></textarea></div><div class="form-group"><label>平台 (多个用逗号分隔)</label><input type="text" id="subPlatforms" placeholder="mac,windows" /></div><div class="form-group"><label>下载链接</label><input type="url" id="subDownloadUrl" placeholder="https://example.com/download" /></div><div class="form-group"><label>图标 URL</label><input type="url" id="subIconUrl" placeholder="https://example.com/icon.png" /></div><div class="form-group"><label>您的联系方式 (邮箱或微信)</label><input type="text" id="subContact" placeholder="用于审核沟通" /></div><div class="form-actions"><button class="btn btn-outline" id="subCancel">取消</button><button class="btn btn-primary" id="subSubmit">提交审核</button></div></div></div>
@@ -4405,9 +4405,9 @@
                         'mac')) platHtml +=
                         '<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>'; if (platforms
                         .includes('windows')) platHtml +=
-                        '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>'; if (!
-                        platHtml) platHtml = '<span class="badge" style="opacity:0.4;">—</span>'; var descText = s
-                        .description || ''; var sizeText = s.size || '—'; var views = s.views || 0; var downloads =
+                        '<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>'; if (!(
+                            platHtml)) platHtml = '<span class="badge" style="opacity:0.4;">—</span>'; var descText =
+                        s.description || ''; var sizeText = s.size || '—'; var views = s.views || 0; var downloads =
                         s.downloads || 0; var cardClass = 'stack-card'; if (i === 0) cardClass += ' card-current';
                     else if (i === 1) cardClass += ' card-next'; else if (i === 2) cardClass += ' card-next2';
                     else if (i === 3) cardClass += ' card-next3'; else if (i === 4) cardClass += ' card-next4';
@@ -4536,8 +4536,8 @@
                         target.classList.add('active');
                         requestAnimationFrame(function() { target.scrollIntoView({ block: 'nearest',
                             behavior: 'smooth' }); }); } } },
-            renderCards: function(container, list, showCategory, keyword) { showCategory = showCategory !== false; if (!
-                    container) return; if (!list || list.length === 0) {
+            renderCards: function(container, list, showCategory, keyword) { showCategory = showCategory !== false; if (!(
+                        container)) return; if (!list || list.length === 0) {
                     container.innerHTML =
                         '<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p>' + (keyword ?
                             '<button class="btn btn-sm btn-outline" id="clearSearchBtn">清空搜索</button>' : '') +
@@ -4874,15 +4874,8 @@
                         '<div class="empty-state"><div class="icon">📖</div><h3>暂无教程</h3><p>管理员正在准备内容，敬请期待</p></div>';
                     return;
                 }
-
-                function getVideoCoverFromUrl(url) {
-                    var ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/);
-                    if (ytMatch) {
-                        return 'https://img.youtube.com/vi/' + ytMatch[1] + '/maxresdefault.jpg';
-                    }
-                    return null;
-                }
-                container.innerHTML = data.map(function(t) {
+                var html = '';
+                for (var t of data) {
                     var videos = [];
                     try {
                         if (t.videos) videos = typeof t.videos === 'string' ? JSON.parse(t.videos) : t.videos;
@@ -4891,89 +4884,97 @@
                     var coverUrl = t.cover || null;
                     if (!coverUrl && videoCount > 0) {
                         var firstVideo = videos[0];
-                        var extracted = getVideoCoverFromUrl(firstVideo);
-                        if (extracted) coverUrl = extracted;
+                        var ytMatch = firstVideo.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/);
+                        if (ytMatch) coverUrl = 'https://img.youtube.com/vi/' + ytMatch[1] + '/maxresdefault.jpg';
                     }
-                    var coverStyle = '';
-                    if (coverUrl) {
-                        coverStyle = 'background-image:url(' + coverUrl +
-                            ');background-size:cover;background-position:center;';
-                    } else {
-                        coverStyle = 'background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);';
-                    }
-                    var badgeHtml = '';
-                    if (videoCount > 0) {
-                        badgeHtml =
-                            '<span style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.7);color:#fff;padding:2px 12px;border-radius:20px;font-size:0.7rem;font-weight:600;backdrop-filter:blur(4px);"><i class="fas fa-video"></i> ' +
-                            videoCount + '</span>';
-                    }
-                    return '<div class="video-card-item" data-id="' + t.id +
-                        '" style="cursor:pointer;border-radius:12px;overflow:hidden;background:var(--bg-card-solid);border:1px solid var(--border-glow);box-shadow:var(--shadow-card);transition:var(--transition);position:relative;">' +
-                        '<div style="height:180px;' + coverStyle +
-                        'position:relative;">' +
-                        '<div style="position:absolute;inset:0;background:rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;" class="play-overlay"><i class="fas fa-play-circle" style="font-size:48px;color:rgba(255,255,255,0.8);text-shadow:0 2px 12px rgba(0,0,0,0.3);"></i></div>' +
+                    var coverStyle = coverUrl ? 'background-image:url(' + coverUrl +
+                        ');background-size:cover;background-position:center;' :
+                        'background:linear-gradient(135deg,#0077ff,#6c5ce7);';
+                    var badgeHtml = videoCount > 0 ?
+                        '<span style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.65);color:#fff;padding:2px 12px;border-radius:20px;font-size:0.65rem;font-weight:600;backdrop-filter:blur(4px);"><i class="fas fa-video"></i> ' +
+                        videoCount + '</span>' :
+                        '<span style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.45);color:#fff;padding:2px 10px;border-radius:20px;font-size:0.6rem;font-weight:500;backdrop-filter:blur(4px);">📄 图文</span>';
+                    var likes = t.likes || 0;
+                    html += '<div class="tut-card" data-id="' + t.id +
+                        '" style="cursor:pointer;border-radius:16px;overflow:hidden;background:var(--bg-card-solid);border:1px solid var(--border-glow);box-shadow:0 2px 12px rgba(0,0,0,0.04);transition:all 0.3s cubic-bezier(0.2,0,0,1);position:relative;display:flex;flex-direction:column;">' +
+                        '<div style="height:200px;' + coverStyle +
+                        'position:relative;flex-shrink:0;background-color:#1a1a2e;">' +
+                        '<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.4) 100%);"></div>' +
                         badgeHtml +
-                        (videoCount > 0 ? '<span style="position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.6);color:#fff;padding:0 8px;border-radius:4px;font-size:0.65rem;backdrop-filter:blur(4px);"><i class="far fa-clock"></i> ' +
-                            timeAgo(t.created_at) + '</span>' : '') +
-                        '</div>' +
-                        '<div style="padding:10px 12px 8px;">' +
-                        '<div style="font-weight:600;font-size:0.95rem;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">' +
-                        escapeHTML(t.title) + '</div>' +
-                        '<div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;display:flex;justify-content:space-between;align-items:center;">' +
-                        '<span>' + escapeHTML(t.category) + '</span>' +
-                        '<span style="display:flex;gap:8px;align-items:center;">' +
-                        '<span><i class="far fa-heart"></i> ' + (t.likes || 0) + '</span>' +
-                        '<button class="like-tut" data-id="' + t.id +
-                        '" style="background:none;border:none;color:var(--text-dim);cursor:pointer;padding:0 4px;"><i class="far fa-heart"></i></button>' +
+                        '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px 18px 14px;color:#fff;">' +
+                        '<div style="font-size:1.05rem;font-weight:700;line-height:1.3;text-shadow:0 2px 8px rgba(0,0,0,0.3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' +
+                        escapeHTML(t.title) +
+                        '</div></div></div>' +
+                        '<div style="padding:14px 18px 16px;flex:1;display:flex;flex-direction:column;gap:6px;">' +
+                        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                        '<span style="font-size:0.6rem;font-weight:600;background:var(--accent-gradient);color:#fff;padding:1px 12px;border-radius:50px;letter-spacing:0.3px;">' +
+                        escapeHTML(t.category) +
+                        '</span>' +
+                        '<span style="font-size:0.7rem;color:var(--text-dim);"><i class="far fa-clock"></i> ' +
+                        timeAgo(t.created_at) +
                         '</span>' +
                         '</div>' +
-                        '</div>' +
-                        '</div>';
-                }).join('');
+                        (t.summary ? '<div style="font-size:0.8rem;color:var(--text-secondary);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' +
+                            escapeHTML(t.summary) + '</div>' : '') +
+                        '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px;border-top:1px solid var(--border-glow);">' +
+                        '<span style="font-size:0.7rem;color:var(--text-dim);display:flex;align-items:center;gap:4px;"><i class="far fa-heart"></i> ' +
+                        likes + '</span>' +
+                        '<button class="tut-like-btn" data-id="' + t.id +
+                        '" style="font-size:0.75rem;background:none;border:none;color:var(--text-dim);cursor:pointer;padding:2px 10px;border-radius:20px;transition:0.2s;display:flex;align-items:center;gap:4px;border:1px solid var(--border-glow);">' +
+                        '<i class="far fa-heart"></i> 点赞</button>' +
+                        '</div></div></div>';
+                }
+                container.innerHTML = html;
 
-                container.querySelectorAll('.video-card-item').forEach(function(card) {
+                container.querySelectorAll('.tut-card').forEach(function(card) {
                     card.addEventListener('click', function(e) {
-                        if (e.target.closest('.like-tut')) return;
+                        if (e.target.closest('.tut-like-btn')) return;
                         var id = this.dataset.id;
                         var tut = data.find(function(t) { return t.id === id; });
                         if (tut) {
                             document.getElementById('tutorialDetailTitle').textContent = tut.title;
-                            document.getElementById('tutorialDetailMeta').textContent = tut.category +
-                                ' · ' + timeAgo(tut.created_at);
-                            document.getElementById('tutorialDetailContent').innerHTML = tut.content;
-                            var videos = [];
+                            document.getElementById('tutorialDetailMeta').innerHTML =
+                                '<span>' + escapeHTML(tut.category) +
+                                '</span><span>·</span><span><i class="far fa-clock"></i> ' + timeAgo(tut
+                                    .created_at) +
+                                '</span><span>·</span><span><i class="far fa-heart"></i> ' + (tut.likes ||
+                                    0) + '</span>';
+                            var content = tut.content || '';
+                            document.getElementById('tutorialDetailContent').textContent = content;
+                            var videos2 = [];
                             try {
-                                if (tut.videos) videos = typeof tut.videos === 'string' ? JSON.parse(tut
+                                if (tut.videos) videos2 = typeof tut.videos === 'string' ? JSON.parse(tut
                                     .videos) : tut.videos;
-                            } catch (e) { videos = []; }
+                            } catch (e) { videos2 = []; }
                             var videosContainer = document.getElementById('tutorialDetailVideos');
                             if (videosContainer) {
-                                if (videos && videos.length > 0) {
-                                    var videoHtml = videos.map(function(url) {
-                                        var embedUrl = url;
-                                        var isYoutube = url.includes('youtube.com') || url
-                                            .includes('youtu.be');
-                                        var isBilibili = url.includes('bilibili.com') || url
-                                            .includes('b23.tv');
+                                if (videos2 && videos2.length > 0) {
+                                    var videoHtml = '';
+                                    for (var v of videos2) {
+                                        var embedUrl = v;
+                                        var isYoutube = v.includes('youtube.com') || v.includes(
+                                            'youtu.be');
+                                        var isBilibili = v.includes('bilibili.com') || v.includes(
+                                            'b23.tv');
                                         if (isYoutube) {
-                                            var match = url.match(
+                                            var ytMatch2 = v.match(
                                                 /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/
                                                 );
-                                            if (match) embedUrl = 'https://www.youtube.com/embed/' +
-                                                match[1];
+                                            if (ytMatch2) embedUrl = 'https://www.youtube.com/embed/' +
+                                                ytMatch2[1];
                                         }
                                         if (isBilibili) {
-                                            var bMatch = url.match(/b23\.tv\/([a-zA-Z0-9]+)/) ||
-                                                url.match(/bilibili\.com\/video\/([a-zA-Z0-9]+)/
-                                                );
+                                            var bMatch = v.match(/b23\.tv\/([a-zA-Z0-9]+)/) || v
+                                                .match(/bilibili\.com\/video\/([a-zA-Z0-9]+)/);
                                             if (bMatch) embedUrl =
                                                 'https://player.bilibili.com/player.html?bvid=' +
                                                 bMatch[1];
                                         }
-                                        return '<div style="margin:8px 0;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;background:#000;"><iframe src="' +
+                                        videoHtml +=
+                                            '<div style="margin:10px 0;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000;box-shadow:0 2px 12px rgba(0,0,0,0.1);"><iframe src="' +
                                             embedUrl +
-                                            '" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe></div>';
-                                    }).join('');
+                                            '" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen loading="lazy"></iframe></div>';
+                                    }
                                     videosContainer.innerHTML = videoHtml;
                                     videosContainer.style.display = 'block';
                                 } else {
@@ -4986,7 +4987,7 @@
                     });
                 });
 
-                container.querySelectorAll('.like-tut').forEach(function(btn) {
+                container.querySelectorAll('.tut-like-btn').forEach(function(btn) {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
                         var id = this.dataset.id;
@@ -5001,11 +5002,6 @@
                                 });
                             });
                     });
-                });
-
-                container.querySelectorAll('.video-card-item .play-overlay').forEach(function(el) {
-                    el.addEventListener('mouseenter', function() { this.style.opacity = '1'; });
-                    el.addEventListener('mouseleave', function() { this.style.opacity = '0'; });
                 });
             });
         }
@@ -5360,6 +5356,7 @@
                 if (isAdmin) {
                     document.getElementById('adminLoginNav').style.display = 'inline-flex';
                     document.getElementById('adminLoginNav').innerHTML = '<i class="fas fa-user-shield"></i> 管理后台';
+                    document.getElementById('newTutorialBtn').style.display = 'inline-flex';
                 }
                 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.addEventListener('click',
                         function(e) { e.preventDefault(); var page = this.dataset.page; if (page === 'home') self
@@ -5444,6 +5441,9 @@
                             toast('已复制微信号: ' + wechatId, 'success'); } }); }
                 document.getElementById('newQuestionBtn').addEventListener('click', function() { document.getElementById(
                         'questionModal').classList.add('open'); });
+                document.getElementById('newTutorialBtn').addEventListener('click', function() { if (!isAdmin) { toast(
+                            '请先登录管理', 'warning'); return; }
+                    document.getElementById('tutorialModal').classList.add('open'); });
                 document.getElementById('tutorialModalClose').addEventListener('click', function() { document
                         .getElementById('tutorialModal').classList.remove('open'); });
                 document.getElementById('tutCancel').addEventListener('click', function() { document.getElementById(
@@ -5452,16 +5452,23 @@
                         .getElementById('tutTitle').value.trim(); var summary = document.getElementById('tutSummary')
                         .value.trim(); var category = document.getElementById('tutCategory').value; var content =
                         document.getElementById('tutContent').value.trim(); var cover = document.getElementById(
-                        'tutCover').value.trim(); if (!title || !content) { toast('标题和内容不能为空',
-                        'warning'); return; }
+                        'tutCover').value.trim(); var videosRaw = document.getElementById('tutVideos').value.trim();
+                    var videos = videosRaw ? videosRaw.split(',').map(function(v) { return v.trim(); }).filter(
+                        Boolean) : [];
+                    if (!title || !content) { toast('标题和内容不能为空', 'warning'); return; }
                     supabaseClient.from('tutorials').insert([{ title: title, summary: summary, category: category,
-                            content: content, cover: cover, likes: 0 }]).then(function(res) { if (res.error) {
-                            console.error('发布教程错误:', res.error); if (res.error.message && res.error
-                                .message.includes('does not exist')) { toast('❌ 教程表不存在，请先创建 tutorials 表',
-                                    'error'); } else { toast('发布失败: ' + res.error.message, 'error'); } } else {
+                            content: content, cover: cover, videos: videos, likes: 0 }]).then(function(res) {
+                        if (res.error) {
+                            console.error('发布教程错误:', res.error);
+                            if (res.error.message && res.error.message.includes('does not exist')) { toast(
+                                    '❌ 教程表不存在，请先创建 tutorials 表', 'error'); } else { toast('发布失败: ' +
+                                    res.error.message, 'error'); }
+                        } else {
                             toast('教程发布成功！', 'success');
                             document.getElementById('tutorialModal').classList.remove('open');
-                            renderTutorials(); } }); });
+                            renderTutorials();
+                        }
+                    }); });
                 document.getElementById('questionModalClose').addEventListener('click', function() { document
                         .getElementById('questionModal').classList.remove('open'); });
                 document.getElementById('qCancel').addEventListener('click', function() { document.getElementById(
@@ -5640,8 +5647,8 @@
                 if (isMobile() && isOpen) closeSidebar();
                 renderQuestions();
             },
-            updateSidebarHighlight: function(cat) { var container = document.getElementById('categoryList'); if (!
-                    container) return;
+            updateSidebarHighlight: function(cat) { var container = document.getElementById('categoryList'); if (!(
+                        container)) return;
                 container.querySelectorAll('.category-item-side,.category-item-all').forEach(function(el) { el
                     .classList.remove('active'); }); if (!cat || cat === 'all') { var allEl = container.querySelector(
                         '.category-item-all'); if (allEl) allEl.classList.add('active'); if (allEl) { requestAnimationFrame(
@@ -5779,6 +5786,7 @@
 
         function copyLink() { copyLinkText('乐哲软件 · 精选高效工具', window.location.href); }
     </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
