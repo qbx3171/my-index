@@ -2099,6 +2099,10 @@
             },
             _submitTutorial: function() {
                 var self = this;
+                if (!supabaseClient) {
+                    toast('❌ 数据库客户端未初始化，请检查网络', 'error');
+                    return;
+                }
                 var title = document.getElementById('tutEditTitle').value.trim();
                 var summary = document.getElementById('tutEditSummary').value.trim();
                 var category = document.getElementById('tutEditCategory').value;
@@ -2118,7 +2122,8 @@
                     category: category,
                     content: content,
                     videos: JSON.stringify(videos),
-                    cover: cover || (images.length > 0 ? images[0] : '')
+                    cover: cover || (images.length > 0 ? images[0] : ''),
+                    likes: 0
                 };
                 var saveToDrafts = function(errMsg) {
                     var draftId = (editId && !isDraftPublish) ? editId : DB.genId();
@@ -2135,10 +2140,10 @@
                     };
                     try {
                         saveDraft(draftData);
-                        toast('已自动保存到草稿箱' + (errMsg ? ' (' + errMsg + ')' : ''), 'warning');
+                        toast('💾 已自动保存到草稿箱' + (errMsg ? ' (' + errMsg + ')' : ''), 'warning');
                     } catch (e) {
                         console.error('草稿保存失败:', e);
-                        toast('草稿保存失败，请检查浏览器存储', 'error');
+                        toast('❌ 草稿保存失败，请检查浏览器存储', 'error');
                     }
                     document.getElementById('tutEditModal').classList.add('hidden');
                     self._stopAutoSave();
@@ -2155,6 +2160,8 @@
                             .then(function(res) {
                                 if (res.error) {
                                     console.error('更新教程错误:', res.error);
+                                    var errMsg = '更新失败: ' + (res.error.message || '未知错误');
+                                    toast(errMsg, 'error');
                                     saveToDrafts(res.error.message);
                                 } else {
                                     var drafts = getDrafts();
@@ -2173,40 +2180,38 @@
                             })
                             .catch(function(err) {
                                 console.error('更新请求异常:', err);
-                                saveToDrafts(err.message || '网络异常');
+                                var errMsg = '网络异常: ' + (err.message || '未知错误');
+                                toast(errMsg, 'error');
+                                saveToDrafts(err.message);
                             });
                     } else {
-                        supabaseClient.from('tutorials').insert([{
-                            title: title,
-                            summary: summary,
-                            category: category,
-                            content: content,
-                            videos: JSON.stringify(videos),
-                            cover: cover || (images.length > 0 ? images[0] : ''),
-                            likes: 0
-                        }])
-                        .then(function(res) {
-                            if (res.error) {
-                                console.error('发布教程错误:', res.error);
-                                saveToDrafts(res.error.message);
-                            } else {
-                                toast('🎉 发布成功', 'success');
-                                if (isDraftPublish && editId) {
-                                    deleteDraft(editId);
-                                    self._isDraftPublish = false;
+                        supabaseClient.from('tutorials').insert([data])
+                            .then(function(res) {
+                                if (res.error) {
+                                    console.error('发布教程错误:', res.error);
+                                    var errMsg = '发布失败: ' + (res.error.message || '未知错误');
+                                    toast(errMsg, 'error');
+                                    saveToDrafts(res.error.message);
+                                } else {
+                                    toast('🎉 发布成功', 'success');
+                                    if (isDraftPublish && editId) {
+                                        deleteDraft(editId);
+                                        self._isDraftPublish = false;
+                                    }
+                                    document.getElementById('tutEditModal').classList.add('hidden');
+                                    self._stopAutoSave();
+                                    self._videoList = [];
+                                    self._imageList = [];
+                                    self._renderMediaLists();
+                                    self.renderAdminTab(self._currentAdminTab);
                                 }
-                                document.getElementById('tutEditModal').classList.add('hidden');
-                                self._stopAutoSave();
-                                self._videoList = [];
-                                self._imageList = [];
-                                self._renderMediaLists();
-                                self.renderAdminTab(self._currentAdminTab);
-                            }
-                        })
-                        .catch(function(err) {
-                            console.error('发布请求异常:', err);
-                            saveToDrafts(err.message || '网络异常');
-                        });
+                            })
+                            .catch(function(err) {
+                                console.error('发布请求异常:', err);
+                                var errMsg = '网络异常: ' + (err.message || '未知错误');
+                                toast(errMsg, 'error');
+                                saveToDrafts(err.message);
+                            });
                     }
                 };
                 performPublish();
