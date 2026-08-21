@@ -734,9 +734,11 @@
                 <input type="password" id="registerPasswordConfirm" placeholder="再次输入密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;transition:border-color 0.2s;padding-right:44px;" />
                 <button type="button" id="toggleRegPwdConfirm" style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;">👁️</button>
             </div>
-            <div class="form-group" style="margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                <input type="checkbox" id="agreeTerms" style="width:18px;height:18px;cursor:pointer;" />
-                <label for="agreeTerms" style="font-size:0.8rem;color:var(--text-secondary);cursor:pointer;">我已阅读并同意 <a href="#" style="color:var(--accent-cyan);text-decoration:underline;">《用户协议》</a> 和 <a href="#" style="color:var(--accent-cyan);text-decoration:underline;">《隐私政策》</a></label>
+            <div class="form-group" style="margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <input type="checkbox" id="agreeTerms" style="width:18px;height:18px;flex-shrink:0;accent-color:var(--accent-cyan);cursor:pointer;appearance:auto;-webkit-appearance:checkbox;-moz-appearance:checkbox;" />
+                <label for="agreeTerms" style="font-size:0.8rem;color:var(--text-secondary);cursor:pointer;">
+                    我已阅读并同意 <a href="#" id="showUserAgreement" style="color:var(--accent-cyan);text-decoration:underline;">《用户协议》</a> 和 <a href="#" id="showPrivacyPolicy" style="color:var(--accent-cyan);text-decoration:underline;">《隐私政策》</a>
+                </label>
             </div>
             <div id="registerError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div>
             <button class="btn btn-primary" id="registerBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;transition:transform 0.15s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="registerBtnText">注 册</span><span id="registerSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button>
@@ -799,6 +801,37 @@
         </div>
         <div id="editProfileError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div>
         <div class="form-actions"><button class="btn btn-outline" id="editProfileCancel">取消</button><button class="btn btn-primary" id="editProfileSave">保存</button></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="resetPasswordSetModal">
+    <div class="modal-box" style="max-width:400px;padding:24px 28px;border-radius:20px;">
+        <button class="close-btn" id="resetPasswordSetModalClose" style="float:right;font-size:1.4rem;color:var(--text-dim);background:none;border:none;cursor:pointer;">&times;</button>
+        <h3 style="font-size:1.2rem;margin-bottom:8px;"><i class="fas fa-key"></i> 设置新密码</h3>
+        <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">请为您的账号设置一个新密码。</p>
+        <div class="form-group" style="margin-bottom:12px;">
+            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">新密码 <span style="font-weight:400;color:var(--text-dim);font-size:0.7rem;">（至少8位，含大小写和数字）</span></label>
+            <input type="password" id="resetPasswordNew" placeholder="新密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;transition:border-color 0.2s;" />
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">确认新密码</label>
+            <input type="password" id="resetPasswordConfirm" placeholder="再次输入新密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;transition:border-color 0.2s;" />
+        </div>
+        <div id="resetPwError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div>
+        <button class="btn btn-primary" id="resetPasswordSetBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;transition:transform 0.15s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="resetPwBtnText">确认修改</span><span id="resetPwSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="agreementModal">
+    <div class="modal-box" style="max-width:600px;">
+        <div class="modal-header">
+            <h3 id="agreementModalTitle">用户协议</h3>
+            <span class="close-btn" id="agreementModalClose">✕</span>
+        </div>
+        <div class="modal-body" id="agreementModalBody" style="max-height:60vh;overflow-y:auto;line-height:1.8;font-size:0.9rem;white-space:pre-wrap;"></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline btn-sm" id="agreementModalCloseBtn">关闭</button>
+        </div>
     </div>
 </div>
 
@@ -931,6 +964,24 @@
     let userProfile = null;
 
     async function loadUser() {
+        const params = new URLSearchParams(window.location.search);
+        let token = params.get('access_token') || params.get('code');
+        if (!token) {
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            token = hashParams.get('access_token') || hashParams.get('code');
+        }
+        if (token) {
+            const modal = document.getElementById('resetPasswordSetModal');
+            if (modal && !modal.classList.contains('open')) {
+                modal.classList.add('open');
+                document.getElementById('resetPasswordNew').value = '';
+                document.getElementById('resetPasswordConfirm').value = '';
+                const errEl = document.getElementById('resetPwError');
+                if (errEl) errEl.style.display = 'none';
+                toast('🔐 请设置新密码', 'success');
+            }
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
         try {
             const { data: { user }, error } = await supabaseClient.auth.getUser();
             if (user) {
@@ -1076,6 +1127,16 @@
     }
     function showChangePwError(msg) { const el = document.getElementById('changePwError'); if (el) { el.textContent = msg; el.style.display = 'block'; } }
     function hideChangePwError() { const el = document.getElementById('changePwError'); if (el) el.style.display = 'none'; }
+    function setResetPwLoading(loading) {
+        const btn = document.getElementById('resetPasswordSetBtn');
+        const text = document.getElementById('resetPwBtnText');
+        const spinner = document.getElementById('resetPwSpinner');
+        if (!btn) return;
+        btn.disabled = loading;
+        if (loading) { text.textContent = '修改中...'; spinner.style.display = 'inline'; } else { text.textContent = '确认修改'; spinner.style.display = 'none'; }
+    }
+    function showResetPwError(msg) { const el = document.getElementById('resetPwError'); if (el) { el.textContent = msg; el.style.display = 'block'; } }
+    function hideResetPwError() { const el = document.getElementById('resetPwError'); if (el) el.style.display = 'none'; }
 
     document.getElementById('toggleLoginPwd')?.addEventListener('click', function() {
         const input = document.getElementById('loginPassword');
@@ -1290,19 +1351,127 @@
     document.getElementById('newPassword')?.addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('changePasswordBtn')?.click(); });
     document.getElementById('newPasswordConfirm')?.addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('changePasswordBtn')?.click(); });
 
-    supabaseClient.auth.onAuthStateChange(function(event, session) {
-        if (event === 'SIGNED_IN' && session?.user) {
-            currentUser = session.user;
-            loadProfile(session.user.id).then(function() {
-                updateUIForLoggedIn(session.user);
-                if (App && App.currentPage === 'profile') renderProfile();
-            });
-        } else if (event === 'SIGNED_OUT') {
-            currentUser = null;
-            userProfile = null;
-            updateUIForLoggedOut();
-            if (App && App.currentPage === 'profile') App.goHome();
+    document.getElementById('resetPasswordSetBtn')?.addEventListener('click', async function() {
+        const newPw = document.getElementById('resetPasswordNew').value.trim();
+        const confirmPw = document.getElementById('resetPasswordConfirm').value.trim();
+        hideResetPwError();
+        if (!newPw || !confirmPw) {
+            showResetPwError('请填写完整');
+            return;
         }
+        const pwError = validatePasswordStrength(newPw);
+        if (pwError) {
+            showResetPwError(pwError);
+            return;
+        }
+        if (newPw !== confirmPw) {
+            showResetPwError('两次输入的密码不一致');
+            return;
+        }
+        setResetPwLoading(true);
+        const { error } = await supabaseClient.auth.updateUser({ password: newPw });
+        setResetPwLoading(false);
+        if (error) {
+            if (error.message.includes('expired') || error.message.includes('invalid')) {
+                showResetPwError('⏰ 重置链接已过期，请重新申请');
+                toast('重置链接已过期', 'error');
+            } else {
+                showResetPwError(error.message);
+            }
+            return;
+        }
+        toast('✅ 密码已更新，请重新登录', 'success');
+        document.getElementById('resetPasswordSetModal').classList.remove('open');
+        setTimeout(() => {
+            document.getElementById('loginModal').classList.add('open');
+        }, 500);
+    });
+
+    document.getElementById('resetPasswordSetModalClose')?.addEventListener('click', function() {
+        document.getElementById('resetPasswordSetModal').classList.remove('open');
+    });
+    document.getElementById('resetPasswordSetModal')?.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('open');
+    });
+
+    const agreementTexts = {
+        user: `用户协议
+
+欢迎使用乐哲软件平台。在使用本平台服务前，请您仔细阅读以下条款：
+
+1. 用户注册与账号安全
+   - 用户需提供真实、有效的邮箱信息进行注册。
+   - 用户应妥善保管自己的账号和密码，因账号被盗用导致的一切损失由用户自行承担。
+
+2. 使用规范
+   - 用户应遵守国家法律法规，不得利用本平台传播违法信息。
+   - 禁止恶意刷屏、传播谣言、侵犯他人隐私等行为。
+
+3. 版权声明
+   - 本平台提供的所有软件资源版权归原作者所有，仅供个人学习、研究使用，请勿用于商业用途。
+   - 用户上传的教程、问答等内容，默认授权乐哲软件平台进行展示和传播。
+
+4. 免责声明
+   - 平台内容来自用户分享，不对软件的安全性、稳定性做任何担保。
+   - 因使用本平台资源导致的任何损失，平台不承担赔偿责任。
+
+5. 隐私保护
+   - 我们承诺保护您的个人隐私，详细内容请查看《隐私政策》。
+
+6. 协议修改
+   - 乐哲软件有权随时修改本协议，修改后的协议将在平台公示，继续使用即表示接受。
+
+如果您有任何疑问，请联系我们：LeZheSoft@outlook.com`,
+
+        privacy: `隐私政策
+
+乐哲软件非常重视您的隐私。本隐私政策说明我们如何收集、使用和保护您的个人信息。
+
+1. 信息收集
+   - 注册时：邮箱地址、用户名（如有）。
+   - 使用过程中：IP地址、浏览器类型、访问时间等常规日志信息。
+   - 我们不会主动收集您的其他敏感信息。
+
+2. 信息使用
+   - 用于提供服务、发送通知、优化用户体验。
+   - 未经您的明确同意，我们不会将您的信息提供给第三方。
+
+3. 信息存储
+   - 您的信息存储在我们的安全服务器上，我们采取行业标准的安全措施保护您的数据。
+
+4. 您的权利
+   - 您可以随时登录个人中心查看、修改或删除您的个人信息。
+   - 您有权要求我们删除您的账号，删除后将无法恢复。
+
+5. Cookie
+   - 我们使用 Cookie 保存您的登录状态，您可以在浏览器中禁用 Cookie，但可能影响部分功能。
+
+6. 联系我们
+   - 如有隐私相关问题，请发邮件至：LeZheSoft@outlook.com
+
+本隐私政策最后更新于 2026 年 1 月 1 日。`
+    };
+
+    document.getElementById('showUserAgreement')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('agreementModalTitle').textContent = '📄 用户协议';
+        document.getElementById('agreementModalBody').textContent = agreementTexts.user;
+        document.getElementById('agreementModal').classList.remove('hidden');
+    });
+    document.getElementById('showPrivacyPolicy')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('agreementModalTitle').textContent = '📄 隐私政策';
+        document.getElementById('agreementModalBody').textContent = agreementTexts.privacy;
+        document.getElementById('agreementModal').classList.remove('hidden');
+    });
+    document.getElementById('agreementModalClose')?.addEventListener('click', function() {
+        document.getElementById('agreementModal').classList.add('hidden');
+    });
+    document.getElementById('agreementModalCloseBtn')?.addEventListener('click', function() {
+        document.getElementById('agreementModal').classList.add('hidden');
+    });
+    document.getElementById('agreementModal')?.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
     });
 
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', loadUser); } else { loadUser(); }
