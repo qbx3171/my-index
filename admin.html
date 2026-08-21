@@ -1824,29 +1824,11 @@
                     try {
                         adminClient = supabase.createClient(SUPABASE_URL, key.trim());
                         hasServiceRole = true;
-                        console.log('Service Role Key 已加载');
-                        // 验证key是否有效
-                        adminClient.auth.admin.listUsers({ page: 1, perPage: 1 }).then(function(res) {
-                            if (res.error) {
-                                console.warn('Service Role Key 无效:', res.error);
-                                hasServiceRole = false;
-                                adminClient = null;
-                                localStorage.removeItem('lezhe_service_role_key');
-                                toast('⚠️ Service Role Key 无效，已自动清除，请重新配置正确的 Key', 'error');
-                            } else {
-                                console.log('Service Role Key 验证通过');
-                            }
-                        }).catch(function(e) {
-                            console.warn('验证 Service Role Key 失败:', e);
-                            hasServiceRole = false;
-                            adminClient = null;
-                            localStorage.removeItem('lezhe_service_role_key');
-                        });
+                        console.log('✅ Service Role Key 已从本地加载');
                     } catch (e) {
-                        console.error('Service Role Key 无效:', e);
+                        console.error('❌ 加载 Service Role Key 失败:', e);
                         adminClient = null;
                         hasServiceRole = false;
-                        localStorage.removeItem('lezhe_service_role_key');
                     }
                 }
             },
@@ -1858,7 +1840,9 @@
                         try {
                             adminClient = supabase.createClient(SUPABASE_URL, key.trim());
                             hasServiceRole = true;
+                            console.log('✅ _getAdminClient 自动恢复 Key');
                         } catch (e) {
+                            console.warn('⚠️ 自动恢复 Key 失败:', e);
                             adminClient = null;
                             hasServiceRole = false;
                         }
@@ -3085,7 +3069,6 @@
                 try {
                     var result = await adminClient.auth.admin.listUsers();
                     if (result.error) {
-                        // 专门处理 401 或 Invalid API key
                         if (result.error.status === 401 || (result.error.message && result.error.message.includes('Invalid API key'))) {
                             localStorage.removeItem('lezhe_service_role_key');
                             adminClient = null;
@@ -3195,7 +3178,6 @@
                     this._bindUsersEvents(container);
                 } catch (err) {
                     console.error('获取用户列表失败:', err);
-                    // 如果错误是 401 或 Invalid API key，提示重新配置
                     var isAuthError = err.message && (err.message.includes('Invalid API key') || err.status === 401);
                     container.innerHTML = '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理注册用户</p>' +
                         '<div class="card" style="padding:24px 28px;border-left:4px solid var(--accent-red);">' +
@@ -3384,43 +3366,29 @@
                         }
                         try {
                             var testClient = supabase.createClient(SUPABASE_URL, key);
-                            // 验证 key
                             testClient.auth.admin.listUsers({ page: 1, perPage: 1 }).then(function(res) {
                                 if (res.error) {
                                     toast('❌ Service Role Key 无效: ' + res.error.message, 'error');
-                                    document.getElementById('serviceRoleStatus').textContent =
-                                        '❌ 无效的 Key';
-                                    document.getElementById('serviceRoleStatus').style.color =
-                                        'var(--accent-red)';
-                                    adminClient = null;
-                                    hasServiceRole = false;
-                                    localStorage.removeItem('lezhe_service_role_key');
-                                } else {
-                                    localStorage.setItem('lezhe_service_role_key', key);
-                                    adminClient = testClient;
-                                    hasServiceRole = true;
-                                    document.getElementById('serviceRoleStatus').textContent =
-                                        '✅ Service Role Key 已保存并验证通过';
-                                    document.getElementById('serviceRoleStatus').style.color =
-                                        'var(--accent-green)';
-                                    toast('Service Role Key 已保存并验证通过', 'success');
-                                    App._loadServiceRoleKey();
+                                    document.getElementById('serviceRoleStatus').textContent = '❌ 无效的 Key（保留原配置）';
+                                    document.getElementById('serviceRoleStatus').style.color = 'var(--accent-red)';
+                                    return;
                                 }
+                                localStorage.setItem('lezhe_service_role_key', key);
+                                adminClient = testClient;
+                                hasServiceRole = true;
+                                document.getElementById('serviceRoleStatus').textContent = '✅ Service Role Key 已保存并验证通过';
+                                document.getElementById('serviceRoleStatus').style.color = 'var(--accent-green)';
+                                toast('Service Role Key 已保存并验证通过', 'success');
+                                App._loadServiceRoleKey();
                             }).catch(function(e) {
-                                toast('❌ Service Role Key 验证失败: ' + e.message, 'error');
-                                document.getElementById('serviceRoleStatus').textContent = '❌ 无效的 Key';
+                                toast('❌ 验证失败: ' + e.message, 'error');
+                                document.getElementById('serviceRoleStatus').textContent = '❌ 验证失败（保留原配置）';
                                 document.getElementById('serviceRoleStatus').style.color = 'var(--accent-red)';
-                                adminClient = null;
-                                hasServiceRole = false;
-                                localStorage.removeItem('lezhe_service_role_key');
                             });
                         } catch (e) {
                             toast('❌ Service Role Key 无效: ' + e.message, 'error');
-                            document.getElementById('serviceRoleStatus').textContent = '❌ 无效的 Key';
+                            document.getElementById('serviceRoleStatus').textContent = '❌ 无效的 Key（保留原配置）';
                             document.getElementById('serviceRoleStatus').style.color = 'var(--accent-red)';
-                            adminClient = null;
-                            hasServiceRole = false;
-                            localStorage.removeItem('lezhe_service_role_key');
                         }
                     });
                 }
