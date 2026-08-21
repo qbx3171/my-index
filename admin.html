@@ -156,6 +156,8 @@
         .table-wrap td .actions .view-btn:hover{background:var(--accent-purple);color:#fff}
         .table-wrap td .actions .reply-btn{background:rgba(11,158,90,0.08);color:var(--accent-green);border-color:rgba(11,158,90,0.10)}
         .table-wrap td .actions .reply-btn:hover{background:var(--accent-green);color:#fff}
+        .table-wrap td .actions .reset-btn{background:rgba(245,158,11,0.08);color:var(--accent-orange);border-color:rgba(245,158,11,0.10)}
+        .table-wrap td .actions .reset-btn:hover{background:var(--accent-orange);color:#fff}
         .table-wrap .empty-row td{padding:36px 18px;text-align:center;color:var(--text-dim)}
         .table-wrap .checkbox-cell{width:32px;text-align:center}
         .table-wrap .checkbox-cell input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent-cyan);cursor:pointer;flex-shrink:0}
@@ -349,125 +351,24 @@
         .comment-reply-bubble{background:var(--bg-primary);border-radius:var(--radius-sm);padding:6px 12px;margin-top:4px;font-size:.8rem;border-left:3px solid var(--accent-cyan);color:var(--text-secondary)}
         .comment-reply-bubble .reply-label{font-size:.6rem;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
         .comment-reply-bubble .reply-author{font-weight:600;color:var(--accent-cyan)}
-        #replyModal .modal-box {
-            max-width: 520px;
-            padding: 20px 24px 24px;
-            border-radius: 16px;
-            background: var(--bg-card-solid);
-        }
-        #replyModal .modal-header {
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-glow);
-            margin-bottom: 16px;
-        }
-        #replyModal .modal-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display:flex;
-            align-items:center;
-            gap:8px;
-        }
-        #replyModal .modal-header h3 .receiver {
-            color: var(--accent-cyan);
-            font-weight: 500;
-        }
-        #replyModal .modal-body textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1.5px solid var(--border-glow);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            resize: vertical;
-            min-height: 100px;
-            font-family: var(--font);
-            transition: border-color 0.2s;
-        }
-        #replyModal .modal-body textarea:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 0 3px rgba(13,124,255,0.08);
-        }
-        #replyModal .emoji-bar {
-            display:flex;
-            align-items:center;
-            gap:8px;
-            margin-top:10px;
-            flex-wrap:wrap;
-        }
-        #replyModal .emoji-bar .emoji-btn {
-            font-size:1.4rem;
-            cursor:pointer;
-            transition:transform 0.15s;
-            background:none;
-            border:none;
-            padding:2px 6px;
-            border-radius:4px;
-        }
-        #replyModal .emoji-bar .emoji-btn:hover {
-            transform:scale(1.3);
-            background:var(--bg-input);
-        }
-        #replyModal .emoji-bar .emoji-toggle-btn {
-            font-size:1.2rem;
-            padding:4px 12px;
-            border-radius:20px;
-            border:1px solid var(--border-glow);
-            background:var(--bg-input);
-            color:var(--text-secondary);
-            cursor:pointer;
-            transition:0.2s;
-        }
-        #replyModal .emoji-bar .emoji-toggle-btn:hover {
-            border-color:var(--accent-cyan);
-            color:var(--text-primary);
-        }
-        #replyModal .emoji-panel {
-            display:none;
-            flex-wrap:wrap;
-            gap:4px;
-            padding:10px 12px;
-            background:var(--bg-card-solid);
-            border:1px solid var(--border-glow);
-            border-radius:10px;
-            margin-top:8px;
-            max-height:160px;
-            overflow-y:auto;
-        }
-        #replyModal .emoji-panel.open {
-            display:flex;
-        }
-        #replyModal .emoji-panel .emoji-char {
-            font-size:1.6rem;
-            cursor:pointer;
-            padding:4px 6px;
-            border-radius:6px;
-            transition:0.15s;
-            line-height:1.4;
-        }
-        #replyModal .emoji-panel .emoji-char:hover {
-            background:var(--bg-input);
-            transform:scale(1.2);
-        }
-        #replyModal .modal-footer {
-            display:flex;
-            justify-content:flex-end;
-            gap:10px;
-            margin-top:16px;
-            border-top:1px solid var(--border-glow);
-            padding-top:16px;
-        }
-        #replyModal .modal-footer .btn {
-            min-height:40px;
-            padding:6px 28px;
-        }
-        @media (max-width:768px) {
-            #replyModal .modal-box {
-                max-width:95%;
-                padding:16px;
-            }
-        }
+        #replyModal .modal-box{max-width:520px;padding:20px 24px 24px;border-radius:16px;background:var(--bg-card-solid)}
+        #replyModal .modal-header{padding-bottom:12px;border-bottom:1px solid var(--border-glow);margin-bottom:16px}
+        #replyModal .modal-header h3{font-size:1rem;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px}
+        #replyModal .modal-header h3 .receiver{color:var(--accent-cyan);font-weight:500}
+        #replyModal .modal-body textarea{width:100%;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);font-size:0.95rem;resize:vertical;min-height:100px;font-family:var(--font);transition:border-color 0.2s}
+        #replyModal .modal-body textarea:focus{border-color:var(--accent-cyan);box-shadow:0 0 0 3px rgba(13,124,255,0.08)}
+        #replyModal .emoji-bar{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+        #replyModal .emoji-bar .emoji-btn{font-size:1.4rem;cursor:pointer;transition:transform 0.15s;background:none;border:none;padding:2px 6px;border-radius:4px}
+        #replyModal .emoji-bar .emoji-btn:hover{transform:scale(1.3);background:var(--bg-input)}
+        #replyModal .emoji-bar .emoji-toggle-btn{font-size:1.2rem;padding:4px 12px;border-radius:20px;border:1px solid var(--border-glow);background:var(--bg-input);color:var(--text-secondary);cursor:pointer;transition:0.2s}
+        #replyModal .emoji-bar .emoji-toggle-btn:hover{border-color:var(--accent-cyan);color:var(--text-primary)}
+        #replyModal .emoji-panel{display:none;flex-wrap:wrap;gap:4px;padding:10px 12px;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:10px;margin-top:8px;max-height:160px;overflow-y:auto}
+        #replyModal .emoji-panel.open{display:flex}
+        #replyModal .emoji-panel .emoji-char{font-size:1.6rem;cursor:pointer;padding:4px 6px;border-radius:6px;transition:0.15s;line-height:1.4}
+        #replyModal .emoji-panel .emoji-char:hover{background:var(--bg-input);transform:scale(1.2)}
+        #replyModal .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;border-top:1px solid var(--border-glow);padding-top:16px}
+        #replyModal .modal-footer .btn{min-height:40px;padding:6px 28px}
+        @media (max-width:768px){#replyModal .modal-box{max-width:95%;padding:16px}}
         @media (max-width:1024px){.admin-sidebar{width:60px;padding:14px 6px}
         .admin-sidebar .logo-sm span,.admin-sidebar .nav-item span:not(.icon),.admin-sidebar .logout-btn span,.admin-sidebar .theme-toggle span{display:none}
         .admin-sidebar .logo-sm{justify-content:center;padding:0 0 12px;font-size:1.2rem}
@@ -669,6 +570,8 @@
         var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
         var supabaseClient = null;
         var quill = null;
+        var adminClient = null;
+        var hasServiceRole = false;
 
         (function loadSupabase() {
             var cdnList = [
@@ -1624,6 +1527,8 @@
             _replyTargetId: null,
             _replyTargetTutorial: null,
             _replyTargetAuthor: '',
+            _userList: [],
+            _userKeyword: '',
 
             init: function() {
                 var self = this;
@@ -1910,6 +1815,56 @@
                 });
 
                 this.preloadData();
+                this._loadServiceRoleKey();
+            },
+
+            _loadServiceRoleKey: function() {
+                var key = localStorage.getItem('lezhe_service_role_key') || '';
+                if (key && key.trim()) {
+                    try {
+                        adminClient = supabase.createClient(SUPABASE_URL, key.trim());
+                        hasServiceRole = true;
+                        console.log('Service Role Key 已加载');
+                        // 验证key是否有效
+                        adminClient.auth.admin.listUsers({ page: 1, perPage: 1 }).then(function(res) {
+                            if (res.error) {
+                                console.warn('Service Role Key 无效:', res.error);
+                                hasServiceRole = false;
+                                adminClient = null;
+                                localStorage.removeItem('lezhe_service_role_key');
+                                toast('⚠️ Service Role Key 无效，已自动清除，请重新配置正确的 Key', 'error');
+                            } else {
+                                console.log('Service Role Key 验证通过');
+                            }
+                        }).catch(function(e) {
+                            console.warn('验证 Service Role Key 失败:', e);
+                            hasServiceRole = false;
+                            adminClient = null;
+                            localStorage.removeItem('lezhe_service_role_key');
+                        });
+                    } catch (e) {
+                        console.error('Service Role Key 无效:', e);
+                        adminClient = null;
+                        hasServiceRole = false;
+                        localStorage.removeItem('lezhe_service_role_key');
+                    }
+                }
+            },
+
+            _getAdminClient: function() {
+                if (!adminClient) {
+                    var key = localStorage.getItem('lezhe_service_role_key') || '';
+                    if (key && key.trim()) {
+                        try {
+                            adminClient = supabase.createClient(SUPABASE_URL, key.trim());
+                            hasServiceRole = true;
+                        } catch (e) {
+                            adminClient = null;
+                            hasServiceRole = false;
+                        }
+                    }
+                }
+                return adminClient;
             },
 
             _startAutoSave: function() {
@@ -3104,85 +3059,289 @@
                 });
             },
 
-            renderUsers: function(container) {
-                var users = DB.get('users') || [];
-                var currentUser = sessionStorage.getItem('lezhe_admin_user') || 'admin';
-                var html = '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理后台账号</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="newUsername" placeholder="新用户名" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:120px;color:var(--text-primary);min-height:40px;" /><input type="password" id="newPassword" placeholder="密码 (至少4位)" style="padding:8px 14px;border-radius:50px;border:1.5px solid var(--border-glow);background:var(--bg-input);flex:1;min-width:120px;color:var(--text-primary);min-height:40px;" /><button class="btn btn-sm btn-primary" id="addUserBtn">⊕ 添加用户</button></div><div class="table-wrap"><table><thead><tr><th>用户名</th><th>角色</th><th style="width:120px;">操作</th></tr></thead><tbody>';
-                if (users.length === 0) {
-                    html += '<tr class="empty-row"><td colspan="3">暂无用户</td></tr>';
-                } else {
-                    for (var i = 0; i < users.length; i++) {
-                        var u = users[i];
-                        var isSelf = u.username === currentUser;
-                        html += '<tr><td>' + u.username + (isSelf ? ' <span class="badge badge-green">当前</span>' :
-                            '') + '</td><td>管理员</td><td>';
-                        if (!isSelf) {
-                            html +=
-                                '<button class="del-btn" data-user="' + u.username +
-                                '" style="padding:3px 12px;border-radius:50px;font-size:0.65rem;background:rgba(239,68,68,0.08);color:var(--accent-red);border:1px solid rgba(239,68,68,0.1);min-height:28px;">删除</button>';
-                        } else {
-                            html += '<span style="color:var(--text-dim);font-size:0.7rem;">不可删除</span>';
-                        }
-                        html += '</td></tr>';
-                    }
+            renderUsers: async function(container) {
+                var self = this;
+                container.innerHTML = '<div class="loading-spinner"><span class="spinner"></span> 加载用户数据...</div>';
+                var adminClient = this._getAdminClient();
+                var hasKey = localStorage.getItem('lezhe_service_role_key') || '';
+                if (!hasKey || !hasKey.trim()) {
+                    container.innerHTML = '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理注册用户</p>' +
+                        '<div class="card" style="padding:24px 28px;margin-bottom:16px;border-left:4px solid var(--accent-orange);">' +
+                        '<h4 style="font-weight:600;color:var(--accent-orange);margin-bottom:6px;">⚠️ 未配置 Service Role Key</h4>' +
+                        '<p style="color:var(--text-secondary);font-size:0.9rem;">请在「系统设置」中配置 Supabase Service Role Key，才能管理用户。</p>' +
+                        '<button class="btn btn-sm btn-primary" style="margin-top:10px;" onclick="App.renderAdminTab(\'settings\')">⚙ 去设置</button>' +
+                        '</div>';
+                    return;
                 }
-                html += '</tbody></table></div>';
-                container.innerHTML = html;
-                this._tabCache['users'] = html;
-                this._bindUsersEvents(container);
+                if (!adminClient) {
+                    container.innerHTML = '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理注册用户</p>' +
+                        '<div class="card" style="padding:24px 28px;border-left:4px solid var(--accent-red);">' +
+                        '<h4 style="font-weight:600;color:var(--accent-red);margin-bottom:6px;">❌ Service Role Key 无效</h4>' +
+                        '<p style="color:var(--text-secondary);font-size:0.9rem;">请检查您的 Service Role Key 是否正确，或重新配置。</p>' +
+                        '<button class="btn btn-sm btn-primary" style="margin-top:10px;" onclick="App.renderAdminTab(\'settings\')">⚙ 重新配置</button>' +
+                        '</div>';
+                    return;
+                }
+                try {
+                    var result = await adminClient.auth.admin.listUsers();
+                    if (result.error) {
+                        // 专门处理 401 或 Invalid API key
+                        if (result.error.status === 401 || (result.error.message && result.error.message.includes('Invalid API key'))) {
+                            localStorage.removeItem('lezhe_service_role_key');
+                            adminClient = null;
+                            hasServiceRole = false;
+                            container.innerHTML = '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理注册用户</p>' +
+                                '<div class="card" style="padding:24px 28px;border-left:4px solid var(--accent-red);">' +
+                                '<h4 style="font-weight:600;color:var(--accent-red);margin-bottom:6px;">❌ Service Role Key 无效或已失效</h4>' +
+                                '<p style="color:var(--text-secondary);font-size:0.9rem;">请重新获取正确的 Service Role Key（从 Supabase 控制台获取），并更新配置。</p>' +
+                                '<button class="btn btn-sm btn-primary" style="margin-top:10px;" onclick="App.renderAdminTab(\'settings\')">⚙ 重新配置</button>' +
+                                '</div>';
+                            return;
+                        }
+                        throw result.error;
+                    }
+                    var users = result.data.users || [];
+                    this._userList = users;
+                    var keyword = (this._userKeyword || '').toLowerCase().trim();
+                    var filtered = users;
+                    if (keyword) {
+                        filtered = users.filter(function(u) {
+                            return (u.email || '').toLowerCase().includes(keyword) ||
+                                (u.id || '').toLowerCase().includes(keyword);
+                        });
+                    }
+                    var total = filtered.length;
+                    var pageSize = this._pageSize;
+                    var totalPages = Math.ceil(total / pageSize) || 1;
+                    if (this._currentPage > totalPages) this._currentPage = totalPages;
+                    var start = (this._currentPage - 1) * pageSize;
+                    var end = Math.min(start + pageSize, total);
+                    var pageItems = filtered.slice(start, end);
+                    var downloadsMap = {};
+                    try {
+                        var profileRes = await supabaseClient.from('profiles').select('id, downloads_count');
+                        if (profileRes.data) {
+                            profileRes.data.forEach(function(p) {
+                                downloadsMap[p.id] = p.downloads_count || 0;
+                            });
+                        }
+                    } catch (e) { console.warn('获取下载次数失败:', e); }
+                    var html = '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">共 ' + total +
+                        ' 位注册用户 · 支持重置密码、删除用户</p><div class="toolbar">';
+                    html += '<div class="search-box"><span class="icon">🔍</span><input type="text" id="userSearchInput" placeholder="搜索邮箱..." value="' +
+                        (this._userKeyword || '') + '" /></div>';
+                    html += '<div class="btn-group">';
+                    html += '<button class="btn btn-sm btn-outline" id="userRefreshBtn">⟳ 刷新</button>';
+                    html +=
+                        '<button class="btn btn-sm btn-success" id="userExportBtn">📥 导出</button>';
+                    html += '<span class="selected-info">共 ' + total + ' 人</span>';
+                    html += '</div></div>';
+                    html += '<div class="table-wrap"><table><thead><tr><th style="width:50px;">#</th><th>邮箱</th><th>用户ID</th><th>注册时间</th><th>📥 下载</th><th style="width:220px;">操作</th></tr></thead><tbody>';
+                    if (pageItems.length === 0) {
+                        html += '<tr class="empty-row"><td colspan="6">暂无用户</td></tr>';
+                    } else {
+                        for (var i = 0; i < pageItems.length; i++) {
+                            var u = pageItems[i];
+                            var idx = start + i + 1;
+                            var downloads = downloadsMap[u.id] || 0;
+                            var created = u.created_at ? formatDate(u.created_at) : '-';
+                            var email = u.email || '未知邮箱';
+                            var isSelf = sessionStorage.getItem('lezhe_admin_user') === email || email === 'admin@example.com';
+                            html += '<tr data-id="' + u.id + '">';
+                            html += '<td style="font-size:0.7rem;color:var(--text-dim);">' + idx + '</td>';
+                            html += '<td><strong>' + escapeHTML(email) + '</strong>' + (isSelf ?
+                                ' <span class="badge badge-green" style="font-size:0.5rem;">当前</span>' : '') +
+                                '</td>';
+                            html += '<td style="font-size:0.7rem;color:var(--text-dim);">' + shortId(u.id) +
+                            '</td>';
+                            html += '<td style="font-size:0.7rem;color:var(--text-secondary);">' + created +
+                            '</td>';
+                            html += '<td><span style="font-weight:600;color:var(--accent-cyan);">' + downloads +
+                                '</span></td>';
+                            html += '<td><div class="actions">';
+                            html +=
+                                '<button class="reset-btn" data-email="' + escapeHTML(email) + '" data-id="' + u
+                                .id + '">🔑 重置密码</button>';
+                            if (!isSelf) {
+                                html +=
+                                    '<button class="del-btn" data-email="' + escapeHTML(email) + '" data-id="' +
+                                    u.id + '">🗑 删除</button>';
+                            } else {
+                                html +=
+                                    '<span style="font-size:0.6rem;color:var(--text-dim);">不可删除</span>';
+                            }
+                            html += '</div></td></tr>';
+                        }
+                    }
+                    html += '</tbody></table></div>';
+                    html += '<div class="pagination"><div class="info">共 ' + total + ' 条，第 ' + (start + 1) + '-' + end +
+                        ' 条</div><div class="pages">';
+                    html += '<button class="user-page-btn" data-page="prev" ' + (this._currentPage <= 1 ? 'disabled' :
+                        '') + '>‹</button>';
+                    var maxShow = Math.min(totalPages, 7);
+                    var startPage = Math.max(1, this._currentPage - 3);
+                    var endPage = Math.min(totalPages, startPage + 6);
+                    if (endPage - startPage < 6) startPage = Math.max(1, endPage - 6);
+                    for (var p = startPage; p <= endPage; p++) {
+                        var active = p === this._currentPage ? 'active' : '';
+                        html += '<button class="user-page-btn ' + active + '" data-page="' + p + '">' + p +
+                        '</button>';
+                    }
+                    html += '<button class="user-page-btn" data-page="next" ' + (this._currentPage >= totalPages ?
+                        'disabled' : '') + '>›</button>';
+                    html += '</div></div>';
+                    container.innerHTML = html;
+                    this._tabCache['users'] = container.innerHTML;
+                    this._bindUsersEvents(container);
+                } catch (err) {
+                    console.error('获取用户列表失败:', err);
+                    // 如果错误是 401 或 Invalid API key，提示重新配置
+                    var isAuthError = err.message && (err.message.includes('Invalid API key') || err.status === 401);
+                    container.innerHTML = '<h2 class="page-title">👤 用户管理</h2><p class="page-sub">管理注册用户</p>' +
+                        '<div class="card" style="padding:24px 28px;border-left:4px solid var(--accent-red);">' +
+                        '<h4 style="font-weight:600;color:var(--accent-red);margin-bottom:6px;">' +
+                        (isAuthError ? '❌ Service Role Key 无效或已失效' : '❌ 获取用户列表失败') +
+                        '</h4>' +
+                        '<p style="color:var(--text-secondary);font-size:0.9rem;">' +
+                        (isAuthError ? '请重新获取正确的 Service Role Key（从 Supabase 控制台获取），并更新配置。' : escapeHTML(err.message || '未知错误')) +
+                        '</p>' +
+                        '<button class="btn btn-sm btn-primary" style="margin-top:10px;" onclick="App.renderAdminTab(\'settings\')">⚙ 去设置</button>' +
+                        '</div>';
+                }
             },
 
             _bindUsersEvents: function(container) {
                 var self = this;
-                var addBtn = container.querySelector('#addUserBtn');
-                if (addBtn) {
-                    addBtn.addEventListener('click', function() {
-                        var name = document.getElementById('newUsername').value.trim();
-                        var pass = document.getElementById('newPassword').value.trim();
-                        if (!name || !pass) {
-                            toast('请填写用户名和密码', 'error');
+                var searchInput = container.querySelector('#userSearchInput');
+                if (searchInput) {
+                    var doSearch = function() {
+                        self._userKeyword = searchInput.value;
+                        self._currentPage = 1;
+                        self.renderUsers(container);
+                    };
+                    searchInput.addEventListener('input', function() {
+                        clearTimeout(self._searchTimer);
+                        self._searchTimer = setTimeout(doSearch, 300);
+                    });
+                }
+                var refreshBtn = container.querySelector('#userRefreshBtn');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', function() {
+                        self.renderUsers(container);
+                        toast('已刷新', 'success');
+                    });
+                }
+                var exportBtn = container.querySelector('#userExportBtn');
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', function() {
+                        var data = self._userList || [];
+                        if (!data || data.length === 0) {
+                            toast('没有用户数据可导出', 'error');
                             return;
                         }
-                        var usersList = DB.get('users') || [];
-                        if (usersList.some(function(u) { return u.username === name; })) {
-                            toast('用户名已存在', 'error');
+                        var headers = ['邮箱', '用户ID', '注册时间', '最后登录', '确认状态'];
+                        var rows = data.map(function(u) {
+                            return [u.email || '', u.id || '', u.created_at ? formatDate(u
+                                .created_at) : '', u.last_sign_in_at ? formatDate(u
+                                .last_sign_in_at) : '-', u.confirmed_at ? '已确认' : '未确认'
+                            ];
+                        });
+                        var csv = headers.join(',') + '\n' + rows.map(function(r) { return r.join(
+                            ','); }).join('\n');
+                        var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                        var link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = '用户列表_' + new Date().toISOString().slice(0, 10) + '.csv';
+                        link.click();
+                        URL.revokeObjectURL(link.href);
+                        toast('导出成功', 'success');
+                        DB.addLog('导出用户', '导出用户列表，共 ' + data.length + ' 条');
+                    });
+                }
+                var resetBtns = container.querySelectorAll('.reset-btn');
+                resetBtns.forEach(function(btn) {
+                    btn.addEventListener('click', function(ev) {
+                        ev.stopPropagation();
+                        var id = this.dataset.id;
+                        var email = this.dataset.email;
+                        if (!confirm('确定要重置用户 ' + email + ' 的密码为 123456789 吗？')) return;
+                        var adminClient = self._getAdminClient();
+                        if (!adminClient) {
+                            toast('❌ Service Role Key 未配置或无效', 'error');
                             return;
                         }
-                        if (pass.length < 4) {
-                            toast('密码至少4位', 'error');
+                        toast('⏳ 正在重置密码...', 'success');
+                        adminClient.auth.admin.updateUserById(id, { password: '123456789' })
+                            .then(function(res) {
+                                if (res.error) {
+                                    toast('❌ 重置失败: ' + res.error.message, 'error');
+                                    return;
+                                }
+                                toast('✅ 密码已重置为 123456789', 'success');
+                                DB.addLog('重置用户密码', '重置用户 ' + email + ' 的密码');
+                            })
+                            .catch(function(err) {
+                                toast('❌ 重置失败: ' + err.message, 'error');
+                            });
+                    });
+                });
+                var delBtns = container.querySelectorAll('.del-btn');
+                delBtns.forEach(function(btn) {
+                    btn.addEventListener('click', function(ev) {
+                        ev.stopPropagation();
+                        var id = this.dataset.id;
+                        var email = this.dataset.email;
+                        if (!confirm('确定要删除用户 ' + email + ' 吗？此操作不可恢复！')) return;
+                        var adminClient = self._getAdminClient();
+                        if (!adminClient) {
+                            toast('❌ Service Role Key 未配置或无效', 'error');
                             return;
                         }
-                        usersList.push({ username: name, passwordHash: hashPassword(pass) });
-                        DB.set('users', usersList);
-                        DB.addLog('添加用户', '添加用户: ' + name);
-                        document.getElementById('newUsername').value = '';
-                        document.getElementById('newPassword').value = '';
-                        toast('用户 ' + name + ' 已添加', 'success');
-                        self._tabCache['users'] = null;
+                        toast('⏳ 正在删除用户...', 'success');
+                        adminClient.auth.admin.deleteUser(id)
+                            .then(function(res) {
+                                if (res.error) {
+                                    toast('❌ 删除失败: ' + res.error.message, 'error');
+                                    return;
+                                }
+                                toast('✅ 用户已删除', 'success');
+                                DB.addLog('删除用户', '删除用户 ' + email);
+                                self.renderUsers(container);
+                            })
+                            .catch(function(err) {
+                                toast('❌ 删除失败: ' + err.message, 'error');
+                            });
+                    });
+                });
+                var pageBtns = container.querySelectorAll('.user-page-btn');
+                pageBtns.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var page = this.dataset.page;
+                        var total = Math.ceil((self._userList || []).length / self._pageSize) || 1;
+                        if (page === 'prev') {
+                            if (self._currentPage > 1) self._currentPage--;
+                        } else if (page === 'next') {
+                            if (self._currentPage < total) self._currentPage++;
+                        } else {
+                            self._currentPage = parseInt(page);
+                        }
                         self.renderUsers(container);
                     });
-                }
-                var delBtns = container.querySelectorAll('.del-btn[data-user]');
-                for (var j = 0; j < delBtns.length; j++) {
-                    delBtns[j].addEventListener('click', function() {
-                        var username = this.dataset.user;
-                        if (confirm('确定删除用户 "' + username + '" 吗？')) {
-                            var usersList = DB.get('users') || [];
-                            usersList = usersList.filter(function(u) { return u.username !== username; });
-                            DB.set('users', usersList);
-                            DB.addLog('删除用户', '删除用户: ' + username);
-                            toast('用户已删除', 'success');
-                            self._tabCache['users'] = null;
-                            self.renderUsers(container);
-                        }
-                    });
-                }
+                });
             },
 
             renderSettings: function(container) {
                 var currentUser = sessionStorage.getItem('lezhe_admin_user') || 'admin';
                 var logs = DB.getLogs();
+                var serviceRoleKey = localStorage.getItem('lezhe_service_role_key') || '';
                 var html = '<h2 class="page-title">⚙ 系统设置</h2><p class="page-sub">管理配置与操作日志</p>';
+                html +=
+                    '<div class="card" style="padding:24px 28px;margin-bottom:20px;"><h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;">🔑 Supabase Service Role Key</h3><p style="color:var(--text-secondary);font-size:0.8rem;margin-bottom:8px;">用于管理用户（重置密码、删除用户等）。<a href="https://supabase.com/dashboard/project/qqcxtfayjxyvswblmdpw/settings/api" target="_blank" style="color:var(--accent-cyan);text-decoration:underline;">在 Supabase 控制台获取</a></p><div style="display:flex;gap:8px;flex-wrap:wrap;"><input type="password" id="serviceRoleKeyInput" placeholder="输入 Service Role Key" value="' +
+                    serviceRoleKey +
+                    '" style="flex:1;min-width:200px;padding:10px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);font-size:0.85rem;min-height:44px;" /><button class="btn btn-sm btn-primary" id="saveServiceRoleBtn">保存</button><button class="btn btn-sm btn-outline" id="toggleKeyVisibility">👁️ 显示</button></div><div id="serviceRoleStatus" style="margin-top:6px;font-size:0.8rem;color:' +
+                    (serviceRoleKey ? 'var(--accent-green)' : 'var(--accent-orange)') + ';">' +
+                    (serviceRoleKey ? '✅ 已配置 Service Role Key' : '⚠️ 未配置 Service Role Key，用户管理功能不可用') +
+                    '</div></div>';
                 html +=
                     '<div class="card" style="padding:24px 28px;margin-bottom:20px;"><h3 style="font-size:1rem;font-weight:600;margin-bottom:12px;">🔑 修改密码</h3><form id="changePwdForm"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;"><input type="password" id="oldPwd" placeholder="当前密码" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:40px;" /><input type="password" id="newPwd" placeholder="新密码 (至少4位)" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:40px;" /><input type="password" id="confirmPwd" placeholder="确认新密码" style="padding:8px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border-glow);background:var(--bg-input);color:var(--text-primary);min-height:40px;" /></div><button type="submit" class="btn btn-sm btn-primary">更新密码</button></form></div>';
                 html +=
@@ -3208,6 +3367,76 @@
                 container.innerHTML = html;
                 this._tabCache['settings'] = html;
                 this._bindSettingsEvents(container);
+                var saveBtn = document.getElementById('saveServiceRoleBtn');
+                var keyInput = document.getElementById('serviceRoleKeyInput');
+                if (saveBtn && keyInput) {
+                    saveBtn.addEventListener('click', function() {
+                        var key = keyInput.value.trim();
+                        if (!key) {
+                            localStorage.removeItem('lezhe_service_role_key');
+                            adminClient = null;
+                            hasServiceRole = false;
+                            document.getElementById('serviceRoleStatus').textContent =
+                                '⚠️ 已清除 Service Role Key';
+                            document.getElementById('serviceRoleStatus').style.color = 'var(--accent-orange)';
+                            toast('已清除 Service Role Key', 'success');
+                            return;
+                        }
+                        try {
+                            var testClient = supabase.createClient(SUPABASE_URL, key);
+                            // 验证 key
+                            testClient.auth.admin.listUsers({ page: 1, perPage: 1 }).then(function(res) {
+                                if (res.error) {
+                                    toast('❌ Service Role Key 无效: ' + res.error.message, 'error');
+                                    document.getElementById('serviceRoleStatus').textContent =
+                                        '❌ 无效的 Key';
+                                    document.getElementById('serviceRoleStatus').style.color =
+                                        'var(--accent-red)';
+                                    adminClient = null;
+                                    hasServiceRole = false;
+                                    localStorage.removeItem('lezhe_service_role_key');
+                                } else {
+                                    localStorage.setItem('lezhe_service_role_key', key);
+                                    adminClient = testClient;
+                                    hasServiceRole = true;
+                                    document.getElementById('serviceRoleStatus').textContent =
+                                        '✅ Service Role Key 已保存并验证通过';
+                                    document.getElementById('serviceRoleStatus').style.color =
+                                        'var(--accent-green)';
+                                    toast('Service Role Key 已保存并验证通过', 'success');
+                                    App._loadServiceRoleKey();
+                                }
+                            }).catch(function(e) {
+                                toast('❌ Service Role Key 验证失败: ' + e.message, 'error');
+                                document.getElementById('serviceRoleStatus').textContent = '❌ 无效的 Key';
+                                document.getElementById('serviceRoleStatus').style.color = 'var(--accent-red)';
+                                adminClient = null;
+                                hasServiceRole = false;
+                                localStorage.removeItem('lezhe_service_role_key');
+                            });
+                        } catch (e) {
+                            toast('❌ Service Role Key 无效: ' + e.message, 'error');
+                            document.getElementById('serviceRoleStatus').textContent = '❌ 无效的 Key';
+                            document.getElementById('serviceRoleStatus').style.color = 'var(--accent-red)';
+                            adminClient = null;
+                            hasServiceRole = false;
+                            localStorage.removeItem('lezhe_service_role_key');
+                        }
+                    });
+                }
+                var toggleBtn = document.getElementById('toggleKeyVisibility');
+                if (toggleBtn) {
+                    toggleBtn.addEventListener('click', function() {
+                        var input = document.getElementById('serviceRoleKeyInput');
+                        if (input.type === 'password') {
+                            input.type = 'text';
+                            this.textContent = '🙈 隐藏';
+                        } else {
+                            input.type = 'password';
+                            this.textContent = '👁️ 显示';
+                        }
+                    });
+                }
             },
 
             _bindSettingsEvents: function(container) {
@@ -3749,8 +3978,10 @@
                 tutorials.forEach(function(t) {
                     allTutorials.push({ value: t.id, label: t.title });
                 });
-                var html = '<h2 class="page-title">💬 评论管理</h2><p class="page-sub">共 ' + total + ' 条评论</p><div class="toolbar">';
-                html += '<div class="search-box"><span class="icon">🔍</span><input type="text" id="commentSearchInput" placeholder="搜索评论内容/作者/教程..." value="' + (this._commentKeyword || '') + '" /></div>';
+                var html = '<h2 class="page-title">💬 评论管理</h2><p class="page-sub">共 ' + total +
+                    ' 条评论</p><div class="toolbar">';
+                html += '<div class="search-box"><span class="icon">🔍</span><input type="text" id="commentSearchInput" placeholder="搜索评论内容/作者/教程..." value="' +
+                    (this._commentKeyword || '') + '" /></div>';
                 html += '<select id="commentFilterTut">';
                 allTutorials.forEach(function(t) {
                     var sel = t.value === (App._commentFilterTutorial || 'all') ? 'selected' : '';
@@ -3760,28 +3991,36 @@
                 html += '<div class="btn-group">';
                 html += '<button class="btn btn-sm btn-outline" id="commentRefreshBtn">⟳ 刷新</button>';
                 var hasSelected = this._selectedIds && this._selectedIds.length > 0;
-                html += '<button class="btn btn-sm btn-danger" id="commentBatchDelBtn" style="display:' + (hasSelected ? 'inline-flex' : 'none') + ';">🗑 删除 (' + (this._selectedIds ? this._selectedIds.length : 0) + ')</button>';
-                html += '<span class="selected-info">已选 ' + (this._selectedIds ? this._selectedIds.length : 0) + ' 项</span>';
+                html += '<button class="btn btn-sm btn-danger" id="commentBatchDelBtn" style="display:' + (hasSelected ?
+                    'inline-flex' : 'none') + ';">🗑 删除 (' + (this._selectedIds ? this._selectedIds.length : 0) +
+                    ')</button>';
+                html += '<span class="selected-info">已选 ' + (this._selectedIds ? this._selectedIds.length : 0) +
+                    ' 项</span>';
                 html += '</div></div>';
                 html += '<div class="table-wrap comment-table-wrap" id="commentTableWrap"></div>';
-                html += '<div class="pagination"><div class="info">共 ' + total + ' 条，第 ' + (start + 1) + '-' + end + ' 条</div><div class="pages">';
-                html += '<button class="comment-page-btn" data-page="prev" ' + (this._currentPage <= 1 ? 'disabled' : '') + '>‹</button>';
+                html += '<div class="pagination"><div class="info">共 ' + total + ' 条，第 ' + (start + 1) + '-' + end +
+                    ' 条</div><div class="pages">';
+                html += '<button class="comment-page-btn" data-page="prev" ' + (this._currentPage <= 1 ? 'disabled' :
+                    '') + '>‹</button>';
                 var maxShow = Math.min(totalPages, 7);
                 var startPage = Math.max(1, this._currentPage - 3);
                 var endPage = Math.min(totalPages, startPage + 6);
                 if (endPage - startPage < 6) startPage = Math.max(1, endPage - 6);
                 for (var p = startPage; p <= endPage; p++) {
                     var active = p === this._currentPage ? 'active' : '';
-                    html += '<button class="comment-page-btn ' + active + '" data-page="' + p + '">' + p + '</button>';
+                    html += '<button class="comment-page-btn ' + active + '" data-page="' + p + '">' + p +
+                    '</button>';
                 }
-                html += '<button class="comment-page-btn" data-page="next" ' + (this._currentPage >= totalPages ? 'disabled' : '') + '>›</button>';
+                html += '<button class="comment-page-btn" data-page="next" ' + (this._currentPage >= totalPages ?
+                    'disabled' : '') + '>›</button>';
                 html += '</div></div>';
                 container.innerHTML = html;
                 this._tabCache['comments'] = container.innerHTML;
                 var wrap = document.getElementById('commentTableWrap');
                 var selfRef = this;
                 var renderCommentsTable = function(wrap, items) {
-                    var html2 = '<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="commentSelectAll" /></th><th data-sort="tutorial_id">教程</th><th data-sort="author">作者</th><th data-sort="content">评论内容</th><th data-sort="created_at">时间</th><th style="width:180px;">操作</th></tr></thead><tbody>';
+                    var html2 =
+                        '<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="commentSelectAll" /></th><th data-sort="tutorial_id">教程</th><th data-sort="author">作者</th><th data-sort="content">评论内容</th><th data-sort="created_at">时间</th><th style="width:180px;">操作</th></tr></thead><tbody>';
                     if (items.length === 0) {
                         html2 += '<tr class="empty-row"><td colspan="6">暂无评论</td></tr>';
                     } else {
@@ -3790,13 +4029,17 @@
                             var checked = (selfRef._selectedIds || []).indexOf(c.id) !== -1 ? 'checked' : '';
                             var title = tutorialMap[c.tutorial_id] || '未知教程';
                             html2 += '<tr data-id="' + c.id + '">';
-                            html2 += '<td class="checkbox-cell"><input type="checkbox" class="comment-row-checkbox" data-id="' + c.id + '" ' + checked + ' /></td>';
+                            html2 += '<td class="checkbox-cell"><input type="checkbox" class="comment-row-checkbox" data-id="' +
+                                c.id + '" ' + checked + ' /></td>';
                             html2 += '<td><span style="font-size:0.75rem;">' + escapeHTML(title) + '</span></td>';
                             html2 += '<td>' + escapeHTML(c.author || '匿名用户') + '</td>';
-                            html2 += '<td class="comment-content-cell" title="' + escapeHTML(c.content || '') + '">' + escapeHTML(c.content || '') + '</td>';
+                            html2 += '<td class="comment-content-cell" title="' + escapeHTML(c.content || '') +
+                                '">' + escapeHTML(c.content || '') + '</td>';
                             html2 += '<td style="font-size:0.7rem;">' + timeAgo(c.created_at) + '</td>';
                             html2 += '<td><div class="actions">';
-                            html2 += '<button class="reply-btn" data-id="' + c.id + '" data-tut="' + c.tutorial_id + '" data-author="' + escapeHTML(c.author || '匿名用户') + '">💬 回复</button>';
+                            html2 += '<button class="reply-btn" data-id="' + c.id + '" data-tut="' + c
+                                .tutorial_id + '" data-author="' + escapeHTML(c.author || '匿名用户') +
+                                '">💬 回复</button>';
                             html2 += '<button class="del-btn" data-id="' + c.id + '">🗑 删除</button>';
                             html2 += '</div></td></tr>';
                         }
@@ -3807,7 +4050,8 @@
                     var rowChecks = wrap.querySelectorAll('.comment-row-checkbox');
                     var updateState = function() {
                         if (!selectAll) return;
-                        var allChecked = true, anyChecked = false;
+                        var allChecked = true,
+                            anyChecked = false;
                         for (var j = 0; j < rowChecks.length; j++) {
                             if (rowChecks[j].checked) anyChecked = true;
                             else allChecked = false;
@@ -3891,9 +4135,11 @@
                                 if (result.success) {
                                     DB.addLog('删除评论', '删除评论 ID: ' + shortId(id));
                                     toast('✅ 已删除', 'success');
-                                    selfRef._comments = selfRef._comments.filter(function(c) { return c.id !== id; });
+                                    selfRef._comments = selfRef._comments.filter(function(c) { return c
+                                        .id !== id; });
                                     if (selfRef._selectedIds) {
-                                        selfRef._selectedIds = selfRef._selectedIds.filter(function(sid) { return sid !== id; });
+                                        selfRef._selectedIds = selfRef._selectedIds.filter(function(
+                                            sid) { return sid !== id; });
                                     }
                                     selfRef.renderComments(container);
                                 } else {
@@ -3909,7 +4155,8 @@
                         th.addEventListener('click', function() {
                             var field = this.dataset.sort;
                             if (selfRef._commentSortField === field) {
-                                selfRef._commentSortOrder = selfRef._commentSortOrder === 'asc' ? 'desc' : 'asc';
+                                selfRef._commentSortOrder = selfRef._commentSortOrder === 'asc' ?
+                                    'desc' : 'asc';
                             } else {
                                 selfRef._commentSortField = field;
                                 selfRef._commentSortOrder = 'asc';
@@ -3951,16 +4198,17 @@
                 if (refreshBtn) {
                     refreshBtn.addEventListener('click', function() {
                         DB.invalidateCache();
-                        Promise.all([DB.getCommentsFromCloud(true), DB.getTutorialsFromCloud(true)]).then(function(res) {
-                            self._comments = res[0];
-                            self._tutorials = res[1];
-                            self._commentKeyword = '';
-                            self._commentFilterTutorial = 'all';
-                            self._selectedIds = [];
-                            self._currentPage = 1;
-                            self.renderComments(container);
-                            toast('✅ 已刷新', 'success');
-                        });
+                        Promise.all([DB.getCommentsFromCloud(true), DB.getTutorialsFromCloud(true)]).then(
+                            function(res) {
+                                self._comments = res[0];
+                                self._tutorials = res[1];
+                                self._commentKeyword = '';
+                                self._commentFilterTutorial = 'all';
+                                self._selectedIds = [];
+                                self._currentPage = 1;
+                                self.renderComments(container);
+                                toast('✅ 已刷新', 'success');
+                            });
                     });
                 }
                 var batchBtn = container.querySelector('#commentBatchDelBtn');
@@ -3978,7 +4226,8 @@
                             return DB.deleteCommentFromCloud(id).then(function(result) {
                                 if (result.success) {
                                     totalDeleted++;
-                                    self._comments = self._comments.filter(function(c) { return c.id !== id; });
+                                    self._comments = self._comments.filter(function(c) { return c
+                                        .id !== id; });
                                 } else {
                                     totalFailed++;
                                 }
@@ -3987,7 +4236,9 @@
                         Promise.all(promises).then(function() {
                             if (totalDeleted > 0) {
                                 DB.addLog('批量删除评论', '批量删除 ' + totalDeleted + ' 条评论');
-                                toast('✅ 已删除 ' + totalDeleted + ' 条评论' + (totalFailed > 0 ? '，' + totalFailed + ' 条失败' : ''), totalFailed > 0 ? 'warning' : 'success');
+                                toast('✅ 已删除 ' + totalDeleted + ' 条评论' + (totalFailed > 0 ?
+                                    '，' + totalFailed + ' 条失败' : ''), totalFailed > 0 ?
+                                    'warning' : 'success');
                             } else {
                                 toast('❌ 全部删除失败，请检查权限', 'error');
                             }
@@ -4136,13 +4387,14 @@
                         { field: 'created_at', label: '创建时间', render: function(item) { return item
                                 .created_at ? timeAgo(item.created_at) : '-'; } }
                     ];
-                    var html2 = '<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="qaSelectAll" /></th>';
+                    var html2 =
+                        '<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="qaSelectAll" /></th>';
                     for (var ci = 0; ci < columns.length; ci++) {
                         var col = columns[ci];
                         var isSorted = selfRef._qaSortField === col.field;
                         var arrow = isSorted ? (selfRef._qaSortOrder === 'asc' ? '↑' : '↓') : '↕';
-                        html2 += '<th data-sort="' + col.field + '" class="' + (isSorted ? 'active' : '') + '">' + col
-                            .label + ' ' + arrow + '</th>';
+                        html2 += '<th data-sort="' + col.field + '" class="' + (isSorted ? 'active' : '') + '">' +
+                            col.label + ' ' + arrow + '</th>';
                     }
                     html2 += '<th style="width:120px;">操作</th></tr></thead><tbody>';
                     if (items.length === 0) {
@@ -4254,7 +4506,8 @@
                             selfRef.showQuestionDetail(id);
                             setTimeout(function() {
                                 var ansBox = document.getElementById('qaAnswerBox');
-                                if (ansBox) ansBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                if (ansBox) ansBox.scrollIntoView({ behavior: 'smooth',
+                                    block: 'center' });
                             }, 300);
                         });
                     }
@@ -4324,15 +4577,15 @@
                 if (refreshBtn) {
                     refreshBtn.addEventListener('click', function() {
                         DB.invalidateCache();
-                        Promise.all([DB.getQuestionsFromCloud(true), DB.getAnswersFromCloud(true)]).then(function(
-                            res) {
-                            self._questions = res[0];
-                            self._answers = res[1];
-                            self._qaKeyword = '';
-                            self._qaFilter = 'all';
-                            self.renderQA(container);
-                            toast('已刷新', 'success');
-                        });
+                        Promise.all([DB.getQuestionsFromCloud(true), DB.getAnswersFromCloud(true)]).then(
+                            function(res) {
+                                self._questions = res[0];
+                                self._answers = res[1];
+                                self._qaKeyword = '';
+                                self._qaFilter = 'all';
+                                self.renderQA(container);
+                                toast('已刷新', 'success');
+                            });
                     });
                 }
                 var pageBtns = container.querySelectorAll('.qa-page-btn');
@@ -4428,21 +4681,22 @@
                                 return;
                             }
                             var qid2 = this.dataset.qid;
-                            DB.addAnswerToCloud({ question_id: qid2, body: body, votes: 0 }).then(function(
-                            result) {
-                                if (result) {
-                                    toast('回答成功', 'success');
-                                    DB.updateQuestionAnswerCount(qid2, answers.length + 1);
-                                    Promise.all([DB.getQuestionsFromCloud(true), DB.getAnswersFromCloud(
-                                        true)]).then(function(res) {
-                                        self._questions = res[0];
-                                        self._answers = res[1];
-                                        self.showQuestionDetail(qid2);
-                                    });
-                                } else {
-                                    toast('回答失败', 'error');
-                                }
-                            });
+                            DB.addAnswerToCloud({ question_id: qid2, body: body, votes: 0 }).then(
+                                function(result) {
+                                    if (result) {
+                                        toast('回答成功', 'success');
+                                        DB.updateQuestionAnswerCount(qid2, answers.length + 1);
+                                        Promise.all([DB.getQuestionsFromCloud(true), DB
+                                            .getAnswersFromCloud(true)
+                                        ]).then(function(res) {
+                                            self._questions = res[0];
+                                            self._answers = res[1];
+                                            self.showQuestionDetail(qid2);
+                                        });
+                                    } else {
+                                        toast('回答失败', 'error');
+                                    }
+                                });
                         });
                         container.querySelectorAll('.qa-del-answer-btn').forEach(function(btn) {
                             btn.addEventListener('click', function() {
@@ -4450,16 +4704,16 @@
                                 var qid2 = this.dataset.qid;
                                 if (confirm('确定要删除这个回答吗？')) {
                                     supabaseClient.from('answers').delete().eq('id', id).then(
-                                    function() {
-                                        toast('已删除', 'success');
-                                        Promise.all([DB.getQuestionsFromCloud(true),
-                                            DB.getAnswersFromCloud(true)
-                                        ]).then(function(res) {
-                                            self._questions = res[0];
-                                            self._answers = res[1];
-                                            self.showQuestionDetail(qid2);
+                                        function() {
+                                            toast('已删除', 'success');
+                                            Promise.all([DB.getQuestionsFromCloud(true),
+                                                DB.getAnswersFromCloud(true)
+                                            ]).then(function(res) {
+                                                self._questions = res[0];
+                                                self._answers = res[1];
+                                                self.showQuestionDetail(qid2);
+                                            });
                                         });
-                                    });
                                 }
                             });
                         });
@@ -4803,6 +5057,5 @@
         window.__APP = App;
         window.__DB = DB;
     </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
