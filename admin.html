@@ -618,6 +618,13 @@
             _cacheTTL: 120000,
             _categoriesCache: null,
             _categoriesTime: 0,
+            _withTimeout: function(promise, ms) {
+                ms = ms || 10000;
+                return Promise.race([
+                    promise,
+                    new Promise(function(_, reject) { setTimeout(function() { reject(new Error('请求超时')); }, ms); })
+                ]);
+            },
             async getSoftwareFromCloud(force) {
                 if (!supabaseClient) { return []; }
                 force = force || false;
@@ -626,7 +633,7 @@
                     return this._softwareCache;
                 }
                 try {
-                    var result = await supabaseClient.from('software').select('*').order('created_at', { ascending: false });
+                    var result = await this._withTimeout(supabaseClient.from('software').select('*').order('created_at', { ascending: false }));
                     if (result.error) {
                         console.error('获取软件失败:', result.error);
                         return this._softwareCache || [];
@@ -647,7 +654,7 @@
                     return this._categoriesCache;
                 }
                 try {
-                    var result = await supabaseClient.from('categories').select('*').order('name');
+                    var result = await this._withTimeout(supabaseClient.from('categories').select('*').order('name'));
                     if (result.error) {
                         console.error('获取分类失败:', result.error);
                         return [];
@@ -669,7 +676,7 @@
             async addSoftwareToCloud(soft) {
                 if (!supabaseClient) { return null; }
                 try {
-                    var result = await supabaseClient.from('software').insert(soft).select();
+                    var result = await this._withTimeout(supabaseClient.from('software').insert(soft).select());
                     if (result.error) {
                         console.error('添加软件失败:', result.error);
                         return null;
@@ -684,7 +691,7 @@
             async updateSoftwareInCloud(id, updates) {
                 if (!supabaseClient) { return; }
                 try {
-                    var result = await supabaseClient.from('software').update(updates).eq('id', id);
+                    var result = await this._withTimeout(supabaseClient.from('software').update(updates).eq('id', id));
                     if (result.error) console.error('更新软件失败:', result.error);
                     this.invalidateCache();
                 } catch (e) {
@@ -694,7 +701,7 @@
             async deleteSoftwareFromCloud(id) {
                 if (!supabaseClient) { return; }
                 try {
-                    var result = await supabaseClient.from('software').delete().eq('id', id);
+                    var result = await this._withTimeout(supabaseClient.from('software').delete().eq('id', id));
                     if (result.error) console.error('删除软件失败:', result.error);
                     this.invalidateCache();
                 } catch (e) {
@@ -704,7 +711,7 @@
             async deleteSoftwareBatchFromCloud(ids) {
                 if (!supabaseClient) { return; }
                 try {
-                    var result = await supabaseClient.from('software').delete().in('id', ids);
+                    var result = await this._withTimeout(supabaseClient.from('software').delete().in('id', ids));
                     if (result.error) console.error('批量删除失败:', result.error);
                     this.invalidateCache();
                 } catch (e) {
@@ -714,7 +721,7 @@
             async setRecommendBatchFromCloud(ids, recommend) {
                 if (!supabaseClient) { return; }
                 try {
-                    var result = await supabaseClient.from('software').update({ recommend: recommend }).in('id', ids);
+                    var result = await this._withTimeout(supabaseClient.from('software').update({ recommend: recommend }).in('id', ids));
                     if (result.error) console.error('批量设置推荐失败:', result.error);
                     this.invalidateCache();
                 } catch (e) {
@@ -724,7 +731,7 @@
             async addCategoryToCloud(name) {
                 if (!supabaseClient) { return; }
                 try {
-                    var result = await supabaseClient.from('categories').insert({ name: name });
+                    var result = await this._withTimeout(supabaseClient.from('categories').insert({ name: name }));
                     if (result.error) console.error('添加分类失败:', result.error);
                     this._categoriesCache = null;
                 } catch (e) {
@@ -734,7 +741,7 @@
             async deleteCategoryFromCloud(name) {
                 if (!supabaseClient) { return; }
                 try {
-                    var result = await supabaseClient.from('categories').delete().eq('name', name);
+                    var result = await this._withTimeout(supabaseClient.from('categories').delete().eq('name', name));
                     if (result.error) console.error('删除分类失败:', result.error);
                     this._categoriesCache = null;
                 } catch (e) {
@@ -745,7 +752,7 @@
                 if (!supabaseClient) { return []; }
                 force = force || false;
                 try {
-                    var result = await supabaseClient.from('tutorials').select('*').order('created_at', { ascending: false });
+                    var result = await this._withTimeout(supabaseClient.from('tutorials').select('*').order('created_at', { ascending: false }));
                     if (result.error) {
                         console.error('获取教程失败:', result.error);
                         return [];
@@ -759,7 +766,7 @@
             async deleteTutorialFromCloud(id) {
                 if (!supabaseClient) { return; }
                 try {
-                    var result = await supabaseClient.from('tutorials').delete().eq('id', id);
+                    var result = await this._withTimeout(supabaseClient.from('tutorials').delete().eq('id', id));
                     if (result.error) console.error('删除教程失败:', result.error);
                 } catch (e) {
                     console.error('删除教程异常:', e);
@@ -769,7 +776,7 @@
                 if (!supabaseClient) { return []; }
                 force = force || false;
                 try {
-                    var result = await supabaseClient.from('questions').select('*').order('created_at', { ascending: false });
+                    var result = await this._withTimeout(supabaseClient.from('questions').select('*').order('created_at', { ascending: false }));
                     if (result.error) {
                         console.error('获取问题失败:', result.error);
                         return [];
@@ -783,8 +790,8 @@
             async deleteQuestionFromCloud(id) {
                 if (!supabaseClient) { return; }
                 try {
-                    await supabaseClient.from('answers').delete().eq('question_id', id);
-                    var result = await supabaseClient.from('questions').delete().eq('id', id);
+                    await this._withTimeout(supabaseClient.from('answers').delete().eq('question_id', id));
+                    var result = await this._withTimeout(supabaseClient.from('questions').delete().eq('id', id));
                     if (result.error) console.error('删除问题失败:', result.error);
                 } catch (e) {
                     console.error('删除问题异常:', e);
@@ -794,7 +801,7 @@
                 if (!supabaseClient) { return []; }
                 force = force || false;
                 try {
-                    var result = await supabaseClient.from('answers').select('*').order('created_at', { ascending: true });
+                    var result = await this._withTimeout(supabaseClient.from('answers').select('*').order('created_at', { ascending: true }));
                     if (result.error) {
                         console.error('获取回答失败:', result.error);
                         return [];
@@ -808,7 +815,7 @@
             async addAnswerToCloud(answer) {
                 if (!supabaseClient) { return null; }
                 try {
-                    var result = await supabaseClient.from('answers').insert(answer).select();
+                    var result = await this._withTimeout(supabaseClient.from('answers').insert(answer).select());
                     if (result.error) {
                         console.error('添加回答失败:', result.error);
                         return null;
@@ -822,7 +829,7 @@
             async updateQuestionAnswerCount(qid, count) {
                 if (!supabaseClient) { return; }
                 try {
-                    var result = await supabaseClient.from('questions').update({ answers_count: count }).eq('id', qid);
+                    var result = await this._withTimeout(supabaseClient.from('questions').update({ answers_count: count }).eq('id', qid));
                     if (result.error) console.error('更新回答数失败:', result.error);
                 } catch (e) {
                     console.error('更新回答数异常:', e);
@@ -832,7 +839,7 @@
                 if (!supabaseClient) { return []; }
                 force = force || false;
                 try {
-                    var result = await supabaseClient.from('tutorial_comments').select('*').order('created_at', { ascending: false });
+                    var result = await this._withTimeout(supabaseClient.from('tutorial_comments').select('*').order('created_at', { ascending: false }));
                     if (result.error) {
                         console.error('获取评论失败:', result.error);
                         return [];
@@ -846,7 +853,7 @@
             async addCommentToCloud(comment) {
                 if (!supabaseClient) { return null; }
                 try {
-                    var result = await supabaseClient.from('tutorial_comments').insert(comment).select();
+                    var result = await this._withTimeout(supabaseClient.from('tutorial_comments').insert(comment).select());
                     if (result.error) {
                         console.error('添加评论失败:', result.error);
                         return null;
@@ -866,7 +873,7 @@
                 }
                 try {
                     console.log('[删除评论] 正在删除 ID:', id);
-                    var result = await supabaseClient.from('tutorial_comments').delete().eq('id', id);
+                    var result = await this._withTimeout(supabaseClient.from('tutorial_comments').delete().eq('id', id));
                     if (result.error) {
                         console.error('[删除评论] 错误:', result.error);
                         return { success: false, error: result.error.message || '数据库删除失败' };
@@ -935,11 +942,15 @@
             return map[cat] || '📦';
         }
         function renderIconThumb(soft) {
+            var fallback = soft.icon || '📦';
             if (soft.icon_url && soft.icon_url.trim()) {
-                return '<img src="' + soft.icon_url + '" alt="' + soft.name + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + (
-                    soft.icon || '📦') + '\'" />';
+                var url = soft.icon_url.trim();
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    return fallback;
+                }
+                return '<img src="' + url + '" alt="' + soft.name + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + fallback + '\'" />';
             }
-            return soft.icon || '📦';
+            return fallback;
         }
         function formatDate(iso) {
             if (!iso) return '-';
@@ -2791,7 +2802,7 @@
                 var url = form.querySelector('[name="iconUrl"]').value.trim();
                 var preview = form.querySelector('.preview-box');
                 var emoji = form.querySelector('[name="icon"]').value.trim() || '📦';
-                if (url) {
+                if (url && url.startsWith('http')) {
                     preview.innerHTML = '<img src="' + url + '" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' +
                         emoji + '\'" />';
                 } else {
