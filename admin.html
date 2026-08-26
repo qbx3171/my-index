@@ -625,15 +625,19 @@
                     new Promise(function(_, reject) { setTimeout(function() { reject(new Error('请求超时')); }, ms); })
                 ]);
             },
+            _getClient: function() {
+                return adminClient || supabaseClient;
+            },
             async getSoftwareFromCloud(force) {
-                if (!supabaseClient) { return []; }
+                var client = this._getClient();
+                if (!client) { return []; }
                 force = force || false;
                 var now = Date.now();
                 if (!force && this._softwareCache && (now - this._cacheTime < this._cacheTTL)) {
                     return this._softwareCache;
                 }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('software').select('*').order('created_at', { ascending: false }));
+                    var result = await this._withTimeout(client.from('software').select('*').order('created_at', { ascending: false }));
                     if (result.error) {
                         console.error('获取软件失败:', result.error);
                         return this._softwareCache || [];
@@ -647,14 +651,15 @@
                 }
             },
             async getCategoriesFromCloud(force) {
-                if (!supabaseClient) { return []; }
+                var client = this._getClient();
+                if (!client) { return []; }
                 force = force || false;
                 var now = Date.now();
                 if (!force && this._categoriesCache && (now - this._cacheTime < this._cacheTTL)) {
                     return this._categoriesCache;
                 }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('categories').select('*').order('name'));
+                    var result = await this._withTimeout(client.from('categories').select('*').order('name'));
                     if (result.error) {
                         console.error('获取分类失败:', result.error);
                         return [];
@@ -674,9 +679,10 @@
                 this._categoriesTime = 0;
             },
             async addSoftwareToCloud(soft) {
-                if (!supabaseClient) { return null; }
+                var client = this._getClient();
+                if (!client) { return null; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('software').insert(soft).select());
+                    var result = await this._withTimeout(client.from('software').insert(soft).select());
                     if (result.error) {
                         console.error('添加软件失败:', result.error);
                         return null;
@@ -689,9 +695,10 @@
                 }
             },
             async updateSoftwareInCloud(id, updates) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { return; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('software').update(updates).eq('id', id));
+                    var result = await this._withTimeout(client.from('software').update(updates).eq('id', id));
                     if (result.error) console.error('更新软件失败:', result.error);
                     this.invalidateCache();
                 } catch (e) {
@@ -699,23 +706,36 @@
                 }
             },
             async deleteSoftwareFromCloud(id) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { throw new Error('客户端未初始化'); }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('software').delete().eq('id', id));
-                    if (result.error) {
-                        console.error('删除软件失败:', result.error);
-                        throw result.error;
+                    var check = await this._withTimeout(client.from('software').select('id').eq('id', id));
+                    if (check.error) throw check.error;
+                    if (!check.data || check.data.length === 0) {
+                        throw new Error('未找到要删除的软件');
+                    }
+                    var result = await this._withTimeout(client.from('software').delete().eq('id', id).select('id').maybeSingle());
+                    if (result.error) throw result.error;
+                    if (!result.data) {
+                        throw new Error('删除操作未影响任何行');
+                    }
+                    var verify = await this._withTimeout(client.from('software').select('id').eq('id', id));
+                    if (verify.error) throw verify.error;
+                    if (verify.data && verify.data.length > 0) {
+                        throw new Error('删除失败，记录仍然存在');
                     }
                     this.invalidateCache();
+                    return true;
                 } catch (e) {
                     console.error('删除软件异常:', e);
                     throw e;
                 }
             },
             async deleteSoftwareBatchFromCloud(ids) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { return; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('software').delete().in('id', ids));
+                    var result = await this._withTimeout(client.from('software').delete().in('id', ids));
                     if (result.error) console.error('批量删除失败:', result.error);
                     this.invalidateCache();
                 } catch (e) {
@@ -723,9 +743,10 @@
                 }
             },
             async setRecommendBatchFromCloud(ids, recommend) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { return; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('software').update({ recommend: recommend }).in('id', ids));
+                    var result = await this._withTimeout(client.from('software').update({ recommend: recommend }).in('id', ids));
                     if (result.error) console.error('批量设置推荐失败:', result.error);
                     this.invalidateCache();
                 } catch (e) {
@@ -733,9 +754,10 @@
                 }
             },
             async addCategoryToCloud(name) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { return; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('categories').insert({ name: name }));
+                    var result = await this._withTimeout(client.from('categories').insert({ name: name }));
                     if (result.error) console.error('添加分类失败:', result.error);
                     this._categoriesCache = null;
                 } catch (e) {
@@ -743,9 +765,10 @@
                 }
             },
             async deleteCategoryFromCloud(name) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { return; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('categories').delete().eq('name', name));
+                    var result = await this._withTimeout(client.from('categories').delete().eq('name', name));
                     if (result.error) console.error('删除分类失败:', result.error);
                     this._categoriesCache = null;
                 } catch (e) {
@@ -753,10 +776,11 @@
                 }
             },
             async getTutorialsFromCloud(force) {
-                if (!supabaseClient) { return []; }
+                var client = this._getClient();
+                if (!client) { return []; }
                 force = force || false;
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('tutorials').select('*').order('created_at', { ascending: false }));
+                    var result = await this._withTimeout(client.from('tutorials').select('*').order('created_at', { ascending: false }));
                     if (result.error) {
                         console.error('获取教程失败:', result.error);
                         return [];
@@ -768,19 +792,21 @@
                 }
             },
             async deleteTutorialFromCloud(id) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { return; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('tutorials').delete().eq('id', id));
+                    var result = await this._withTimeout(client.from('tutorials').delete().eq('id', id));
                     if (result.error) console.error('删除教程失败:', result.error);
                 } catch (e) {
                     console.error('删除教程异常:', e);
                 }
             },
             async getQuestionsFromCloud(force) {
-                if (!supabaseClient) { return []; }
+                var client = this._getClient();
+                if (!client) { return []; }
                 force = force || false;
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('questions').select('*').order('created_at', { ascending: false }));
+                    var result = await this._withTimeout(client.from('questions').select('*').order('created_at', { ascending: false }));
                     if (result.error) {
                         console.error('获取问题失败:', result.error);
                         return [];
@@ -792,20 +818,22 @@
                 }
             },
             async deleteQuestionFromCloud(id) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { return; }
                 try {
-                    await this._withTimeout(supabaseClient.from('answers').delete().eq('question_id', id));
-                    var result = await this._withTimeout(supabaseClient.from('questions').delete().eq('id', id));
+                    await this._withTimeout(client.from('answers').delete().eq('question_id', id));
+                    var result = await this._withTimeout(client.from('questions').delete().eq('id', id));
                     if (result.error) console.error('删除问题失败:', result.error);
                 } catch (e) {
                     console.error('删除问题异常:', e);
                 }
             },
             async getAnswersFromCloud(force) {
-                if (!supabaseClient) { return []; }
+                var client = this._getClient();
+                if (!client) { return []; }
                 force = force || false;
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('answers').select('*').order('created_at', { ascending: true }));
+                    var result = await this._withTimeout(client.from('answers').select('*').order('created_at', { ascending: true }));
                     if (result.error) {
                         console.error('获取回答失败:', result.error);
                         return [];
@@ -817,9 +845,10 @@
                 }
             },
             async addAnswerToCloud(answer) {
-                if (!supabaseClient) { return null; }
+                var client = this._getClient();
+                if (!client) { return null; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('answers').insert(answer).select());
+                    var result = await this._withTimeout(client.from('answers').insert(answer).select());
                     if (result.error) {
                         console.error('添加回答失败:', result.error);
                         return null;
@@ -831,19 +860,21 @@
                 }
             },
             async updateQuestionAnswerCount(qid, count) {
-                if (!supabaseClient) { return; }
+                var client = this._getClient();
+                if (!client) { return; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('questions').update({ answers_count: count }).eq('id', qid));
+                    var result = await this._withTimeout(client.from('questions').update({ answers_count: count }).eq('id', qid));
                     if (result.error) console.error('更新回答数失败:', result.error);
                 } catch (e) {
                     console.error('更新回答数异常:', e);
                 }
             },
             async getCommentsFromCloud(force) {
-                if (!supabaseClient) { return []; }
+                var client = this._getClient();
+                if (!client) { return []; }
                 force = force || false;
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('tutorial_comments').select('*').order('created_at', { ascending: false }));
+                    var result = await this._withTimeout(client.from('tutorial_comments').select('*').order('created_at', { ascending: false }));
                     if (result.error) {
                         console.error('获取评论失败:', result.error);
                         return [];
@@ -855,9 +886,10 @@
                 }
             },
             async addCommentToCloud(comment) {
-                if (!supabaseClient) { return null; }
+                var client = this._getClient();
+                if (!client) { return null; }
                 try {
-                    var result = await this._withTimeout(supabaseClient.from('tutorial_comments').insert(comment).select());
+                    var result = await this._withTimeout(client.from('tutorial_comments').insert(comment).select());
                     if (result.error) {
                         console.error('添加评论失败:', result.error);
                         return null;
@@ -869,7 +901,8 @@
                 }
             },
             async deleteCommentFromCloud(id) {
-                if (!supabaseClient) {
+                var client = this._getClient();
+                if (!client) {
                     return { success: false, error: '客户端未初始化' };
                 }
                 if (!id) {
@@ -877,7 +910,7 @@
                 }
                 try {
                     console.log('[删除评论] 正在删除 ID:', id);
-                    var result = await this._withTimeout(supabaseClient.from('tutorial_comments').delete().eq('id', id));
+                    var result = await this._withTimeout(client.from('tutorial_comments').delete().eq('id', id));
                     if (result.error) {
                         console.error('[删除评论] 错误:', result.error);
                         return { success: false, error: result.error.message || '数据库删除失败' };
@@ -2549,7 +2582,6 @@
                                 await DB.deleteSoftwareFromCloud(id);
                                 DB.addLog('删除软件', '删除软件 ID: ' + shortId(id));
                                 toast('已删除', 'success');
-                                DB.invalidateCache();
                                 self._dataLoaded = false;
                                 var data = await DB.getSoftwareFromCloud(true);
                                 self._allSoftware = data;
@@ -2560,6 +2592,7 @@
                                 self._tabCache['software'] = container.innerHTML;
                             } catch (err) {
                                 toast('删除失败: ' + err.message, 'error');
+                                console.error('删除错误:', err);
                             }
                         }
                     },
