@@ -2236,9 +2236,8 @@
             },
 
             renderAdminTab: function(tab) {
-                this._currentAdminTab = tab;
-                var main = document.getElementById('adminMain');
-                if (tab !== 'add' && this._tabCache[tab]) {
+                if (this._tabCache[tab] && tab !== 'add') {
+                    var main = document.getElementById('adminMain');
                     main.innerHTML = this._tabCache[tab];
                     if (tab === 'categories') this._bindCategoriesEvents(main);
                     else if (tab === 'users') this._bindUsersEvents(main);
@@ -2247,6 +2246,8 @@
                     else if (tab === 'comments') this._bindCommentsEvents(main);
                     return;
                 }
+                this._currentAdminTab = tab;
+                var main = document.getElementById('adminMain');
                 if (tab === 'software') {
                     var self = this;
                     main.innerHTML = '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
@@ -2273,6 +2274,15 @@
                 }
                 if (tab === 'comments') {
                     this.renderComments(main);
+                    return;
+                }
+                if (this._tabCache[tab]) {
+                    main.innerHTML = this._tabCache[tab];
+                    if (tab === 'categories') this._bindCategoriesEvents(main);
+                    else if (tab === 'users') this._bindUsersEvents(main);
+                    else if (tab === 'settings') this._bindSettingsEvents(main);
+                    else if (tab === 'qa') this._bindQAEvents(main);
+                    else if (tab === 'comments') this._bindCommentsEvents(main);
                     return;
                 }
                 main.innerHTML = '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
@@ -2793,7 +2803,7 @@
                 if (winCheck) winCheck.checked = platforms.indexOf('windows') !== -1;
                 if (submitBtn) submitBtn.textContent = '✎ 更新';
                 if (cancelBtn) cancelBtn.classList.remove('hidden');
-                App._updateIconPreview(form);
+                this._updateIconPreview(form);
             },
 
             _updateIconPreview: function(form) {
@@ -2802,8 +2812,9 @@
                 var url = form.querySelector('[name="iconUrl"]').value.trim();
                 var preview = form.querySelector('.preview-box');
                 var emoji = form.querySelector('[name="icon"]').value.trim() || '📦';
-                if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
-                    preview.innerHTML = '<img src="' + url + '" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + emoji + '\'" />';
+                if (url && url.startsWith('http')) {
+                    preview.innerHTML = '<img src="' + url + '" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' +
+                        emoji + '\'" />';
                 } else {
                     preview.textContent = emoji;
                 }
@@ -2937,7 +2948,7 @@
                 var iconEmojiInput = form.querySelector('[name="icon"]');
                 var previewBox = form.querySelector('.preview-box');
                 var updatePreview = function() {
-                    App._updateIconPreview(form);
+                    self._updateIconPreview(form);
                 };
                 if (iconUrlInput) {
                     iconUrlInput.addEventListener('input', updatePreview);
@@ -3031,7 +3042,6 @@
                                 if (previewBox) previewBox.textContent = '📦';
                                 self._editingId = null;
                                 self._tabCache['software'] = null;
-                                self._tabCache['add'] = null;
                                 self._dataLoaded = false;
                                 var newData = await DB.getSoftwareFromCloud(true);
                                 self._allSoftware = newData;
