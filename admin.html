@@ -702,10 +702,14 @@
                 if (!supabaseClient) { return; }
                 try {
                     var result = await this._withTimeout(supabaseClient.from('software').delete().eq('id', id));
-                    if (result.error) console.error('删除软件失败:', result.error);
+                    if (result.error) {
+                        console.error('删除软件失败:', result.error);
+                        throw result.error;
+                    }
                     this.invalidateCache();
                 } catch (e) {
                     console.error('删除软件异常:', e);
+                    throw e;
                 }
             },
             async deleteSoftwareBatchFromCloud(ids) {
@@ -2255,11 +2259,12 @@
                         self._filteredSoftware = data.slice();
                         self._dataLoaded = true;
                         self._renderSoftwarePage(main);
-                    }).catch(function() {
+                    }).catch(function(err) {
+                        console.error('加载软件失败:', err);
                         self._dataLoaded = true;
                         self._allSoftware = [];
                         self._filteredSoftware = [];
-                        self._renderSoftwarePage(main);
+                        main.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>' + escapeHTML(err.message || '网络异常') + '</p><button class="btn btn-sm btn-primary" onclick="App.renderAdminTab(\'software\')">重试</button></div>';
                     });
                     return;
                 }
@@ -2406,11 +2411,12 @@
                         self._filteredSoftware = data.slice();
                         self._dataLoaded = true;
                         self._renderSoftwarePage(container);
-                    }).catch(function() {
+                    }).catch(function(err) {
+                        console.error('加载软件失败:', err);
                         self._dataLoaded = true;
                         self._allSoftware = [];
                         self._filteredSoftware = [];
-                        self._renderSoftwarePage(container);
+                        container.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>' + escapeHTML(err.message || '网络异常') + '</p><button class="btn btn-sm btn-primary" onclick="App.renderAdminTab(\'software\')">重试</button></div>';
                     });
                     return;
                 }
@@ -2539,18 +2545,22 @@
                     },
                     onDelete: async function(id) {
                         if (confirm('确定要删除此软件吗？')) {
-                            await DB.deleteSoftwareFromCloud(id);
-                            DB.addLog('删除软件', '删除软件 ID: ' + shortId(id));
-                            toast('已删除', 'success');
-                            DB.invalidateCache();
-                            self._dataLoaded = false;
-                            var data = await DB.getSoftwareFromCloud(true);
-                            self._allSoftware = data;
-                            self._filteredSoftware = data.slice();
-                            self._dataLoaded = true;
-                            self._selectedIds = [];
-                            self._renderSoftwarePage(container);
-                            self._tabCache['software'] = container.innerHTML;
+                            try {
+                                await DB.deleteSoftwareFromCloud(id);
+                                DB.addLog('删除软件', '删除软件 ID: ' + shortId(id));
+                                toast('已删除', 'success');
+                                DB.invalidateCache();
+                                self._dataLoaded = false;
+                                var data = await DB.getSoftwareFromCloud(true);
+                                self._allSoftware = data;
+                                self._filteredSoftware = data.slice();
+                                self._dataLoaded = true;
+                                self._selectedIds = [];
+                                self._renderSoftwarePage(container);
+                                self._tabCache['software'] = container.innerHTML;
+                            } catch (err) {
+                                toast('删除失败: ' + err.message, 'error');
+                            }
                         }
                     },
                     onSelect: function() {
@@ -2639,6 +2649,8 @@
                             self._dataLoaded = true;
                             self._renderSoftwarePage(container);
                             toast('已刷新', 'success');
+                        }).catch(function(err) {
+                            toast('刷新失败: ' + err.message, 'error');
                         });
                     });
                 }
