@@ -2236,8 +2236,9 @@
             },
 
             renderAdminTab: function(tab) {
-                if (this._tabCache[tab] && tab !== 'add') {
-                    var main = document.getElementById('adminMain');
+                this._currentAdminTab = tab;
+                var main = document.getElementById('adminMain');
+                if (tab !== 'add' && this._tabCache[tab]) {
                     main.innerHTML = this._tabCache[tab];
                     if (tab === 'categories') this._bindCategoriesEvents(main);
                     else if (tab === 'users') this._bindUsersEvents(main);
@@ -2246,8 +2247,6 @@
                     else if (tab === 'comments') this._bindCommentsEvents(main);
                     return;
                 }
-                this._currentAdminTab = tab;
-                var main = document.getElementById('adminMain');
                 if (tab === 'software') {
                     var self = this;
                     main.innerHTML = '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
@@ -2274,15 +2273,6 @@
                 }
                 if (tab === 'comments') {
                     this.renderComments(main);
-                    return;
-                }
-                if (this._tabCache[tab]) {
-                    main.innerHTML = this._tabCache[tab];
-                    if (tab === 'categories') this._bindCategoriesEvents(main);
-                    else if (tab === 'users') this._bindUsersEvents(main);
-                    else if (tab === 'settings') this._bindSettingsEvents(main);
-                    else if (tab === 'qa') this._bindQAEvents(main);
-                    else if (tab === 'comments') this._bindCommentsEvents(main);
                     return;
                 }
                 main.innerHTML = '<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
@@ -2803,7 +2793,7 @@
                 if (winCheck) winCheck.checked = platforms.indexOf('windows') !== -1;
                 if (submitBtn) submitBtn.textContent = '✎ 更新';
                 if (cancelBtn) cancelBtn.classList.remove('hidden');
-                this._updateIconPreview(form);
+                App._updateIconPreview(form);
             },
 
             _updateIconPreview: function(form) {
@@ -2812,9 +2802,8 @@
                 var url = form.querySelector('[name="iconUrl"]').value.trim();
                 var preview = form.querySelector('.preview-box');
                 var emoji = form.querySelector('[name="icon"]').value.trim() || '📦';
-                if (url && url.startsWith('http')) {
-                    preview.innerHTML = '<img src="' + url + '" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' +
-                        emoji + '\'" />';
+                if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                    preview.innerHTML = '<img src="' + url + '" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + emoji + '\'" />';
                 } else {
                     preview.textContent = emoji;
                 }
@@ -2948,7 +2937,7 @@
                 var iconEmojiInput = form.querySelector('[name="icon"]');
                 var previewBox = form.querySelector('.preview-box');
                 var updatePreview = function() {
-                    self._updateIconPreview(form);
+                    App._updateIconPreview(form);
                 };
                 if (iconUrlInput) {
                     iconUrlInput.addEventListener('input', updatePreview);
@@ -3013,7 +3002,8 @@
                             self._allSoftware = updated;
                             self._filteredSoftware = updated.slice();
                             self._dataLoaded = true;
-                            self.renderAdminTab('software');
+                            self._tabCache['add'] = null;
+                            self.renderAdminTab('add');
                         } else {
                             var newSoft = {
                                 id: DB.genId(),
@@ -3042,18 +3032,21 @@
                                 if (previewBox) previewBox.textContent = '📦';
                                 self._editingId = null;
                                 self._tabCache['software'] = null;
+                                self._tabCache['add'] = null;
                                 self._dataLoaded = false;
                                 var newData = await DB.getSoftwareFromCloud(true);
                                 self._allSoftware = newData;
                                 self._filteredSoftware = newData.slice();
                                 self._dataLoaded = true;
-                                self.renderAdminTab('software');
+                                self.renderAdminTab('add');
                             } else {
-                                toast('上传失败，请检查网络后重试', 'error');
+                                toast('❌ 上传失败，请检查控制台查看详细错误', 'error');
+                                console.error('❌ 添加软件失败，返回结果为 null');
                             }
                         }
                     } catch (err) {
-                        toast('操作失败: ' + err.message, 'error');
+                        console.error('❌ 提交异常:', err);
+                        toast('❌ 操作异常: ' + (err.message || '未知错误'), 'error');
                     } finally {
                         self._isSubmitting = false;
                         if (submitBtn) {
