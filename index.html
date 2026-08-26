@@ -650,7 +650,7 @@
                 <div class="container" style="max-width:var(--max-width);padding:0 16px;">
                     <div class="section-header"><h2><i class="fas fa-user-shield"></i> 管理后台</h2><button class="btn btn-outline" id="adminLogoutBtn" style="color:var(--danger);"><i class="fas fa-sign-out-alt"></i> 退出管理</button></div>
                     <div class="admin-stats" id="adminStats"><div class="stat-item">📚 教程总数：<strong id="adminTutCount">0</strong></div><div class="stat-item">💬 问题总数：<strong id="adminQCount">0</strong></div><div class="stat-item">📝 回答总数：<strong id="adminACount">0</strong></div></div>
-                    <div class="admin-tabs"><button class="active" data-tab="tutorials">📖 教程管理</button><button data-tab="questions">💬 问答管理</button></div>
+                    <div class="admin-tabs"><button class="active" data-tab="tutorials">📖 教程管理</button><button data-tab="questions">💬 问答管理</button><button data-tab="submissions">📥 待审核</button></div>
                     <div id="adminContent"></div>
                 </div>
             </section>
@@ -663,7 +663,7 @@
         </div>
         <footer class="footer">
             <div class="brand">◆ 乐哲软件</div>
-            <p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a></p>
+            <p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection#97dbf2cdfff2c4f8f1e3d7f8e2e3fbf8f8fcb9f4f8fa"><span class="__cf_email__" data-cfemail="83cfe6d9ebe6d0ece5f7c3ecf6f7efecece8ade0ecee">[email&#160;protected]</span></a></p>
             <div class="links"><span>友情链接：</span><a href="https://github.com" target="_blank" rel="noopener">GitHub</a> | <a href="https://www.v2ex.com" target="_blank" rel="noopener">V2EX</a> | <a href="https://www.oschina.net" target="_blank" rel="noopener">开源中国</a> | <a href="https://www.csdn.net" target="_blank" rel="noopener">CSDN</a> | <a href="https://www.zhihu.com" target="_blank" rel="noopener">知乎</a></div>
             <div class="disclaimer">免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。</div>
         </footer>
@@ -674,8 +674,6 @@
 
 <nav class="mobile-bottom-nav" id="mobileBottomNav"><a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a><a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a><a href="#" data-page="tutorials"><i class="fas fa-book"></i><span>教程</span></a><a href="#" data-page="qa"><i class="fas fa-comments"></i><span>问答</span></a><a href="#" data-page="profile" style="display:none;"><i class="fas fa-user"></i><span>我的</span></a></nav>
 <div class="share-float" id="shareFloat"><a href="#" onclick="shareOn('wechat')" title="分享到微信"><i class="fab fa-weixin"></i></a><a href="#" onclick="shareOn('weibo')" title="分享到微博"><i class="fab fa-weibo"></i></a><a href="#" onclick="shareOn('twitter')" title="分享到Twitter"><i class="fab fa-twitter"></i></a><a href="#" onclick="copyLink()" title="复制链接"><i class="fas fa-link"></i></a><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" title="回到顶部"><i class="fas fa-arrow-up"></i></a></div>
-
-<div class="modal-overlay" id="adminModal"><div class="modal-box"><button class="close-btn" id="adminModalClose">&times;</button><h3>管理员登录</h3><div class="form-group"><label>请输入管理密码</label><input type="password" id="adminPassword" placeholder="请输入密码" /></div><div class="form-actions"><button class="btn btn-outline" id="adminCancel">取消</button><button class="btn btn-primary" id="adminLoginBtn">登录</button></div></div></div>
 
 <div class="modal-overlay" id="tutorialDetailModal">
     <div class="modal-box" style="padding:0;max-width:900px;">
@@ -848,16 +846,13 @@
     </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
 var SUPABASE_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 var supabaseClient = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 var CACHE_KEY = 'lezhe_software_cache';
 var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
-var isAdmin = localStorage.getItem('lezhe_admin') === 'true';
+var isAdmin = false;
 var adminTab = 'tutorials';
 
 function isToday(d) { if (!d) return false; var t = new Date(d), n = new Date(); return t.getFullYear() === n.getFullYear() && t.getMonth() === n.getMonth() && t.getDate() === n.getDate(); }
@@ -901,8 +896,15 @@ function showSuggestions(keyword) {
     hist.innerHTML = '';
     hist.classList.remove('open');
     if (!keyword && searchHistory.length > 0) {
-        hist.innerHTML = '<div class="history-header">最近搜索</div>' + searchHistory.map(function(h) { return '<div class="item" data-kw="' + h + '">' + h + '<span class="remove-history" data-kw="' + h + '">✕</span></div>'; }).join('');
+        hist.innerHTML = '<div class="history-header">最近搜索 <span class="remove-history" id="clearAllHistory" style="float:right;color:var(--danger);cursor:pointer;font-weight:normal;">清空全部</span></div>' + searchHistory.map(function(h) { return '<div class="item" data-kw="' + h + '">' + h + '<span class="remove-history" data-kw="' + h + '">✕</span></div>'; }).join('');
         hist.classList.add('open');
+        document.getElementById('clearAllHistory').addEventListener('click', function(e) {
+            e.stopPropagation();
+            searchHistory = [];
+            localStorage.setItem('lezhe_search_history', JSON.stringify(searchHistory));
+            showSuggestions('');
+            toast('搜索历史已清空', 'success');
+        });
         hist.querySelectorAll('.item').forEach(function(el) {
             el.addEventListener('click', function(e) {
                 if (e.target.classList.contains('remove-history')) {
@@ -998,13 +1000,128 @@ document.getElementById('tutorialDetailClose').addEventListener('click', functio
 document.getElementById('tutorialDetailCloseBtn').addEventListener('click', function() { document.getElementById('tutorialDetailModal').classList.remove('open'); });
 function showQuestionDetail(qid) { var container = document.getElementById('questionDetailContainer'); var list = document.getElementById('questionList'); list.classList.add('hidden'); container.classList.remove('hidden'); supabaseClient.from('questions').select('*').eq('id', qid).single().then(function(res) { if (res.error) { toast('加载问题失败', 'error'); return; } var q = res.data; var html = '<div class="question-detail">' + '<div class="q-title">' + escapeHTML(q.title) + '</div>' + '<div class="q-meta"><span>' + escapeHTML(q.category) + '</span> · <span>' + timeAgo(q.created_at) + '</span> · <span>👍 ' + (q.votes || 0) + '</span></div>' + '<div class="q-body">' + escapeHTML(q.body || '') + '</div>' + '<div style="margin-top:12px;">' + '<button class="btn btn-sm btn-outline" id="backToQuestions">← 返回问题列表</button>' + '<button class="btn btn-sm btn-primary" id="answerBtn" style="margin-left:10px;">写回答</button>' + '</div></div><div id="answersList"></div>'; container.innerHTML = html; document.getElementById('backToQuestions').addEventListener('click', function() { container.classList.add('hidden'); list.classList.remove('hidden'); }); document.getElementById('answerBtn').addEventListener('click', function() { var modal = document.getElementById('answerModal'); modal.classList.add('open'); document.getElementById('aBody').value = ''; document.getElementById('aSubmit').dataset.qid = qid; }); loadAnswers(qid); }); }
 function loadAnswers(qid) { var container = document.getElementById('answersList'); supabaseClient.from('answers').select('*').eq('question_id', qid).order('created_at', { ascending: true }).then(function(res) { if (res.error) { console.error('回答加载错误:', res.error); if (res.error.message && res.error.message.includes('does not exist')) { container.innerHTML = '<p style="color:var(--text-dim);">💡 请在 Supabase 中创建 <code>answers</code> 表</p>'; } else { container.innerHTML = '<p style="color:var(--text-dim);">暂无回答，快来抢沙发！</p>'; } return; } var data = res.data || []; if (data.length === 0) { container.innerHTML = '<p style="color:var(--text-dim);">还没有回答，快来抢沙发！</p>'; return; } container.innerHTML = data.map(function(a) { return '<div class="answer-item">' + '<div class="a-meta"><span>匿名用户</span><span>' + timeAgo(a.created_at) + '</span></div>' + '<div class="a-body">' + escapeHTML(a.body) + '</div>' + '<div class="a-actions">' + '<button class="vote-a" data-id="' + a.id + '"><i class="fas fa-thumbs-up"></i> ' + (a.votes || 0) + '</button>' + '</div></div>'; }).join(''); container.addEventListener('click', function(e) { var target = e.target.closest('button'); if (!target) return; var id = target.dataset.id; if (!id) return; if (target.classList.contains('vote-a')) { supabaseClient.from('answers').select('votes').eq('id', id).single().then(function(res) { if (res.error) { toast('投票失败', 'warning'); return; } var votes = (res.data ? res.data.votes : 0) + 1; supabaseClient.from('answers').update({ votes: votes }).eq('id', id).then(function() { toast('已投票', 'success'); loadAnswers(qid); }).catch(function() { toast('投票异常', 'warning'); }); }).catch(function() { toast('投票异常', 'warning'); }); return; } }); }).catch(function(err) { console.error('加载回答异常:', err); container.innerHTML = '<p style="color:var(--text-dim);">加载回答失败</p>'; }); }
-function renderAdmin() { if (!isAdmin) return; var container = document.getElementById('adminContent'); if (adminTab === 'tutorials') { supabaseClient.from('tutorials').select('*').order('created_at', { ascending: false }).then(function(res) { if (res.error) { container.innerHTML = '<p>加载失败</p>'; return; } var data = res.data || []; document.getElementById('adminTutCount').textContent = data.length; if (data.length === 0) { container.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center;">暂无教程</p>'; return; } container.innerHTML = data.map(function(t) { return '<div class="admin-card-item">' + '<div class="info"><div class="title">' + escapeHTML(t.title) + '</div>' + '<div class="meta"><span>' + escapeHTML(t.category) + '</span><span>' + timeAgo(t.created_at) + '</span><span>❤️ ' + (t.likes || 0) + '</span></div>' + '<div class="preview">' + escapeHTML((t.summary || t.content || '').slice(0, 80)) + '...</div></div>' + '<div class="actions"><button class="btn btn-danger admin-delete" data-type="tutorial" data-id="' + t.id + '">删除</button></div></div>'; }).join(''); container.querySelectorAll('.admin-delete').forEach(function(btn) { btn.addEventListener('click', function() { var type = this.dataset.type; var id = this.dataset.id; if (confirm('确定要删除这个' + (type === 'tutorial' ? '教程' : '问题') + '吗？')) { supabaseClient.from(type + 's').delete().eq('id', id).then(function(res) { if (res.error) { toast('删除失败:' + res.error.message, 'error'); } else { toast('删除成功', 'success'); renderAdmin(); renderTutorials(); renderQuestions(); } }).catch(function() { toast('删除异常', 'warning'); }); } }); }); }).catch(function() { container.innerHTML = '<p>加载失败</p>'; }); } else { Promise.all([ supabaseClient.from('questions').select('*').order('created_at', { ascending: false }), supabaseClient.from('answers').select('*') ]).then(function(reses) { var qRes = reses[0], aRes = reses[1]; if (qRes.error) { container.innerHTML = '<p>加载失败</p>'; return; } var qData = qRes.data || []; var aData = aRes.error ? [] : aRes.data || []; document.getElementById('adminQCount').textContent = qData.length; document.getElementById('adminACount').textContent = aData.length; if (qData.length === 0) { container.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center;">暂无问题</p>'; return; } container.innerHTML = qData.map(function(q) { var answerCount = aData.filter(function(a) { return a.question_id === q.id; }).length; return '<div class="admin-card-item">' + '<div class="info"><div class="title">' + escapeHTML(q.title) + '</div>' + '<div class="meta"><span>' + escapeHTML(q.category) + '</span><span>' + timeAgo(q.created_at) + '</span><span>👍 ' + (q.votes || 0) + '</span><span>💬 ' + answerCount + '</span></div>' + '<div class="preview">' + escapeHTML((q.body || '').slice(0, 80)) + '...</div></div>' + '<div class="actions"><button class="btn btn-danger admin-delete" data-type="question" data-id="' + q.id + '">删除</button></div></div>'; }).join(''); container.querySelectorAll('.admin-delete').forEach(function(btn) { btn.addEventListener('click', function() { var type = this.dataset.type; var id = this.dataset.id; if (confirm('确定要删除这个' + (type === 'tutorial' ? '教程' : '问题') + '及其所有回答吗？')) { if (type === 'question') { supabaseClient.from('answers').delete().eq('question_id', id).then(function() { supabaseClient.from('questions').delete().eq('id', id).then(function(res) { if (res.error) { toast('删除失败:' + res.error.message, 'error'); } else { toast('删除成功', 'success'); renderAdmin(); renderTutorials(); renderQuestions(); } }).catch(function() { toast('删除异常', 'warning'); }); }).catch(function() { toast('删除异常', 'warning'); }); } } }); }); }).catch(function() { container.innerHTML = '<p>加载失败</p>'; }); } }
-document.getElementById('adminLoginNav').addEventListener('click', function(e) { e.preventDefault(); if (isAdmin) { App.goAdmin(); } else { document.getElementById('adminModal').classList.add('open'); document.getElementById('adminPassword').value = ''; } });
-document.getElementById('adminModalClose').addEventListener('click', function() { document.getElementById('adminModal').classList.remove('open'); });
-document.getElementById('adminCancel').addEventListener('click', function() { document.getElementById('adminModal').classList.remove('open'); });
-document.getElementById('adminLoginBtn').addEventListener('click', function() { var pwd = document.getElementById('adminPassword').value.trim(); if (pwd === 'qbx12164811..') { isAdmin = true; localStorage.setItem('lezhe_admin', 'true'); toast('管理员登录成功', 'success'); document.getElementById('adminModal').classList.remove('open'); document.getElementById('adminLoginNav').style.display = 'inline-flex'; document.getElementById('adminLoginNav').innerHTML = '<i class="fas fa-user-shield"></i> 管理后台'; App.goAdmin(); } else { toast('密码错误', 'error'); } });
-document.getElementById('adminLogoutBtn').addEventListener('click', function() { if (confirm('确定要退出管理后台吗？')) { isAdmin = false; localStorage.removeItem('lezhe_admin'); document.getElementById('adminLoginNav').style.display = 'none'; toast('已退出管理', 'success'); App.goHome(); } });
-document.querySelectorAll('.admin-tabs button').forEach(function(btn) { btn.addEventListener('click', function() { document.querySelectorAll('.admin-tabs button').forEach(function(b) { b.classList.remove('active'); }); this.classList.add('active'); adminTab = this.dataset.tab; renderAdmin(); }); });
+function renderAdmin() {
+    if (!isAdmin) return;
+    var container = document.getElementById('adminContent');
+    if (adminTab === 'tutorials') {
+        supabaseClient.from('tutorials').select('*').order('created_at', { ascending: false }).then(function(res) {
+            if (res.error) { container.innerHTML = '<p>加载失败</p>'; return; }
+            var data = res.data || [];
+            document.getElementById('adminTutCount').textContent = data.length;
+            if (data.length === 0) { container.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center;">暂无教程</p>'; return; }
+            container.innerHTML = data.map(function(t) {
+                return '<div class="admin-card-item">' +
+                    '<div class="info"><div class="title">' + escapeHTML(t.title) + '</div>' +
+                    '<div class="meta"><span>' + escapeHTML(t.category) + '</span><span>' + timeAgo(t.created_at) + '</span><span>❤️ ' + (t.likes || 0) + '</span></div>' +
+                    '<div class="preview">' + escapeHTML((t.summary || t.content || '').slice(0, 80)) + '...</div></div>' +
+                    '<div class="actions"><button class="btn btn-danger admin-delete" data-type="tutorial" data-id="' + t.id + '">删除</button></div></div>';
+            }).join('');
+            container.querySelectorAll('.admin-delete').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var type = this.dataset.type;
+                    var id = this.dataset.id;
+                    if (confirm('确定要删除这个' + (type === 'tutorial' ? '教程' : '问题') + '吗？')) {
+                        supabaseClient.from(type + 's').delete().eq('id', id).then(function(res) {
+                            if (res.error) { toast('删除失败:' + res.error.message, 'error'); } else { toast('删除成功', 'success'); renderAdmin(); renderTutorials(); renderQuestions(); }
+                        }).catch(function() { toast('删除异常', 'warning'); });
+                    }
+                });
+            });
+        }).catch(function() { container.innerHTML = '<p>加载失败</p>'; });
+    } else if (adminTab === 'questions') {
+        Promise.all([supabaseClient.from('questions').select('*').order('created_at', { ascending: false }), supabaseClient.from('answers').select('*')]).then(function(reses) {
+            var qRes = reses[0], aRes = reses[1];
+            if (qRes.error) { container.innerHTML = '<p>加载失败</p>'; return; }
+            var qData = qRes.data || [];
+            var aData = aRes.error ? [] : aRes.data || [];
+            document.getElementById('adminQCount').textContent = qData.length;
+            document.getElementById('adminACount').textContent = aData.length;
+            if (qData.length === 0) { container.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center;">暂无问题</p>'; return; }
+            container.innerHTML = qData.map(function(q) {
+                var answerCount = aData.filter(function(a) { return a.question_id === q.id; }).length;
+                return '<div class="admin-card-item">' +
+                    '<div class="info"><div class="title">' + escapeHTML(q.title) + '</div>' +
+                    '<div class="meta"><span>' + escapeHTML(q.category) + '</span><span>' + timeAgo(q.created_at) + '</span><span>👍 ' + (q.votes || 0) + '</span><span>💬 ' + answerCount + '</span></div>' +
+                    '<div class="preview">' + escapeHTML((q.body || '').slice(0, 80)) + '...</div></div>' +
+                    '<div class="actions"><button class="btn btn-danger admin-delete" data-type="question" data-id="' + q.id + '">删除</button></div></div>';
+            }).join('');
+            container.querySelectorAll('.admin-delete').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var type = this.dataset.type;
+                    var id = this.dataset.id;
+                    if (confirm('确定要删除这个' + (type === 'tutorial' ? '教程' : '问题') + '及其所有回答吗？')) {
+                        if (type === 'question') {
+                            supabaseClient.from('answers').delete().eq('question_id', id).then(function() {
+                                supabaseClient.from('questions').delete().eq('id', id).then(function(res) {
+                                    if (res.error) { toast('删除失败:' + res.error.message, 'error'); } else { toast('删除成功', 'success'); renderAdmin(); renderTutorials(); renderQuestions(); }
+                                }).catch(function() { toast('删除异常', 'warning'); });
+                            }).catch(function() { toast('删除异常', 'warning'); });
+                        }
+                    }
+                });
+            });
+        }).catch(function() { container.innerHTML = '<p>加载失败</p>'; });
+    } else if (adminTab === 'submissions') {
+        supabaseClient.from('software_submissions').select('*').eq('status', 'pending').order('created_at', { ascending: false }).then(function(res) {
+            if (res.error) { container.innerHTML = '<p>加载失败</p>'; return; }
+            var data = res.data || [];
+            if (data.length === 0) { container.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center;">🎉 暂无待审核的软件</p>'; return; }
+            container.innerHTML = data.map(function(item) {
+                return '<div class="admin-card-item" data-id="' + item.id + '">' +
+                    '<div class="info"><div class="title">' + escapeHTML(item.name) + '</div>' +
+                    '<div class="meta"><span>' + escapeHTML(item.category) + '</span><span>' + timeAgo(item.created_at) + '</span><span>📧 ' + escapeHTML(item.contact || '无') + '</span></div>' +
+                    '<div class="preview">' + escapeHTML((item.description || '').slice(0, 60)) + '...</div></div>' +
+                    '<div class="actions"><button class="btn btn-primary admin-approve" data-id="' + item.id + '">✅ 批准</button><button class="btn btn-danger admin-reject" data-id="' + item.id + '">❌ 拒绝</button></div></div>';
+            }).join('');
+            container.querySelectorAll('.admin-approve').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var id = this.dataset.id;
+                    if (!confirm('确认批准该软件上架吗？')) return;
+                    var item = data.find(function(d) { return d.id === id; });
+                    if (!item) return;
+                    supabaseClient.from('software').insert([{ name: item.name, category: item.category, version: item.version || '1.0', description: item.description || '', platforms: item.platforms || [], download_url: item.download_url || '', icon_url: item.icon_url || '', size: '—', views: 0, downloads: 0, recommend: false, created_at: new Date().toISOString() }]).then(function(insertRes) {
+                        if (insertRes.error) { toast('批准失败: ' + insertRes.error.message, 'error'); return; }
+                        supabaseClient.from('software_submissions').update({ status: 'approved' }).eq('id', id).then(function(updateRes) {
+                            if (updateRes.error) { toast('状态更新失败，但软件已上架', 'warning'); } else { toast('✅ 软件已成功上架', 'success'); }
+                            renderAdmin();
+                            DB.loadAll(true).then(function() { App.refreshAll(); });
+                        });
+                    }).catch(function(err) { toast('操作异常: ' + err.message, 'error'); });
+                });
+            });
+            container.querySelectorAll('.admin-reject').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var id = this.dataset.id;
+                    if (!confirm('确认拒绝该软件提交吗？')) return;
+                    supabaseClient.from('software_submissions').update({ status: 'rejected' }).eq('id', id).then(function(res) {
+                        if (res.error) { toast('拒绝失败: ' + res.error.message, 'error'); } else { toast('已拒绝该提交', 'success'); renderAdmin(); }
+                    });
+                });
+            });
+        }).catch(function(err) { container.innerHTML = '<p>加载失败: ' + err.message + '</p>'; });
+    }
+}
+document.getElementById('adminLoginNav').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (isAdmin) { App.goAdmin(); } else { toast('您没有管理员权限', 'warning'); }
+});
+document.getElementById('adminLogoutBtn').addEventListener('click', function() {
+    if (confirm('确定要退出管理后台吗？')) {
+        isAdmin = false;
+        localStorage.removeItem('lezhe_admin');
+        document.getElementById('adminLoginNav').style.display = 'none';
+        toast('已退出管理', 'success');
+        App.goHome();
+    }
+});
+document.querySelectorAll('.admin-tabs button').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.admin-tabs button').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        adminTab = this.dataset.tab;
+        renderAdmin();
+    });
+});
 
 var currentPage = 1, PAGE_SIZE = 6, currentFilteredList = [];
 var App = {
@@ -1015,7 +1132,7 @@ var App = {
     platformFilter: 'all',
     _scrollPos: 0,
     init: function() { var self = this; var savedSort = localStorage.getItem('lezhe_sort_by'); if (savedSort && ['date', 'views', 'downloads'].includes(savedSort)) { self.sortBy = savedSort; document.getElementById('sortSelect').value = savedSort; } var cached = getCachedData(); if (cached) { self.refreshAll(); DB.loadAll(true).then(function() { self.refreshAll(); renderRecentHistory(); renderTutorials(); renderQuestions(); }); } else { DB.loadAll().then(function() { self.refreshAll(); renderRecentHistory(); renderTutorials(); renderQuestions(); }); } if (isAdmin) { document.getElementById('adminLoginNav').style.display = 'inline-flex'; document.getElementById('adminLoginNav').innerHTML = '<i class="fas fa-user-shield"></i> 管理后台'; document.getElementById('newTutorialBtn').style.display = 'inline-flex'; } document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.addEventListener('click', function(e) { e.preventDefault(); var page = this.dataset.page; if (page === 'home') self.goHome(); else if (page === 'list') self.goList(); else if (page === 'tutorials') self.goTutorials(); else if (page === 'qa') self.goQA(); }); }); document.querySelectorAll('#mobileBottomNav a').forEach(function(a) { a.addEventListener('click', function(e) { e.preventDefault(); var page = this.dataset.page; if (page === 'home') self.goHome(); else if (page === 'list') self.goList(); else if (page === 'tutorials') self.goTutorials(); else if (page === 'qa') self.goQA(); }); }); var searchInput = document.getElementById('searchInput'), searchBtn = document.getElementById('searchBtn'); if (searchBtn) { searchBtn.addEventListener('click', function() { closeSearchSuggestions(); self.doSearch(searchInput.value.trim()); }); } if (searchInput) { searchInput.addEventListener('keyup', function(e) { if (e.key === 'Enter') { closeSearchSuggestions(); self.doSearch(this.value.trim()); } showSuggestions(this.value.trim()); }); } var sidebarSearchInput = document.getElementById('sidebarSearchInput'), sidebarSearchBtn = document.getElementById('sidebarSearchBtn'); if (sidebarSearchBtn) { sidebarSearchBtn.addEventListener('click', function() { closeSearchSuggestions(); self.doSearch(sidebarSearchInput.value.trim()); }); } if (sidebarSearchInput) { sidebarSearchInput.addEventListener('keyup', function(e) { if (e.key === 'Enter') { closeSearchSuggestions(); self.doSearch(this.value.trim()); } }); } document.getElementById('logoHome').addEventListener('click', function(e) { e.preventDefault(); self.goHome(); }); document.getElementById('mobileToggle').addEventListener('click', function() { document.getElementById('navLinks').classList.toggle('open'); }); document.getElementById('prevPageBtn').addEventListener('click', function() { if (currentPage > 1) { currentPage--; self.renderListPage(); } }); document.getElementById('nextPageBtn').addEventListener('click', function() { var total = Math.ceil(currentFilteredList.length / PAGE_SIZE); if (currentPage < total) { currentPage++; self.renderListPage(); } }); document.getElementById('sortSelect').addEventListener('change', function() { self.sortBy = this.value; localStorage.setItem('lezhe_sort_by', self.sortBy); currentPage = 1; self.refreshListWithFilters(); }); document.getElementById('jumpPageBtn').addEventListener('click', function() { var p = parseInt(document.getElementById('jumpPageInput').value); var total = Math.ceil(currentFilteredList.length / PAGE_SIZE); if (p >= 1 && p <= total) { currentPage = p; self.renderListPage(); } }); document.getElementById('jumpPageInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('jumpPageBtn').click(); } }); document.getElementById('platformFilter').addEventListener('change', function() { self.platformFilter = this.value; currentPage = 1; self.refreshListWithFilters(); }); document.getElementById('resetFiltersBtn').addEventListener('click', function() { document.getElementById('platformFilter').value = 'all'; self.platformFilter = 'all'; currentPage = 1; self.refreshListWithFilters(); }); var themeToggle = document.getElementById('themeToggle'), headerThemeBtn = document.getElementById('headerThemeBtn'), themeLabel = document.getElementById('themeLabel'); function setTheme(theme) { document.documentElement.setAttribute('data-theme', theme); localStorage.setItem('theme', theme); if (theme === 'dark') { themeLabel.textContent = '黑夜'; headerThemeBtn.innerHTML = '<i class="fas fa-sun"></i>'; } else { themeLabel.textContent = '白天'; headerThemeBtn.innerHTML = '<i class="fas fa-moon"></i>'; } } var savedTheme = localStorage.getItem('theme') || 'light'; setTheme(savedTheme); themeToggle.addEventListener('click', function() { var current = document.documentElement.getAttribute('data-theme'); setTheme(current === 'dark' ? 'light' : 'dark'); }); headerThemeBtn.addEventListener('click', function() { var current = document.documentElement.getAttribute('data-theme'); setTheme(current === 'dark' ? 'light' : 'dark'); }); var wechatContact = document.getElementById('wechatContact'); if (wechatContact) { wechatContact.addEventListener('click', function() { var wechatId = 'Win_Mac_123'; if (navigator.clipboard) { navigator.clipboard.writeText(wechatId).then(function() { toast('已复制微信号: ' + wechatId, 'success'); }); } else { var input = document.createElement('input'); input.value = wechatId; document.body.appendChild(input); input.select(); document.execCommand('copy'); document.body.removeChild(input); toast('已复制微信号: ' + wechatId, 'success'); } }); } document.getElementById('newQuestionBtn').addEventListener('click', function() { document.getElementById('questionModal').classList.add('open'); }); document.getElementById('newTutorialBtn').addEventListener('click', function() { if (!isAdmin) { toast('请先登录管理', 'warning'); return; } document.getElementById('tutorialModal').classList.add('open'); }); document.getElementById('tutorialModalClose').addEventListener('click', function() { document.getElementById('tutorialModal').classList.remove('open'); }); document.getElementById('tutCancel').addEventListener('click', function() { document.getElementById('tutorialModal').classList.remove('open'); }); document.getElementById('tutSubmit').addEventListener('click', function() { var title = document.getElementById('tutTitle').value.trim(); var summary = document.getElementById('tutSummary').value.trim(); var category = document.getElementById('tutCategory').value; var content = document.getElementById('tutContent').value.trim(); var cover = document.getElementById('tutCover').value.trim(); var videosRaw = document.getElementById('tutVideos').value.trim(); var videos = videosRaw ? videosRaw.split(',').map(function(v) { return v.trim(); }).filter(Boolean) : []; if (!title || !content) { toast('标题和内容不能为空', 'warning'); return; } supabaseClient.from('tutorials').insert([{ title: title, summary: summary, category: category, content: content, cover: cover, videos: videos, likes: 0 }]).then(function(res) { if (res.error) { console.error('发布教程错误:', res.error); if (res.error.message && res.error.message.includes('does not exist')) { toast('❌ 教程表不存在，请先创建 tutorials 表', 'error'); } else { toast('发布失败: ' + res.error.message, 'error'); } } else { toast('教程发布成功！', 'success'); document.getElementById('tutorialModal').classList.remove('open'); renderTutorials(); } }).catch(function(err) { toast('发布异常: ' + err.message, 'error'); }); }); document.getElementById('questionModalClose').addEventListener('click', function() { document.getElementById('questionModal').classList.remove('open'); }); document.getElementById('qCancel').addEventListener('click', function() { document.getElementById('questionModal').classList.remove('open'); }); document.getElementById('qSubmit').addEventListener('click', function() { var title = document.getElementById('qTitle').value.trim(); var body = document.getElementById('qBody').value.trim(); var category = document.getElementById('qCategory').value; if (!title || !body) { toast('标题和描述不能为空', 'warning'); return; } supabaseClient.from('questions').insert([{ title: title, body: body, category: category, answers_count: 0, votes: 0 }]).then(function(res) { if (res.error) { console.error('提交问题错误:', res.error); if (res.error.message && res.error.message.includes('does not exist')) { toast('❌ 问答表不存在，请先创建 questions 表', 'error'); } else { toast('提问失败: ' + res.error.message, 'error'); } } else { toast('问题提交成功！', 'success'); document.getElementById('questionModal').classList.remove('open'); renderQuestions(); } }).catch(function(err) { toast('提交异常: ' + err.message, 'error'); }); }); document.getElementById('answerModalClose').addEventListener('click', function() { document.getElementById('answerModal').classList.remove('open'); }); document.getElementById('aCancel').addEventListener('click', function() { document.getElementById('answerModal').classList.remove('open'); }); document.getElementById('aSubmit').addEventListener('click', function() { var qid = this.dataset.qid; var body = document.getElementById('aBody').value.trim(); if (!body) { toast('请填写回答内容', 'warning'); return; } supabaseClient.from('answers').insert([{ question_id: qid, body: body, votes: 0 }]).then(function(res) { if (res.error) { console.error('提交回答错误:', res.error); if (res.error.message && res.error.message.includes('does not exist')) { toast('❌ 回答表不存在，请先创建 answers 表', 'error'); } else { toast('回答失败: ' + res.error.message, 'error'); } } else { toast('回答成功！', 'success'); document.getElementById('answerModal').classList.remove('open'); loadAnswers(qid); supabaseClient.from('questions').select('answers_count').eq('id', qid).single().then(function(res) { if (!res.error) { var count = (res.data ? +res.data.answers_count : 0) + 1; supabaseClient.from('questions').update({ answers_count: count }).eq('id', qid).then(function() { renderQuestions(); }).catch(function() { }); } }); } }).catch(function(err) { toast('回答提交异常: ' + err.message, 'error'); }); }); document.getElementById('submitSoftwareModalClose').addEventListener('click', function() { document.getElementById('submitSoftwareModal').classList.remove('open'); }); document.getElementById('subCancel').addEventListener('click', function() { document.getElementById('submitSoftwareModal').classList.remove('open'); }); document.getElementById('subSubmit').addEventListener('click', function() { var name = document.getElementById('subName').value.trim(); var category = document.getElementById('subCategory').value; var version = document.getElementById('subVersion').value.trim(); var desc = document.getElementById('subDesc').value.trim(); var platforms = document.getElementById('subPlatforms').value.split(',').map(function(p) { return p.trim(); }).filter(Boolean); var downloadUrl = document.getElementById('subDownloadUrl').value.trim(); var iconUrl = document.getElementById('subIconUrl').value.trim(); var contact = document.getElementById('subContact').value.trim(); if (!name || !downloadUrl) { toast('软件名称和下载链接为必填', 'warning'); return; } supabaseClient.from('software_submissions').insert([{ name: name, category: category, version: version, description: desc, platforms: platforms, download_url: downloadUrl, icon_url: iconUrl, contact: contact, status: 'pending' }]).then(function(res) { if (res.error) { console.error('提交软件错误:', res.error); if (res.error.message && res.error.message.includes('does not exist')) { toast('❌ 提交表不存在，请先创建 software_submissions 表', 'error'); } else { toast('提交失败: ' + res.error.message, 'error'); } } else { toast('提交成功！等待审核', 'success'); document.getElementById('submitSoftwareModal').classList.remove('open'); } }).catch(function(err) { toast('提交异常: ' + err.message, 'error'); }); }); window.addEventListener('popstate', function(e) { if (e.state && e.state.softId) { var soft = cache.software.find(function(s) { return s.id === e.state.softId; }); if (soft) { renderDetailView(soft); document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageList').classList.add('hidden'); document.getElementById('pageTutorials').classList.add('hidden'); document.getElementById('pageQA').classList.add('hidden'); document.getElementById('pageAdmin').classList.add('hidden'); document.getElementById('pageDetail').classList.remove('hidden'); } } else { self.goHome(); } }); var currentUrlParams = new URLSearchParams(window.location.search); var softId = currentUrlParams.get('soft'); if (softId) { var soft = cache.software.find(function(s) { return s.id === softId; }); if (soft) { setTimeout(function() { renderDetailView(soft); document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageList').classList.add('hidden'); document.getElementById('pageTutorials').classList.add('hidden'); document.getElementById('pageQA').classList.add('hidden'); document.getElementById('pageAdmin').classList.add('hidden'); document.getElementById('pageDetail').classList.remove('hidden'); }, 300); } } document.getElementById('detailBackBtn').addEventListener('click', function() { App.goHome(); }); document.addEventListener('click', function(e) { var searchWrapper = document.querySelector('.search-wrapper'); var searchInputEl = document.getElementById('searchInput'); var searchSuggestions = document.getElementById('searchSuggestions'); var searchHistoryEl = document.getElementById('searchHistory'); if (!searchWrapper) return; var target = e.target; if (!searchWrapper.contains(target) && target !== searchInputEl) { closeSearchSuggestions(); } }); loadUser(); },
-    goAdmin: function() { if (!isAdmin) { toast('请先登录管理', 'warning'); return; } closeSearchSuggestions(); this.currentPage = 'admin'; document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageList').classList.add('hidden'); document.getElementById('pageDetail').classList.add('hidden'); document.getElementById('pageTutorials').classList.add('hidden'); document.getElementById('pageQA').classList.add('hidden'); document.getElementById('pageAdmin').classList.remove('hidden'); document.getElementById('pageProfile').classList.add('hidden'); document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); }); document.querySelectorAll('.nav-links a').forEach(function(a) { a.classList.remove('active'); }); document.getElementById('adminLoginNav').classList.add('active'); document.getElementById('navLinks').classList.remove('open'); if (isMobile() && isOpen) closeSidebar(); renderAdmin(); },
+    goAdmin: function() { if (!isAdmin) { toast('您没有管理员权限', 'warning'); return; } closeSearchSuggestions(); this.currentPage = 'admin'; document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageList').classList.add('hidden'); document.getElementById('pageDetail').classList.add('hidden'); document.getElementById('pageTutorials').classList.add('hidden'); document.getElementById('pageQA').classList.add('hidden'); document.getElementById('pageAdmin').classList.remove('hidden'); document.getElementById('pageProfile').classList.add('hidden'); document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); }); document.querySelectorAll('.nav-links a').forEach(function(a) { a.classList.remove('active'); }); document.getElementById('adminLoginNav').classList.add('active'); document.getElementById('navLinks').classList.remove('open'); if (isMobile() && isOpen) closeSidebar(); renderAdmin(); },
     goHome: function() { closeSearchSuggestions(); this.currentPage = 'home'; this.currentCategory = 'all'; this.searchKeyword = ''; document.getElementById('pageHome').classList.remove('hidden'); document.getElementById('pageList').classList.add('hidden'); document.getElementById('pageDetail').classList.add('hidden'); document.getElementById('pageTutorials').classList.add('hidden'); document.getElementById('pageQA').classList.add('hidden'); document.getElementById('pageAdmin').classList.add('hidden'); document.getElementById('pageProfile').classList.add('hidden'); document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); }); document.querySelector('.nav-links a[data-page="home"]').classList.add('active'); document.getElementById('navLinks').classList.remove('open'); this.refreshHome(); renderRecentHistory(); document.querySelectorAll('#mobileBottomNav a').forEach(function(a) { a.classList.remove('active'); }); document.querySelector('#mobileBottomNav a[data-page="home"]').classList.add('active'); this.updateSidebarHighlight(null); document.getElementById('sidebarSearchWrapper').classList.remove('active'); document.getElementById('sidebarStats').style.display = 'block'; document.getElementById('filterTags').querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); if (b.dataset.cat === 'all') b.classList.add('active'); }); if (isMobile() && isOpen) closeSidebar(); window.history.pushState(null, '', window.location.pathname); },
     goList: function(cat) { closeSearchSuggestions(); cat = cat || 'all'; this.currentPage = 'list'; this.currentCategory = cat; document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageList').classList.remove('hidden'); document.getElementById('pageDetail').classList.add('hidden'); document.getElementById('pageTutorials').classList.add('hidden'); document.getElementById('pageQA').classList.add('hidden'); document.getElementById('pageAdmin').classList.add('hidden'); document.getElementById('pageProfile').classList.add('hidden'); document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); }); document.querySelector('.nav-links a[data-page="list"]').classList.add('active'); document.getElementById('navLinks').classList.remove('open'); currentPage = 1; this.refreshList(); document.querySelectorAll('#mobileBottomNav a').forEach(function(a) { a.classList.remove('active'); }); document.querySelector('#mobileBottomNav a[data-page="list"]').classList.add('active'); this.updateSidebarHighlight(cat === 'all' ? null : cat); document.getElementById('sidebarSearchWrapper').classList.add('active'); document.getElementById('sidebarStats').style.display = 'none'; if (isMobile() && isOpen) closeSidebar(); document.getElementById('filterTags').querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); if (b.dataset.cat === cat) b.classList.add('active'); }); if (cat === 'all') { document.getElementById('filterTags').querySelector('button[data-cat="all"]').classList.add('active'); } window.history.pushState(null, '', window.location.pathname + '?cat=' + cat); },
     goTutorials: function() { closeSearchSuggestions(); this.currentPage = 'tutorials'; document.getElementById('pageHome').classList.add('hidden'); document.getElementById('pageList').classList.add('hidden'); document.getElementById('pageDetail').classList.add('hidden'); document.getElementById('pageTutorials').classList.remove('hidden'); document.getElementById('pageQA').classList.add('hidden'); document.getElementById('pageAdmin').classList.add('hidden'); document.getElementById('pageProfile').classList.add('hidden'); document.querySelectorAll('.nav-links a[data-page]').forEach(function(a) { a.classList.remove('active'); }); document.querySelector('.nav-links a[data-page="tutorials"]').classList.add('active'); document.getElementById('navLinks').classList.remove('open'); document.querySelectorAll('#mobileBottomNav a').forEach(function(a) { a.classList.remove('active'); }); document.querySelector('#mobileBottomNav a[data-page="tutorials"]').classList.add('active'); if (isMobile() && isOpen) closeSidebar(); renderTutorials(); },
@@ -1062,15 +1179,39 @@ async function loadUser() {
         if (user) {
             currentUser = user;
             await loadProfile(user.id);
+            const { data: profileData, error: profileError } = await supabaseClient.from('profiles').select('is_admin').eq('id', user.id).maybeSingle();
+            if (!profileError && profileData) {
+                isAdmin = profileData.is_admin === true;
+                const adminNav = document.getElementById('adminLoginNav');
+                if (adminNav) {
+                    if (isAdmin) {
+                        adminNav.style.display = 'inline-flex';
+                        adminNav.innerHTML = '<i class="fas fa-user-shield"></i> 管理后台';
+                        document.getElementById('newTutorialBtn').style.display = 'inline-flex';
+                    } else {
+                        adminNav.style.display = 'none';
+                        document.getElementById('newTutorialBtn').style.display = 'none';
+                    }
+                }
+                if (App.currentPage === 'admin' && !isAdmin) {
+                    App.goHome();
+                    toast('您没有管理员权限', 'warning');
+                }
+            }
             updateUIForLoggedIn(user);
         } else {
             currentUser = null;
             userProfile = null;
+            isAdmin = false;
             updateUIForLoggedOut();
+            const adminNav = document.getElementById('adminLoginNav');
+            if (adminNav) adminNav.style.display = 'none';
+            document.getElementById('newTutorialBtn').style.display = 'none';
         }
     } catch (e) {
         currentUser = null;
         userProfile = null;
+        isAdmin = false;
         updateUIForLoggedOut();
     }
 }
@@ -1078,11 +1219,7 @@ async function loadUser() {
 async function loadProfile(userId) {
     if (!userId) return;
     const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', userId).maybeSingle();
-    if (error) {
-        console.warn('加载profile失败:', error);
-        userProfile = null;
-        return;
-    }
+    if (error) { console.warn('加载profile失败:', error); userProfile = null; return; }
     userProfile = data || null;
 }
 
@@ -1374,7 +1511,7 @@ function renderProfile() {
     var displayName = getDisplayName();
     var bio = userProfile?.bio || '';
 
-    container.innerHTML = '\n                <div style="display:flex;flex-direction:column;gap:16px;">\n                    <div style="display:flex;align-items:center;gap:20px;padding:24px;background:var(--bg-card);border-radius:var(--radius-lg);border:1px solid var(--border-glow);flex-wrap:wrap;">\n                        <div style="width:72px;height:72px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.2rem;font-weight:700;flex-shrink:0;overflow:hidden;">\n                            ' + (avatarUrl ? '<img src="' + avatarUrl + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent=\'' + currentUser.email[0].toUpperCase() + '\'">' : currentUser.email[0].toUpperCase()) + '\n                        </div>\n                        <div style="flex:1;min-width:160px;">\n                            <h3 style="font-size:1.15rem;word-break:break-all;margin:0 0 2px;">' + escapeHTML(displayName) + '</h3>\n                            <p style="color:var(--text-secondary);font-size:0.8rem;margin:0;">' + escapeHTML(currentUser.email) + '</p>\n                            ' + (bio ? '<p style="color:var(--text-dim);font-size:0.85rem;margin:4px 0 0;">' + escapeHTML(bio) + '</p>' : '') + '\n                            <p style="color:var(--text-dim);font-size:0.7rem;margin:4px 0 0;">注册于 ' + new Date(currentUser.created_at).toLocaleString() + '</p>\n                        </div>\n                        <div style="display:flex;flex-direction:column;gap:6px;">\n                            <button class="btn btn-outline" id="editProfileBtn" style="font-size:0.75rem;padding:6px 14px;"><i class="fas fa-edit"></i> 编辑资料</button>\n                            <button class="btn btn-outline" id="changePasswordNavBtn" style="font-size:0.75rem;padding:6px 14px;"><i class="fas fa-key"></i> 修改密码</button>\n                        </div>\n                    </div>\n                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-glow);text-align:center;">\n                            <div style="font-size:1.8rem;font-weight:700;color:var(--accent-cyan);">' + favSoft.length + '</div>\n                            <div style="font-size:0.75rem;color:var(--text-dim);">收藏</div>\n                        </div>\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-glow);text-align:center;">\n                            <div style="font-size:1.8rem;font-weight:700;color:var(--accent-cyan);">' + histSoft.length + '</div>\n                            <div style="font-size:0.75rem;color:var(--text-dim);">浏览记录</div>\n                        </div>\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-glow);text-align:center;">\n                            <div style="font-size:1.8rem;font-weight:700;color:var(--accent-cyan);">' + totalDownloads + '</div>\n                            <div style="font-size:0.75rem;color:var(--text-dim);">总下载</div>\n                        </div>\n                    </div>\n                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-glow);">\n                            <h4 style="font-size:0.9rem;margin:0 0 8px;"><i class="fas fa-heart" style="color:var(--danger);"></i> 我的收藏</h4>\n                            <div style="max-height:220px;overflow-y:auto;font-size:0.85rem;">\n                                ' + (favSoft.length ? favSoft.map(function(s) { return '<div style="padding:5px 0;border-bottom:1px solid var(--border-glow);"><a href="#" data-id="' + s.id + '" class="profile-link" style="color:var(--accent-cyan);text-decoration:none;">' + s.name + '</a></div>'; }).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;margin:0;">还没有收藏的软件</p>') + '\n                            </div>\n                        </div>\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-glow);">\n                            <h4 style="font-size:0.9rem;margin:0 0 8px;"><i class="fas fa-history"></i> 浏览历史</h4>\n                            <div style="max-height:220px;overflow-y:auto;font-size:0.85rem;">\n                                ' + (histSoft.length ? histSoft.map(function(s) { return '<div style="padding:5px 0;border-bottom:1px solid var(--border-glow);"><a href="#" data-id="' + s.id + '" class="profile-link" style="color:var(--accent-cyan);text-decoration:none;">' + s.name + '</a></div>'; }).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;margin:0;">暂无浏览记录</p>') + '\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            ';
+    container.innerHTML = '\n                <div style="display:flex;flex-direction:column;gap:16px;">\n                    <div style="display:flex;align-items:center;gap:20px;padding:24px;background:var(--bg-card);border-radius:var(--radius-lg);border:1px solid var(--border-glow);flex-wrap:wrap;">\n                        <div style="width:72px;height:72px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.2rem;font-weight:700;flex-shrink:0;overflow:hidden;">\n                            ' + (avatarUrl ? '<img src="' + avatarUrl + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.textContent=\'' + currentUser.email[0].toUpperCase() + '\'">' : currentUser.email[0].toUpperCase()) + '\n                        </div>\n                        <div style="flex:1;min-width:160px;">\n                            <h3 style="font-size:1.15rem;word-break:break-all;margin:0 0 2px;">' + escapeHTML(displayName) + '</h3>\n                            <p style="color:var(--text-secondary);font-size:0.8rem;margin:0;">' + escapeHTML(currentUser.email) + '</p>\n                            ' + (bio ? '<p style="color:var(--text-dim);font-size:0.85rem;margin:4px 0 0;">' + escapeHTML(bio) + '</p>' : '') + '\n                            <p style="color:var(--text-dim);font-size:0.7rem;margin:4px 0 0;">注册于 ' + new Date(currentUser.created_at).toLocaleString() + '</p>\n                        </div>\n                        <div style="display:flex;flex-direction:column;gap:6px;">\n                            <button class="btn btn-outline" id="editProfileBtn" style="font-size:0.75rem;padding:6px 14px;"><i class="fas fa-edit"></i> 编辑资料</button>\n                            <button class="btn btn-outline" id="changePasswordNavBtn" style="font-size:0.75rem;padding:6px 14px;"><i class="fas fa-key"></i> 修改密码</button>\n                        </div>\n                    </div>\n                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-glow);text-align:center;">\n                            <div style="font-size:1.8rem;font-weight:700;color:var(--accent-cyan);">' + favSoft.length + '</div>\n                            <div style="font-size:0.75rem;color:var(--text-dim);">收藏</div>\n                        </div>\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-glow);text-align:center;">\n                            <div style="font-size:1.8rem;font-weight:700;color:var(--accent-cyan);">' + histSoft.length + '</div>\n                            <div style="font-size:0.75rem;color:var(--text-dim);">浏览记录</div>\n                        </div>\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-glow);text-align:center;">\n                            <div style="font-size:1.8rem;font-weight:700;color:var(--accent-cyan);">' + totalDownloads + '</div>\n                            <div style="font-size:0.75rem;color:var(--text-dim);">总下载</div>\n                        </div>\n                    </div>\n                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-glow);">\n                            <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 8px;">\n                                <h4 style="font-size:0.9rem;margin:0;"><i class="fas fa-heart" style="color:var(--danger);"></i> 我的收藏</h4>\n                            </div>\n                            <div style="max-height:220px;overflow-y:auto;font-size:0.85rem;">\n                                ' + (favSoft.length ? favSoft.map(function(s) { return '<div style="padding:5px 0;border-bottom:1px solid var(--border-glow);"><a href="#" data-id="' + s.id + '" class="profile-link" style="color:var(--accent-cyan);text-decoration:none;">' + s.name + '</a></div>'; }).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;margin:0;">还没有收藏的软件</p>') + '\n                            </div>\n                        </div>\n                        <div style="background:var(--bg-card);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-glow);">\n                            <div style="display:flex;justify-content:space-between;align-items:center;margin:0 0 8px;">\n                                <h4 style="font-size:0.9rem;margin:0;"><i class="fas fa-history"></i> 浏览历史</h4>\n                                <button class="btn btn-sm btn-outline" id="clearHistoryBtn" style="font-size:0.65rem;padding:2px 10px;color:var(--danger);border-color:var(--danger);">清空</button>\n                            </div>\n                            <div style="max-height:220px;overflow-y:auto;font-size:0.85rem;">\n                                ' + (histSoft.length ? histSoft.map(function(s) { return '<div style="padding:5px 0;border-bottom:1px solid var(--border-glow);"><a href="#" data-id="' + s.id + '" class="profile-link" style="color:var(--accent-cyan);text-decoration:none;">' + s.name + '</a></div>'; }).join('') : '<p style="color:var(--text-dim);font-size:0.8rem;margin:0;">暂无浏览记录</p>') + '\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            ';
 
     document.querySelectorAll('.profile-link').forEach(function(a) {
         a.addEventListener('click', function(e) {
@@ -1399,6 +1536,15 @@ function renderProfile() {
         document.getElementById('oldPassword').value = '';
         document.getElementById('newPassword').value = '';
         document.getElementById('newPasswordConfirm').value = '';
+    });
+
+    document.getElementById('clearHistoryBtn')?.addEventListener('click', function() {
+        if (confirm('确定要清空所有浏览历史吗？')) {
+            localStorage.setItem('lezhe_view_history', JSON.stringify([]));
+            renderProfile();
+            renderRecentHistory();
+            toast('浏览历史已清空', 'success');
+        }
     });
 }
 
@@ -1533,27 +1679,25 @@ document.getElementById('showUserAgreement')?.addEventListener('click', function
     e.preventDefault();
     document.getElementById('agreementModalTitle').textContent = '📄 用户协议';
     document.getElementById('agreementModalBody').textContent = agreementTexts.user;
-    document.getElementById('agreementModal').classList.remove('hidden');
+    document.getElementById('agreementModal').classList.add('open');
 });
 document.getElementById('showPrivacyPolicy')?.addEventListener('click', function(e) {
     e.preventDefault();
     document.getElementById('agreementModalTitle').textContent = '📄 隐私政策';
     document.getElementById('agreementModalBody').textContent = agreementTexts.privacy;
-    document.getElementById('agreementModal').classList.remove('hidden');
+    document.getElementById('agreementModal').classList.add('open');
 });
 document.getElementById('agreementModalClose')?.addEventListener('click', function() {
-    document.getElementById('agreementModal').classList.add('hidden');
+    document.getElementById('agreementModal').classList.remove('open');
 });
 document.getElementById('agreementModalCloseBtn')?.addEventListener('click', function() {
-    document.getElementById('agreementModal').classList.add('hidden');
+    document.getElementById('agreementModal').classList.remove('open');
 });
 document.getElementById('agreementModal')?.addEventListener('click', function(e) {
-    if (e.target === this) this.classList.add('hidden');
+    if (e.target === this) this.classList.remove('open');
 });
 
 if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', loadUser); } else { loadUser(); }
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1}' crossorigin="anonymous"></script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1}' crossorigin="anonymous"></script>
 </body>
 </html>
