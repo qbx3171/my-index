@@ -621,11 +621,11 @@ var u=s.data&&s.data.session?s.data.session.user:null;
 if(!u){this.showLogin();return;}
 var p=await supabaseClient.from('profiles').select('is_admin').eq('id',u.id).maybeSingle();
 if(p.error||!p.data){
-var ins=await supabaseClient.from('profiles').insert([{id:u.id,is_admin:false}]).select('is_admin').maybeSingle();
+var ins=await supabaseClient.from('profiles').insert([{id:u.id,email:u.email,is_admin:false}]).select('is_admin').maybeSingle();
 if(ins.error){
 await supabaseClient.auth.signOut();
 this.showLogin();
-document.getElementById('loginError').innerHTML='该账号尚未授权管理员。请在 Supabase 执行：<br><code>insert into profiles (id,is_admin) values (\''+u.id+'\',true) on conflict (id) do update set is_admin=true;</code>';
+document.getElementById('loginError').innerHTML='该账号尚未授权管理员。请在 Supabase 执行：<br><code>insert into profiles (id,email,is_admin) values (\''+u.id+'\',\''+(u.email||'')+'\',true) on conflict (id) do update set is_admin=true;</code>';
 return;
 }
 p={data:ins.data};
@@ -668,10 +668,10 @@ er.textContent=m;b.disabled=false;b.textContent='✦ 进入控制台';return;
 var u=r.data.user;
 var p2=await supabaseClient.from('profiles').select('is_admin').eq('id',u.id).maybeSingle();
 if(p2.error||!p2.data){
-var ins=await supabaseClient.from('profiles').insert([{id:u.id,is_admin:false}]).select('is_admin').maybeSingle();
+var ins=await supabaseClient.from('profiles').insert([{id:u.id,email:u.email,is_admin:false}]).select('is_admin').maybeSingle();
 if(ins.error){
 await supabaseClient.auth.signOut();
-er.innerHTML='该账号尚未授权管理员。请在 Supabase 执行：<br><code>insert into profiles (id,is_admin) values (\''+u.id+'\',true) on conflict (id) do update set is_admin=true;</code>';
+er.innerHTML='该账号尚未授权管理员。请在 Supabase 执行：<br><code>insert into profiles (id,email,is_admin) values (\''+u.id+'\',\''+(u.email||'')+'\',true) on conflict (id) do update set is_admin=true;</code>';
 b.disabled=false;b.textContent='✦ 进入控制台';return;
 }
 p2={data:ins.data};
@@ -741,7 +741,7 @@ if(t==='qa'){this.renderQA(m);return;}
 
 renderDash:async function(c){
 c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
-var all=await DB.soft(),cats=await DB.cats(),tuts=await DB.tut(),qs=await DB.q(),ans=await DB.an(),cms=await DB.cm(),subs=await DB.sub();
+var all=await DB.soft(),cats=await DB.cats(),tuts=await DB.tut(),qs=await DB.q(),ans=await DB.an(),cms=await DB.cm(),subs=await DB.sub(),pfs=await DB.pf();
 var drafts=getDrafts();
 var pend=subs.filter(function(s){return s.status==='pending';}).length;
 var total=all.length,dl=0,vw=0,rec=0,cc={};
@@ -761,6 +761,7 @@ var h='<h2 class="page-title">◈ 控制台</h2><p class="page-sub">乐哲软件
 '<div class="stat-card"><div class="num">'+dl+'</div><div class="label">总下载</div></div>'+
 '<div class="stat-card"><div class="num">'+vw+'</div><div class="label">总浏览</div></div>'+
 '<div class="stat-card"><div class="num">'+rec+'</div><div class="label">推荐软件</div></div>'+
+'<div class="stat-card"><div class="num">'+pfs.length+'</div><div class="label">用户数</div></div>'+
 '<div class="stat-card"><div class="num">'+tuts.length+'</div><div class="label">教程数</div></div>'+
 '<div class="stat-card"><div class="num">'+qs.length+'</div><div class="label">问答数</div></div>'+
 '<div class="stat-card"><div class="num">'+ans.length+'</div><div class="label">回答数</div></div>'+
@@ -882,7 +883,7 @@ c.querySelectorAll('.page-btn').forEach(function(b){b.addEventListener('click',f
 _exportCSV:function(d){
 if(!d||d.length===0){toast('没有数据可导出','error');return;}
 var hs=['名称','分类','版本','下载量','浏览数','推荐','日期'];
-var rows=d.map(function(s){return [s.name,s.category,'v'+s.version,s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||''];});
+var rows=d.map(function(s){return [s.name,s.category,'v'+s.version,s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||''];}); 
 var csv=hs.join(',')+'\n'+rows.map(function(r){return r.join(',');}).join('\n');
 var bl=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
 var a=document.createElement('a');
@@ -917,7 +918,10 @@ if(pi.length===0)h+='<tr class="empty-row"><td colspan="8">暂无提交</td></tr
 else{
 for(var i=0;i<pi.length;i++){
 var s=pi[i];
-var plat=(s.platforms||[]).join(', ')||'-';
+var rawPlat=s.platforms;
+if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=rawPlat.split(',').map(function(x){return x.trim();}).filter(Boolean);}}
+if(!Array.isArray(rawPlat))rawPlat=[];
+var plat=rawPlat.length?rawPlat.join(', '):'-';
 var stt=s.status||'pending';
 var stLb=stt==='pending'?'<span class="badge badge-orange">待审核</span>':stt==='approved'?'<span class="badge badge-green">已批准</span>':'<span class="badge badge-red">已拒绝</span>';
 h+='<tr data-id="'+s.id+'">';
@@ -953,7 +957,7 @@ if(sf)sf.addEventListener('change',function(){self._subF=this.value;self._page=1
 var rb=c.querySelector('#subRefreshBtn');
 if(rb)rb.addEventListener('click',function(){DB.sub(true).then(function(d){self._subs=d;self.renderSubs(c);self.refreshSubBadge();toast('已刷新');});});
 c.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(s)App.showSubmission(s);});});
-c.querySelectorAll('.approve-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(!s)return;if(!confirm('确认批准「'+s.name+'」上架？'))return;var soft={name:s.name,category:s.category,version:s.version||'1.0',description:s.description||'',detail:s.detail||'',platforms:s.platforms||[],download_url:s.download_url||'',icon_url:s.icon_url||'',icon:s.icon||'📦',size:s.size||'—',views:0,downloads:0,recommend:false,created_at:new Date().toISOString()};DB.approve(id,soft).then(function(){toast('✅ 已批准上架');DB.addLog('批准提交','软件: '+s.name);self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('批准失败: '+(e.message||'未知错误'),'error');});});});
+c.querySelectorAll('.approve-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(!s)return;if(!confirm('确认批准「'+s.name+'」上架？'))return;var rawPlat=s.platforms;if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=[];}}if(!Array.isArray(rawPlat))rawPlat=[];var soft={name:s.name,category:s.category,version:s.version||'1.0',description:s.description||'',detail:s.detail||'',platforms:rawPlat,download_url:s.download_url||'',icon_url:s.icon_url||'',icon:s.icon||'📦',size:s.size||'—',views:0,downloads:0,recommend:false,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()};DB.approve(id,soft).then(function(){toast('✅ 已批准上架');DB.addLog('批准提交','软件: '+s.name);self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('批准失败: '+(e.message||'未知错误'),'error');});});});
 c.querySelectorAll('.reject-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;if(!confirm('确认拒绝该提交？'))return;DB.reject(id).then(function(){toast('已拒绝');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('拒绝失败: '+(e.message||'未知错误'),'error');});});});
 c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;if(!confirm('确定要删除此提交记录吗？'))return;DB.delSub(id).then(function(){toast('已删除');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');});});});
 c.querySelectorAll('.sub-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil((self._subs.filter(function(x){return self._subF==='all'||x.status===self._subF;})).length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderSubs(c);});});
@@ -962,7 +966,10 @@ c.querySelectorAll('.sub-page-btn').forEach(function(b){b.addEventListener('clic
 showSubmission:function(s){
 var m=document.getElementById('submissionModal');
 document.getElementById('submissionTitle').textContent='📥 '+(s.name||'提交详情');
-var plat=(s.platforms||[]).map(function(p){return p==='mac'?'🍎 Mac':p==='windows'?'🪟 Windows':p;}).join(', ')||'-';
+var rawPlat=s.platforms;
+if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=[];}}
+if(!Array.isArray(rawPlat))rawPlat=[];
+var plat=rawPlat.map(function(p){return p==='mac'?'🍎 Mac':p==='windows'?'🪟 Windows':p;}).join(', ')||'-';
 var h='<div class="detail-row"><div class="label">名称</div><div class="value">'+escapeHTML(s.name||'')+'</div></div>'+
 '<div class="detail-row"><div class="label">分类</div><div class="value">'+escapeHTML(s.category||'')+'</div></div>'+
 '<div class="detail-row"><div class="label">版本</div><div class="value">v'+escapeHTML(s.version||'1.0')+'</div></div>'+
@@ -990,7 +997,7 @@ var self=this;
 var data=this._pfs||[];
 var adminCount=data.filter(function(p){return p.is_admin===true;}).length;
 var h='<h2 class="page-title">👤 用户管理</h2><p class="page-sub" id="userSub">共 '+data.length+' 位用户，'+adminCount+' 位管理员</p><div class="toolbar">';
-h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="userSearch" placeholder="搜索昵称或ID..." value="'+escapeHTML(this._pfKw)+'" autocomplete="off" /></div>';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="userSearch" placeholder="搜索昵称 / 邮箱 / ID..." value="'+escapeHTML(this._pfKw)+'" autocomplete="off" /></div>';
 h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="userRefresh">⟳ 刷新</button><span class="selected-info" id="userCountInfo">共 '+data.length+' 人</span></div></div>';
 h+='<div id="userTableArea"></div>';
 c.innerHTML=h;
@@ -1014,7 +1021,7 @@ var self=this;
 var data=this._pfs||[];
 var kw=(this._pfKw||'').toLowerCase().trim();
 var fil=data;
-if(kw)fil=data.filter(function(p){return (p.username||'').toLowerCase().includes(kw)||(p.id||'').toLowerCase().includes(kw);});
+if(kw)fil=data.filter(function(p){return (p.username||'').toLowerCase().includes(kw)||(p.email||'').toLowerCase().includes(kw)||(p.id||'').toLowerCase().includes(kw);});
 var total=fil.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
@@ -1025,9 +1032,14 @@ var en=Math.min(st+ps,total);
 var pi=fil.slice(st,en);
 var area=c.querySelector('#userTableArea');
 if(!area)return;
-var h='<div class="table-wrap"><table><thead><tr><th style="width:50px;">#</th><th>昵称</th><th>用户ID</th><th>简介</th><th>注册时间</th><th>角色</th><th style="width:220px;">操作</th></tr></thead><tbody>';
-if(pi.length===0)h+='<tr class="empty-row"><td colspan="7">'+(kw?'没有匹配的用户':'暂无用户')+'</td></tr>';
-else{
+var h='<div class="table-wrap"><table><thead><tr><th style="width:50px;">#</th><th>昵称</th><th>邮箱</th><th>用户ID</th><th>简介</th><th>注册时间</th><th>角色</th><th style="width:220px;">操作</th></tr></thead><tbody>';
+if(pi.length===0){
+if(!kw&&data.length===0){
+h+='<tr class="empty-row"><td colspan="8">暂无用户。如注册用户无法显示，请在 Supabase 执行 SQL 将 auth.users 同步到 profiles 表</td></tr>';
+}else{
+h+='<tr class="empty-row"><td colspan="8">'+(kw?'没有匹配的用户':'暂无用户')+'</td></tr>';
+}
+}else{
 for(var i=0;i<pi.length;i++){
 var u=pi[i];
 var idx=st+i+1;
@@ -1036,6 +1048,7 @@ var roleHtml=u.is_admin===true?'<span class="badge badge-green">管理员</span>
 h+='<tr data-id="'+u.id+'">';
 h+='<td style="font-size:.7rem;color:var(--dim);">'+idx+'</td>';
 h+='<td><strong>'+escapeHTML(u.username||'(未设置)')+'</strong>'+(isSelf?' <span class="badge badge-orange" style="font-size:.5rem;">当前</span>':'')+'</td>';
+h+='<td style="font-size:.72rem;color:var(--tx2);word-break:break-all;">'+escapeHTML(u.email||'-')+'</td>';
 h+='<td style="font-size:.7rem;color:var(--dim);">'+shortId(u.id)+'</td>';
 h+='<td style="font-size:.72rem;color:var(--tx2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHTML(u.bio||'-')+'</td>';
 h+='<td style="font-size:.7rem;">'+(u.created_at?formatDate(u.created_at):'-')+'</td>';
@@ -1090,7 +1103,7 @@ _getFilteredProfiles:function(){
 var data=this._pfs||[];
 var kw=(this._pfKw||'').toLowerCase().trim();
 if(!kw)return data;
-return data.filter(function(p){return (p.username||'').toLowerCase().includes(kw)||(p.id||'').toLowerCase().includes(kw);});
+return data.filter(function(p){return (p.username||'').toLowerCase().includes(kw)||(p.email||'').toLowerCase().includes(kw)||(p.id||'').toLowerCase().includes(kw);});
 },
 
 renderCats:async function(c){
@@ -1206,7 +1219,6 @@ await DB.soft(true).then(function(dd){self._all=dd;self._fil=dd.slice();});
 self.renderTab('add');
 }else{
 var ns={
-id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
 name:d.name,category:d.category,version:d.version,
 icon:d.icon,icon_url:d.icon_url,download_url:d.download_url,
 platforms:d.platforms,size:d.size,description:d.description,detail:d.detail,
@@ -1858,5 +1870,6 @@ if(cb)cb.addEventListener('click',function(){if(!confirm('确定清空所有操�
 
 document.addEventListener('DOMContentLoaded',function(){App.init();});
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
