@@ -1225,9 +1225,12 @@ document.getElementById('resetPasswordBtn')?.addEventListener('click', async fun
     var res = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
     setResetLoading(false);
     if (res.error) { showResetError(res.error.message); return; }
-    showResetSuccess('验证码已发送，请查收邮箱（可能进入垃圾箱）');
-    setTimeout(function() { 
-        document.getElementById('resetPasswordModal').classList.remove('open'); 
+    
+    showResetSuccess('验证码已发送，请查收邮箱。即将进入设置新密码界面...');
+    
+    document.getElementById('resetPasswordModal').classList.remove('open');
+    
+    setTimeout(function() {
         document.getElementById('resetPasswordSetModal').classList.add('open');
         document.getElementById('resetPasswordEmail').value = email;
         document.getElementById('resetPasswordOtp').value = '';
@@ -1235,7 +1238,7 @@ document.getElementById('resetPasswordBtn')?.addEventListener('click', async fun
         document.getElementById('resetPasswordConfirm').value = '';
         document.getElementById('resetPwError').style.display = 'none';
         document.getElementById('resetPasswordOtp').focus();
-    }, 2000);
+    }, 350);
 });
 document.getElementById('resetPasswordModalClose')?.addEventListener('click', function() { document.getElementById('resetPasswordModal').classList.remove('open'); });
 document.getElementById('resetEmail')?.addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('resetPasswordBtn')?.click(); });
