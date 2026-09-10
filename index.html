@@ -785,14 +785,14 @@
     <div class="modal-box" style="max-width:400px;padding:24px 28px;border-radius:20px;">
         <button class="close-btn" id="resetPasswordSetModalClose" style="float:right;font-size:1.4rem;color:var(--text-dim);background:none;border:none;cursor:pointer;">&times;</button>
         <h3 style="font-size:1.2rem;margin-bottom:8px;"><i class="fas fa-key"></i> 重置密码</h3>
-        <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">请输入您收到的 6 位数字验证码，并设置新密码。</p>
+        <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">请输入您收到的验证码，并设置新密码。</p>
         <div class="form-group" style="margin-bottom:12px;">
             <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">📧 邮箱地址</label>
             <input type="email" id="resetPasswordEmail" placeholder="your@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" />
         </div>
         <div class="form-group" style="margin-bottom:12px;">
-            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔢 验证码（6位数字）</label>
-            <input type="text" id="resetPasswordOtp" placeholder="请输入邮件中的 6 位数字" maxlength="6" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;letter-spacing: 4px; text-align: center;" />
+            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔢 验证码</label>
+            <input type="text" id="resetPasswordOtp" placeholder="请输入邮件中的验证码" maxlength="10" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;letter-spacing: 4px; text-align: center;" />
         </div>
         <div class="form-group" style="margin-bottom:12px;">
             <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔑 新密码 <span style="font-weight:400;color:var(--text-dim);font-size:0.7rem;">（至少8位，含大小写和数字）</span></label>
@@ -1359,7 +1359,7 @@ document.getElementById('resetPasswordSetBtn')?.addEventListener('click', async 
     var confirmPw = document.getElementById('resetPasswordConfirm').value.trim();
     hideResetPwError();
     if (!email || !otp || !newPw || !confirmPw) { showResetPwError('请填写所有字段'); return; }
-    if (otp.length !== 6 || isNaN(otp)) { showResetPwError('验证码应为 6 位数字'); return; }
+    if (!/^\d+$/.test(otp)) { showResetPwError('验证码应为纯数字'); return; }
     var pwError = validatePasswordStrength(newPw);
     if (pwError) { showResetPwError(pwError); return; }
     if (newPw !== confirmPw) { showResetPwError('两次输入的密码不一致'); return; }
