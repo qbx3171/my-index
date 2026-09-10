@@ -728,14 +728,14 @@
     <div class="modal-box" style="max-width:400px;padding:24px 28px;border-radius:20px;">
         <button class="close-btn" id="resetPasswordModalClose" style="float:right;font-size:1.4rem;color:var(--text-dim);background:none;border:none;cursor:pointer;">&times;</button>
         <h3 style="font-size:1.2rem;margin-bottom:8px;"><i class="fas fa-key"></i> 重置密码</h3>
-        <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">输入您的邮箱，我们将发送重置链接。</p>
+        <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">输入您的邮箱，我们将发送重置验证码。</p>
         <div class="form-group" style="margin-bottom:16px;">
             <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">📧 邮箱地址</label>
             <input type="email" id="resetEmail" placeholder="your@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;transition:border-color 0.2s;" />
         </div>
         <div id="resetError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div>
         <div id="resetSuccess" style="background:#e8f5e9;color:#2e7d32;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #4caf50;"></div>
-        <button class="btn btn-primary" id="resetPasswordBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;transition:transform 0.15s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="resetBtnText">发送重置邮件</span><span id="resetSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button>
+        <button class="btn btn-primary" id="resetPasswordBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;transition:transform 0.15s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="resetBtnText">发送验证码</span><span id="resetSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button>
     </div>
 </div>
 
@@ -784,18 +784,26 @@
 <div class="modal-overlay" id="resetPasswordSetModal">
     <div class="modal-box" style="max-width:400px;padding:24px 28px;border-radius:20px;">
         <button class="close-btn" id="resetPasswordSetModalClose" style="float:right;font-size:1.4rem;color:var(--text-dim);background:none;border:none;cursor:pointer;">&times;</button>
-        <h3 style="font-size:1.2rem;margin-bottom:8px;"><i class="fas fa-key"></i> 设置新密码</h3>
-        <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">请为您的账号设置一个新密码。</p>
+        <h3 style="font-size:1.2rem;margin-bottom:8px;"><i class="fas fa-key"></i> 重置密码</h3>
+        <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">请输入您收到的 6 位数字验证码，并设置新密码。</p>
         <div class="form-group" style="margin-bottom:12px;">
-            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">新密码 <span style="font-weight:400;color:var(--text-dim);font-size:0.7rem;">（至少8位，含大小写和数字）</span></label>
-            <input type="password" id="resetPasswordNew" placeholder="新密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;transition:border-color 0.2s;" />
+            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">📧 邮箱地址</label>
+            <input type="email" id="resetPasswordEmail" placeholder="your@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" />
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔢 验证码（6位数字）</label>
+            <input type="text" id="resetPasswordOtp" placeholder="请输入邮件中的 6 位数字" maxlength="6" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;letter-spacing: 4px; text-align: center;" />
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔑 新密码 <span style="font-weight:400;color:var(--text-dim);font-size:0.7rem;">（至少8位，含大小写和数字）</span></label>
+            <input type="password" id="resetPasswordNew" placeholder="新密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" />
         </div>
         <div class="form-group" style="margin-bottom:16px;">
-            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">确认新密码</label>
-            <input type="password" id="resetPasswordConfirm" placeholder="再次输入新密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;transition:border-color 0.2s;" />
+            <label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">✔️ 确认新密码</label>
+            <input type="password" id="resetPasswordConfirm" placeholder="再次输入新密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" />
         </div>
         <div id="resetPwError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div>
-        <button class="btn btn-primary" id="resetPasswordSetBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;transition:transform 0.15s,box-shadow 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="resetPwBtnText">确认修改</span><span id="resetPwSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button>
+        <button class="btn btn-primary" id="resetPasswordSetBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="resetPwBtnText">确认修改</span><span id="resetPwSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button>
     </div>
 </div>
 
@@ -821,26 +829,6 @@ var cache = { software: [], categories: [], loaded: false, lastFetch: 0 };
 var isAdmin = false;
 var currentUser = null;
 var userProfile = null;
-
-if (supabaseClient) {
-    supabaseClient.auth.onAuthStateChange(function(event, session) {
-        if (event === 'PASSWORD_RECOVERY') {
-            setTimeout(function() {
-                var modal = document.getElementById('resetPasswordSetModal');
-                if (modal && !modal.classList.contains('open')) {
-                    modal.classList.add('open');
-                    var el1 = document.getElementById('resetPasswordNew');
-                    var el2 = document.getElementById('resetPasswordConfirm');
-                    var el3 = document.getElementById('resetPwError');
-                    if (el1) el1.value = '';
-                    if (el2) el2.value = '';
-                    if (el3) el3.style.display = 'none';
-                    if (typeof toast === 'function') toast('🔐 请设置新密码', 'success');
-                }
-            }, 300);
-        }
-    });
-}
 
 function isToday(d) { if (!d) return false; var t = new Date(d), n = new Date(); return t.getFullYear() === n.getFullYear() && t.getMonth() === n.getMonth() && t.getDate() === n.getDate(); }
 function timeAgo(d) { if (!d) return '刚刚'; var n = new Date(), diff = n - new Date(d), m = Math.floor(diff / 60000); if (m < 1) return '刚刚'; if (m < 60) return m + '分钟前'; var h = Math.floor(m / 60); if (h < 24) return h + '小时前'; var days = Math.floor(h / 24); if (days < 7) return days + '天前'; return new Date(d).toLocaleDateString('zh-CN'); }
@@ -1063,14 +1051,8 @@ function copyLink() { copyLinkText('乐哲软件 · 精选高效工具', window.
 
 async function loadUser() {
     if (!supabaseClient) { updateUIForLoggedOut(); return; }
-
     var hash = window.location.hash || '';
     var search = window.location.search || '';
-    var isRecovery = false;
-
-    if (hash.indexOf('type=recovery') !== -1) isRecovery = true;
-    if (search.indexOf('type=recovery') !== -1) isRecovery = true;
-
     if (hash.indexOf('error_description') !== -1 || search.indexOf('error_description') !== -1) {
         try {
             var hp = new URLSearchParams(hash.replace(/^#/, ''));
@@ -1084,34 +1066,6 @@ async function loadUser() {
         } catch (e) {}
         return;
     }
-
-    if (search.indexOf('code=') !== -1 && !isRecovery) {
-        try {
-            var code = new URLSearchParams(search).get('code');
-            if (code) {
-                var ex = await supabaseClient.auth.exchangeCodeForSession(code);
-                if (!ex.error && ex.data && ex.data.session) isRecovery = true;
-            }
-        } catch (e) {}
-    }
-
-    if (isRecovery) {
-        setTimeout(function() {
-            var modal = document.getElementById('resetPasswordSetModal');
-            if (modal && !modal.classList.contains('open')) {
-                modal.classList.add('open');
-                var el1 = document.getElementById('resetPasswordNew');
-                var el2 = document.getElementById('resetPasswordConfirm');
-                var el3 = document.getElementById('resetPwError');
-                if (el1) el1.value = '';
-                if (el2) el2.value = '';
-                if (el3) el3.style.display = 'none';
-                if (typeof toast === 'function') toast('🔐 请设置新密码', 'success');
-            }
-        }, 500);
-        return;
-    }
-
     try {
         var userRes = await supabaseClient.auth.getUser();
         var user = userRes.data ? userRes.data.user : null;
@@ -1196,7 +1150,7 @@ function hideLoginError() { var el = document.getElementById('loginError'); if (
 function hideRegisterError() { var el = document.getElementById('registerError'); if (el) el.style.display = 'none'; }
 function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 function validatePasswordStrength(pw) { if (pw.length < 8) return '密码至少8位'; if (!/[a-z]/.test(pw)) return '密码需包含小写字母'; if (!/[A-Z]/.test(pw)) return '密码需包含大写字母'; if (!/\d/.test(pw)) return '密码需包含数字'; return null; }
-function setResetLoading(loading) { var btn = document.getElementById('resetPasswordBtn'); var text = document.getElementById('resetBtnText'); var spinner = document.getElementById('resetSpinner'); if (!btn) return; btn.disabled = loading; if (loading) { text.textContent = '发送中...'; spinner.style.display = 'inline'; } else { text.textContent = '发送重置邮件'; spinner.style.display = 'none'; } }
+function setResetLoading(loading) { var btn = document.getElementById('resetPasswordBtn'); var text = document.getElementById('resetBtnText'); var spinner = document.getElementById('resetSpinner'); if (!btn) return; btn.disabled = loading; if (loading) { text.textContent = '发送中...'; spinner.style.display = 'inline'; } else { text.textContent = '发送验证码'; spinner.style.display = 'none'; } }
 function showResetError(msg) { var el = document.getElementById('resetError'); if (el) { el.textContent = msg; el.style.display = 'block'; } }
 function hideResetError() { var el = document.getElementById('resetError'); if (el) el.style.display = 'none'; }
 function showResetSuccess(msg) { var el = document.getElementById('resetSuccess'); if (el) { el.textContent = msg; el.style.display = 'block'; } }
@@ -1271,8 +1225,17 @@ document.getElementById('resetPasswordBtn')?.addEventListener('click', async fun
     var res = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
     setResetLoading(false);
     if (res.error) { showResetError(res.error.message); return; }
-    showResetSuccess('重置邮件已发送，请查收邮箱（可能进入垃圾箱）');
-    setTimeout(function() { document.getElementById('resetPasswordModal').classList.remove('open'); }, 3000);
+    showResetSuccess('验证码已发送，请查收邮箱（可能进入垃圾箱）');
+    setTimeout(function() { 
+        document.getElementById('resetPasswordModal').classList.remove('open'); 
+        document.getElementById('resetPasswordSetModal').classList.add('open');
+        document.getElementById('resetPasswordEmail').value = email;
+        document.getElementById('resetPasswordOtp').value = '';
+        document.getElementById('resetPasswordNew').value = '';
+        document.getElementById('resetPasswordConfirm').value = '';
+        document.getElementById('resetPwError').style.display = 'none';
+        document.getElementById('resetPasswordOtp').focus();
+    }, 2000);
 });
 document.getElementById('resetPasswordModalClose')?.addEventListener('click', function() { document.getElementById('resetPasswordModal').classList.remove('open'); });
 document.getElementById('resetEmail')?.addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('resetPasswordBtn')?.click(); });
@@ -1387,27 +1350,43 @@ document.getElementById('newPassword')?.addEventListener('keydown', function(e) 
 document.getElementById('newPasswordConfirm')?.addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('changePasswordBtn')?.click(); });
 
 document.getElementById('resetPasswordSetBtn')?.addEventListener('click', async function() {
+    var email = document.getElementById('resetPasswordEmail').value.trim();
+    var otp = document.getElementById('resetPasswordOtp').value.trim();
     var newPw = document.getElementById('resetPasswordNew').value.trim();
     var confirmPw = document.getElementById('resetPasswordConfirm').value.trim();
     hideResetPwError();
-    if (!newPw || !confirmPw) { showResetPwError('请填写完整'); return; }
+    if (!email || !otp || !newPw || !confirmPw) { showResetPwError('请填写所有字段'); return; }
+    if (otp.length !== 6 || isNaN(otp)) { showResetPwError('验证码应为 6 位数字'); return; }
     var pwError = validatePasswordStrength(newPw);
     if (pwError) { showResetPwError(pwError); return; }
     if (newPw !== confirmPw) { showResetPwError('两次输入的密码不一致'); return; }
     setResetPwLoading(true);
-    var res = await supabaseClient.auth.updateUser({ password: newPw });
-    setResetPwLoading(false);
-    if (res.error) {
-        var msg = res.error.message || '';
-        if (msg.indexOf('expired') !== -1 || msg.indexOf('invalid') !== -1) { showResetPwError('⏰ 重置链接已过期，请重新申请'); }
-        else { showResetPwError(msg || '修改失败'); }
-        return;
+    try {
+        var verifyRes = await supabaseClient.auth.verifyOtp({ email: email, token: otp, type: 'recovery' });
+        if (verifyRes.error) {
+            setResetPwLoading(false);
+            showResetPwError('验证码错误或已过期，请重新获取');
+            return;
+        }
+        var res = await supabaseClient.auth.updateUser({ password: newPw });
+        setResetPwLoading(false);
+        if (res.error) {
+            showResetPwError(res.error.message || '修改失败，请重试');
+            return;
+        }
+        if (window.history && window.history.replaceState) { window.history.replaceState({}, document.title, window.location.pathname); }
+        toast('✅ 密码已更新，请重新登录', 'success');
+        document.getElementById('resetPasswordSetModal').classList.remove('open');
+        document.getElementById('resetPasswordEmail').value = '';
+        document.getElementById('resetPasswordOtp').value = '';
+        document.getElementById('resetPasswordNew').value = '';
+        document.getElementById('resetPasswordConfirm').value = '';
+        await supabaseClient.auth.signOut();
+        setTimeout(function() { document.getElementById('loginModal').classList.add('open'); }, 500);
+    } catch (err) {
+        setResetPwLoading(false);
+        showResetPwError('网络异常，请稍后重试');
     }
-    if (window.history && window.history.replaceState) { window.history.replaceState({}, document.title, window.location.pathname); }
-    toast('✅ 密码已更新，请重新登录', 'success');
-    document.getElementById('resetPasswordSetModal').classList.remove('open');
-    await supabaseClient.auth.signOut();
-    setTimeout(function() { document.getElementById('loginModal').classList.add('open'); }, 500);
 });
 document.getElementById('resetPasswordSetModalClose')?.addEventListener('click', function() { document.getElementById('resetPasswordSetModal').classList.remove('open'); });
 document.getElementById('resetPasswordSetModal')?.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
