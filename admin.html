@@ -425,9 +425,19 @@ function toast(m,t){t=t||'success';var c=document.getElementById('toastContainer
 function escapeHTML(s){if(s===null||s===undefined)return '';var d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
 function formatDate(iso){if(!iso)return '-';var d=new Date(iso);return d.toLocaleDateString('zh-CN')+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});}
 function shortId(id){return id?id.slice(0,8):'';}
-function timeAgo(d){if(!d)return '刚刚';var n=new Date(),df=n-new Date(d),m=Math.floor(df/60000);if(m<1)return '刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';var dd=Math.floor(h/24);if(dd<7)return dd+'天前';return new Date(d).toLocaleDateString('zh-CN');}
+function timeAgo(d){if(!d)return '刚刚';var n=new Date(),df=Math.max(0,n-new Date(d)),m=Math.floor(df/60000);if(m<1)return '刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';var dd=Math.floor(h/24);if(dd<7)return dd+'天前';return new Date(d).toLocaleDateString('zh-CN');}
 function getIconEmoji(c){var m={'设计工具':'✎','开发工具':'⚙','办公软件':'📋','媒体工具':'🎬','实用工具':'🔧'};return m[c]||'📦';}
-function getPlatformLabels(p){if(!p||p.length===0)return '-';var m={'mac':'🍎 Mac','windows':'🪟 Win'};return p.map(function(x){return m[x]||x;}).join(' · ');}
+
+function getPlatformLabels(p){
+  if(!p)return '-';
+  if(typeof p==='string'){
+    try{p=JSON.parse(p);}catch(e){p=p.split(',').map(function(x){return x.trim();}).filter(Boolean);}
+  }
+  if(!Array.isArray(p)||p.length===0)return '-';
+  var m={'mac':'🍎 Mac','windows':'🪟 Win'};
+  return p.map(function(x){return m[x]||x;}).join(' · ');
+}
+
 function renderIconThumb(s){var fb=s.icon||'📦';if(s.icon_url&&s.icon_url.trim()){var u=s.icon_url.trim();if(!u.startsWith('http://')&&!u.startsWith('https://'))return escapeHTML(fb);return '<img src="'+escapeHTML(u)+'" alt="'+escapeHTML(s.name||'')+'" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeHTML(fb)+'\'" />';}return escapeHTML(fb);}
 function getCategoryTagClass(c){var m={'设计':'design','开发':'dev','办公':'office','媒体':'media','实用':'tool'};return m[c]||'design';}
 function getDrafts(){try{return JSON.parse(localStorage.getItem('lezhe_tutorial_drafts')||'[]');}catch(e){return [];}}
@@ -440,7 +450,82 @@ function isPlatformEmbeddable(p){return ['douyin','kuaishou','xiaohongshu'].inde
 function getBilibiliCover(url){return new Promise(function(resolve){var m=url.match(/b23\.tv\/([a-zA-Z0-9]+)/)||url.match(/bilibili\.com\/video\/([a-zA-Z0-9]+)/);if(!m){resolve(null);return;}fetch('https://api.bilibili.com/x/web-interface/view?bvid='+m[1],{signal:AbortSignal.timeout(5000)}).then(function(r){return r.json();}).then(function(d){resolve(d&&d.data&&d.data.pic?d.data.pic:null);}).catch(function(){resolve(null);});});}
 function getPlatformCoverUrl(url){return new Promise(function(resolve){var p=detectVideoPlatform(url);if(p==='youtube'){var m=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/);if(m){resolve('https://img.youtube.com/vi/'+m[1]+'/maxresdefault.jpg');return;}}if(p==='bilibili'){getBilibiliCover(url).then(resolve);return;}resolve(null);});}
 function extractVideoCover(url){return new Promise(function(resolve,reject){getPlatformCoverUrl(url).then(function(c){if(c)resolve(c);else reject(new Error('未能提取封面'));}).catch(function(e){reject(e);});});}
-function sanitizeHTML(h){if(!h)return '';var ok=['p','br','strong','em','u','s','blockquote','code','pre','ul','ol','li','h1','h2','h3','h4','h5','h6','img','a','span','div','hr','table','thead','tbody','tr','td','th','iframe','figure','figcaption'];var d=document.createElement('div');d.innerHTML=h;function walk(n){if(n.nodeType===1){var t=n.tagName.toLowerCase();if(ok.indexOf(t)===-1){var p=n.parentNode;while(n.childNodes.length>0)p.insertBefore(n.childNodes[0],n);p.removeChild(n);return;}var a=n.attributes;for(var i=a.length-1;i>=0;i--){var at=a[i],nm=at.name.toLowerCase();if(['src','href','alt','title','class','style','target','width','height'].indexOf(nm)===-1){n.removeAttribute(nm);}else if(nm==='src'||nm==='href'){var v=at.value;if(!v.startsWith('http://')&&!v.startsWith('https://')&&!v.startsWith('data:image/')&&!v.startsWith('//')&&!v.startsWith('/'))n.removeAttribute(nm);}}}var c=n.childNodes;for(var j=c.length-1;j>=0;j--)walk(c[j]);}walk(d);return d.innerHTML;}
+
+var ALLOWED_IFRAME_HOSTS=['youtube.com','youtu.be','youtube-nocookie.com','bilibili.com','youku.com','v.qq.com','douyin.com','vimeo.com','dailymotion.com','player.bilibili.com'];
+function isAllowedIframeSrc(src){
+  if(!src)return false;
+  var v=String(src).trim();
+  if(v.startsWith('//'))v='https:'+v;
+  try{
+    var u=new URL(v,window.location.origin);
+    if(u.protocol!=='https:'&&u.protocol!=='http:')return false;
+    var host=u.hostname.toLowerCase();
+    for(var i=0;i<ALLOWED_IFRAME_HOSTS.length;i++){
+      var d=ALLOWED_IFRAME_HOSTS[i];
+      if(host===d||host.endsWith('.'+d))return true;
+    }
+    return false;
+  }catch(e){return false;}
+}
+
+function sanitizeHTML(h){
+  if(!h)return '';
+  var ok=['p','br','strong','em','u','s','blockquote','code','pre','ul','ol','li','h1','h2','h3','h4','h5','h6','img','a','span','div','hr','table','thead','tbody','tr','td','th','iframe','figure','figcaption'];
+  var d=document.createElement('div');
+  d.innerHTML=h;
+  function walk(n){
+    if(n.nodeType!==1)return;
+    var t=n.tagName.toLowerCase();
+    if(ok.indexOf(t)===-1){
+      var p=n.parentNode;
+      while(n.childNodes.length>0)p.insertBefore(n.childNodes[0],n);
+      p.removeChild(n);
+      return;
+    }
+    if(t==='iframe'){
+      var srcAttr=n.getAttribute('src')||'';
+      if(!isAllowedIframeSrc(srcAttr)){
+        n.parentNode.removeChild(n);
+        return;
+      }
+      var keep=['src','allowfullscreen','frameborder','allow','width','height','title','loading','referrerpolicy'];
+      var ats=n.attributes;
+      for(var ii=ats.length-1;ii>=0;ii--){
+        var an=ats[ii].name.toLowerCase();
+        if(keep.indexOf(an)===-1)n.removeAttribute(ats[ii].name);
+      }
+      return;
+    }
+    var a=n.attributes;
+    for(var i=a.length-1;i>=0;i--){
+      var at=a[i],nm=at.name.toLowerCase();
+      if(['src','href','alt','title','class','style','target','width','height'].indexOf(nm)===-1){
+        n.removeAttribute(nm);
+      }else if(nm==='src'||nm==='href'){
+        var v=at.value;
+        if(!v.startsWith('http://')&&!v.startsWith('https://')&&!v.startsWith('data:image/')&&!v.startsWith('//')&&!v.startsWith('/'))n.removeAttribute(nm);
+      }else if(nm==='style'){
+        var sv=at.value||'';
+        if(/url\s*\(|expression|behavior|javascript:/i.test(sv))n.removeAttribute('style');
+      }
+    }
+    var c=n.childNodes;
+    for(var j=c.length-1;j>=0;j--)walk(c[j]);
+  }
+  walk(d);
+  return d.innerHTML;
+}
+
+function getQuillHTML(){
+  if(!quill||!quill.root)return '';
+  if(quill.root.tagName==='TEXTAREA')return quill.root.value||'';
+  return quill.root.innerHTML||'';
+}
+function setQuillHTML(html){
+  if(!quill||!quill.root)return;
+  if(quill.root.tagName==='TEXTAREA')quill.root.value=html||'';
+  else quill.root.innerHTML=html||'';
+}
 
 var DB={
 _sw:null,_swT:0,_ca:null,_caT:0,_tu:null,_tuT:0,_qu:null,_quT:0,_an:null,_anT:0,_cm:null,_cmT:0,_sb:null,_sbT:0,_pf:null,_pfT:0,_ttl:120000,
@@ -477,7 +562,7 @@ clearLogs:function(){localStorage.setItem('lezhe_logs','[]');}
 };
 
 var App={
-_tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,
+_tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,_editSource:null,_pubDraftId:null,
 
 sel:function(){return this._selByTab[this._tab]||[];},
 setSel:function(ids){this._selByTab[this._tab]=ids;},
@@ -568,7 +653,7 @@ placeholder:'输入教程内容...'
 quill.on('text-change',function(){
 var p=document.getElementById('contentPreviewArea');
 if(!p.classList.contains('hidden')){
-var s=sanitizeHTML(quill.root.innerHTML);
+var s=sanitizeHTML(getQuillHTML());
 p.innerHTML=s||'<span style="color:var(--dim);">内容为空</span>';
 }
 });
@@ -588,19 +673,19 @@ if(u&&u.trim()){
 var s=u.trim();
 if(s.startsWith('//'))s='https:'+s;
 if(!s.startsWith('http://')&&!s.startsWith('https://')&&!s.startsWith('data:image/')){toast('⚠️ 请填写有效的图片链接','warning');return;}
-quill.root.innerHTML=(quill.root.innerHTML||'')+'<p><img src="'+s+'" style="max-width:100%;" /></p>';
+setQuillHTML(getQuillHTML()+'<p><img src="'+s+'" style="max-width:100%;" /></p>');
 toast('✅ 图片已插入');
 }
 });
 document.getElementById('insertBrBtn').addEventListener('click',function(){
-quill.root.innerHTML=(quill.root.innerHTML||'')+'<br>';
+setQuillHTML(getQuillHTML()+'<br>');
 toast('已插入换行');
 });
 document.getElementById('previewContentBtn').addEventListener('click',function(){
 var p=document.getElementById('contentPreviewArea');
 if(p.classList.contains('hidden')){
 p.classList.remove('hidden');
-var c=quill.root.innerHTML||quill.root.value||'';
+var c=getQuillHTML();
 p.innerHTML=sanitizeHTML(c)||'<span style="color:var(--dim);">内容为空</span>';
 this.textContent='隐藏预览';
 }else{p.classList.add('hidden');this.textContent='预览';}
@@ -625,7 +710,7 @@ var ins=await supabaseClient.from('profiles').insert([{id:u.id,email:u.email,is_
 if(ins.error){
 await supabaseClient.auth.signOut();
 this.showLogin();
-document.getElementById('loginError').innerHTML='该账号尚未授权管理员。请在 Supabase 执行：<br><code>insert into profiles (id,email,is_admin) values (\''+u.id+'\',\''+(u.email||'')+'\',true) on conflict (id) do update set is_admin=true;</code>';
+document.getElementById('loginError').innerHTML='该账号尚未授权管理员。请在 Supabase 执行：<br><code>insert into profiles (id,email,is_admin) values (\''+escapeHTML(u.id)+'\',\''+escapeHTML(u.email||'')+'\',true) on conflict (id) do update set is_admin=true;</code>';
 return;
 }
 p={data:ins.data};
@@ -633,7 +718,7 @@ p={data:ins.data};
 if(!p.data||p.data.is_admin!==true){
 await supabaseClient.auth.signOut();
 this.showLogin();
-document.getElementById('loginError').innerHTML='该账号不是管理员。请在 Supabase 执行：<br><code>update profiles set is_admin=true where id=\''+u.id+'\';</code>';
+document.getElementById('loginError').innerHTML='该账号不是管理员。请在 Supabase 执行：<br><code>update profiles set is_admin=true where id=\''+escapeHTML(u.id)+'\';</code>';
 return;
 }
 currentAdminUser=u;
@@ -671,14 +756,14 @@ if(p2.error||!p2.data){
 var ins=await supabaseClient.from('profiles').insert([{id:u.id,email:u.email,is_admin:false}]).select('is_admin').maybeSingle();
 if(ins.error){
 await supabaseClient.auth.signOut();
-er.innerHTML='该账号尚未授权管理员。请在 Supabase 执行：<br><code>insert into profiles (id,email,is_admin) values (\''+u.id+'\',\''+(u.email||'')+'\',true) on conflict (id) do update set is_admin=true;</code>';
+er.innerHTML='该账号尚未授权管理员。请在 Supabase 执行：<br><code>insert into profiles (id,email,is_admin) values (\''+escapeHTML(u.id)+'\',\''+escapeHTML(u.email||'')+'\',true) on conflict (id) do update set is_admin=true;</code>';
 b.disabled=false;b.textContent='✦ 进入控制台';return;
 }
 p2={data:ins.data};
 }
 if(!p2.data||p2.data.is_admin!==true){
 await supabaseClient.auth.signOut();
-er.innerHTML='该账号不是管理员。请在 Supabase 执行：<br><code>update profiles set is_admin=true where id=\''+u.id+'\';</code>';
+er.innerHTML='该账号不是管理员。请在 Supabase 执行：<br><code>update profiles set is_admin=true where id=\''+escapeHTML(u.id)+'\';</code>';
 b.disabled=false;b.textContent='✦ 进入控制台';return;
 }
 currentAdminUser=u;
@@ -777,7 +862,7 @@ else h+='<tr class="empty-row"><td colspan="4">暂无数据</td></tr>';
 h+='</tbody></table></div>';
 c.innerHTML=h;
 var rb=c.querySelector('#refreshDash');
-if(rb)rb.addEventListener('click',function(){DB.invalidate();App.preload();App.renderTab('dashboard');App.refreshSubBadge();toast('已刷新');});
+if(rb)rb.addEventListener('click',function(){DB.invalidate();App.renderTab('dashboard');App.refreshSubBadge();toast('已刷新');});
 },
 
 _renderSoftPage:function(c){
@@ -1144,7 +1229,7 @@ try{await DB.delCat(cat);DB.addLog('删除分类','分类: '+cat);toast('已删�
 renderAddForm:function(c){
 var self=this;
 var isEdit=!!this._editId;
-var editName=isEdit?(this._all.find(function(s){return s.id===self._editId;})||{}).name||'':'';
+var editName=isEdit?(this._all.find(function(s){return s.id===self._editId;})||{}).name||'':''; 
 var h='<h2 class="page-title">';
 if(isEdit)h+='<span>✎ 编辑资源 <span style="font-weight:400;font-size:.9rem;color:var(--tx2);">· '+escapeHTML(editName)+'</span></span>';
 else h+='⊕ 上传软件';
@@ -1169,6 +1254,8 @@ f.querySelector('[name="description"]').value=s.description||'';
 f.querySelector('[name="detail"]').value=s.detail||'';
 f.querySelector('[name="recommend"]').checked=!!s.recommend;
 var p=s.platforms||[];
+if(typeof p==='string'){try{p=JSON.parse(p);}catch(e){p=p.split(',').map(function(x){return x.trim();}).filter(Boolean);}}
+if(!Array.isArray(p))p=[];
 f.querySelector('[name="platformMac"]').checked=p.indexOf('mac')!==-1;
 f.querySelector('[name="platformWin"]').checked=p.indexOf('windows')!==-1;
 App._updIconPreview(f);
@@ -1284,12 +1371,13 @@ var rb=c.querySelector('#tutRefresh');
 if(rb)rb.addEventListener('click',function(){DB.tut(true).then(function(d){self._tuts=d;self.renderTuts(c);toast('已刷新');});});
 var nb=c.querySelector('#tutNew');
 if(nb)nb.addEventListener('click',function(){
-self._tutEditId=null;self._isDraftPub=false;self._vl=[];self._il=[];self._renderMedia();
+self._tutEditId=null;self._isDraftPub=false;self._editSource='new';self._pubDraftId=null;
+self._vl=[];self._il=[];self._renderMedia();
 document.getElementById('tutEditModal').classList.remove('hidden');
 document.getElementById('tutEditTitle').value='';
 document.getElementById('tutEditSummary').value='';
 document.getElementById('tutEditCategory').value='设计';
-if(quill&&quill.root){if(quill.root.tagName==='TEXTAREA')quill.root.value='';else quill.root.innerHTML='';}
+setQuillHTML('');
 document.getElementById('tutVideoInput').value='';
 document.getElementById('tutImageInput').value='';
 document.getElementById('tutEditCover').value='';
@@ -1346,10 +1434,9 @@ h+='</div></div>';
 c.innerHTML=h;
 c.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;var t=self._tuts.find(function(x){return x.id===id;});if(t)App.showTutDetail(t);});});
 c.querySelectorAll('.edit-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;var t=self._tuts.find(function(x){return x.id===id;});if(t){
-self._tutEditId=id;self._isDraftPub=false;
+self._tutEditId=id;self._isDraftPub=false;self._editSource='published';self._pubDraftId=null;
 self._vl=[];self._il=[];
 try{if(t.videos)self._vl=typeof t.videos==='string'?JSON.parse(t.videos):t.videos;}catch(e){self._vl=[];}
-if(t.cover)self._il.push(t.cover);
 self._renderMedia();
 document.getElementById('tutEditModal').classList.remove('hidden');
 document.getElementById('tutEditModalTitle').textContent='编辑教程';
@@ -1357,7 +1444,7 @@ document.getElementById('tutSubmitBtn').textContent='更新';
 document.getElementById('tutEditTitle').value=t.title||'';
 document.getElementById('tutEditSummary').value=t.summary||'';
 document.getElementById('tutEditCategory').value=t.category||'设计';
-if(quill&&quill.root){if(quill.root.tagName==='TEXTAREA')quill.root.value=(t.content||'').replace(/<[^>]+>/g,'');else quill.root.innerHTML=t.content||'';}
+setQuillHTML(t.content||'');
 document.getElementById('tutVideoInput').value='';
 document.getElementById('tutImageInput').value='';
 document.getElementById('tutEditCover').value=t.cover||'';
@@ -1645,7 +1732,7 @@ h+='</div></div>';
 }
 c.innerHTML=h;
 c.querySelectorAll('.edit-draft-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var d=getDraft(id);if(d){
-self._tutEditId=id;self._isDraftPub=false;
+self._tutEditId=id;self._isDraftPub=false;self._editSource='draft';self._pubDraftId=id;
 try{self._vl=typeof d.videos==='string'?JSON.parse(d.videos):(d.videos||[]);self._il=typeof d.images==='string'?JSON.parse(d.images):(d.images||[]);}catch(e){self._vl=[];self._il=[];}
 self._renderMedia();
 document.getElementById('tutEditModal').classList.remove('hidden');
@@ -1654,7 +1741,7 @@ document.getElementById('tutSubmitBtn').textContent='更新草稿';
 document.getElementById('tutEditTitle').value=d.title||'';
 document.getElementById('tutEditSummary').value=d.summary||'';
 document.getElementById('tutEditCategory').value=d.category||'设计';
-if(quill&&quill.root){if(quill.root.tagName==='TEXTAREA')quill.root.value=(d.content||'').replace(/<[^>]+>/g,'');else quill.root.innerHTML=d.content||'';}
+setQuillHTML(d.content||'');
 document.getElementById('tutVideoInput').value='';
 document.getElementById('tutImageInput').value='';
 document.getElementById('tutEditCover').value=d.cover||'';
@@ -1665,7 +1752,7 @@ if(tg)tg.classList.add('active');
 self._startAuto();
 }});});
 c.querySelectorAll('.pub-draft-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var d=getDraft(id);if(d){
-self._tutEditId=null;self._isDraftPub=true;
+self._tutEditId=null;self._isDraftPub=true;self._editSource='draftPub';self._pubDraftId=id;
 try{self._vl=typeof d.videos==='string'?JSON.parse(d.videos):(d.videos||[]);self._il=typeof d.images==='string'?JSON.parse(d.images):(d.images||[]);}catch(e){self._vl=[];self._il=[];}
 self._renderMedia();
 document.getElementById('tutEditModal').classList.remove('hidden');
@@ -1674,7 +1761,7 @@ document.getElementById('tutSubmitBtn').textContent='发布';
 document.getElementById('tutEditTitle').value=d.title||'';
 document.getElementById('tutEditSummary').value=d.summary||'';
 document.getElementById('tutEditCategory').value=d.category||'设计';
-if(quill&&quill.root){if(quill.root.tagName==='TEXTAREA')quill.root.value=(d.content||'').replace(/<[^>]+>/g,'');else quill.root.innerHTML=d.content||'';}
+setQuillHTML(d.content||'');
 document.getElementById('tutVideoInput').value='';
 document.getElementById('tutImageInput').value='';
 document.getElementById('tutEditCover').value=d.cover||'';
@@ -1704,8 +1791,9 @@ if(this._autoSave){clearInterval(this._autoSave);this._autoSave=null;}
 },
 _autoSaveDraft:function(){
 if(!quill||!quill.root)return;
+if(this._editSource==='published')return;
 var title=document.getElementById('tutEditTitle').value.trim();
-var content=quill.root.tagName==='TEXTAREA'?quill.root.value:quill.root.innerHTML;
+var content=getQuillHTML();
 content=(content||'').trim();
 if(!title&&!content)return;
 var sum=document.getElementById('tutEditSummary').value.trim();
@@ -1713,9 +1801,9 @@ var cat=document.getElementById('tutEditCategory').value;
 var cov=document.getElementById('tutEditCover').value.trim();
 var vs=this._vl.slice();
 var is=this._il.slice();
-var did=this._tutEditId||Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+var did=(this._editSource==='draft'&&this._pubDraftId)?this._pubDraftId:(this._tutEditId||Date.now().toString(36)+Math.random().toString(36).slice(2,6));
 var d={id:did,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
-try{saveDraft(d);if(!this._tutEditId)this._tutEditId=did;}catch(e){}
+try{saveDraft(d);if(!this._tutEditId&&this._editSource!=='draft')this._tutEditId=did;}catch(e){}
 },
 
 _extractAddVideo:function(url){
@@ -1798,17 +1886,18 @@ if(!supabaseClient){toast('❌ 客户端未初始化','error');return;}
 var title=document.getElementById('tutEditTitle').value.trim();
 var sum=document.getElementById('tutEditSummary').value.trim();
 var cat=document.getElementById('tutEditCategory').value;
-var content=quill.root.tagName==='TEXTAREA'?quill.root.value:quill.root.innerHTML;
+var content=getQuillHTML();
 content=(content||'').trim();
 var cov=document.getElementById('tutEditCover').value.trim();
 if(!title||!content){toast('标题和内容不能为空','warning');return;}
 var vs=this._vl.slice();
 var is=this._il.slice();
 var editId=this._tutEditId;
-var isDraft=this._isDraftPub;
-var data={title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),cover:cov||(is.length>0?is[0]:''),likes:0};
+var editSource=this._editSource||'new';
+var pubDraftId=this._pubDraftId;
+var data={title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),cover:cov||(is.length>0?is[0]:'')};
 var saveToDrafts=function(msg){
-var did=(editId&&!isDraft)?editId:Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+var did=(editSource==='draft'&&pubDraftId)?pubDraftId:((editSource==='published'&&editId)?editId:Date.now().toString(36)+Math.random().toString(36).slice(2,6));
 var d={id:did,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
 try{saveDraft(d);toast('💾 已自动保存到草稿箱'+(msg?' ('+msg+')':''),'warning');}catch(e){toast('❌ 草稿保存失败','error');}
 document.getElementById('tutEditModal').classList.add('hidden');
@@ -1817,33 +1906,43 @@ self._vl=[];self._il=[];
 self._renderMedia();
 if(self._tab==='drafts')self.renderDrafts(document.getElementById('adminMain'));
 };
-var doSave=function(){
-if(editId&&!isDraft){
+var closeAndReset=function(){
+document.getElementById('tutEditModal').classList.add('hidden');
+self._stopAuto();
+self._vl=[];self._il=[];
+self._renderMedia();
+self._editSource=null;
+self._pubDraftId=null;
+self._tutEditId=null;
+self._isDraftPub=false;
+};
+
+if(editSource==='draft'){
+var d={id:pubDraftId||editId,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
+try{saveDraft(d);toast('✅ 草稿已更新');closeAndReset();self.renderTab(self._tab);}catch(e){toast('❌ 草稿更新失败','error');}
+return;
+}
+
+if(editSource==='published'&&editId){
 supabaseClient.from('tutorials').update(data).eq('id',editId).then(function(r){
 if(r.error){saveToDrafts(r.error.message);return;}
 var drafts=getDrafts();
 if(drafts.some(function(d){return d.id===editId;}))deleteDraft(editId);
 toast('✅ 更新成功');
-document.getElementById('tutEditModal').classList.add('hidden');
-self._stopAuto();
-self._vl=[];self._il=[];
-self._renderMedia();
+closeAndReset();
 self.renderTab(self._tab);
 }).catch(function(e){saveToDrafts(e.message);});
-}else{
-supabaseClient.from('tutorials').insert([data]).then(function(r){
+return;
+}
+
+var insertData=Object.assign({likes:0},data);
+supabaseClient.from('tutorials').insert([insertData]).then(function(r){
 if(r.error){saveToDrafts(r.error.message);return;}
 toast('🎉 发布成功');
-if(isDraft&&editId){deleteDraft(editId);self._isDraftPub=false;}
-document.getElementById('tutEditModal').classList.add('hidden');
-self._stopAuto();
-self._vl=[];self._il=[];
-self._renderMedia();
+if(editSource==='draftPub'&&pubDraftId){deleteDraft(pubDraftId);}
+closeAndReset();
 self.renderTab(self._tab);
 }).catch(function(e){saveToDrafts(e.message);});
-}
-};
-doSave();
 },
 
 renderSettings:function(c){
