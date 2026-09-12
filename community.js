@@ -221,7 +221,7 @@ var bell=document.createElement('button');
 bell.id='communityBell';
 bell.className='header-theme-btn';
 bell.style.cssText='position:relative;display:none;';
-bell.innerHTML='<i class="fas fa-bell"></i><span id="communityBellDot" style="position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:#e74c3c;display:none;"></span>';
+bell.innerHTML='<i class="fas fa-bell"></i><span id="communityBellDot" style="position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:#e74c3c;display:none;box-shadow:0 0 0 2px var(--bg-card-solid);"></span>';
 bell.addEventListener('click',Community.showNotifications);
 var last=headerInner.lastElementChild;
 headerInner.insertBefore(bell,last);
@@ -240,26 +240,89 @@ Community.showNotifications=async function(){
 if(!window.currentUser)return;
 var existing=document.getElementById('communityNotifPanel');
 if(existing){existing.remove();return;}
-var res=await supabaseClient.from('notifications').select('*').eq('user_id',window.currentUser.id).order('created_at',{ascending:false}).limit(30);
-var html='<div id="communityNotifPanel" style="position:fixed;top:70px;right:20px;width:320px;max-height:400px;overflow-y:auto;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:9999;padding:12px;">';
-html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong>通知</strong><button id="communityNotifClose" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-dim);">&times;</button></div>';
-if(!res.data||res.data.length===0){
-html+='<p style="color:var(--text-dim);font-size:0.8rem;">暂无通知</p>';
-}else{
-for(var i=0;i<res.data.length;i++){
-var n=res.data[i];
-html+='<div style="padding:6px 0;border-bottom:1px solid var(--border-glow);font-size:0.8rem;'+(n.is_read?'opacity:0.6':'')+'">'+Community.escapeHTML(n.content||'')+'<div style="font-size:0.6rem;color:var(--text-dim);">'+(typeof timeAgo==='function'?timeAgo(n.created_at):'')+'</div></div>';
+if(!document.getElementById('communityNotifStyles')){
+var s=document.createElement('style');
+s.id='communityNotifStyles';
+s.textContent='@keyframes notifIn{from{opacity:0;transform:translateY(-12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes notifOut{to{opacity:0;transform:translateY(-8px) scale(.97)}}@keyframes notifPulse{0%,100%{box-shadow:0 0 0 0 currentColor;opacity:1}50%{box-shadow:0 0 0 4px transparent;opacity:.7}}#communityNotifBody::-webkit-scrollbar{width:5px}#communityNotifBody::-webkit-scrollbar-track{background:transparent}#communityNotifBody::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.2);border-radius:10px}#communityNotifBody::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.35)}';
+document.head.appendChild(s);
 }
+var res=await supabaseClient.from('notifications').select('*').eq('user_id',window.currentUser.id).order('created_at',{ascending:false}).limit(30);
+var data=res.data||[];
+var unreadCount=data.filter(function(n){return !n.is_read;}).length;
+var panel=document.createElement('div');
+panel.id='communityNotifPanel';
+panel.style.cssText='position:fixed;top:70px;right:16px;width:360px;max-width:calc(100vw - 32px);max-height:480px;background:var(--bg-card-solid);border:1px solid var(--border-glow-strong);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.16),0 2px 8px rgba(0,0,0,0.06);z-index:9999;overflow:hidden;display:flex;flex-direction:column;font-family:var(--font);animation:notifIn .28s cubic-bezier(.2,.8,.3,1);';
+var header=document.createElement('div');
+header.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border-glow);background:linear-gradient(135deg,rgba(0,119,255,0.05),rgba(108,92,231,0.04));';
+var titleHtml='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:1.1rem;">🔔</span><strong style="font-size:0.95rem;font-weight:700;color:var(--text-primary);">消息通知</strong>';
+if(unreadCount>0){titleHtml+='<span style="background:var(--accent-gradient);color:#fff;font-size:0.65rem;font-weight:700;padding:1px 8px;border-radius:20px;">'+unreadCount+' 条未读</span>';}
+else{titleHtml+='<span style="background:rgba(0,0,0,0.06);color:var(--text-dim);font-size:0.65rem;padding:1px 8px;border-radius:20px;">全部已读</span>';}
+titleHtml+='</div>';
+header.innerHTML=titleHtml;
+var closeBtn=document.createElement('button');
+closeBtn.innerHTML='&times;';
+closeBtn.style.cssText='background:rgba(0,0,0,0.04);border:none;width:28px;height:28px;border-radius:50%;color:var(--text-dim);font-size:1.15rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:.2s;';
+closeBtn.onmouseover=function(){this.style.background='rgba(239,68,68,0.12)';this.style.color='#ef4444';};
+closeBtn.onmouseout=function(){this.style.background='rgba(0,0,0,0.04)';this.style.color='var(--text-dim)';};
+header.appendChild(closeBtn);
+panel.appendChild(header);
+var body=document.createElement('div');
+body.id='communityNotifBody';
+body.style.cssText='flex:1;overflow-y:auto;padding:6px 0;scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.2) transparent;';
+if(data.length===0){
+body.innerHTML='<div style="text-align:center;padding:48px 20px;"><div style="font-size:2.4rem;opacity:0.3;margin-bottom:8px;">📭</div><div style="font-size:0.85rem;color:var(--text-dim);">暂无新消息</div><div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;opacity:0.7;">有新动态时会在这里通知你</div></div>';
+}else{
+data.forEach(function(n){
+var item=document.createElement('div');
+var unread=!n.is_read;
+var contentStr=String(n.content||'');
+var titleMatch=contentStr.match(/^【([^】]+)】([\s\S]+)$/);
+var title=titleMatch?titleMatch[1]:'系统通知';
+var bodyText=titleMatch?titleMatch[2]:contentStr;
+var color='#0077ff';
+var icon='🔔';
+if(title.indexOf('新软件')!==-1||title.indexOf('上架')!==-1){color='#0b9e5a';icon='🚀';}
+else if(title.indexOf('更新')!==-1){color='#f59e0b';icon='⚡';}
+else if(title.indexOf('教程')!==-1){color='#7c3aed';icon='📖';}
+else if(title.indexOf('活动')!==-1||title.indexOf('🎉')!==-1){color='#ec4899';icon='🎉';}
+item.style.cssText='display:flex;gap:12px;padding:12px 16px;cursor:pointer;transition:background .2s;'+(unread?'background:linear-gradient(90deg,'+color+'0d,transparent 60%);border-left:3px solid '+color+';':'border-left:3px solid transparent;');
+var iconBox=document.createElement('div');
+iconBox.style.cssText='width:36px;height:36px;border-radius:10px;background:'+color+'15;color:'+color+';display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;';
+iconBox.textContent=icon;
+var contentBox=document.createElement('div');
+contentBox.style.cssText='flex:1;min-width:0;';
+var innerHtml='<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><strong style="font-size:0.83rem;font-weight:700;color:var(--text-primary);">'+Community.escapeHTML(title)+'</strong>'+(unread?'<span style="width:6px;height:6px;border-radius:50%;background:'+color+';flex-shrink:0;"></span>':'')+'</div>';
+innerHtml+='<div style="font-size:0.78rem;line-height:1.5;color:var(--text-secondary);word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">'+Community.escapeHTML(bodyText)+'</div>';
+innerHtml+='<div style="font-size:0.65rem;color:var(--text-dim);margin-top:6px;display:flex;align-items:center;gap:4px;"><i class="far fa-clock"></i> '+(typeof timeAgo==='function'?timeAgo(n.created_at):'刚刚')+'</div>';
+contentBox.innerHTML=innerHtml;
+item.appendChild(iconBox);
+item.appendChild(contentBox);
+item.onmouseover=function(){this.style.background=unread?'linear-gradient(90deg,'+color+'18,transparent 60%)':'rgba(0,0,0,0.025)';};
+item.onmouseout=function(){this.style.background=unread?'linear-gradient(90deg,'+color+'0d,transparent 60%)':'transparent';};
+body.appendChild(item);
+});
+}
+panel.appendChild(body);
+if(data.length>0){
+var footer=document.createElement('div');
+footer.style.cssText='padding:10px 16px;border-top:1px solid var(--border-glow);text-align:center;background:var(--bg-primary);';
+footer.innerHTML='<div style="font-size:0.7rem;color:var(--text-dim);">显示最近 '+data.length+' 条通知</div>';
+panel.appendChild(footer);
+}
+document.body.appendChild(panel);
+var closePanel=function(){panel.style.animation='notifOut .22s ease forwards';setTimeout(function(){if(panel.parentNode)panel.remove();document.removeEventListener('click',outsideClick);},200);};
+closeBtn.onclick=closePanel;
+var outsideClick=function(e){
+if(!panel.contains(e.target)&&!e.target.closest('#communityBell')){
+closePanel();
+}
+};
+setTimeout(function(){document.addEventListener('click',outsideClick);},10);
+if(unreadCount>0){
 await supabaseClient.from('notifications').update({is_read:true}).eq('user_id',window.currentUser.id).eq('is_read',false);
 var dot=document.getElementById('communityBellDot');
 if(dot)dot.style.display='none';
 }
-html+='</div>';
-var wrapper=document.createElement('div');
-wrapper.innerHTML=html;
-var panel=wrapper.firstChild;
-document.body.appendChild(panel);
-document.getElementById('communityNotifClose').onclick=function(){panel.remove();};
 };
 
 Community.hijackDetailOpen=function(){
