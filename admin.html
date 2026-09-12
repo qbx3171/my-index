@@ -356,6 +356,7 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 <div class="nav-item" data-tab="categories"><span class="icon">⌗</span><span>分类管理</span></div>
 <div class="nav-item" data-tab="add"><span class="icon">⊕</span><span>上传软件</span></div>
 <div class="nav-item" data-tab="users"><span class="icon">👤</span><span>用户管理</span></div>
+<div class="nav-item" data-tab="messages"><span class="icon">✉</span><span>站内信</span></div>
 <div class="nav-item" data-tab="settings"><span class="icon">⚙</span><span>系统设置</span></div>
 <div class="theme-toggle" id="themeToggle">🌓<span>主题切换</span></div>
 <div class="logout-btn" id="adminLogout"><span class="icon">↺</span><span>退 出</span></div>
@@ -556,6 +557,26 @@ async reject(id){if(!supabaseClient)throw new Error('未初始化');var r=await 
 async delSub(id){if(!supabaseClient)throw new Error('未初始化');var r=await this._t(supabaseClient.from('software_submissions').delete().eq('id',id));if(r.error)throw r.error;this._sb=null;},
 async pf(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._pf&&n-this._pfT<this._ttl)return this._pf;try{var r=await this._t(supabaseClient.from('profiles').select('*').order('created_at',{ascending:false}));if(r.error)return this._pf||[];this._pf=r.data||[];this._pfT=n;return this._pf;}catch(e){return this._pf||[];}},
 async updPf(id,u){if(!supabaseClient)throw new Error('未初始化');var r=await this._t(supabaseClient.from('profiles').update(u).eq('id',id).select());if(r.error)throw r.error;if(!r.data||r.data.length===0)throw new Error('更新失败或权限不足');this._pf=null;return r.data[0];},
+async sendNotificationToAll(content){
+if(!supabaseClient)throw new Error('客户端未初始化');
+var pf=await this._t(supabaseClient.from('profiles').select('id'));
+if(pf.error)throw pf.error;
+var ids=(pf.data||[]).map(function(x){return x.id;});
+if(ids.length===0)return 0;
+var now=new Date().toISOString();
+var rows=ids.map(function(uid){return {user_id:uid,content:content,is_read:false,created_at:now};});
+var r=await this._t(supabaseClient.from('notifications').insert(rows));
+if(r.error)throw r.error;
+return ids.length;
+},
+async getNotificationHistory(){
+if(!supabaseClient)return [];
+try{
+var r=await this._t(supabaseClient.from('notifications').select('content,created_at').order('created_at',{ascending:false}).limit(500));
+if(r.error)return [];
+return r.data||[];
+}catch(e){return [];}
+},
 getLogs:function(){try{return JSON.parse(localStorage.getItem('lezhe_logs'))||[];}catch(e){return [];}},
 addLog:function(a,d){var l=this.getLogs();l.unshift({id:Date.now().toString(36),time:new Date().toISOString(),action:a,detail:d,user:currentAdminUser?currentAdminUser.email:'admin'});if(l.length>200)l=l.slice(0,200);localStorage.setItem('lezhe_logs',JSON.stringify(l));},
 clearLogs:function(){localStorage.setItem('lezhe_logs','[]');}
@@ -820,8 +841,66 @@ if(t==='dashboard'){this.renderDash(m);return;}
 if(t==='categories'){this.renderCats(m);return;}
 if(t==='add'){this.renderAddForm(m);return;}
 if(t==='users'){this.renderUsers(m);return;}
+if(t==='messages'){this.renderMessages(m);return;}
 if(t==='settings'){this.renderSettings(m);return;}
 if(t==='qa'){this.renderQA(m);return;}
+},
+
+renderMessages:function(c){
+var self=this;
+var h='<h2 class="page-title">✉ 站内信</h2><p class="page-sub">向所有已注册用户发送系统通知</p>';
+h+='<div class="admin-form" style="max-width:720px;">';
+h+='<div class="form-group"><label>通知标题 <span class="hint">(可选)</span></label><input type="text" id="msgTitle" placeholder="例如：系统更新通知" /></div>';
+h+='<div class="form-group"><label>通知内容 <span class="required">*</span></label><textarea id="msgContent" placeholder="输入要发送给所有用户的通知内容..." style="min-height:120px;"></textarea></div>';
+h+='<div class="form-actions"><button class="btn btn-primary" id="sendMsgBtn">📨 发送给所有用户</button></div></div>';
+h+='<h3 style="font-size:1rem;font-weight:600;margin:28px 0 12px;">📋 最近发送记录</h3>';
+h+='<div class="table-wrap" id="msgHistoryWrap"><div class="loading-spinner"><span class="spinner"></span> 加载中...</div></div>';
+c.innerHTML=h;
+c.querySelector('#sendMsgBtn').addEventListener('click',async function(){
+var btn=this;
+var title=document.getElementById('msgTitle').value.trim();
+var content=document.getElementById('msgContent').value.trim();
+if(!content){toast('请输入通知内容','error');return;}
+if(!confirm('确定要发送给所有用户吗？'))return;
+btn.disabled=true;btn.textContent='⏳ 发送中...';
+try{
+var full=title?'【'+title+'】'+content:content;
+var n=await DB.sendNotificationToAll(full);
+DB.addLog('发送站内信','共发送给 '+n+' 位用户');
+toast('✅ 已发送给 '+n+' 位用户');
+document.getElementById('msgContent').value='';
+document.getElementById('msgTitle').value='';
+self._loadMsgHistory();
+}catch(e){
+toast('❌ 发送失败: '+(e.message||'未知错误'),'error');
+}finally{
+btn.disabled=false;btn.textContent='📨 发送给所有用户';
+}
+});
+this._loadMsgHistory();
+},
+
+_loadMsgHistory:async function(){
+var wrap=document.getElementById('msgHistoryWrap');
+if(!wrap)return;
+var data=await DB.getNotificationHistory();
+if(!data.length){wrap.innerHTML='<div class="empty-state"><div class="icon">✉</div><h3>暂无发送记录</h3><p style="color:var(--dim);font-size:.85rem;">发送第一条站内信后，这里会显示发送历史</p></div>';return;}
+var groups={};
+for(var i=0;i<data.length;i++){
+var n=data[i];
+var key=(n.content||'')+'|'+((n.created_at||'').slice(0,16));
+if(!groups[key]){groups[key]={content:n.content,created_at:n.created_at,count:0};}
+groups[key].count++;
+}
+var list=Object.keys(groups).map(function(k){return groups[k];});
+list.sort(function(a,b){return (b.created_at||'').localeCompare(a.created_at||'');});
+var h='<table><thead><tr><th style="width:160px;">时间</th><th>内容</th><th style="width:90px;">接收人数</th></tr></thead><tbody>';
+for(var j=0;j<list.length;j++){
+var g=list[j];
+h+='<tr><td style="font-size:.72rem;white-space:nowrap;color:var(--tx2);">'+escapeHTML(formatDate(g.created_at))+'</td><td style="font-size:.8rem;">'+escapeHTML(g.content||'')+'</td><td><span class="badge badge-cyan">'+g.count+' 人</span></td></tr>';
+}
+h+='</tbody></table>';
+wrap.innerHTML=h;
 },
 
 renderDash:async function(c){
@@ -1043,7 +1122,7 @@ if(sf)sf.addEventListener('change',function(){self._subF=this.value;self._page=1
 var rb=c.querySelector('#subRefreshBtn');
 if(rb)rb.addEventListener('click',function(){DB.sub(true).then(function(d){self._subs=d;self.renderSubs(c);self.refreshSubBadge();toast('已刷新');});});
 c.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(s)App.showSubmission(s);});});
-c.querySelectorAll('.approve-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(!s)return;if(!confirm('确认批准「'+s.name+'」上架？'))return;btn.disabled=true;btn.textContent='处理中...';var rawPlat=s.platforms;if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=[];}}if(!Array.isArray(rawPlat))rawPlat=[];var soft={name:s.name,category:s.category,version:s.version||'1.0',description:s.description||'',detail:s.detail||'',platforms:rawPlat,download_url:s.download_url||'',icon_url:s.icon_url||'',icon:s.icon||'📦',size:s.size||'—',views:0,downloads:0,recommend:false,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()};DB.approve(id,soft).then(function(){toast('✅ 已批准上架');DB.addLog('批准提交','软件: '+s.name);self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('批准失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='✅ 批准';});});});
+c.querySelectorAll('.approve-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(!s)return;if(!confirm('确认批准「'+s.name+'」上架？'))return;btn.disabled=true;btn.textContent='处理中...';var rawPlat=s.platforms;if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=[];}}if(!Array.isArray(rawPlat))rawPlat=[];var soft={name:s.name,category:s.category,version:s.version||'1.0',description:s.description||'',detail:s.detail||'',platforms:rawPlat,download_url:s.download_url||'',icon_url:s.icon_url||'',icon:s.icon||'📦',size:s.size||'—',views:0,downloads:0,recommend:false,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()};DB.approve(id,soft).then(function(){toast('✅ 已批准上架');DB.addLog('批准提交','软件: '+s.name);DB.sendNotificationToAll('【新软件上架】'+s.name+' 已经上架，快来看看吧！').catch(function(){});self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('批准失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='✅ 批准';});});});
 c.querySelectorAll('.reject-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;if(!confirm('确认拒绝该提交？'))return;btn.disabled=true;btn.textContent='处理中...';DB.reject(id).then(function(){toast('已拒绝');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('拒绝失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='❌ 拒绝';});});});
 c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;if(!confirm('确定要删除此提交记录吗？'))return;btn.disabled=true;btn.textContent='处理中...';DB.delSub(id).then(function(){toast('已删除');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='删除';});});});
 c.querySelectorAll('.sub-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil((self._subs.filter(function(x){return self._subF==='all'||x.status===self._subF;})).length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderSubs(c);});});
@@ -1308,6 +1387,7 @@ if(self._editId){
 await DB.updSoft(self._editId,d);
 DB.addLog('更新软件','软件: '+d.name);
 toast('已更新: '+d.name);
+DB.sendNotificationToAll('【软件更新】'+d.name+' 已更新到 v'+d.version+'，快来看看吧！').catch(function(){});
 self._editId=null;
 await DB.soft(true).then(function(dd){self._all=dd;self._fil=dd.slice();});
 self.renderTab('add');
@@ -1325,6 +1405,7 @@ var r=await DB.addSoft(ns);
 if(r){
 DB.addLog('添加软件','软件: '+d.name);
 toast('上传成功: '+d.name);
+DB.sendNotificationToAll('【新软件上架】'+d.name+' v'+d.version+' 已发布，快来看看吧！').catch(function(){});
 form.reset();
 var pb=form.querySelector('.preview-box');if(pb)pb.textContent='📦';
 await DB.soft(true).then(function(dd){self._all=dd;self._fil=dd.slice();});
@@ -1963,6 +2044,7 @@ supabaseClient.from('tutorials').insert([insertData]).then(function(r){
 if(r.error){saveToDrafts(r.error.message);return;}
 toast('🎉 发布成功');
 if(editSource==='draftPub'&&pubDraftId){deleteDraft(pubDraftId);}
+DB.sendNotificationToAll('【新教程发布】'+title+'，快来看看吧！').catch(function(){});
 closeAndReset();
 self.renderTab(self._tab);
 }).catch(function(e){saveToDrafts(e.message);});
