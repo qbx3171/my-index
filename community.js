@@ -60,38 +60,12 @@ if(window.App&&!App._communityHijacked)Community.hijackGoProfile();
 if(window.Detail&&!Detail._communityHijacked)Community.hijackDetailOpen();
 if(typeof toggleFavorite==='function'&&!toggleFavorite._communityHijacked)Community.hijackFavoriteToggle();
 if(typeof addViewHistory==='function'&&!addViewHistory._communityHijacked)Community.hijackViewHistory();
-Community.adjustLeaderboardPosition();
 var pp=document.getElementById('pageProfile');
 if(pp&&!pp.classList.contains('hidden')&&!document.getElementById('communityProfileSection')){
 Community.injectProfile();
 }
 }catch(e){}
 },1000);
-};
-
-Community.adjustLeaderboardPosition=function(){
-var div=document.getElementById('communityLeaderboard');
-if(!div)return;
-var vh=window.innerHeight;
-var vw=window.innerWidth;
-var maxBottom=120;
-for(var i=0;i<document.body.children.length;i++){
-var el=document.body.children[i];
-if(el===div)continue;
-var cs;
-try{cs=window.getComputedStyle(el);}catch(e){continue;}
-if(cs.position!=='fixed')continue;
-if(cs.display==='none'||cs.visibility==='hidden'||parseFloat(cs.opacity)===0)continue;
-var r=el.getBoundingClientRect();
-if(r.width<10||r.height<10)continue;
-if(r.width>250||r.height>250)continue;
-var distRight=vw-r.right;
-if(distRight>60||distRight<-10)continue;
-if(r.top<vh*0.5)continue;
-var bottomEdge=vh-r.top;
-if(bottomEdge+16>maxBottom)maxBottom=Math.round(bottomEdge+16);
-}
-div.style.bottom=maxBottom+'px';
 };
 
 Community.bindAuthListener=function(){
@@ -560,8 +534,8 @@ Community.addLeaderboard=function(){
 if(document.getElementById('communityLeaderboard'))return;
 var div=document.createElement('div');
 div.id='communityLeaderboard';
-div.style.cssText='position:fixed;right:16px;bottom:120px;z-index:70;font-family:inherit;transition:bottom 0.3s;';
-div.innerHTML='<div id="communityLeaderboardPanel" style="display:none;position:absolute;bottom:56px;right:0;width:240px;max-height:60vh;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:12px;overflow:hidden;">'+
+div.style.cssText='position:fixed;left:16px;bottom:160px;z-index:70;font-family:inherit;';
+div.innerHTML='<div id="communityLeaderboardPanel" style="display:none;position:absolute;bottom:56px;left:0;width:240px;max-height:60vh;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:12px;overflow:hidden;">'+
 '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+
 '<span style="font-size:0.85rem;font-weight:700;color:var(--text-primary);">🏆 社区排行榜</span>'+
 '<button id="communityLeaderboardClose" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text-dim);padding:0 4px;">&times;</button>'+
@@ -583,7 +557,6 @@ closeBtn.addEventListener('click',function(){
 panel.style.display='none';
 expanded=false;
 });
-setTimeout(Community.adjustLeaderboardPosition,200);
 };
 
 Community.loadLeaderboard=async function(){
