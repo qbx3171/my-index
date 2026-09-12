@@ -372,7 +372,7 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 <div class="form-group"><label>摘要 <span class="hint">· 一句话简介</span></label><input type="text" id="tutEditSummary" placeholder="一句话概括教程内容" /></div>
 <div class="form-group"><label>分类 <span class="hint">· 选择所属类别</span></label><div class="category-select-wrapper" id="categorySelectWrapper"><span class="cat-option active" data-cat="设计">🎨 设计</span><span class="cat-option" data-cat="开发">💻 开发</span><span class="cat-option" data-cat="办公">📋 办公</span><span class="cat-option" data-cat="媒体">🎬 媒体</span><span class="cat-option" data-cat="实用">🔧 实用</span></div><input type="hidden" id="tutEditCategory" value="设计" /></div>
 <div class="form-group">
-<label>视频链接 <span class="hint">· 支持 YouTube / B站 / 抖音 / 腾讯 / 优酷 等</span></label>
+<label>视频链接 <span class="hint">· 支持 YouTube / B站 自动提取封面，其他平台请手动输入</span></label>
 <div class="media-input-group">
 <input type="text" id="tutVideoInput" placeholder="粘贴视频链接，自动识别平台并提取封面" />
 <button class="add-btn" id="addVideoBtn">+ 添加</button>
@@ -438,7 +438,7 @@ function getPlatformLabels(p){
   return p.map(function(x){return m[x]||x;}).join(' · ');
 }
 
-function renderIconThumb(s){var fb=s.icon||'📦';if(s.icon_url&&s.icon_url.trim()){var u=s.icon_url.trim();if(!u.startsWith('http://')&&!u.startsWith('https://'))return escapeHTML(fb);return '<img src="'+escapeHTML(u)+'" alt="'+escapeHTML(s.name||'')+'" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeHTML(fb)+'\'" />';}return escapeHTML(fb);}
+function renderIconThumb(s){var fb=s.icon||'📦';if(s.icon_url&&s.icon_url.trim()){var u=s.icon_url.trim();if(!u.startsWith('http://')&&!u.startsWith('https://'))return escapeHTML(fb);var safeFb=escapeHTML(fb).replace(/'/g,"\\'");return '<img src="'+escapeHTML(u)+'" alt="'+escapeHTML(s.name||'')+'" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+safeFb+'\'" />';}return escapeHTML(fb);}
 function getCategoryTagClass(c){var m={'设计':'design','开发':'dev','办公':'office','媒体':'media','实用':'tool'};return m[c]||'design';}
 function getDrafts(){try{return JSON.parse(localStorage.getItem('lezhe_tutorial_drafts')||'[]');}catch(e){return [];}}
 function saveDrafts(d){localStorage.setItem('lezhe_tutorial_drafts',JSON.stringify(d));}
@@ -536,8 +536,8 @@ async cats(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&th
 async addSoft(s){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').insert(s).select());if(r.error)return null;this.invalidate();return r.data?r.data[0]:null;}catch(e){return null;}},
 async updSoft(id,u){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').update(u).eq('id',id).select());if(r.error)throw r.error;this.invalidate();},
 async delSoft(id){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').delete().eq('id',id).select('id'));if(r.error)throw r.error;if(!r.data||r.data.length===0)throw new Error('删除失败或权限不足');this.invalidate();},
-async delSoftBatch(ids){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').delete().in('id',ids));if(r.error)throw r.error;this.invalidate();},
-async recSoftBatch(ids,rec){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').update({recommend:rec}).in('id',ids));if(r.error)throw r.error;this.invalidate();},
+async delSoftBatch(ids){if(!supabaseClient)throw new Error('客户端未初始化');if(!ids||ids.length===0)return;var r=await this._t(supabaseClient.from('software').delete().in('id',ids));if(r.error)throw r.error;this.invalidate();},
+async recSoftBatch(ids,rec){if(!supabaseClient)throw new Error('客户端未初始化');if(!ids||ids.length===0)return;var r=await this._t(supabaseClient.from('software').update({recommend:rec}).in('id',ids));if(r.error)throw r.error;this.invalidate();},
 async addCat(n){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('categories').insert({name:n}));if(r.error)throw r.error;this._ca=null;},
 async delCat(n){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('categories').delete().eq('name',n));if(r.error)throw r.error;this._ca=null;},
 async tut(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._tu&&n-this._tuT<this._ttl)return this._tu;try{var r=await this._t(supabaseClient.from('tutorials').select('*').order('created_at',{ascending:false}));if(r.error)return this._tu||[];this._tu=r.data||[];this._tuT=n;return this._tu;}catch(e){return this._tu||[];}},
@@ -673,7 +673,7 @@ if(u&&u.trim()){
 var s=u.trim();
 if(s.startsWith('//'))s='https:'+s;
 if(!s.startsWith('http://')&&!s.startsWith('https://')&&!s.startsWith('data:image/')){toast('⚠️ 请填写有效的图片链接','warning');return;}
-setQuillHTML(getQuillHTML()+'<p><img src="'+s+'" style="max-width:100%;" /></p>');
+setQuillHTML(getQuillHTML()+'<p><img src="'+escapeHTML(s)+'" style="max-width:100%;" /></p>');
 toast('✅ 图片已插入');
 }
 });
@@ -968,8 +968,9 @@ c.querySelectorAll('.page-btn').forEach(function(b){b.addEventListener('click',f
 _exportCSV:function(d){
 if(!d||d.length===0){toast('没有数据可导出','error');return;}
 var hs=['名称','分类','版本','下载量','浏览数','推荐','日期'];
+var csvEscape=function(val){if(val===null||val===undefined)return '';var str=String(val);if(str.includes(',')||str.includes('"')||str.includes('\n')){return '"'+str.replace(/"/g,'""')+'"';}return str;};
 var rows=d.map(function(s){return [s.name,s.category,'v'+s.version,s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||''];}); 
-var csv=hs.join(',')+'\n'+rows.map(function(r){return r.join(',');}).join('\n');
+var csv=hs.join(',')+'\n'+rows.map(function(r){return r.map(csvEscape).join(',');}).join('\n');
 var bl=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
 var a=document.createElement('a');
 a.href=URL.createObjectURL(bl);
@@ -1042,9 +1043,9 @@ if(sf)sf.addEventListener('change',function(){self._subF=this.value;self._page=1
 var rb=c.querySelector('#subRefreshBtn');
 if(rb)rb.addEventListener('click',function(){DB.sub(true).then(function(d){self._subs=d;self.renderSubs(c);self.refreshSubBadge();toast('已刷新');});});
 c.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(s)App.showSubmission(s);});});
-c.querySelectorAll('.approve-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(!s)return;if(!confirm('确认批准「'+s.name+'」上架？'))return;var rawPlat=s.platforms;if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=[];}}if(!Array.isArray(rawPlat))rawPlat=[];var soft={name:s.name,category:s.category,version:s.version||'1.0',description:s.description||'',detail:s.detail||'',platforms:rawPlat,download_url:s.download_url||'',icon_url:s.icon_url||'',icon:s.icon||'📦',size:s.size||'—',views:0,downloads:0,recommend:false,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()};DB.approve(id,soft).then(function(){toast('✅ 已批准上架');DB.addLog('批准提交','软件: '+s.name);self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('批准失败: '+(e.message||'未知错误'),'error');});});});
-c.querySelectorAll('.reject-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;if(!confirm('确认拒绝该提交？'))return;DB.reject(id).then(function(){toast('已拒绝');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('拒绝失败: '+(e.message||'未知错误'),'error');});});});
-c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;if(!confirm('确定要删除此提交记录吗？'))return;DB.delSub(id).then(function(){toast('已删除');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');});});});
+c.querySelectorAll('.approve-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(!s)return;if(!confirm('确认批准「'+s.name+'」上架？'))return;btn.disabled=true;btn.textContent='处理中...';var rawPlat=s.platforms;if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=[];}}if(!Array.isArray(rawPlat))rawPlat=[];var soft={name:s.name,category:s.category,version:s.version||'1.0',description:s.description||'',detail:s.detail||'',platforms:rawPlat,download_url:s.download_url||'',icon_url:s.icon_url||'',icon:s.icon||'📦',size:s.size||'—',views:0,downloads:0,recommend:false,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()};DB.approve(id,soft).then(function(){toast('✅ 已批准上架');DB.addLog('批准提交','软件: '+s.name);self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('批准失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='✅ 批准';});});});
+c.querySelectorAll('.reject-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;if(!confirm('确认拒绝该提交？'))return;btn.disabled=true;btn.textContent='处理中...';DB.reject(id).then(function(){toast('已拒绝');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('拒绝失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='❌ 拒绝';});});});
+c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;if(!confirm('确定要删除此提交记录吗？'))return;btn.disabled=true;btn.textContent='处理中...';DB.delSub(id).then(function(){toast('已删除');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='删除';});});});
 c.querySelectorAll('.sub-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil((self._subs.filter(function(x){return self._subF==='all'||x.status===self._subF;})).length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderSubs(c);});});
 },
 
@@ -1062,7 +1063,7 @@ var h='<div class="detail-row"><div class="label">名称</div><div class="value"
 '<div class="detail-row"><div class="label">大小</div><div class="value">'+escapeHTML(s.size||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">简介</div><div class="value">'+escapeHTML(s.description||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">详情</div><div class="value">'+escapeHTML(s.detail||'-')+'</div></div>'+
-'<div class="detail-row"><div class="label">下载链接</div><div class="value">'+(s.download_url?'<a href="'+escapeHTML(s.download_url)+'" target="_blank" style="color:var(--cy);word-break:break-all;">'+escapeHTML(s.download_url)+'</a>':'-')+'</div></div>'+
+'<div class="detail-row"><div class="label">下载链接</div><div class="value">'+(s.download_url?'<a href="'+escapeHTML(s.download_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;">'+escapeHTML(s.download_url)+'</a>':'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">图标链接</div><div class="value">'+escapeHTML(s.icon_url||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">联系方式</div><div class="value">'+escapeHTML(s.contact||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">提交时间</div><div class="value">'+(s.created_at?formatDate(s.created_at):'-')+'</div></div>';
@@ -1161,15 +1162,14 @@ var info=c.querySelector('#userCountInfo');
 if(info)info.textContent='共 '+total+' 人';
 area.querySelectorAll('.toggle-admin-btn').forEach(function(b){
 b.addEventListener('click',function(){
-var id=this.dataset.id;
-var isAdm=this.dataset.admin==='1';
-var nv=!isAdm;
+var btn=this;var id=btn.dataset.id;var isAdm=btn.dataset.admin==='1';var nv=!isAdm;
 if(!confirm(nv?'确定将该用户设为管理员？':'确定取消该用户的管理员权限？'))return;
+btn.disabled=true;btn.textContent='处理中...';
 DB.updPf(id,{is_admin:nv}).then(function(){
 toast('✅ 已'+(nv?'设为':'取消')+'管理员');
 DB.addLog('修改权限','用户 '+shortId(id)+' is_admin='+nv);
 DB.pf(true).then(function(d){self._pfs=d;self._renderUsersPage(c);});
-}).catch(function(e){toast('操作失败: '+(e.message||'未知错误'),'error');});
+}).catch(function(e){toast('操作失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent=nv?'🛡 设为管理员':'🛡 取消管理员';});
 });
 });
 area.querySelectorAll('.pf-page-btn').forEach(function(b){
@@ -1218,11 +1218,12 @@ if(list.some(function(x){return x.name===n;})){toast('该分类已存在','error
 try{await DB.addCat(n);DB.addLog('添加分类','分类: '+n);toast('分类已添加');self.renderCats(c);}catch(e){toast('添加失败: '+(e.message||''),'error');}
 });
 c.querySelectorAll('.del-btn[data-cat]').forEach(function(b){b.addEventListener('click',async function(){
-var cat=this.dataset.cat;
-var allSoft=await DB.soft();
-if(allSoft.some(function(s){return s.category===cat;})){toast('该分类下还有软件，无法删除','error');return;}
-if(!confirm('确定删除分类 "'+cat+'" 吗？'))return;
-try{await DB.delCat(cat);DB.addLog('删除分类','分类: '+cat);toast('已删除');self.renderCats(c);}catch(e){toast('删除失败: '+(e.message||''),'error');}
+var btn=this;var cat=btn.dataset.cat;
+btn.disabled=true;
+var allSoft=await DB.soft(true);
+if(allSoft.some(function(s){return s.category===cat;})){toast('该分类下还有软件，无法删除','error');btn.disabled=false;return;}
+if(!confirm('确定删除分类 "'+cat+'" 吗？')){btn.disabled=false;return;}
+try{await DB.delCat(cat);DB.addLog('删除分类','分类: '+cat);toast('已删除');self.renderCats(c);}catch(e){toast('删除失败: '+(e.message||''),'error');btn.disabled=false;}
 });});
 },
 
@@ -1334,7 +1335,7 @@ if(!form)return;
 var u=form.querySelector('[name="iconUrl"]').value.trim();
 var p=form.querySelector('.preview-box');
 var e=form.querySelector('[name="icon"]').value.trim()||'📦';
-if(u&&(u.startsWith('http://')||u.startsWith('https://')))p.innerHTML='<img src="'+escapeHTML(u)+'" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeHTML(e)+'\'" />';
+if(u&&(u.startsWith('http://')||u.startsWith('https://')))p.innerHTML='<img src="'+escapeHTML(u)+'" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeHTML(e).replace(/'/g,"\\'")+'\'" />';
 else p.textContent=e;
 },
 
@@ -1393,6 +1394,7 @@ s.innerHTML='💡 输入视频链接后点击「提取封面」或「添加」�
 document.getElementById('contentPreviewArea').classList.add('hidden');
 document.getElementById('previewContentBtn').textContent='预览';
 self._startAuto();
+setTimeout(function(){if(quill&&quill.focus)quill.focus();},300);
 });
 c.querySelectorAll('.tut-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil(self._getFilteredTuts().length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderTuts(c);});});
 },
@@ -1453,6 +1455,7 @@ document.querySelectorAll('#categorySelectWrapper .cat-option').forEach(function
 var tg=document.querySelector('#categorySelectWrapper .cat-option[data-cat="'+(t.category||'设计')+'"]');
 if(tg)tg.classList.add('active');
 self._startAuto();
+setTimeout(function(){if(quill&&quill.focus)quill.focus();},300);
 }});});
 c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;if(!confirm('确定要删除这篇教程吗？'))return;DB.delTut(id).then(function(){DB.addLog('删除教程','ID: '+shortId(id));toast('已删除');DB.tut(true).then(function(d){self._tuts=d;self.renderTuts(document.getElementById('adminMain'));});}).catch(function(e){toast('删除失败: '+(e.message||''),'error');});});});
 c.querySelectorAll('.tutorial-card').forEach(function(card){card.addEventListener('click',function(e){if(e.target.closest('button'))return;var id=this.dataset.id;var t=self._tuts.find(function(x){return x.id===id;});if(t)App.showTutDetail(t);});});
@@ -1476,7 +1479,7 @@ if(p==='youtube'){var yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?
 else if(p==='bilibili'){var bm=url.match(/b23\.tv\/([a-zA-Z0-9]+)/)||url.match(/bilibili\.com\/video\/([a-zA-Z0-9]+)/);if(bm)eu='https://player.bilibili.com/player.html?bvid='+bm[1];}
 return '<div style="margin:6px 0;border-radius:6px;overflow:hidden;"><iframe src="'+escapeHTML(eu)+'" style="width:100%;min-height:200px;border:none;border-radius:6px;" allowfullscreen loading="lazy"></iframe></div>';
 }
-return '<div style="margin:4px 0;"><a href="'+escapeHTML(url)+'" target="_blank" rel="noopener" style="color:var(--cy);word-break:break-all;font-size:.8rem;">'+escapeHTML(url)+'</a><div style="font-size:.65rem;color:var(--dim);margin-top:2px;">💡 该平台视频不支持直接嵌入，点击链接在新窗口观看</div></div>';
+return '<div style="margin:4px 0;"><a href="'+escapeHTML(url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;font-size:.8rem;">'+escapeHTML(url)+'</a><div style="font-size:.65rem;color:var(--dim);margin-top:2px;">💡 该平台视频不支持直接嵌入，点击链接在新窗口观看</div></div>';
 }).join('');
 }
 var cov='';
@@ -1508,7 +1511,7 @@ body.innerHTML='<div class="detail-row"><div class="label">图标</div><div clas
 '<div class="detail-row"><div class="label">推荐</div><div class="value">'+(s.recommend?'✅ 是':'❌ 否')+'</div></div>'+
 '<div class="detail-row"><div class="label">简介</div><div class="value">'+escapeHTML(s.description||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">详情</div><div class="value">'+escapeHTML(s.detail||'-')+'</div></div>'+
-'<div class="detail-row"><div class="label">下载链接</div><div class="value">'+(s.download_url?'<a href="'+escapeHTML(s.download_url)+'" target="_blank" style="color:var(--cy);word-break:break-all;">'+escapeHTML(s.download_url)+'</a>':'-')+'</div></div>'+
+'<div class="detail-row"><div class="label">下载链接</div><div class="value">'+(s.download_url?'<a href="'+escapeHTML(s.download_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;">'+escapeHTML(s.download_url)+'</a>':'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">创建时间</div><div class="value">'+(s.created_at?formatDate(s.created_at):s.date||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">ID</div><div class="value" style="font-size:.7rem;color:var(--dim);">'+escapeHTML(s.id||'')+'</div></div>';
 m.classList.remove('hidden');
@@ -1520,11 +1523,8 @@ var self=this;
 var data=await DB.cm(true);
 var tuts=await DB.tut(true);
 this._cms=data;
-var tm={};
-tuts.forEach(function(t){tm[t.id]=t.title;});
-var kw=(this._cmKw||'').toLowerCase().trim();
-var fTut=this._cmTutF||'all';
-var fil=data.filter(function(x){var mt=(tm[x.tutorial_id]||'').toLowerCase().includes(kw);var mc=(x.content||'').toLowerCase().includes(kw);var ma=(x.author||'').toLowerCase().includes(kw);var mtu=fTut==='all'||x.tutorial_id===fTut;return (mt||mc||ma)&&mtu;});
+this._tuts=tuts;
+var fil=this._getFilteredComments();
 var total=fil.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
@@ -1535,14 +1535,15 @@ var pi=fil.slice(st,en);
 var tOpt=[{v:'all',l:'全部教程'}].concat(tuts.map(function(t){return {v:t.id,l:t.title};}));
 var h='<h2 class="page-title">💬 评论管理</h2><p class="page-sub">共 '+total+' 条评论</p><div class="toolbar">';
 h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="cmSearch" placeholder="搜索评论..." value="'+escapeHTML(this._cmKw)+'" /></div>';
-h+='<select id="cmFilterTut">'+tOpt.map(function(o){return '<option value="'+escapeHTML(o.v)+'" '+(o.v===fTut?'selected':'')+'>'+escapeHTML(o.l)+'</option>';}).join('')+'</select>';
+h+='<select id="cmFilterTut">'+tOpt.map(function(o){return '<option value="'+escapeHTML(o.v)+'" '+(o.v===self._cmTutF?'selected':'')+'>'+escapeHTML(o.l)+'</option>';}).join('')+'</select>';
 h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="cmRefresh">⟳ 刷新</button><span class="selected-info">共 '+total+' 条</span></div></div>';
 h+='<div class="table-wrap comment-table-wrap"><table><thead><tr><th>教程</th><th>作者</th><th>评论内容</th><th>时间</th><th style="width:180px;">操作</th></tr></thead><tbody>';
 if(pi.length===0)h+='<tr class="empty-row"><td colspan="5">暂无评论</td></tr>';
 else{
 for(var i=0;i<pi.length;i++){
 var x=pi[i];
-var ttl=tm[x.tutorial_id]||'未知教程';
+var ttl='未知教程';
+for(var ti=0;ti<tuts.length;ti++){if(tuts[ti].id===x.tutorial_id){ttl=tuts[ti].title;break;}}
 h+='<tr data-id="'+x.id+'">';
 h+='<td style="font-size:.75rem;">'+escapeHTML(ttl)+'</td>';
 h+='<td>'+escapeHTML(x.author||'匿名用户')+'</td>';
@@ -1568,8 +1569,17 @@ if(fs)fs.addEventListener('change',function(){self._cmTutF=this.value;self._page
 var rb=c.querySelector('#cmRefresh');
 if(rb)rb.addEventListener('click',function(){DB.cm(true).then(function(d){self._cms=d;self.renderComments(c);toast('已刷新');});});
 c.querySelectorAll('.reply-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var tut=this.dataset.tut;var au=this.dataset.author;self._replyId=id;self._replyTut=tut;self._replyAuthor=au;document.getElementById('replyReceiver').textContent='@'+au;document.getElementById('replyInput').value='';document.getElementById('replyModal').classList.remove('hidden');setTimeout(function(){document.getElementById('replyInput').focus();},100);});});
-c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;if(!confirm('确定要删除这条评论吗？'))return;DB.delCm(id).then(function(r){if(r.success){DB.addLog('删除评论','ID: '+shortId(id));toast('✅ 已删除');self._cms=self._cms.filter(function(x){return x.id!==id;});self.renderComments(c);}else toast('❌ '+(r.error||'删除失败'),'error');});});});
-c.querySelectorAll('.cm-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil((self._cms.filter(function(x){var mt=(tm[x.tutorial_id]||'').toLowerCase().includes((self._cmKw||'').toLowerCase());var mc=(x.content||'').toLowerCase().includes((self._cmKw||'').toLowerCase());var mtu=self._cmTutF==='all'||x.tutorial_id===self._cmTutF;return (mt||mc)&&mtu;})).length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderComments(c);});});
+c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;if(!confirm('确定要删除这条评论吗？'))return;btn.disabled=true;btn.textContent='处理中...';DB.delCm(id).then(function(r){if(r.success){DB.addLog('删除评论','ID: '+shortId(id));toast('✅ 已删除');self._cms=self._cms.filter(function(x){return x.id!==id;});self.renderComments(c);}else{toast('❌ '+(r.error||'删除失败'),'error');btn.disabled=false;btn.textContent='🗑 删除';}});});});
+c.querySelectorAll('.cm-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil(self._getFilteredComments().length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderComments(c);});});
+},
+
+_getFilteredComments:function(){
+var data=this._cms||[];
+var kw=(this._cmKw||'').toLowerCase().trim();
+var fTut=this._cmTutF||'all';
+var tm={};
+(this._tuts||[]).forEach(function(t){tm[t.id]=t.title;});
+return data.filter(function(x){var mt=(tm[x.tutorial_id]||'').toLowerCase().includes(kw);var mc=(x.content||'').toLowerCase().includes(kw);var ma=(x.author||'').toLowerCase().includes(kw);var mtu=fTut==='all'||x.tutorial_id===fTut;return (mt||mc||ma)&&mtu;});
 },
 
 _sendReply:function(){
@@ -1645,7 +1655,7 @@ var rb=c.querySelector('#qaRefresh');
 if(rb)rb.addEventListener('click',function(){Promise.all([DB.q(true),DB.an(true)]).then(function(r){self._qs=r[0];self._ans=r[1];self.renderQA(c);toast('已刷新');});});
 c.querySelectorAll('tr.clickable').forEach(function(tr){tr.addEventListener('click',function(e){if(e.target.closest('button'))return;self.showQDetail(this.dataset.id);});});
 c.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();self.showQDetail(this.dataset.id);});});
-c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;if(!confirm('确定要删除这个问题及其所有回答吗？'))return;DB.delQ(id).then(function(){DB.addLog('删除问题','ID: '+shortId(id));toast('已删除');Promise.all([DB.q(true),DB.an(true)]).then(function(r){self._qs=r[0];self._ans=r[1];self.renderQA(c);});}).catch(function(e){toast('删除失败: '+(e.message||''),'error');});});});
+c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var btn=this;var id=btn.dataset.id;if(!confirm('确定要删除这个问题及其所有回答吗？'))return;btn.disabled=true;btn.textContent='处理中...';DB.delQ(id).then(function(){DB.addLog('删除问题','ID: '+shortId(id));toast('已删除');Promise.all([DB.q(true),DB.an(true)]).then(function(r){self._qs=r[0];self._ans=r[1];self.renderQA(c);});}).catch(function(e){toast('删除失败: '+(e.message||''),'error');btn.disabled=false;btn.textContent='删除';});});});
 c.querySelectorAll('.qa-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil(self._getFilteredQ().length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderQA(c);});});
 },
 
@@ -1750,6 +1760,7 @@ document.querySelectorAll('#categorySelectWrapper .cat-option').forEach(function
 var tg=document.querySelector('#categorySelectWrapper .cat-option[data-cat="'+(d.category||'设计')+'"]');
 if(tg)tg.classList.add('active');
 self._startAuto();
+setTimeout(function(){if(quill&&quill.focus)quill.focus();},300);
 }});});
 c.querySelectorAll('.pub-draft-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var d=getDraft(id);if(d){
 self._tutEditId=null;self._isDraftPub=true;self._editSource='draftPub';self._pubDraftId=id;
@@ -1770,6 +1781,7 @@ document.querySelectorAll('#categorySelectWrapper .cat-option').forEach(function
 var tg=document.querySelector('#categorySelectWrapper .cat-option[data-cat="'+(d.category||'设计')+'"]');
 if(tg)tg.classList.add('active');
 self._startAuto();
+setTimeout(function(){if(quill&&quill.focus)quill.focus();},300);
 }});});
 c.querySelectorAll('.del-draft-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;if(!confirm('确定要删除这篇草稿吗？'))return;deleteDraft(id);toast('草稿已删除');self.renderDrafts(document.getElementById('adminMain'));});});
 },
@@ -1895,7 +1907,7 @@ var is=this._il.slice();
 var editId=this._tutEditId;
 var editSource=this._editSource||'new';
 var pubDraftId=this._pubDraftId;
-var data={title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),cover:cov||(is.length>0?is[0]:'')};
+var data={title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:'')};
 var saveToDrafts=function(msg){
 var did=(editSource==='draft'&&pubDraftId)?pubDraftId:((editSource==='published'&&editId)?editId:Date.now().toString(36)+Math.random().toString(36).slice(2,6));
 var d={id:did,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
