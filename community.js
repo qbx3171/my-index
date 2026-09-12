@@ -252,7 +252,10 @@ s.textContent=[
 '#communityNotifBody::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.2);border-radius:10px}',
 '#communityNotifBody::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.35)}',
 '.notif-card{transition:all .25s cubic-bezier(.2,.8,.3,1);}',
-'.notif-card:hover{transform:translateX(2px);}'
+'.notif-card:hover{transform:translateX(2px);}',
+'.notif-del-btn{transition:all .2s;}',
+'.notif-card:hover .notif-del-btn{opacity:0.7 !important;}',
+'.notif-del-btn:hover{background:rgba(239,68,68,0.12) !important;color:#ef4444 !important;opacity:1 !important;}'
 ].join('');
 document.head.appendChild(s);
 }
@@ -271,7 +274,7 @@ header.innerHTML='<div style="display:flex;align-items:center;gap:10px;">'+
 '<i class="fas fa-bell"></i></div>'+
 '<div>'+
 '<div style="font-size:0.95rem;font-weight:700;color:var(--text-primary);line-height:1.2;">消息通知</div>'+
-'<div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;">'+(unreadCount>0?('<span style="color:#0077ff;font-weight:600;">'+unreadCount+'</span> 条未读'):'全部已读')+'</div>'+
+'<div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;" id="communityNotifSubtitle">'+(unreadCount>0?('<span style="color:#0077ff;font-weight:600;">'+unreadCount+'</span> 条未读'):'全部已读')+'</div>'+
 '</div>'+
 '</div>';
 
@@ -338,13 +341,68 @@ dot.style.cssText='width:7px;height:7px;border-radius:50%;background:'+cfg.color
 titleWrap.appendChild(dot);
 }
 
+var rightGroup=document.createElement('div');
+rightGroup.style.cssText='display:flex;align-items:center;gap:4px;flex-shrink:0;';
+
 var timeEl=document.createElement('span');
-timeEl.style.cssText='font-size:0.65rem;color:var(--text-dim);flex-shrink:0;font-variant-numeric:tabular-nums;';
+timeEl.style.cssText='font-size:0.65rem;color:var(--text-dim);font-variant-numeric:tabular-nums;white-space:nowrap;';
 timeEl.textContent=(typeof timeAgo==='function'?timeAgo(n.created_at):'刚刚');
 
+var delBtn=document.createElement('button');
+delBtn.className='notif-del-btn';
+delBtn.innerHTML='&times;';
+delBtn.title='删除这条通知';
+delBtn.style.cssText='width:22px;height:22px;border-radius:6px;background:transparent;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0.35;padding:0;line-height:1;flex-shrink:0;';
+
+delBtn.onclick=async function(e){
+e.stopPropagation();
+if(!confirm('确定删除这条通知吗？'))return;
+delBtn.disabled=true;
+delBtn.innerHTML='<i class="fas fa-spinner fa-spin" style="font-size:0.7rem;"></i>';
+try{
+var delRes=await supabaseClient.from('notifications').delete().eq('id',n.id);
+if(delRes.error){
+Community.toast('删除失败: '+delRes.error.message,'error');
+delBtn.disabled=false;
+delBtn.innerHTML='&times;';
+return;
+}
+Community.toast('已删除','success');
+card.style.transition='all .3s cubic-bezier(.2,.8,.3,1)';
+card.style.opacity='0';
+card.style.transform='translateX(30px)';
+card.style.marginBottom='-'+card.offsetHeight+'px';
+setTimeout(function(){
+card.remove();
+var remaining=body.querySelectorAll('.notif-card').length;
+if(remaining===0){
+body.innerHTML='<div style="text-align:center;padding:56px 20px;">'+
+'<div style="font-size:2.8rem;opacity:0.25;margin-bottom:10px;">📭</div>'+
+'<div style="font-size:0.88rem;color:var(--text-secondary);font-weight:500;">暂无新消息</div>'+
+'<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;">有新动态时会在这里通知你</div>'+
+'</div>';
+}
+var subtitle=document.getElementById('communityNotifSubtitle');
+if(subtitle){
+var nowUnread=body.querySelectorAll('.notif-card').length;
+if(unread){
+var unreadNow=Array.prototype.filter.call(body.querySelectorAll('.notif-card'),function(el){return el.querySelector('.notif-card-dot');}).length;
+subtitle.innerHTML=unreadNow>0?('<span style="color:#0077ff;font-weight:600;">'+unreadNow+'</span> 条未读'):'全部已读';
+}
+}
+},320);
+}catch(err){
+Community.toast('删除异常: '+(err.message||'未知错误'),'error');
+delBtn.disabled=false;
+delBtn.innerHTML='&times;';
+}
+};
+
+rightGroup.appendChild(timeEl);
+rightGroup.appendChild(delBtn);
 topRow.appendChild(iconBox);
 topRow.appendChild(titleWrap);
-topRow.appendChild(timeEl);
+topRow.appendChild(rightGroup);
 card.appendChild(topRow);
 
 var bodyEl=document.createElement('div');
