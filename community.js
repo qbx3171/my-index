@@ -1,4 +1,4 @@
-console.log('community.js v16 loaded');
+console.log('community.js v17 loaded');
 
 (function () {
   'use strict';
@@ -41,25 +41,38 @@ console.log('community.js v16 loaded');
 
   function detectPointFieldFromProfile(p) {
     if (!p) return null;
+    var fallback = null;
     for (var i = 0; i < POINT_FIELDS.length; i++) {
-      if (p[POINT_FIELDS[i]] !== undefined && p[POINT_FIELDS[i]] !== null) {
-        return POINT_FIELDS[i];
+      var f = POINT_FIELDS[i];
+      if (p[f] !== undefined && p[f] !== null) {
+        var v = Number(p[f]) || 0;
+        if (v > 0) return f;
+        if (fallback === null) fallback = f;
       }
     }
-    return null;
+    return fallback;
   }
 
   function detectPointFieldFromList(records) {
     if (!records || !records.length) return null;
+    var fallback = null;
     for (var j = 0; j < POINT_FIELDS.length; j++) {
+      var f = POINT_FIELDS[j];
+      var hasField = false;
+      var hasPositive = false;
       for (var k = 0; k < records.length; k++) {
-        if (records[k] && records[k][POINT_FIELDS[j]] !== undefined &&
-            records[k][POINT_FIELDS[j]] !== null) {
-          return POINT_FIELDS[j];
+        if (records[k] && records[k][f] !== undefined && records[k][f] !== null) {
+          hasField = true;
+          if ((Number(records[k][f]) || 0) > 0) {
+            hasPositive = true;
+            break;
+          }
         }
       }
+      if (hasPositive) return f;
+      if (hasField && fallback === null) fallback = f;
     }
-    return null;
+    return fallback;
   }
 
   function getProfilePoints(p) {
