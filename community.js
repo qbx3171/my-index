@@ -7,7 +7,6 @@ C.init=function(){if(typeof supabaseClient==='undefined'||!supabaseClient){setTi
 C.run=function(){var fns=[C.hijackDetail,C.hijackProfile,C.hijackFav,C.hijackHist,C.addBell,C.addBoard,C.egg,C.pwa,C.bindAuth];for(var i=0;i<fns.length;i++){try{fns[i]();}catch(e){console.warn('init err',e);}}};
 C.retry=function(){if(C._rt)return;var n=0;C._rt=setInterval(function(){n++;if(n>60){clearInterval(C._rt);C._rt=null;return;}try{
 if(!document.getElementById('communityLeaderboard'))C.addBoard();
-C.adjustBoardPos();
 if(!document.getElementById('communityBell'))C.addBell();
 if(window.App&&!App._ch)C.hijackProfile();
 if(window.Detail&&!Detail._ch)C.hijackDetail();
@@ -16,17 +15,7 @@ if(typeof addViewHistory==='function'&&!addViewHistory._ch)C.hijackHist();
 var pp=document.getElementById('pageProfile');if(pp&&!pp.classList.contains('hidden'))C.injectProfile();
 }catch(e){}},1000);};
 
-C.adjustBoardPos=function(){
-var d=document.getElementById('communityLeaderboard');
-if(!d)return;
-var sf=document.getElementById('shareFloat');
-var b=340;
-if(sf){
-var r=sf.getBoundingClientRect();
-if(r.height>0){b=Math.max(120,Math.round(window.innerHeight-r.top+8));}
-}
-d.style.bottom=b+'px';
-};
+C.adjustBoardPos=function(){};
 
 C.bindAuth=function(){if(C._ab)return;C._ab=true;try{supabaseClient.auth.onAuthStateChange(function(e,s){if(s&&s.user){window.currentUser=s.user;C.onLogin();}else{window.currentUser=null;C.onLogout();}});}catch(e){}setTimeout(function(){if(window.currentUser)C.onLogin();},1500);};
 C.onLogin=async function(){C.refreshProfile();try{await C.ensureProfile();}catch(e){}await Promise.all([C.syncFav(),C.syncHist(),C.loadPoints(),C.loadNotifs()].map(function(p){return p.catch(function(){});}));C.updateLv();C.refreshProfile();};
@@ -61,7 +50,48 @@ C.injectProfile=function(){if(C._ip)return;C._ip=true;setTimeout(function(){C._i
 C.refreshProfile=function(){var pp=document.getElementById('pageProfile');if(pp&&!pp.classList.contains('hidden')){C.injectProfile();if(typeof renderRecentHistory==='function')renderRecentHistory();}};
 C.doCheckin=async function(){if(!window.currentUser){C.tip('请先登录','warning');return;}var b=document.getElementById('communityCheckinBtn');if(b){b.disabled=true;b.textContent='签到中...';}try{var td=C.getToday();var ex=await supabaseClient.from('checkins').select('id').eq('user_id',window.currentUser.id).eq('checkin_date',td).maybeSingle();if(ex.error){C.tip('查询失败','error');if(b){b.disabled=false;b.textContent='每日签到';}return;}if(ex.data){C.tip('今天已经签到过了','warning');window.userLastCheckin=td;await C.loadPoints();C.injectProfile();C.updateLv();return;}var pr=await supabaseClient.from('profiles').select('points,streak,last_checkin').eq('id',window.currentUser.id).maybeSingle();var cp=0,cs=0,lc=null;if(pr.data){cp=pr.data.points||0;cs=pr.data.streak||0;lc=pr.data.last_checkin||null;}var st=cs+1;if(st>1&&lc){var df=(new Date(td)-new Date(lc))/86400000;if(df>1)st=1;}var np=cp+10;var lv=Math.floor(np/100)+1;var ir=await supabaseClient.from('checkins').insert({user_id:window.currentUser.id,checkin_date:td,points:10});if(ir.error){C.tip('签到失败','error');if(b){b.disabled=false;b.textContent='每日签到';}return;}var ur=await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:np,level:lv,streak:st,last_checkin:td,updated_at:new Date().toISOString()},{onConflict:'id'});if(ur.error){C.tip('积分保存失败','error');if(b){b.disabled=false;b.textContent='每日签到';}return;}await C.loadPoints();C.injectProfile();C.updateLv();C.tip('签到成功 +10 积分','success');}catch(e){C.tip('签到异常','error');if(b){b.disabled=false;b.textContent='每日签到';}}};
 
-C.addBoard=function(){if(document.getElementById('communityLeaderboard'))return;var d=document.createElement('div');d.id='communityLeaderboard';d.style.cssText='position:fixed;right:16px;bottom:340px;z-index:70;font-family:inherit;transition:bottom 0.25s ease;';d.innerHTML='<div id="communityLeaderboardPanel" style="display:none;position:absolute;bottom:60px;right:0;width:260px;max-height:60vh;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.18);padding:14px;overflow:hidden;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:0.88rem;font-weight:700;color:var(--text-primary);">🏆 社区排行榜</span><button id="communityLeaderboardClose" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text-dim);padding:0 4px;">&times;</button></div><div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:50vh;overflow-y:auto;">点击加载...</div></div><button id="communityLeaderboardToggle" style="width:50px;height:50px;border-radius:50%;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;font-size:1.35rem;box-shadow:0 6px 20px rgba(0,119,255,0.4);display:flex;align-items:center;justify-content:center;">🏆</button>';document.body.appendChild(d);var tg=document.getElementById('communityLeaderboardToggle');var pn=document.getElementById('communityLeaderboardPanel');var cb=document.getElementById('communityLeaderboardClose');var ex=false;var op=function(){pn.style.display='block';ex=true;C.loadBoard();};var cp=function(){pn.style.display='none';ex=false;};tg.addEventListener('click',function(e){e.stopPropagation();if(ex)cp();else op();});cb.addEventListener('click',function(e){e.stopPropagation();cp();});pn.addEventListener('click',function(e){e.stopPropagation();});document.addEventListener('click',function(e){if(ex&&!d.contains(e.target))cp();});};
+C.addBoard=function(){
+if(document.getElementById('communityLeaderboard'))return;
+var sf=document.getElementById('shareFloat');
+if(!sf){setTimeout(C.addBoard,500);return;}
+var wechat=null;
+var as=sf.getElementsByTagName('a');
+for(var i=0;i<as.length;i++){
+var ti=as[i].getAttribute('title')||'';
+var oc=as[i].getAttribute('onclick')||'';
+if(ti.indexOf('微信')!==-1||oc.indexOf('wechat')!==-1){wechat=as[i];break;}
+}
+var wrap=document.createElement('div');
+wrap.id='communityLeaderboard';
+wrap.style.cssText='position:relative;';
+var btn=document.createElement('a');
+btn.id='communityLeaderboardToggle';
+btn.href='#';
+btn.title='社区排行榜';
+btn.innerHTML='<i class="fas fa-trophy"></i>';
+btn.style.cssText='display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:var(--bg-card-solid);box-shadow:var(--shadow-card);border:1px solid var(--border-glow);color:var(--text-secondary);font-size:1.1rem;transition:all .3s;text-decoration:none;cursor:pointer;';
+btn.onmouseenter=function(){btn.style.background='var(--accent-gradient)';btn.style.color='#fff';btn.style.transform='scale(1.08)';btn.style.borderColor='transparent';};
+btn.onmouseleave=function(){btn.style.background='var(--bg-card-solid)';btn.style.color='var(--text-secondary)';btn.style.transform='';btn.style.borderColor='var(--border-glow)';};
+wrap.appendChild(btn);
+var panel=document.createElement('div');
+panel.id='communityLeaderboardPanel';
+panel.style.cssText='display:none;position:fixed;width:260px;max-height:60vh;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.18);padding:14px;overflow:hidden;z-index:200;';
+panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:0.88rem;font-weight:700;color:var(--text-primary);">🏆 社区排行榜</span><button id="communityLeaderboardClose" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text-dim);padding:0 4px;">&times;</button></div><div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:50vh;overflow-y:auto;">点击加载...</div>';
+document.body.appendChild(panel);
+if(wechat&&wechat.parentNode===sf){sf.insertBefore(wrap,wechat);}else{sf.insertBefore(wrap,sf.firstChild);}
+var isOpen=false;
+var placePanel=function(){var r=btn.getBoundingClientRect();panel.style.left=(r.left-260+42)+'px';panel.style.top=(r.top-8)+'px';panel.style.transform='translateY(-100%)';};
+var open=function(){placePanel();panel.style.display='block';isOpen=true;C.loadBoard();};
+var close=function(){panel.style.display='none';isOpen=false;};
+btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();if(isOpen)close();else open();});
+var cb=document.getElementById('communityLeaderboardClose');
+if(cb)cb.addEventListener('click',function(e){e.stopPropagation();close();});
+panel.addEventListener('click',function(e){e.stopPropagation();});
+document.addEventListener('click',function(e){if(isOpen&&!wrap.contains(e.target)&&!panel.contains(e.target))close();});
+window.addEventListener('resize',function(){if(isOpen)placePanel();});
+window.addEventListener('scroll',function(){if(isOpen)placePanel();},true);
+};
+
 C.loadBoard=async function(){var el=document.getElementById('communityLeaderboardContent');if(!el)return;el.innerHTML='加载中...';var r=await supabaseClient.from('profiles').select('username,points,level').order('points',{ascending:false}).limit(10);if(r.error){el.innerHTML='<p style="color:var(--text-dim);">加载失败</p>';return;}var d=r.data||[];if(d.length===0){el.innerHTML='<p style="color:var(--text-dim);">暂无数据</p>';return;}var h='';for(var i=0;i<d.length;i++){var u=d[i];var rc=i===0?'#f39c12':i===1?'#95a5a6':i===2?'#cd7f32':'var(--text-dim)';var md=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-glow);"><span style="width:20px;text-align:center;font-weight:700;color:'+rc+';flex-shrink:0;">'+md+'</span><span style="flex:1;font-weight:500;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+C.esc(u.username||'匿名')+'</span><span style="font-size:0.7rem;color:var(--accent-cyan);font-weight:600;flex-shrink:0;">'+(u.points||0)+'</span><span style="font-size:0.6rem;color:var(--text-dim);flex-shrink:0;">Lv'+(u.level||1)+'</span></div>';}el.innerHTML=h;};
 
 C.egg=function(){var lg=document.getElementById('logoHome');if(lg&&!lg._ee){lg._ee=true;var n=0;lg.addEventListener('click',function(){n++;if(n>=5){n=0;C.tip('🎉 彩蛋触发！','success');var r=document.documentElement;r.style.setProperty('--accent-cyan','#ff00ff');setTimeout(function(){r.style.setProperty('--accent-cyan','#0077ff');},3000);}});}};
