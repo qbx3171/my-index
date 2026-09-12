@@ -1,4 +1,5 @@
-/* community.js - 社区排行榜模块（独立、无语法风险、自动定位） */
+console.log('community.js v5 loaded');
+
 (function () {
   'use strict';
 
