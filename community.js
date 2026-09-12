@@ -33,7 +33,7 @@ C.init=function(){
 };
 
 C.run=function(){
-  var fns=[C.hijackDetail,C.hijackProfile,C.hijackFav,C.hijackHist,C.addBell,C.addBoard,C.egg,C.pwa,C.bindAuth];
+  var fns=[C.addBell,C.addBoard,C.bindAuth,C.hijackDetail,C.hijackProfile,C.hijackFav,C.hijackHist,C.egg,C.pwa];
   for(var i=0;i<fns.length;i++){try{fns[i]();}catch(e){console.warn('init err',e);}}
 };
 
@@ -42,7 +42,7 @@ C.retry=function(){
   var n=0;
   C._rt=setInterval(function(){
     n++;
-    if(n>60){clearInterval(C._rt);C._rt=null;return;}
+    if(n>300){clearInterval(C._rt);C._rt=null;return;}
     try{
       if(!document.getElementById('communityLeaderboard'))C.addBoard();
       if(!document.getElementById('communityBell'))C.addBell();
@@ -55,8 +55,6 @@ C.retry=function(){
     }catch(e){}
   },1000);
 };
-
-C.adjustBoardPos=function(){};
 
 C.bindAuth=function(){
   if(C._ab)return;
@@ -139,10 +137,7 @@ C.loadPoints=async function(){
     window.userStreak=r.data.streak||0;
     window.userLastCheckin=r.data.last_checkin||null;
   }else{
-    window.userPoints=0;
-    window.userLevel=1;
-    window.userStreak=0;
-    window.userLastCheckin=null;
+    window.userPoints=0;window.userLevel=1;window.userStreak=0;window.userLastCheckin=null;
   }
 };
 
@@ -177,19 +172,24 @@ C.updateLv=function(){
 C.addBell=function(){
   if(document.getElementById('communityBell'))return;
   var hi=document.querySelector('.header-inner');
-  if(!hi)return;
+  if(!hi){return;}
   var b=document.createElement('button');
   b.id='communityBell';
   b.className='header-theme-btn';
-  b.style.cssText='position:relative;display:none;';
+  b.style.cssText='position:relative;display:flex;';
   b.innerHTML='<i class="fas fa-bell"></i><span id="communityBellDot" style="position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:#e74c3c;display:none;"></span>';
-  b.addEventListener('click',C.showNotifs);
+  b.addEventListener('click',function(e){e.stopPropagation();C.showNotifs();});
   var last=hi.lastElementChild;
   hi.insertBefore(b,last);
+  if(!window.currentUser)b.style.display='none';
 };
 
 C.loadNotifs=async function(){
-  if(!window.currentUser)return;
+  if(!window.currentUser){
+    var b0=document.getElementById('communityBell');
+    if(b0)b0.style.display='none';
+    return;
+  }
   var b=document.getElementById('communityBell');
   if(b)b.style.display='flex';
   var r=await supabaseClient.from('notifications').select('id').eq('user_id',window.currentUser.id).eq('is_read',false);
@@ -207,11 +207,7 @@ C.showNotifDetail=function(title,body,timeStr){
   box.style.cssText='width:100%;max-width:560px;max-height:80vh;background:var(--bg-card-solid);border:1px solid var(--border-glow-strong);border-radius:18px;box-shadow:0 24px 64px rgba(0,0,0,0.2);display:flex;flex-direction:column;overflow:hidden;transform:scale(0.96);transition:transform .25s cubic-bezier(0.2,0,0,1);';
   var hd=document.createElement('div');
   hd.style.cssText='display:flex;align-items:center;gap:10px;padding:18px 22px 14px;border-bottom:1px solid var(--border-glow);flex-shrink:0;';
-  hd.innerHTML='<div style="width:34px;height:34px;border-radius:10px;background:var(--accent-gradient);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-bell"></i></div>'+
-    '<div style="flex:1;min-width:0;">'+
-    '<div style="font-size:1rem;font-weight:700;color:var(--text-primary);word-break:break-word;">'+C.esc(title)+'</div>'+
-    '<div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;">'+C.esc(timeStr||'')+'</div>'+
-    '</div>';
+  hd.innerHTML='<div style="width:34px;height:34px;border-radius:10px;background:var(--accent-gradient);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-bell"></i></div><div style="flex:1;min-width:0;"><div style="font-size:1rem;font-weight:700;color:var(--text-primary);word-break:break-word;">'+C.esc(title)+'</div><div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;">'+C.esc(timeStr||'')+'</div></div>';
   var cb=document.createElement('button');
   cb.innerHTML='&times;';
   cb.style.cssText='background:rgba(0,0,0,0.04);border:none;width:30px;height:30px;border-radius:50%;color:var(--text-dim);font-size:1.2rem;cursor:pointer;flex-shrink:0;line-height:1;';
@@ -227,15 +223,12 @@ C.showNotifDetail=function(title,body,timeStr){
   var onKey=function(e){if(e.key==='Escape')close();};
   var close=function(){ov.remove();document.removeEventListener('keydown',onKey);};
   cb.onclick=close;
-  ov.addEventListener('click',function(e){
-    e.stopPropagation();
-    if(e.target===ov)close();
-  });
+  ov.addEventListener('click',function(e){e.stopPropagation();if(e.target===ov)close();});
   document.addEventListener('keydown',onKey);
 };
 
 C.showNotifs=function(){
-  if(!window.currentUser)return;
+  if(!window.currentUser){C.needLogin();return;}
   var ex=document.getElementById('communityNotifPanel');
   if(ex){ex.remove();return;}
 
@@ -248,11 +241,7 @@ C.showNotifs=function(){
 
   var hd=document.createElement('div');
   hd.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:16px 20px 14px;border-bottom:1px solid var(--border-glow);flex-shrink:0;';
-  hd.innerHTML='<div style="display:flex;align-items:center;gap:10px;">'+
-    '<div style="width:32px;height:32px;border-radius:10px;background:var(--accent-gradient);color:#fff;display:flex;align-items:center;justify-content:center;"><i class="fas fa-bell"></i></div>'+
-    '<div><div style="font-size:0.95rem;font-weight:700;">消息通知</div>'+
-    '<div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;" id="communityNotifCount">加载中...</div></div>'+
-    '</div>';
+  hd.innerHTML='<div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:10px;background:var(--accent-gradient);color:#fff;display:flex;align-items:center;justify-content:center;"><i class="fas fa-bell"></i></div><div><div style="font-size:0.95rem;font-weight:700;">消息通知</div><div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;" id="communityNotifCount">加载中...</div></div></div>';
   var cb=document.createElement('button');
   cb.innerHTML='&times;';
   cb.style.cssText='background:rgba(0,0,0,0.04);border:none;width:30px;height:30px;border-radius:50%;color:var(--text-dim);font-size:1.2rem;cursor:pointer;flex-shrink:0;line-height:1;';
@@ -272,10 +261,10 @@ C.showNotifs=function(){
   var oc=function(e){if(!p.contains(e.target)&&!e.target.closest('#communityBell')){cp();}};
   setTimeout(function(){document.addEventListener('click',oc);},10);
 
-  C.loadNotifContent(bd,p);
+  C.loadNotifContent(bd);
 };
 
-C.loadNotifContent=async function(bd,p){
+C.loadNotifContent=async function(bd){
   try{
     var r=await supabaseClient.from('notifications').select('*').eq('user_id',window.currentUser.id).order('created_at',{ascending:false}).limit(30);
     var data=r.data||[];
@@ -302,28 +291,29 @@ C.loadNotifContent=async function(bd,p){
       }else{
         bstyle+='white-space:pre-wrap;';
       }
-      html+='<div class="notif-item" data-id="'+n.id+'" style="background:var(--bg-card-solid);border-radius:12px;padding:14px 16px;margin-bottom:8px;border:1px solid var(--border-glow);position:relative;transition:border-color .2s;'+(isLong?'cursor:pointer;':'')+'">'+
+      html+='<div class="notif-item" data-id="'+n.id+'" data-long="'+(isLong?'1':'0')+'" style="background:var(--bg-card-solid);border-radius:12px;padding:14px 16px;margin-bottom:8px;border:1px solid var(--border-glow);position:relative;transition:border-color .2s;'+(isLong?'cursor:pointer;':'')+'">'+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'+
-        '<span style="font-size:0.85rem;font-weight:700;color:var(--text-primary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+C.esc(title)+'</span>'+
-        '<span style="font-size:0.65rem;color:var(--text-dim);flex-shrink:0;">'+timeStr+'</span>'+
+        '<span class="notif-title" style="font-size:0.85rem;font-weight:700;color:var(--text-primary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+C.esc(title)+'</span>'+
+        '<span class="notif-time" style="font-size:0.65rem;color:var(--text-dim);flex-shrink:0;">'+timeStr+'</span>'+
         '<button class="ndel" data-id="'+n.id+'" style="background:transparent;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;opacity:0.5;flex-shrink:0;line-height:1;padding:0 4px;">&times;</button>'+
         '</div>'+
-        '<div style="'+bstyle+'">'+C.esc(body)+'</div>'+
+        '<div class="notif-body" style="'+bstyle+'">'+C.esc(body)+'</div>'+
         (isLong?'<div style="font-size:0.68rem;color:var(--accent-cyan);margin-top:8px;font-weight:600;display:flex;align-items:center;gap:4px;"><i class="fas fa-expand-alt"></i> 点击查看全文</div>':'')+
         '</div>';
     });
     bd.innerHTML=html;
 
     bd.querySelectorAll('.notif-item').forEach(function(el){
-      if(!el.style.cursor||el.style.cursor!=='pointer')return;
+      if(el.dataset.long!=='1')return;
       el.addEventListener('click',function(e){
         if(e.target.closest('.ndel'))return;
-        var tt=String(el.querySelector('div:nth-child(2)').textContent||'');
-        var titleEl=el.querySelector('div span');
+        var titleEl=el.querySelector('.notif-title');
+        var bodyEl=el.querySelector('.notif-body');
+        var timeEl=el.querySelector('.notif-time');
         var title=titleEl?titleEl.textContent:'系统通知';
-        var timeEl=el.querySelectorAll('div span')[1];
+        var body=bodyEl?bodyEl.textContent:'';
         var timeStr=timeEl?timeEl.textContent:'';
-        C.showNotifDetail(title,tt,timeStr);
+        C.showNotifDetail(title,body,timeStr);
       });
     });
 
@@ -362,7 +352,13 @@ C.hijackProfile=function(){
   if(typeof App.goProfile!=='function')return;
   App._ch=true;
   var o=App.goProfile;
-  App.goProfile=function(){o.call(App);C.injectProfile();setTimeout(function(){C.loadPoints().then(C.injectProfile);if(typeof renderRecentHistory==='function')renderRecentHistory();},100);};
+  App.goProfile=function(){
+    o.call(App);
+    setTimeout(function(){
+      C.loadPoints().then(function(){C.injectProfile();});
+      if(typeof renderRecentHistory==='function')renderRecentHistory();
+    },120);
+  };
 };
 
 C.hijackFav=function(){
@@ -469,10 +465,10 @@ C.getToday=function(){
 
 C.injectProfile=function(){
   if(C._ip)return;
+  var ct=document.getElementById('profileContent');
+  if(!ct){C._ip=false;return;}
   C._ip=true;
   setTimeout(function(){C._ip=false;},200);
-  var ct=document.getElementById('profileContent');
-  if(!ct)return;
   var old=document.getElementById('communityProfileSection');
   if(old)old.remove();
   var p=window.userPoints||0;
@@ -567,18 +563,8 @@ C.addBoard=function(){
     sty.textContent='@keyframes rankGlassIn{0%{opacity:0;transform:translateX(-12px) scale(0.94);backdrop-filter:blur(0px);}100%{opacity:1;transform:translateX(0) scale(1);backdrop-filter:blur(24px);}}@keyframes rankGlassGlow{0%,100%{box-shadow:0 12px 40px rgba(0,122,255,0.18),inset 0 1px 0 rgba(255,255,255,0.6),inset 0 -1px 0 rgba(255,255,255,0.15);}50%{box-shadow:0 18px 50px rgba(0,122,255,0.28),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(255,255,255,0.2);}}';
     document.head.appendChild(sty);
   }
-  var sf=document.getElementById('shareFloat');
-  if(!sf){setTimeout(C.addBoard,500);return;}
-  var wechat=null;
-  var as=sf.getElementsByTagName('a');
-  for(var i=0;i<as.length;i++){
-    var ti=as[i].getAttribute('title')||'';
-    var oc=as[i].getAttribute('onclick')||'';
-    if(ti.indexOf('微信')!==-1||oc.indexOf('wechat')!==-1){wechat=as[i];break;}
-  }
   var wrap=document.createElement('div');
   wrap.id='communityLeaderboard';
-  wrap.style.cssText='position:relative;';
   var btn=document.createElement('a');
   btn.id='communityLeaderboardToggle';
   btn.href='#';
@@ -588,13 +574,30 @@ C.addBoard=function(){
   btn.onmouseenter=function(){btn.style.background='var(--accent-gradient)';btn.style.color='#fff';btn.style.transform='scale(1.08)';btn.style.borderColor='transparent';};
   btn.onmouseleave=function(){btn.style.background='var(--bg-card-solid)';btn.style.color='var(--text-secondary)';btn.style.transform='';btn.style.borderColor='var(--border-glow)';};
   wrap.appendChild(btn);
+
   var panel=document.createElement('div');
   panel.id='communityLeaderboardPanel';
   panel.style.cssText='display:none;position:fixed;width:280px;max-height:60vh;border-radius:20px;padding:16px;overflow:hidden;z-index:200;background:linear-gradient(135deg,rgba(255,255,255,0.72) 0%,rgba(255,255,255,0.55) 50%,rgba(240,246,255,0.65) 100%);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,0.65);box-shadow:0 12px 40px rgba(0,122,255,0.18),inset 0 1px 0 rgba(255,255,255,0.6),inset 0 -1px 0 rgba(255,255,255,0.15);animation:rankGlassIn .35s cubic-bezier(0.2,0,0,1) forwards;';
   panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><span style="font-size:0.9rem;font-weight:700;color:#0f1a2e;letter-spacing:.3px;">🏆 社区排行榜</span><button id="communityLeaderboardClose" style="background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);width:26px;height:26px;border-radius:50%;font-size:0.85rem;cursor:pointer;color:#3d5068;display:flex;align-items:center;justify-content:center;transition:all .2s;">&times;</button></div><div id="communityLeaderboardContent" style="font-size:0.78rem;color:#3d5068;max-height:50vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;">点击加载...</div><style>#communityLeaderboardContent::-webkit-scrollbar{display:none;}</style>';
   document.body.appendChild(panel);
-  if(wechat&&wechat.parentNode===sf){sf.insertBefore(wrap,wechat);}
-  else{sf.insertBefore(wrap,sf.firstChild);}
+
+  var sf=document.getElementById('shareFloat');
+  if(sf&&sf.parentNode){
+    wrap.style.cssText='position:relative;';
+    var wechat=null;
+    var as=sf.getElementsByTagName('a');
+    for(var i=0;i<as.length;i++){
+      var ti=as[i].getAttribute('title')||'';
+      var oc=as[i].getAttribute('onclick')||'';
+      if(ti.indexOf('微信')!==-1||oc.indexOf('wechat')!==-1){wechat=as[i];break;}
+    }
+    if(wechat&&wechat.parentNode===sf){sf.insertBefore(wrap,wechat);}
+    else{sf.insertBefore(wrap,sf.firstChild);}
+  }else{
+    wrap.style.cssText='position:fixed;bottom:200px;right:16px;z-index:100;display:flex;flex-direction:column;gap:8px;';
+    document.body.appendChild(wrap);
+  }
+
   var isOpen=false;
   var placePanel=function(){
     var r=btn.getBoundingClientRect();
