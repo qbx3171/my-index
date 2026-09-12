@@ -1,4 +1,4 @@
-console.log('community.js v14 loaded');
+console.log('community.js v15 loaded');
 
 (function () {
   'use strict';
@@ -40,21 +40,21 @@ console.log('community.js v14 loaded');
   var NAME_FIELDS = ['username', 'nickname', 'display_name', 'name', 'full_name'];
 
   function detectPointField(records) {
+    if (records && records.length) {
+      for (var j = 0; j < POINT_FIELDS.length; j++) {
+        for (var k = 0; k < records.length; k++) {
+          if (records[k] && records[k][POINT_FIELDS[j]] !== undefined &&
+              records[k][POINT_FIELDS[j]] !== null) {
+            return POINT_FIELDS[j];
+          }
+        }
+      }
+    }
     if (window.userProfile) {
       for (var i = 0; i < POINT_FIELDS.length; i++) {
         if (window.userProfile[POINT_FIELDS[i]] !== undefined &&
             window.userProfile[POINT_FIELDS[i]] !== null) {
           return POINT_FIELDS[i];
-        }
-      }
-    }
-    if (records && records.length) {
-      for (var j = 0; j < POINT_FIELDS.length; j++) {
-        for (var k = 0; k < records.length; k++) {
-          if (records[k][POINT_FIELDS[j]] !== undefined &&
-              records[k][POINT_FIELDS[j]] !== null) {
-            return POINT_FIELDS[j];
-          }
         }
       }
     }
@@ -231,13 +231,26 @@ console.log('community.js v14 loaded');
     var sb = getClient();
     if (!sb || !window.currentUser) return;
 
-    checkinState.cardRendered = true;
+    var fetchProfile = window.userProfile
+      ? Promise.resolve(window.userProfile)
+      : sb.from('profiles').select('*').eq('id', window.currentUser.id).maybeSingle()
+          .then(function (r) { return r.data || {}; })
+          .catch(function () { return {}; });
 
-    var renderCard = function (profile) {
+    fetchProfile.then(function (profile) {
+      if (!profile) profile = {};
+      window.userProfile = profile;
+
+      if (!window.currentUser) return;
+
+      var container2 = $('profileContent');
+      if (!container2) return;
+
       var old = $('checkinCard');
       if (old) old.parentNode.removeChild(old);
 
       var pts = getProfilePoints(profile);
+      var field = pts.field;
       var card = document.createElement('div');
       card.className = 'checkin-card';
       card.id = 'checkinCard';
@@ -249,13 +262,12 @@ console.log('community.js v14 loaded');
         '</div>' +
         '<button class="checkin-btn" id="checkinBtn"><i class="fas fa-check-circle"></i> 立即签到</button>';
 
-      var c2 = $('profileContent');
-      if (!c2) return;
-      c2.insertBefore(card, c2.firstChild);
+      container2.insertBefore(card, container2.firstChild);
+      checkinState.cardRendered = true;
 
       var btn = $('checkinBtn');
       if (btn) {
-        btn.addEventListener('click', function () { doCheckin(profile); });
+        btn.addEventListener('click', function () { doCheckin(field, profile); });
       }
 
       var today = todayStr();
@@ -274,24 +286,10 @@ console.log('community.js v14 loaded');
           }
         })
         .catch(function () {});
-    };
-
-    if (window.userProfile) {
-      renderCard(window.userProfile);
-    } else {
-      sb.from('profiles').select('*').eq('id', window.currentUser.id).maybeSingle()
-        .then(function (r) {
-          var p = r.data || {};
-          window.userProfile = p;
-          renderCard(p);
-        })
-        .catch(function () {
-          renderCard({});
-        });
-    }
+    });
   }
 
-  function doCheckin(profile) {
+  function doCheckin(field, profile) {
     if (checkinState.loading) return;
     var sb = getClient();
     if (!sb) { toast('服务未加载', 'error'); return; }
@@ -315,45 +313,69 @@ console.log('community.js v14 loaded');
             checkinState.loading = false;
             return;
           }
+          toast('签到失败：' + insRes.error.message, 'error');
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
+          checkinState.loading = false;
+          return;
         }
-        addPoints(sb, user.id, 1, profile, btn);
+        addPoints(sb, user.id, 1, field, btn);
       })
-      .catch(function () {
-        addPoints(sb, user.id, 1, profile, btn);
+      .catch(function (err) {
+        toast('签到失败：' + (err.message || '网络异常'), 'error');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
+        checkinState.loading = false;
       });
   }
 
-  function addPoints(sb, userId, delta, profile, btn) {
-    var pts = getProfilePoints(profile);
-    var field = pts.field;
-    var newVal = (pts.value || 0) + delta;
-    var update = {};
-    update[field] = newVal;
-
-    if (window.userProfile) {
-      try { window.userProfile[field] = newVal; } catch (e) {}
-    }
-
+  function addPoints(sb, userId, delta, field, btn) {
     sb.from('profiles')
-      .update(update)
+      .select('*')
       .eq('id', userId)
-      .then(function (res) {
-        if (res.error) {
-          toast('签到成功，但积分更新失败：' + res.error.message, 'warning');
-        } else {
-          toast('签到成功！+' + delta + ' 积分', 'success');
-          var ptsEl = $('checkinPointsVal');
-          if (ptsEl) ptsEl.textContent = newVal;
+      .maybeSingle()
+      .then(function (readRes) {
+        if (readRes.error) {
+          toast('签到成功，但读取积分失败：' + readRes.error.message, 'warning');
+          if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
+          checkinState.loading = false;
+          return;
         }
-        if (btn) {
-          btn.disabled = true;
-          btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到';
-        }
-        checkinState.loading = false;
+        var fresh = readRes.data || {};
+        var currentVal = Number(fresh[field]) || 0;
+        var newVal = currentVal + delta;
+        var update = {};
+        update[field] = newVal;
+
+        sb.from('profiles')
+          .update(update)
+          .eq('id', userId)
+          .then(function (res) {
+            if (res.error) {
+              toast('签到失败：' + res.error.message, 'error');
+              if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
+              checkinState.loading = false;
+              return;
+            }
+            toast('签到成功！+' + delta + ' 积分', 'success');
+            var ptsEl = $('checkinPointsVal');
+            if (ptsEl) ptsEl.textContent = newVal;
+            if (window.userProfile) {
+              try { window.userProfile[field] = newVal; } catch (e) {}
+            }
+            if (btn) {
+              btn.disabled = true;
+              btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到';
+            }
+            checkinState.loading = false;
+          })
+          .catch(function (err) {
+            toast('签到失败：' + (err.message || '网络异常'), 'error');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
+            checkinState.loading = false;
+          });
       })
-      .catch(function () {
-        toast('签到成功，积分同步异常', 'warning');
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
+      .catch(function (err) {
+        toast('签到失败：' + (err.message || '网络异常'), 'error');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
         checkinState.loading = false;
       });
   }
