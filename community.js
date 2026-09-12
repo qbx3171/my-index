@@ -43,6 +43,7 @@ if(window.currentUser){Community.onLogin();}
 };
 
 Community.onLogin=async function(){
+await Community.ensureProfile();
 await Community.syncFavorites();
 await Community.syncHistory();
 await Community.loadPoints();
@@ -56,6 +57,20 @@ var bell=document.getElementById('communityBell');
 if(bell)bell.style.display='none';
 var badge=document.getElementById('communityLevelBadge');
 if(badge)badge.remove();
+};
+
+Community.ensureProfile=async function(){
+if(!window.currentUser)return;
+var res=await supabaseClient.from('profiles').select('id').eq('id',window.currentUser.id).maybeSingle();
+if(res.error)return;
+if(res.data)return;
+await supabaseClient.from('profiles').insert({
+id:window.currentUser.id,
+points:0,
+level:1,
+streak:0,
+updated_at:new Date().toISOString()
+});
 };
 
 Community.syncFavorites=async function(){
@@ -98,6 +113,11 @@ window.userPoints=res.data.points||0;
 window.userLevel=res.data.level||1;
 window.userStreak=res.data.streak||0;
 window.userLastCheckin=res.data.last_checkin;
+}else{
+window.userPoints=0;
+window.userLevel=1;
+window.userStreak=0;
+window.userLastCheckin=null;
 }
 };
 
@@ -105,11 +125,12 @@ Community.addPoints=async function(points){
 if(!window.currentUser)return;
 var newPoints=(window.userPoints||0)+points;
 var level=Math.floor(newPoints/100)+1;
-await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:newPoints,level:level,updated_at:new Date().toISOString()});
+var res=await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:newPoints,level:level,updated_at:new Date().toISOString()});
+if(res.error){toast('积分保存失败: '+res.error.message,'error');return;}
 window.userPoints=newPoints;
 window.userLevel=level;
 Community.updateAvatarLevel();
-Community.updateProfileStats();
+Community.refreshProfileIfVisible();
 if(typeof toast==='function')toast('积分 +'+points,'success');
 };
 
@@ -321,13 +342,13 @@ section.id='communityProfileSection';
 section.style.cssText='margin-top:16px;';
 section.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'+
 '<div style="background:var(--bg-card);border-radius:12px;padding:16px;border:1px solid var(--border-glow);text-align:center;">'+
-'<div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan);" id="communityPoints">0</div>'+
+'<div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan);" id="communityPoints">'+(window.userPoints||0)+'</div>'+
 '<div style="font-size:0.75rem;color:var(--text-dim);">积分</div>'+
 '<button class="btn btn-sm btn-primary" id="communityCheckinBtn" style="margin-top:8px;">每日签到</button></div>'+
 '<div style="background:var(--bg-card);border-radius:12px;padding:16px;border:1px solid var(--border-glow);text-align:center;">'+
-'<div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan);" id="communityLevel">Lv1</div>'+
+'<div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan);" id="communityLevel">Lv'+(window.userLevel||1)+'</div>'+
 '<div style="font-size:0.75rem;color:var(--text-dim);">等级</div>'+
-'<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">连续签到 <span id="communityStreak">0</span> 天</div></div>'+
+'<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">连续签到 <span id="communityStreak">'+(window.userStreak||0)+'</span> 天</div></div>'+
 '</div>';
 container.appendChild(section);
 Community.updateProfileStats();
@@ -352,9 +373,12 @@ if(s)s.textContent=window.userStreak||0;
 
 Community.doCheckin=async function(){
 if(!window.currentUser){toast('请先登录','warning');return;}
-var today=new Date().toISOString().slice(0,10);
+var btn=document.getElementById('communityCheckinBtn');
+if(btn){btn.disabled=true;btn.textContent='签到中...';}
+try{
+var today=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10);
 var exist=await supabaseClient.from('checkins').select('id').eq('user_id',window.currentUser.id).eq('checkin_date',today).maybeSingle();
-if(exist.data){toast('今天已经签到过了','warning');return;}
+if(exist.data){toast('今天已经签到过了','warning');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
 var points=10;
 var streak=(window.userStreak||0)+1;
 if(streak>1&&window.userLastCheckin){
@@ -363,15 +387,21 @@ if(diff>1)streak=1;
 }
 var newPoints=(window.userPoints||0)+points;
 var level=Math.floor(newPoints/100)+1;
-await supabaseClient.from('checkins').insert({user_id:window.currentUser.id,checkin_date:today,points:points});
-await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:newPoints,level:level,streak:streak,last_checkin:today,updated_at:new Date().toISOString()});
+var insertRes=await supabaseClient.from('checkins').insert({user_id:window.currentUser.id,checkin_date:today,points:points});
+if(insertRes.error){toast('签到记录失败: '+insertRes.error.message,'error');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
+var upsertRes=await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:newPoints,level:level,streak:streak,last_checkin:today,updated_at:new Date().toISOString()});
+if(upsertRes.error){toast('积分保存失败: '+upsertRes.error.message,'error');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
 window.userPoints=newPoints;
 window.userLevel=level;
 window.userStreak=streak;
 window.userLastCheckin=today;
-Community.updateProfileStats();
+Community.injectProfile();
 Community.updateAvatarLevel();
 toast('签到成功 +'+points+' 积分','success');
+}catch(e){
+toast('签到异常: '+e.message,'error');
+if(btn){btn.disabled=false;btn.textContent='每日签到';}
+}
 };
 
 Community.addRandomButton=function(){
@@ -411,17 +441,16 @@ var panel=document.getElementById('communityLeaderboardPanel');
 var expanded=false;
 toggle.addEventListener('click',function(){
 if(expanded){panel.style.width='0';}
-else{panel.style.width='240px';}
+else{panel.style.width='240px';Community.loadLeaderboard();}
 expanded=!expanded;
 });
-Community.loadLeaderboard();
 };
 
 Community.loadLeaderboard=async function(){
 var el=document.getElementById('communityLeaderboardContent');
 if(!el)return;
 var res=await supabaseClient.from('profiles').select('username,points,level').order('points',{ascending:false}).limit(10);
-if(res.error){el.innerHTML='<p style="color:var(--text-dim);">暂无数据</p>';return;}
+if(res.error){el.innerHTML='<p style="color:var(--text-dim);">加载失败：'+Community.escapeHTML(res.error.message||'')+'</p>';return;}
 var data=res.data||[];
 if(data.length===0){el.innerHTML='<p style="color:var(--text-dim);">暂无数据</p>';return;}
 var html='';
