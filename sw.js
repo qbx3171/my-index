@@ -1,4 +1,4 @@
-var CACHE_NAME='lezhe-v4';
+var CACHE_NAME='lezhe-v5';
 
 self.addEventListener('install',function(e){
 self.skipWaiting();
