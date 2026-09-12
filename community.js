@@ -1,4 +1,4 @@
-console.log('community.js v8 loaded');
+console.log('community.js v11 loaded');
 
 (function () {
   'use strict';
@@ -48,7 +48,6 @@ console.log('community.js v8 loaded');
 
   var POINT_FIELDS = ['checkin_points', 'points', 'total_points', 'score', 'credits', 'sign_points'];
   var NAME_FIELDS = ['username', 'nickname', 'display_name', 'name'];
-  var AVATAR_FIELDS = ['avatar_url', 'avatar', 'photo_url'];
 
   function getProfilePoints(p) {
     for (var i = 0; i < POINT_FIELDS.length; i++) {
@@ -67,223 +66,62 @@ console.log('community.js v8 loaded');
     return '匿名用户';
   }
 
-  function getAvatar(p) {
-    for (var i = 0; i < AVATAR_FIELDS.length; i++) {
-      if (p && p[AVATAR_FIELDS[i]]) return p[AVATAR_FIELDS[i]];
-    }
-    return '';
-  }
-
+  /* ========== 样式 ========== */
   function injectStyles() {
     if ($('communityModuleStyles')) return;
     var st = document.createElement('style');
     st.id = 'communityModuleStyles';
     st.textContent =
-      '.ranking-item{display:flex;align-items:center;gap:12px;padding:10px 12px;' +
-      'border-bottom:1px solid var(--border-glow);cursor:pointer;transition:background .2s;}' +
-      '.ranking-item:last-child{border-bottom:none;}' +
-      '.ranking-item:hover{background:rgba(0,119,255,0.04);}' +
-      '.ranking-item .rank-num{font-size:1.1rem;font-weight:700;width:32px;' +
-      'text-align:center;flex-shrink:0;}' +
-      '.ranking-item .rank-avatar{width:32px;height:32px;border-radius:50%;' +
-      'background:var(--accent-gradient);color:#fff;display:flex;align-items:center;' +
-      'justify-content:center;font-size:.75rem;font-weight:600;flex-shrink:0;overflow:hidden;}' +
-      '.ranking-item .rank-avatar img{width:100%;height:100%;object-fit:cover;}' +
-      '.ranking-item .rank-info{flex:1;min-width:0;}' +
-      '.ranking-item .rank-title{font-size:0.85rem;font-weight:600;' +
-      'color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
-      '.ranking-item .rank-meta{font-size:0.65rem;color:var(--text-dim);' +
-      'display:flex;gap:8px;margin-top:2px;}' +
-      '.review-star{cursor:pointer;transition:color .2s;}' +
-      '.review-star.active{color:#f39c12;}' +
-      '.checkin-card{margin-top:16px;padding:18px 20px;background:var(--bg-card);' +
-      'border:1px solid var(--border-glow);border-radius:var(--radius-md);' +
+      '.rank-popover{position:fixed;bottom:90px;right:70px;width:260px;' +
+      'max-height:400px;background:var(--bg-card-solid,#fff);' +
+      'border:1px solid var(--border-glow,rgba(0,120,255,0.18));border-radius:14px;' +
+      'box-shadow:0 12px 40px rgba(0,0,0,0.14);z-index:300;' +
+      'display:flex;flex-direction:column;overflow:hidden;' +
+      'opacity:0;visibility:hidden;transform:translateY(12px) scale(0.94);' +
+      'transition:opacity .22s ease,transform .22s ease,visibility .22s;}' +
+      '.rank-popover.open{opacity:1;visibility:visible;transform:translateY(0) scale(1);}' +
+      '.rank-popover .rank-head{padding:12px 14px;display:flex;align-items:center;gap:8px;' +
+      'background:var(--accent-gradient,linear-gradient(135deg,#0077ff,#6c5ce7));' +
+      'color:#fff;font-size:0.85rem;font-weight:700;letter-spacing:.3px;}' +
+      '.rank-popover .rank-head i{font-size:0.95rem;}' +
+      '.rank-popover .rank-head .close{margin-left:auto;background:none;border:none;' +
+      'color:rgba(255,255,255,0.85);font-size:1.15rem;cursor:pointer;line-height:1;padding:0 2px;}' +
+      '.rank-popover .rank-body{overflow-y:auto;max-height:340px;padding:4px 0;' +
+      'scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.2) transparent;}' +
+      '.rank-popover .rank-body::-webkit-scrollbar{width:4px;}' +
+      '.rank-popover .rank-body::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.2);border-radius:4px;}' +
+      '.rank-popover .rank-item{display:flex;align-items:center;gap:8px;padding:7px 12px;' +
+      'border-bottom:1px solid var(--border-glow,rgba(0,120,255,0.12));font-size:0.78rem;}' +
+      '.rank-popover .rank-item:last-child{border-bottom:none;}' +
+      '.rank-popover .rank-item .n{width:22px;text-align:center;font-weight:700;' +
+      'color:var(--text-secondary,#3d5068);flex-shrink:0;}' +
+      '.rank-popover .rank-item .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;' +
+      'text-overflow:ellipsis;color:var(--text-primary,#0f1a2e);}' +
+      '.rank-popover .rank-item .pt{font-size:0.72rem;color:#f39c12;font-weight:600;' +
+      'flex-shrink:0;white-space:nowrap;}' +
+      '.rank-popover .rank-item .pt i{margin-right:2px;}' +
+      '.rank-popover .rank-empty{padding:24px 12px;text-align:center;' +
+      'color:var(--text-dim,#7a8ca3);font-size:0.78rem;}' +
+      '.checkin-card{margin-top:16px;padding:18px 20px;background:var(--bg-card,#fff);' +
+      'border:1px solid var(--border-glow,rgba(0,120,255,0.18));border-radius:12px;' +
       'display:flex;align-items:center;gap:16px;flex-wrap:wrap;}' +
       '.checkin-card .checkin-icon{width:52px;height:52px;border-radius:50%;' +
-      'background:var(--accent-gradient);color:#fff;display:flex;align-items:center;' +
-      'justify-content:center;font-size:1.5rem;flex-shrink:0;}' +
+      'background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;' +
+      'display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}' +
       '.checkin-card .checkin-info{flex:1;min-width:140px;}' +
-      '.checkin-card .checkin-info .t{font-size:1rem;font-weight:700;color:var(--text-primary);}' +
-      '.checkin-card .checkin-info .s{font-size:0.75rem;color:var(--text-dim);margin-top:2px;}' +
+      '.checkin-card .checkin-info .t{font-size:1rem;font-weight:700;color:var(--text-primary,#0f1a2e);}' +
+      '.checkin-card .checkin-info .s{font-size:0.75rem;color:var(--text-dim,#7a8ca3);margin-top:2px;}' +
       '.checkin-card .checkin-btn{padding:10px 22px;border-radius:50px;font-weight:700;' +
-      'font-size:0.85rem;background:var(--accent-gradient);color:#fff;border:none;' +
-      'cursor:pointer;transition:transform .15s;}' +
+      'font-size:0.85rem;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;' +
+      'border:none;cursor:pointer;transition:transform .15s;}' +
       '.checkin-card .checkin-btn:hover{transform:translateY(-2px);}' +
-      '.checkin-card .checkin-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}';
+      '.checkin-card .checkin-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}' +
+      '.review-star{cursor:pointer;transition:color .2s;}' +
+      '.review-star.active{color:#f39c12;}';
     document.head.appendChild(st);
   }
 
-  /* ========== 签到 ========== */
-  var checkinState = { loading: false };
-
-  function renderCheckinCard(profile) {
-    var container = $('profileContent');
-    if (!container) return;
-
-    var old = $('checkinCard');
-    if (old) old.parentNode.removeChild(old);
-
-    var pts = getProfilePoints(profile);
-    var sb = getClient();
-
-    var card = document.createElement('div');
-    card.className = 'checkin-card';
-    card.id = 'checkinCard';
-    card.innerHTML =
-      '<div class="checkin-icon"><i class="fas fa-calendar-check"></i></div>' +
-      '<div class="checkin-info">' +
-        '<div class="t">每日签到</div>' +
-        '<div class="s">当前积分：<span id="checkinPointsVal">' + esc(pts.value) + '</span> 分</div>' +
-      '</div>' +
-      '<button class="checkin-btn" id="checkinBtn"><i class="fas fa-check-circle"></i> 立即签到</button>';
-
-    container.insertBefore(card, container.firstChild);
-
-    var btn = $('checkinBtn');
-    if (btn) {
-      btn.addEventListener('click', function () { doCheckin(profile); });
-    }
-
-    var today = todayStr();
-    if (sb && window.currentUser) {
-      sb.from('checkins')
-        .select('id')
-        .eq('user_id', window.currentUser.id)
-        .eq('checkin_date', today)
-        .maybeSingle()
-        .then(function (res) {
-          if (res.data) {
-            var b = $('checkinBtn');
-            if (b) {
-              b.disabled = true;
-              b.innerHTML = '<i class="fas fa-check"></i> 今日已签到';
-            }
-          }
-        })
-        .catch(function () {});
-    }
-  }
-
-  function doCheckin(profile) {
-    if (checkinState.loading) return;
-    var sb = getClient();
-    if (!sb) { toast('服务未加载', 'error'); return; }
-    var user = window.currentUser;
-    if (!user) { toast('请先登录', 'warning'); return; }
-
-    checkinState.loading = true;
-    var btn = $('checkinBtn');
-    if (btn) { btn.disabled = true; btn.innerHTML = '签到中...'; }
-
-    var today = todayStr();
-
-    sb.from('checkins')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('checkin_date', today)
-      .maybeSingle()
-      .then(function (res) {
-        if (res.data) {
-          toast('今天已经签到过啦～', 'warning');
-          if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
-          checkinState.loading = false;
-          return;
-        }
-
-        sb.from('checkins')
-          .insert([{ user_id: user.id, checkin_date: today, points: 1 }])
-          .then(function (insRes) {
-            if (insRes.error) {
-              toast('签到失败：' + insRes.error.message, 'error');
-              if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
-              checkinState.loading = false;
-              return;
-            }
-            addPoints(sb, user.id, 1, profile, btn);
-          })
-          .catch(function () {
-            toast('签到异常，请稍后重试', 'error');
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
-            checkinState.loading = false;
-          });
-      })
-      .catch(function () {
-        toast('签到异常，请稍后重试', 'error');
-        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
-        checkinState.loading = false;
-      });
-  }
-
-  function addPoints(sb, userId, delta, profile, btn) {
-    var pts = getProfilePoints(profile);
-    var field = pts.field;
-    var newVal = (pts.value || 0) + delta;
-
-    var update = {};
-    update[field] = newVal;
-
-    sb.from('profiles')
-      .update(update)
-      .eq('id', userId)
-      .then(function (res) {
-        if (res.error) {
-          toast('签到成功，但积分更新失败', 'warning');
-        } else {
-          toast('签到成功！+' + delta + ' 积分', 'success');
-          var ptsEl = $('checkinPointsVal');
-          if (ptsEl) ptsEl.textContent = newVal;
-        }
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
-        checkinState.loading = false;
-        if (window.userProfile) {
-          try { window.userProfile[field] = newVal; } catch (e) {}
-        }
-      })
-      .catch(function () {
-        toast('签到成功，积分同步异常', 'warning');
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
-        checkinState.loading = false;
-      });
-  }
-
-  function observeProfile() {
-    var container = $('profileContent');
-    if (!container) return;
-    var lastHtmlLen = 0;
-    var observer = new MutationObserver(function () {
-      var len = container.innerHTML.length;
-      if (len !== lastHtmlLen) {
-        lastHtmlLen = len;
-        if (window.currentUser) {
-          setTimeout(function () {
-            var p = window.userProfile || null;
-            if (!p) {
-              var sb = getClient();
-              if (sb && window.currentUser) {
-                sb.from('profiles').select('*').eq('id', window.currentUser.id).maybeSingle()
-                  .then(function (r) {
-                    if (r.data) {
-                      window.userProfile = r.data;
-                      renderCheckinCard(r.data);
-                    } else {
-                      renderCheckinCard({});
-                    }
-                  })
-                  .catch(function () { renderCheckinCard({}); });
-              } else {
-                renderCheckinCard({});
-              }
-            } else {
-              renderCheckinCard(p);
-            }
-          }, 150);
-        }
-      }
-    });
-    observer.observe(container, { childList: true, subtree: true });
-  }
-
-  /* ========== 签到积分排行榜 ========== */
+  /* ========== 奖杯按钮 ========== */
   function placeButton() {
     var box = $('shareFloat');
     if (!box) return;
@@ -314,110 +152,274 @@ console.log('community.js v8 loaded');
     }
   }
 
-  function ensureRankingModal() {
-    var modal = $('rankingModal');
-    if (modal) return modal;
-    modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.id = 'rankingModal';
-    modal.innerHTML =
-      '<div class="modal-box" style="max-width:520px;padding:0;overflow:hidden;">' +
-        '<div style="background:var(--accent-gradient);padding:20px 24px;color:#fff;' +
-        'display:flex;align-items:center;gap:10px;">' +
-          '<i class="fas fa-trophy" style="font-size:1.4rem;"></i>' +
-          '<h3 style="margin:0;font-size:1.2rem;font-weight:700;color:#fff;">签到积分榜</h3>' +
-          '<button class="close-btn" id="rankingModalClose" style="float:none;' +
-          'margin-left:auto;color:rgba(255,255,255,0.8);font-size:1.5rem;' +
-          'background:none;border:none;cursor:pointer;">&times;</button>' +
-        '</div>' +
-        '<div id="rankingList" style="max-height:60vh;overflow-y:auto;' +
-        'scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.2) transparent;' +
-        'padding:4px 0;"></div>' +
-        '<div class="form-actions" style="padding:12px 24px 16px;' +
-        'border-top:1px solid var(--border-glow);">' +
-          '<button class="btn btn-outline" id="rankingModalCloseBtn">关闭</button>' +
-        '</div>' +
+  /* ========== 排行榜浮层 ========== */
+  function ensurePopover() {
+    var p = $('rankPopover');
+    if (p) return p;
+    p = document.createElement('div');
+    p.className = 'rank-popover';
+    p.id = 'rankPopover';
+    p.innerHTML =
+      '<div class="rank-head">' +
+        '<i class="fas fa-trophy"></i>' +
+        '<span>签到积分榜</span>' +
+        '<button class="close" id="rankPopoverClose" type="button">✕</button>' +
+      '</div>' +
+      '<div class="rank-body" id="rankBody">' +
+        '<div class="rank-empty">加载中...</div>' +
       '</div>';
-    document.body.appendChild(modal);
-    return modal;
+    document.body.appendChild(p);
+    return p;
   }
 
   function openRanking() {
-    ensureRankingModal().classList.add('open');
+    ensurePopover().classList.add('open');
     loadRanking();
   }
 
   function closeRanking() {
-    var m = $('rankingModal');
-    if (m) m.classList.remove('open');
+    var p = $('rankPopover');
+    if (p) p.classList.remove('open');
   }
 
   function loadRanking() {
-    var box = $('rankingList');
-    if (!box) return;
+    var body = $('rankBody');
+    if (!body) return;
     var sb = getClient();
     if (!sb) {
-      box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">服务未加载，请稍后重试</p>';
+      body.innerHTML = '<div class="rank-empty">服务未加载</div>';
       return;
     }
-    box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">加载中...</p>';
+    body.innerHTML = '<div class="rank-empty">加载中...</div>';
 
-    var idx = 0;
-    function tryNext() {
-      if (idx >= POINT_FIELDS.length) {
-        box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">暂无积分数据</p>';
+    sb.from('profiles').select('*').limit(1).then(function (probeRes) {
+      if (probeRes.error || !probeRes.data || probeRes.data.length === 0) {
+        body.innerHTML = '<div class="rank-empty">暂无积分数据</div>';
         return;
       }
-      var field = POINT_FIELDS[idx++];
+      var sample = probeRes.data[0];
+      var realField = null;
+      for (var i = 0; i < POINT_FIELDS.length; i++) {
+        if (sample[POINT_FIELDS[i]] !== undefined) {
+          realField = POINT_FIELDS[i];
+          break;
+        }
+      }
+      if (!realField) {
+        body.innerHTML = '<div class="rank-empty">未找到积分字段</div>';
+        return;
+      }
+
       sb.from('profiles')
         .select('*')
-        .order(field, { ascending: false })
+        .order(realField, { ascending: false })
         .limit(10)
         .then(function (res) {
-          if (res.error) { tryNext(); return; }
-          var list = res.data || [];
-          if (list.length === 0) {
-            box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">暂无签到数据，快去签到吧！</p>';
+          if (res.error) {
+            body.innerHTML = '<div class="rank-empty">加载失败</div>';
             return;
           }
-          renderRankList(list, field);
+          var list = res.data || [];
+          if (list.length === 0) {
+            body.innerHTML = '<div class="rank-empty">暂无积分数据</div>';
+            return;
+          }
+          var html = '';
+          for (var i = 0; i < list.length; i++) {
+            var it = list[i];
+            var medal = (i + 1) + '';
+            if (i === 0) medal = '🥇';
+            else if (i === 1) medal = '🥈';
+            else if (i === 2) medal = '🥉';
+            var nm = getName(it);
+            var pt = it[realField] || 0;
+            html +=
+              '<div class="rank-item">' +
+                '<span class="n">' + medal + '</span>' +
+                '<span class="nm">' + esc(nm) + '</span>' +
+                '<span class="pt"><i class="fas fa-coins"></i>' + pt + '</span>' +
+              '</div>';
+          }
+          body.innerHTML = html;
         })
-        .catch(function () { tryNext(); });
-    }
-    tryNext();
+        .catch(function () {
+          body.innerHTML = '<div class="rank-empty">网络异常</div>';
+        });
+    }).catch(function () {
+      body.innerHTML = '<div class="rank-empty">网络异常</div>';
+    });
   }
 
-  function renderRankList(list, pointField) {
-    var box = $('rankingList');
-    if (!box) return;
-    var html = '';
-    for (var i = 0; i < list.length; i++) {
-      var it = list[i];
-      var medal = '#' + (i + 1);
-      if (i === 0) medal = '🥇';
-      else if (i === 1) medal = '🥈';
-      else if (i === 2) medal = '🥉';
+  /* ========== 签到卡片 ========== */
+  var checkinState = { loading: false, rendering: false };
 
-      var displayName = getName(it);
-      var avatarUrl = getAvatar(it);
-      var avatarHtml = avatarUrl
-        ? '<img src="' + escA(avatarUrl) + '" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\'' + escA(displayName.charAt(0).toUpperCase()) + '\';" />'
-        : esc(displayName.charAt(0).toUpperCase());
-      var pointVal = it[pointField] || 0;
+  function ensureCheckinCard() {
+    if (checkinState.rendering) return;
+    var container = $('profileContent');
+    if (!container) return;
 
-      html +=
-        '<div class="ranking-item" data-id="' + escA(it.id || '') + '">' +
-          '<span class="rank-num">' + medal + '</span>' +
-          '<span class="rank-avatar">' + avatarHtml + '</span>' +
-          '<div class="rank-info">' +
-            '<div class="rank-title">' + esc(displayName) + '</div>' +
-            '<div class="rank-meta">' +
-              '<span><i class="fas fa-coins" style="color:#f39c12;"></i> ' + pointVal + ' 积分</span>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
+    /* 已存在卡片，且已被标记为已签到 → 不重建 */
+    var existing = $('checkinCard');
+    if (existing && existing.getAttribute('data-rendered') === '1') return;
+
+    var sb = getClient();
+    if (!sb || !window.currentUser) return;
+
+    checkinState.rendering = true;
+
+    var doRender = function (profile) {
+      /* 再次确认没有卡片 */
+      var c2 = $('profileContent');
+      if (!c2) { checkinState.rendering = false; return; }
+      var old = $('checkinCard');
+      if (old) old.parentNode.removeChild(old);
+
+      var pts = getProfilePoints(profile);
+      var card = document.createElement('div');
+      card.className = 'checkin-card';
+      card.id = 'checkinCard';
+      card.setAttribute('data-rendered', '1');
+      card.innerHTML =
+        '<div class="checkin-icon"><i class="fas fa-calendar-check"></i></div>' +
+        '<div class="checkin-info">' +
+          '<div class="t">每日签到</div>' +
+          '<div class="s">当前积分：<span id="checkinPointsVal">' + esc(pts.value) + '</span> 分</div>' +
+        '</div>' +
+        '<button class="checkin-btn" id="checkinBtn"><i class="fas fa-check-circle"></i> 立即签到</button>';
+      c2.insertBefore(card, c2.firstChild);
+
+      var btn = $('checkinBtn');
+      if (btn) {
+        btn.addEventListener('click', function () { doCheckin(profile); });
+      }
+
+      /* 判断今日是否已签到 */
+      var today = todayStr();
+      sb.from('checkins')
+        .select('id')
+        .eq('user_id', window.currentUser.id)
+        .eq('checkin_date', today)
+        .maybeSingle()
+        .then(function (res) {
+          if (res.data) {
+            var b = $('checkinBtn');
+            if (b) {
+              b.disabled = true;
+              b.innerHTML = '<i class="fas fa-check"></i> 今日已签到';
+            }
+          }
+          checkinState.rendering = false;
+        })
+        .catch(function () {
+          checkinState.rendering = false;
+        });
+    };
+
+    if (window.userProfile) {
+      doRender(window.userProfile);
+    } else {
+      sb.from('profiles').select('*').eq('id', window.currentUser.id).maybeSingle()
+        .then(function (r) {
+          var p = r.data || {};
+          window.userProfile = p;
+          doRender(p);
+        })
+        .catch(function () {
+          doRender({});
+        });
     }
-    box.innerHTML = html;
+  }
+
+  function doCheckin(profile) {
+    if (checkinState.loading) return;
+    var sb = getClient();
+    if (!sb) { toast('服务未加载', 'error'); return; }
+    var user = window.currentUser;
+    if (!user) { toast('请先登录', 'warning'); return; }
+
+    checkinState.loading = true;
+    var btn = $('checkinBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '签到中...'; }
+
+    var today = todayStr();
+
+    sb.from('checkins')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('checkin_date', today)
+      .maybeSingle()
+      .then(function (res) {
+        if (res.data) {
+          toast('今天已经签到过啦～', 'warning');
+          if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
+          checkinState.loading = false;
+          return;
+        }
+        sb.from('checkins')
+          .insert([{ user_id: user.id, checkin_date: today, points: 1 }])
+          .then(function (insRes) {
+            if (insRes.error) {
+              toast('签到失败：' + insRes.error.message, 'error');
+              if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
+              checkinState.loading = false;
+              return;
+            }
+            addPoints(sb, user.id, 1, profile, btn);
+          })
+          .catch(function () {
+            toast('签到异常，请稍后重试', 'error');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
+            checkinState.loading = false;
+          });
+      })
+      .catch(function () {
+        toast('签到异常，请稍后重试', 'error');
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
+        checkinState.loading = false;
+      });
+  }
+
+  function addPoints(sb, userId, delta, profile, btn) {
+    var pts = getProfilePoints(profile);
+    var field = pts.field;
+    var newVal = (pts.value || 0) + delta;
+    var update = {};
+    update[field] = newVal;
+
+    sb.from('profiles')
+      .update(update)
+      .eq('id', userId)
+      .then(function (res) {
+        if (res.error) {
+          toast('签到成功，但积分更新失败', 'warning');
+        } else {
+          toast('签到成功！+' + delta + ' 积分', 'success');
+          var ptsEl = $('checkinPointsVal');
+          if (ptsEl) ptsEl.textContent = newVal;
+        }
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
+        checkinState.loading = false;
+        if (window.userProfile) {
+          try { window.userProfile[field] = newVal; } catch (e) {}
+        }
+      })
+      .catch(function () {
+        toast('签到成功，积分同步异常', 'warning');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
+        checkinState.loading = false;
+      });
+  }
+
+  /* ========== 轮询检查：进入个人中心时插入卡片 ========== */
+  function startProfileWatch() {
+    setInterval(function () {
+      var pageProfile = $('pageProfile');
+      if (!pageProfile) return;
+      if (pageProfile.classList.contains('hidden')) return;
+      if (!$('checkinCard')) {
+        ensureCheckinCard();
+      }
+    }, 700);
   }
 
   /* ========== 软件评价 ========== */
@@ -600,37 +602,60 @@ console.log('community.js v8 loaded');
     observer.observe(overlay, { attributes: true });
   }
 
-  function onClickCapture(e) {
+  /* ========== 全局点击：点击空白处收回排行榜 ========== */
+  function onDocClick(e) {
     var t = e.target;
-    if (!t || !t.closest) return;
-    if (t.closest('#rankingBtn')) { e.preventDefault(); e.stopPropagation(); openRanking(); return; }
-    if (t.closest('#rankingModalClose') || t.closest('#rankingModalCloseBtn')) {
-      e.preventDefault(); e.stopPropagation(); closeRanking(); return;
+    if (!t) return;
+
+    var rankBtn = t.closest ? t.closest('#rankingBtn') : null;
+    if (rankBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      var pop = $('rankPopover');
+      if (pop && pop.classList.contains('open')) {
+        closeRanking();
+      } else {
+        openRanking();
+      }
+      return;
     }
-    var modal = $('rankingModal');
-    if (modal && modal.classList.contains('open') && t === modal) closeRanking();
+
+    var closeBtn = t.closest ? t.closest('#rankPopoverClose') : null;
+    if (closeBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeRanking();
+      return;
+    }
+
+    var pop2 = $('rankPopover');
+    if (pop2 && pop2.classList.contains('open')) {
+      if (t.closest && t.closest('#rankPopover')) return;
+      closeRanking();
+    }
   }
 
   function onKeyDown(e) {
     if (e.key !== 'Escape') return;
-    var rModal = $('rankingModal');
-    if (rModal && rModal.classList.contains('open')) closeRanking();
+    var pop = $('rankPopover');
+    if (pop && pop.classList.contains('open')) closeRanking();
     var revModal = $('reviewModal');
     if (revModal && revModal.classList.contains('open')) closeReviewModal();
   }
 
+  /* ========== 启动 ========== */
   var started = false;
   function start() {
     if (started) return;
     started = true;
     try { injectStyles(); } catch (e) {}
     try { placeButton(); } catch (e) {}
-    try { ensureRankingModal(); } catch (e) {}
+    try { ensurePopover(); } catch (e) {}
     try { ensureReviewModal(); } catch (e) {}
     try { observeDetailModal(); } catch (e) {}
-    try { observeProfile(); } catch (e) {}
+    try { startProfileWatch(); } catch (e) {}
     try { bindReviewEvents(); } catch (e) {}
-    document.addEventListener('click', onClickCapture, true);
+    document.addEventListener('click', onDocClick, true);
     document.addEventListener('keydown', onKeyDown, false);
   }
 
