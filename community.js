@@ -1,8 +1,7 @@
-/* community.js - 社区排行榜模块（独立、兼容、防冲突） */
+/* community.js - 社区排行榜模块（独立、无语法风险、自动定位） */
 (function () {
   'use strict';
 
-  /* ========== 工具函数 ========== */
   function $(id) { return document.getElementById(id); }
 
   function esc(s) {
@@ -33,7 +32,6 @@
     } catch (e) { return null; }
   }
 
-  /* ========== 样式 ========== */
   function injectStyles() {
     if ($('rankingModuleStyles')) return;
     var st = document.createElement('style');
@@ -53,7 +51,6 @@
     document.head.appendChild(st);
   }
 
-  /* ========== 按钮位置：放到"微信"按钮上方 ========== */
   function placeButton() {
     var box = $('shareFloat');
     if (!box) return;
@@ -79,8 +76,7 @@
     }
 
     if (wechat) {
-      /* 让 btn 位于 wechat 之前（上方），用 element 判断避免文本节点干扰 */
-      if (btn.nextElementSibling !== wechat || btn.parentNode !== box) {
+      if (btn.parentNode !== box || btn.nextElementSibling !== wechat) {
         box.insertBefore(btn, wechat);
       }
     } else {
@@ -90,7 +86,6 @@
     }
   }
 
-  /* ========== 弹窗：若 HTML 已存在则复用，不存在才创建 ========== */
   function ensureModal() {
     var modal = $('rankingModal');
     if (modal) return modal;
@@ -120,7 +115,6 @@
     return modal;
   }
 
-  /* ========== 打开 / 关闭 ========== */
   function openRanking() {
     ensureModal().classList.add('open');
     loadRanking();
@@ -131,7 +125,6 @@
     if (m) m.classList.remove('open');
   }
 
-  /* ========== 加载数据 ========== */
   function loadRanking() {
     var box = $('rankingList');
     if (!box) return;
@@ -201,12 +194,10 @@
       });
   }
 
-  /* ========== 事件：使用捕获阶段，优先拦截 ========== */
   function onClickCapture(e) {
     var t = e.target;
     if (!t || !t.closest) return;
 
-    /* 打开排行榜 */
     if (t.closest('#rankingBtn')) {
       e.preventDefault();
       e.stopPropagation();
@@ -214,7 +205,6 @@
       return;
     }
 
-    /* 关闭按钮 */
     if (t.closest('#rankingModalClose') || t.closest('#rankingModalCloseBtn')) {
       e.preventDefault();
       e.stopPropagation();
@@ -222,7 +212,6 @@
       return;
     }
 
-    /* 点击空白遮罩关闭 */
     var modal = $('rankingModal');
     if (modal && modal.classList.contains('open') && t === modal) {
       closeRanking();
@@ -235,7 +224,6 @@
     if (modal && modal.classList.contains('open')) closeRanking();
   }
 
-  /* ========== 启动 ========== */
   var started = false;
   function start() {
     if (started) return;
@@ -247,7 +235,6 @@
     document.addEventListener('keydown', onKeyDown, false);
   }
 
-  /* 页面加载完成后启动；若按钮由主脚本动态渲染，也再兜底重试几次 */
   function boot() {
     start();
     setTimeout(placeButton, 300);
@@ -261,7 +248,6 @@
     boot();
   }
 
-  /* 对外暴露 */
   window.RankingModule = {
     open: openRanking,
     close: closeRanking,
