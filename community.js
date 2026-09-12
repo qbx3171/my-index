@@ -1,32 +1,20 @@
+/* community.js - 社区排行榜模块（独立、兼容、防冲突） */
 (function () {
   'use strict';
 
-  var FALLBACK_URL = 'https://qqcxtfayjxyvswblmdpw.supabase.co';
-  var FALLBACK_KEY = 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+  /* ========== 工具函数 ========== */
+  function $(id) { return document.getElementById(id); }
 
-  function getClient() {
-    if (window.supabaseClient) return window.supabaseClient;
-    if (typeof supabase === 'undefined') return null;
-    try {
-      var url = window.SUPABASE_URL || FALLBACK_URL;
-      var key = window.SUPABASE_ANON_KEY || FALLBACK_KEY;
-      window.supabaseClient = supabase.createClient(url, key);
-      return window.supabaseClient;
-    } catch (err) {
-      return null;
-    }
+  function esc(s) {
+    if (s === null || s === undefined) return '';
+    var d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
   }
 
-  function escHtml(input) {
-    if (input === null || input === undefined) return '';
-    var div = document.createElement('div');
-    div.textContent = String(input);
-    return div.innerHTML;
-  }
-
-  function escAttr(input) {
-    if (input === null || input === undefined) return '';
-    return String(input)
+  function escA(s) {
+    if (s === null || s === undefined) return '';
+    return String(s)
       .replace(/&/g, '&amp;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;')
@@ -34,41 +22,54 @@
       .replace(/>/g, '&gt;');
   }
 
-  function injectStyles() {
-    if (document.getElementById('rankingModuleStyles')) return;
-    var style = document.createElement('style');
-    style.id = 'rankingModuleStyles';
-    style.textContent =
-      '.ranking-item{display:flex;align-items:center;gap:12px;padding:10px 12px;' +
-      'border-bottom:1px solid var(--border-glow);cursor:pointer;transition:background .2s}' +
-      '.ranking-item:last-child{border-bottom:none}' +
-      '.ranking-item:hover{background:rgba(0,119,255,0.04)}' +
-      '.ranking-item .rank-num{font-size:1.1rem;font-weight:700;width:32px;' +
-      'text-align:center;flex-shrink:0}' +
-      '.ranking-item .rank-info{flex:1;min-width:0}' +
-      '.ranking-item .rank-title{font-size:0.85rem;font-weight:600;' +
-      'color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
-      '.ranking-item .rank-meta{font-size:0.65rem;color:var(--text-dim);' +
-      'display:flex;gap:8px;margin-top:2px}';
-    document.head.appendChild(style);
+  function getClient() {
+    if (window.supabaseClient) return window.supabaseClient;
+    if (typeof window.supabase === 'undefined') return null;
+    try {
+      var url = window.SUPABASE_URL || 'https://qqcxtfayjxyvswblmdpw.supabase.co';
+      var key = window.SUPABASE_ANON_KEY || 'sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
+      window.supabaseClient = window.supabase.createClient(url, key);
+      return window.supabaseClient;
+    } catch (e) { return null; }
   }
 
-  function buildRankingButton() {
-    var floatBox = document.getElementById('shareFloat');
-    if (!floatBox) return null;
+  /* ========== 样式 ========== */
+  function injectStyles() {
+    if ($('rankingModuleStyles')) return;
+    var st = document.createElement('style');
+    st.id = 'rankingModuleStyles';
+    st.textContent =
+      '.ranking-item{display:flex;align-items:center;gap:12px;padding:10px 12px;' +
+      'border-bottom:1px solid var(--border-glow);cursor:pointer;transition:background .2s;}' +
+      '.ranking-item:last-child{border-bottom:none;}' +
+      '.ranking-item:hover{background:rgba(0,119,255,0.04);}' +
+      '.ranking-item .rank-num{font-size:1.1rem;font-weight:700;width:32px;' +
+      'text-align:center;flex-shrink:0;}' +
+      '.ranking-item .rank-info{flex:1;min-width:0;}' +
+      '.ranking-item .rank-title{font-size:0.85rem;font-weight:600;' +
+      'color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}' +
+      '.ranking-item .rank-meta{font-size:0.65rem;color:var(--text-dim);' +
+      'display:flex;gap:8px;margin-top:2px;}';
+    document.head.appendChild(st);
+  }
 
-    var wechatAnchor = null;
-    var links = floatBox.querySelectorAll('a');
-    for (var i = 0; i < links.length; i++) {
-      var t = links[i].getAttribute('title') || '';
-      var oc = links[i].getAttribute('onclick') || '';
-      if (t.indexOf('微信') !== -1 || oc.indexOf('wechat') !== -1) {
-        wechatAnchor = links[i];
+  /* ========== 按钮位置：放到"微信"按钮上方 ========== */
+  function placeButton() {
+    var box = $('shareFloat');
+    if (!box) return;
+
+    var wechat = null;
+    var anchors = box.getElementsByTagName('a');
+    for (var i = 0; i < anchors.length; i++) {
+      var title = anchors[i].getAttribute('title') || '';
+      var onclick = anchors[i].getAttribute('onclick') || '';
+      if (title.indexOf('微信') !== -1 || onclick.indexOf('wechat') !== -1) {
+        wechat = anchors[i];
         break;
       }
     }
 
-    var btn = document.getElementById('rankingBtn');
+    var btn = $('rankingBtn');
     if (!btn) {
       btn = document.createElement('a');
       btn.id = 'rankingBtn';
@@ -77,18 +78,21 @@
       btn.innerHTML = '<i class="fas fa-trophy"></i>';
     }
 
-    if (wechatAnchor) {
-      if (btn.parentNode !== floatBox || btn.nextSibling !== wechatAnchor) {
-        floatBox.insertBefore(btn, wechatAnchor);
+    if (wechat) {
+      /* 让 btn 位于 wechat 之前（上方），用 element 判断避免文本节点干扰 */
+      if (btn.nextElementSibling !== wechat || btn.parentNode !== box) {
+        box.insertBefore(btn, wechat);
       }
-    } else if (btn.parentNode !== floatBox) {
-      floatBox.insertBefore(btn, floatBox.firstChild);
+    } else {
+      if (btn.parentNode !== box) {
+        box.insertBefore(btn, box.firstChild);
+      }
     }
-    return btn;
   }
 
-  function buildRankingModal() {
-    var modal = document.getElementById('rankingModal');
+  /* ========== 弹窗：若 HTML 已存在则复用，不存在才创建 ========== */
+  function ensureModal() {
+    var modal = $('rankingModal');
     if (modal) return modal;
 
     modal = document.createElement('div');
@@ -100,9 +104,9 @@
         'display:flex;align-items:center;gap:10px;">' +
           '<i class="fas fa-trophy" style="font-size:1.4rem;"></i>' +
           '<h3 style="margin:0;font-size:1.2rem;font-weight:700;color:#fff;">社区排行榜</h3>' +
-          '<button class="close-btn" id="rankingModalClose" ' +
-          'style="float:none;margin-left:auto;color:rgba(255,255,255,0.8);' +
-          'font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button>' +
+          '<button class="close-btn" id="rankingModalClose" style="float:none;' +
+          'margin-left:auto;color:rgba(255,255,255,0.8);font-size:1.5rem;' +
+          'background:none;border:none;cursor:pointer;">&times;</button>' +
         '</div>' +
         '<div id="rankingList" style="max-height:60vh;overflow-y:auto;' +
         'scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.2) transparent;' +
@@ -116,66 +120,60 @@
     return modal;
   }
 
+  /* ========== 打开 / 关闭 ========== */
   function openRanking() {
-    buildRankingModal().classList.add('open');
+    ensureModal().classList.add('open');
     loadRanking();
   }
 
   function closeRanking() {
-    var modal = document.getElementById('rankingModal');
-    if (modal) modal.classList.remove('open');
+    var m = $('rankingModal');
+    if (m) m.classList.remove('open');
   }
 
+  /* ========== 加载数据 ========== */
   function loadRanking() {
-    var box = document.getElementById('rankingList');
+    var box = $('rankingList');
     if (!box) return;
 
-    var client = getClient();
-    if (!client) {
-      box.innerHTML =
-        '<p style="color:var(--text-dim);text-align:center;padding:24px;">' +
-        '服务未加载，请稍后重试</p>';
+    var sb = getClient();
+    if (!sb) {
+      box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">服务未加载，请稍后重试</p>';
       return;
     }
 
-    box.innerHTML =
-      '<p style="color:var(--text-dim);text-align:center;padding:24px;">加载中...</p>';
+    box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">加载中...</p>';
 
-    client
-      .from('questions')
+    sb.from('questions')
       .select('*')
       .order('votes', { ascending: false })
       .limit(10)
       .then(function (res) {
         if (res.error) {
-          box.innerHTML =
-            '<p style="color:var(--text-dim);text-align:center;padding:24px;">' +
-            '加载失败，请稍后重试</p>';
+          box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">加载失败，请稍后重试</p>';
           return;
         }
         var list = res.data || [];
         if (list.length === 0) {
-          box.innerHTML =
-            '<p style="color:var(--text-dim);text-align:center;padding:24px;">' +
-            '暂无排行数据</p>';
+          box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">暂无排行数据</p>';
           return;
         }
         var html = '';
         for (var i = 0; i < list.length; i++) {
-          var item = list[i];
+          var it = list[i];
           var medal = '#' + (i + 1);
           if (i === 0) medal = '🥇';
           else if (i === 1) medal = '🥈';
           else if (i === 2) medal = '🥉';
           html +=
-            '<div class="ranking-item" data-id="' + escAttr(item.id) + '">' +
+            '<div class="ranking-item" data-id="' + escA(it.id) + '">' +
               '<span class="rank-num">' + medal + '</span>' +
               '<div class="rank-info">' +
-                '<div class="rank-title">' + escHtml(item.title) + '</div>' +
+                '<div class="rank-title">' + esc(it.title) + '</div>' +
                 '<div class="rank-meta">' +
-                  '<span>' + escHtml(item.category) + '</span>' +
-                  '<span>👍 ' + (item.votes || 0) + '</span>' +
-                  '<span>💬 ' + (item.answers_count || 0) + '</span>' +
+                  '<span>' + esc(it.category) + '</span>' +
+                  '<span>👍 ' + (it.votes || 0) + '</span>' +
+                  '<span>💬 ' + (it.answers_count || 0) + '</span>' +
                 '</div>' +
               '</div>' +
             '</div>';
@@ -199,61 +197,62 @@
         }
       })
       .catch(function () {
-        box.innerHTML =
-          '<p style="color:var(--text-dim);text-align:center;padding:24px;">' +
-          '网络异常，请稍后重试</p>';
+        box.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:24px;">网络异常，请稍后重试</p>';
       });
   }
 
-  function handleClick(e) {
-    var target = e.target;
+  /* ========== 事件：使用捕获阶段，优先拦截 ========== */
+  function onClickCapture(e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
 
-    var rankingTrigger = target.closest ? target.closest('#rankingBtn') : null;
-    if (rankingTrigger) {
+    /* 打开排行榜 */
+    if (t.closest('#rankingBtn')) {
       e.preventDefault();
       e.stopPropagation();
       openRanking();
       return;
     }
 
-    var closer = target.closest
-      ? target.closest('#rankingModalClose, #rankingModalCloseBtn')
-      : null;
-    if (closer) {
+    /* 关闭按钮 */
+    if (t.closest('#rankingModalClose') || t.closest('#rankingModalCloseBtn')) {
       e.preventDefault();
       e.stopPropagation();
       closeRanking();
       return;
     }
 
-    var modal = document.getElementById('rankingModal');
-    if (modal && target === modal) {
+    /* 点击空白遮罩关闭 */
+    var modal = $('rankingModal');
+    if (modal && modal.classList.contains('open') && t === modal) {
       closeRanking();
     }
   }
 
-  function handleKey(e) {
+  function onKeyDown(e) {
     if (e.key !== 'Escape') return;
-    var modal = document.getElementById('rankingModal');
-    if (modal && modal.classList.contains('open')) {
-      closeRanking();
-    }
+    var modal = $('rankingModal');
+    if (modal && modal.classList.contains('open')) closeRanking();
   }
 
-  var installed = false;
-
-  function install() {
-    if (installed) return;
-    installed = true;
-    injectStyles();
-    buildRankingButton();
-    buildRankingModal();
-    document.addEventListener('click', handleClick, true);
-    document.addEventListener('keydown', handleKey);
+  /* ========== 启动 ========== */
+  var started = false;
+  function start() {
+    if (started) return;
+    started = true;
+    try { injectStyles(); } catch (e) {}
+    try { placeButton(); } catch (e) {}
+    try { ensureModal(); } catch (e) {}
+    document.addEventListener('click', onClickCapture, true);
+    document.addEventListener('keydown', onKeyDown, false);
   }
 
+  /* 页面加载完成后启动；若按钮由主脚本动态渲染，也再兜底重试几次 */
   function boot() {
-    install();
+    start();
+    setTimeout(placeButton, 300);
+    setTimeout(placeButton, 1200);
+    setTimeout(placeButton, 2500);
   }
 
   if (document.readyState === 'loading') {
@@ -262,10 +261,11 @@
     boot();
   }
 
+  /* 对外暴露 */
   window.RankingModule = {
     open: openRanking,
     close: closeRanking,
     refresh: loadRanking,
-    ensureButton: buildRankingButton
+    place: placeButton
   };
 })();
