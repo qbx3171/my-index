@@ -46,7 +46,54 @@ C.loadDiscussions=async function(id){var list=document.getElementById('community
 C.submitDiscussion=async function(id){if(!window.currentUser){C.needLogin();return;}var ce=document.getElementById('communityDiscussionContent');if(!ce)return;var c=ce.value.trim();if(!c){C.tip('请填写讨论内容','warning');return;}var r=await supabaseClient.from('software_discussions').insert({user_id:window.currentUser.id,software_id:String(id),content:c});if(r.error){C.tip('发表失败','error');return;}C.tip('发表成功','success');ce.value='';C.loadDiscussions(id);await C.addPoints(3);};
 
 C.getToday=function(){var d=new Date(Date.now()+8*3600*1000);return d.toISOString().slice(0,10);};
-C.injectProfile=function(){if(C._ip)return;C._ip=true;setTimeout(function(){C._ip=false;},200);var ct=document.getElementById('profileContent');if(!ct)return;var old=document.getElementById('communityProfileSection');if(old)old.remove();var p=window.userPoints||0;var lv=window.userLevel||1;var sk=window.userStreak||0;var td=C.getToday();var ck=!!(window.userLastCheckin&&window.userLastCheckin===td);var bt=ck?'✅ 已签到':'每日签到';var be=ck?'background:#0b9e5a;border-color:#0b9e5a;':'';var sec=document.createElement('div');sec.id='communityProfileSection';sec.className='profile-card';sec.innerHTML='<div class="box-header" style="display:flex;justify-content:space-between;align-items:center;margin:0 0 12px;"><h4 style="font-size:.9rem;margin:0;"><i class="fas fa-gift" style="color:var(--accent-cyan);"></i> 我的积分</h4></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div style="background:var(--bg-primary);border-radius:12px;padding:14px;border:1px solid var(--border-glow);text-align:center;"><div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan);">'+p+'</div><div style="font-size:0.72rem;color:var(--text-dim);">积分</div><button class="btn btn-sm btn-primary" id="communityCheckinBtn" style="margin-top:8px;font-size:.72rem;padding:4px 12px;'+be+'" '+(ck?'disabled':'')+'>'+bt+'</button></div><div style="background:var(--bg-primary);border-radius:12px;padding:14px;border:1px solid var(--border-glow);text-align:center;"><div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan);">Lv'+lv+'</div><div style="font-size:0.72rem;color:var(--text-dim);">等级</div><div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;">连续签到 '+sk+' 天</div></div></div>';var rs=document.getElementById('profileRecentSection');if(rs&&rs.parentNode===ct){ct.insertBefore(sec,rs);}else{ct.appendChild(sec);}var b=document.getElementById('communityCheckinBtn');if(b&&!ck)b.onclick=C.doCheckin;};
+
+C.injectProfile=function(){
+if(C._ip)return;
+C._ip=true;
+setTimeout(function(){C._ip=false;},200);
+var ct=document.getElementById('profileContent');
+if(!ct)return;
+var old=document.getElementById('communityProfileSection');
+if(old)old.remove();
+var p=window.userPoints||0;
+var lv=window.userLevel||1;
+var sk=window.userStreak||0;
+var td=C.getToday();
+var ck=!!(window.userLastCheckin&&window.userLastCheckin===td);
+var bt=ck?'<i class="fas fa-check"></i> 已签到':'<i class="fas fa-gift"></i> 签到 +10';
+var bg=ck?'background:#0b9e5a;border-color:#0b9e5a;cursor:default;opacity:.85;':'';
+var sec=document.createElement('div');
+sec.id='communityProfileSection';
+sec.className='profile-card';
+sec.style.cssText='margin-top:16px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border-glow);border-radius:var(--radius-md);';
+sec.innerHTML=
+'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;">'+
+'<h4 style="font-size:.9rem;margin:0;display:flex;align-items:center;gap:8px;font-weight:700;">'+
+'<i class="fas fa-gift" style="color:var(--accent-cyan);"></i> 我的积分'+
+'</h4>'+
+'<button class="btn btn-sm btn-primary" id="communityCheckinBtn" style="font-size:.72rem;padding:5px 14px;border-radius:50px;'+bg+'" '+(ck?'disabled':'')+'>'+bt+'</button>'+
+'</div>'+
+'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'+
+'<div style="text-align:center;padding:12px 6px;background:linear-gradient(135deg,rgba(0,119,255,0.06),rgba(108,92,231,0.08));border-radius:12px;border:1px solid var(--border-glow);">'+
+'<div style="font-size:1.5rem;font-weight:800;color:var(--accent-cyan);line-height:1.1;letter-spacing:-0.5px;">'+p+'</div>'+
+'<div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;">积分</div>'+
+'</div>'+
+'<div style="text-align:center;padding:12px 6px;background:linear-gradient(135deg,rgba(108,92,231,0.06),rgba(0,119,255,0.08));border-radius:12px;border:1px solid var(--border-glow);">'+
+'<div style="font-size:1.5rem;font-weight:800;color:var(--accent-purple);line-height:1.1;letter-spacing:-0.5px;">'+lv+'</div>'+
+'<div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;">等级</div>'+
+'</div>'+
+'<div style="text-align:center;padding:12px 6px;background:linear-gradient(135deg,rgba(243,156,18,0.06),rgba(231,76,60,0.08));border-radius:12px;border:1px solid var(--border-glow);">'+
+'<div style="font-size:1.5rem;font-weight:800;color:#f39c12;line-height:1.1;letter-spacing:-0.5px;">'+sk+'</div>'+
+'<div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;">连续(天)</div>'+
+'</div>'+
+'</div>';
+var rs=document.getElementById('profileRecentSection');
+if(rs&&rs.parentNode===ct){ct.insertBefore(sec,rs);}
+else{ct.appendChild(sec);}
+var b=document.getElementById('communityCheckinBtn');
+if(b&&!ck)b.onclick=C.doCheckin;
+};
+
 C.refreshProfile=function(){var pp=document.getElementById('pageProfile');if(pp&&!pp.classList.contains('hidden')){C.injectProfile();if(typeof renderRecentHistory==='function')renderRecentHistory();}};
 C.doCheckin=async function(){if(!window.currentUser){C.tip('请先登录','warning');return;}var b=document.getElementById('communityCheckinBtn');if(b){b.disabled=true;b.textContent='签到中...';}try{var td=C.getToday();var ex=await supabaseClient.from('checkins').select('id').eq('user_id',window.currentUser.id).eq('checkin_date',td).maybeSingle();if(ex.error){C.tip('查询失败','error');if(b){b.disabled=false;b.textContent='每日签到';}return;}if(ex.data){C.tip('今天已经签到过了','warning');window.userLastCheckin=td;await C.loadPoints();C.injectProfile();C.updateLv();return;}var pr=await supabaseClient.from('profiles').select('points,streak,last_checkin').eq('id',window.currentUser.id).maybeSingle();var cp=0,cs=0,lc=null;if(pr.data){cp=pr.data.points||0;cs=pr.data.streak||0;lc=pr.data.last_checkin||null;}var st=cs+1;if(st>1&&lc){var df=(new Date(td)-new Date(lc))/86400000;if(df>1)st=1;}var np=cp+10;var lv=Math.floor(np/100)+1;var ir=await supabaseClient.from('checkins').insert({user_id:window.currentUser.id,checkin_date:td,points:10});if(ir.error){C.tip('签到失败','error');if(b){b.disabled=false;b.textContent='每日签到';}return;}var ur=await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:np,level:lv,streak:st,last_checkin:td,updated_at:new Date().toISOString()},{onConflict:'id'});if(ur.error){C.tip('积分保存失败','error');if(b){b.disabled=false;b.textContent='每日签到';}return;}await C.loadPoints();C.injectProfile();C.updateLv();C.tip('签到成功 +10 积分','success');}catch(e){C.tip('签到异常','error');if(b){b.disabled=false;b.textContent='每日签到';}}};
 
