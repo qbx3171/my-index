@@ -2,83 +2,97 @@
 var Community={};
 window.Community=Community;
 Community.currentSoft=null;
+
+Community.escapeHTML=function(str){
+if(str===null||str===undefined)return '';
+var d=document.createElement('div');
+d.textContent=String(str);
+return d.innerHTML;
+};
+
 Community.init=function(){
 if(typeof supabaseClient==='undefined'||!supabaseClient){setTimeout(Community.init,500);return;}
-Community.hijackLoadUser();
 Community.hijackDetailOpen();
 Community.hijackGoProfile();
+Community.hijackFavoriteToggle();
+Community.hijackViewHistory();
 Community.addNotificationBell();
 Community.addRandomButton();
+Community.addLeaderboard();
 Community.initEasterEggs();
 Community.initThemes();
 Community.initPWA();
-Community.addLeaderboard();
-if(window.currentUser){Community.onLogin();}else{Community.onLogout();}
+Community.bindAuthListener();
 };
-Community.hijackLoadUser=function(){
-var orig=window.loadUser;
-window.loadUser=async function(){
-if(orig)await orig();
-if(window.currentUser){await Community.onLogin();}else{Community.onLogout();}
+
+Community.bindAuthListener=function(){
+try{
+supabaseClient.auth.onAuthStateChange(function(event,session){
+if(session&&session.user){
+window.currentUser=session.user;
+Community.onLogin();
+}else{
+window.currentUser=null;
+Community.onLogout();
+}
+});
+}catch(e){}
+setTimeout(function(){
+if(window.currentUser){Community.onLogin();}
+},1800);
 };
-};
-Community.hijackDetailOpen=function(){
-if(!window.Detail)return;
-var orig=Detail.open;
-Detail.open=function(soft){
-orig.call(Detail,soft);
-Community.currentSoft=soft;
-Community.injectDetail(soft);
-};
-};
-Community.hijackGoProfile=function(){
-if(!window.App)return;
-var orig=App.goProfile;
-App.goProfile=function(){
-orig.call(App);
-Community.injectProfile();
-};
-};
+
 Community.onLogin=async function(){
 await Community.syncFavorites();
 await Community.syncHistory();
 await Community.loadPoints();
 await Community.loadNotifications();
 Community.updateAvatarLevel();
+Community.refreshProfileIfVisible();
 };
+
 Community.onLogout=function(){
 var bell=document.getElementById('communityBell');
 if(bell)bell.style.display='none';
+var badge=document.getElementById('communityLevelBadge');
+if(badge)badge.remove();
 };
+
 Community.syncFavorites=async function(){
-if(!currentUser)return;
-var res=await supabaseClient.from('favorites').select('software_id').eq('user_id',currentUser.id);
+if(!window.currentUser)return;
+var res=await supabaseClient.from('favorites').select('software_id').eq('user_id',window.currentUser.id);
 if(res.error)return;
-var ids=res.data.map(function(x){return x.software_id;});
+var ids=(res.data||[]).map(function(x){return x.software_id;});
 localStorage.setItem('lezhe_favorites',JSON.stringify(ids));
 };
+
 Community.syncHistory=async function(){
-if(!currentUser)return;
-var res=await supabaseClient.from('view_history').select('software_id').eq('user_id',currentUser.id).order('viewed_at',{ascending:false}).limit(6);
+if(!window.currentUser)return;
+var res=await supabaseClient.from('view_history').select('software_id').eq('user_id',window.currentUser.id).order('viewed_at',{ascending:false}).limit(6);
 if(res.error)return;
-var ids=res.data.map(function(x){return x.software_id;});
+var ids=(res.data||[]).map(function(x){return x.software_id;});
 localStorage.setItem('lezhe_view_history',JSON.stringify(ids));
+if(typeof renderRecentHistory==='function')renderRecentHistory();
 };
+
 Community.addFavoriteCloud=async function(softwareId){
-if(!currentUser)return;
-await supabaseClient.from('favorites').upsert({user_id:currentUser.id,software_id:softwareId},{onConflict:'user_id,software_id'});
+if(!window.currentUser)return;
+await supabaseClient.from('favorites').upsert({user_id:window.currentUser.id,software_id:String(softwareId)},{onConflict:'user_id,software_id'});
 };
+
 Community.removeFavoriteCloud=async function(softwareId){
-if(!currentUser)return;
-await supabaseClient.from('favorites').delete().eq('user_id',currentUser.id).eq('software_id',softwareId);
+if(!window.currentUser)return;
+await supabaseClient.from('favorites').delete().eq('user_id',window.currentUser.id).eq('software_id',String(softwareId));
 };
+
 Community.addHistoryCloud=async function(softwareId){
-if(!currentUser)return;
-await supabaseClient.from('view_history').upsert({user_id:currentUser.id,software_id:softwareId,viewed_at:new Date().toISOString()},{onConflict:'user_id,software_id'});
+if(!window.currentUser)return;
+await supabaseClient.from('view_history').upsert({user_id:window.currentUser.id,software_id:String(softwareId),viewed_at:new Date().toISOString()},{onConflict:'user_id,software_id'});
 };
+
 Community.loadPoints=async function(){
-if(!currentUser)return;
-var res=await supabaseClient.from('profiles').select('points,level,streak,last_checkin').eq('id',currentUser.id).maybeSingle();
+if(!window.currentUser)return;
+var res=await supabaseClient.from('profiles').select('points,level,streak,last_checkin').eq('id',window.currentUser.id).maybeSingle();
 if(res.data){
 window.userPoints=res.data.points||0;
 window.userLevel=res.data.level||1;
@@ -86,64 +100,125 @@ window.userStreak=res.data.streak||0;
 window.userLastCheckin=res.data.last_checkin;
 }
 };
+
+Community.addPoints=async function(points){
+if(!window.currentUser)return;
+var newPoints=(window.userPoints||0)+points;
+var level=Math.floor(newPoints/100)+1;
+await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:newPoints,level:level,updated_at:new Date().toISOString()});
+window.userPoints=newPoints;
+window.userLevel=level;
+Community.updateAvatarLevel();
+Community.updateProfileStats();
+if(typeof toast==='function')toast('积分 +'+points,'success');
+};
+
 Community.updateAvatarLevel=function(){
 var level=window.userLevel||1;
 var badge=document.getElementById('communityLevelBadge');
 if(!badge){
 badge=document.createElement('span');
 badge.id='communityLevelBadge';
-badge.style.cssText='font-size:0.6rem;background:var(--accent-gradient);color:#fff;padding:0 6px;border-radius:20px;margin-left:4px;';
+badge.style.cssText='font-size:0.6rem;background:var(--accent-gradient);color:#fff;padding:1px 6px;border-radius:20px;margin-left:4px;line-height:1.4;';
 var authNav=document.getElementById('authNav');
 if(authNav)authNav.appendChild(badge);
 }
 badge.textContent='Lv'+level;
 };
+
 Community.addNotificationBell=function(){
 if(document.getElementById('communityBell'))return;
-var header=document.querySelector('.header-inner');
-if(!header)return;
+var headerInner=document.querySelector('.header-inner');
+if(!headerInner)return;
 var bell=document.createElement('button');
 bell.id='communityBell';
 bell.className='header-theme-btn';
 bell.style.cssText='position:relative;display:none;';
 bell.innerHTML='<i class="fas fa-bell"></i><span id="communityBellDot" style="position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:#e74c3c;display:none;"></span>';
 bell.addEventListener('click',Community.showNotifications);
-header.insertBefore(bell,header.lastElementChild);
+var last=headerInner.lastElementChild;
+headerInner.insertBefore(bell,last);
 };
+
 Community.loadNotifications=async function(){
-if(!currentUser)return;
+if(!window.currentUser)return;
 var bell=document.getElementById('communityBell');
 if(bell)bell.style.display='flex';
-var res=await supabaseClient.from('notifications').select('id').eq('user_id',currentUser.id).eq('is_read',false);
+var res=await supabaseClient.from('notifications').select('id').eq('user_id',window.currentUser.id).eq('is_read',false);
 var dot=document.getElementById('communityBellDot');
 if(dot)dot.style.display=(res.data&&res.data.length>0)?'block':'none';
 };
+
 Community.showNotifications=async function(){
-if(!currentUser)return;
-var res=await supabaseClient.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
-var html='<div style="position:fixed;top:70px;right:20px;width:320px;max-height:400px;overflow-y:auto;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:9999;padding:12px;">';
-html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong>通知</strong><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">&times;</button></div>';
-if(!res.data||res.data.length===0){html+='<p style="color:var(--text-dim);font-size:0.8rem;">暂无通知</p>';}
-else{
+if(!window.currentUser)return;
+var existing=document.getElementById('communityNotifPanel');
+if(existing){existing.remove();return;}
+var res=await supabaseClient.from('notifications').select('*').eq('user_id',window.currentUser.id).order('created_at',{ascending:false}).limit(30);
+var html='<div id="communityNotifPanel" style="position:fixed;top:70px;right:20px;width:320px;max-height:400px;overflow-y:auto;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.15);z-index:9999;padding:12px;">';
+html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><strong>通知</strong><button id="communityNotifClose" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-dim);">&times;</button></div>';
+if(!res.data||res.data.length===0){
+html+='<p style="color:var(--text-dim);font-size:0.8rem;">暂无通知</p>';
+}else{
 for(var i=0;i<res.data.length;i++){
 var n=res.data[i];
-html+='<div style="padding:6px 0;border-bottom:1px solid var(--border-glow);font-size:0.8rem;'+(n.is_read?'opacity:0.6':'')+'">'+Community.escapeHTML(n.content||'')+'<div style="font-size:0.6rem;color:var(--text-dim);">'+timeAgo(n.created_at)+'</div></div>';
+html+='<div style="padding:6px 0;border-bottom:1px solid var(--border-glow);font-size:0.8rem;'+(n.is_read?'opacity:0.6':'')+'">'+Community.escapeHTML(n.content||'')+'<div style="font-size:0.6rem;color:var(--text-dim);">'+(typeof timeAgo==='function'?timeAgo(n.created_at):'')+'</div></div>';
 }
-await supabaseClient.from('notifications').update({is_read:true}).eq('user_id',currentUser.id).eq('is_read',false);
+await supabaseClient.from('notifications').update({is_read:true}).eq('user_id',window.currentUser.id).eq('is_read',false);
 var dot=document.getElementById('communityBellDot');
 if(dot)dot.style.display='none';
 }
 html+='</div>';
-var div=document.createElement('div');
-div.innerHTML=html;
-document.body.appendChild(div.firstChild);
+var wrapper=document.createElement('div');
+wrapper.innerHTML=html;
+var panel=wrapper.firstChild;
+document.body.appendChild(panel);
+document.getElementById('communityNotifClose').onclick=function(){panel.remove();};
 };
-Community.escapeHTML=function(str){
-if(str===null||str===undefined)return '';
-var d=document.createElement('div');
-d.textContent=String(str);
-return d.innerHTML;
+
+Community.hijackDetailOpen=function(){
+if(!window.Detail||Detail._communityHijacked)return;
+Detail._communityHijacked=true;
+var orig=Detail.open;
+Detail.open=function(soft){
+orig.call(Detail,soft);
+Community.currentSoft=soft;
+Community.addHistoryCloud(soft.id);
+Community.injectDetail(soft);
 };
+};
+
+Community.hijackGoProfile=function(){
+if(!window.App||App._communityHijacked)return;
+App._communityHijacked=true;
+var orig=App.goProfile;
+App.goProfile=function(){
+orig.call(App);
+setTimeout(Community.injectProfile,80);
+};
+};
+
+Community.hijackFavoriteToggle=function(){
+if(typeof toggleFavorite!=='function'||toggleFavorite._communityHijacked)return;
+toggleFavorite._communityHijacked=true;
+var orig=toggleFavorite;
+window.toggleFavorite=function(id){
+var result=orig(id);
+if(result){Community.addFavoriteCloud(id);}
+else{Community.removeFavoriteCloud(id);}
+return result;
+};
+};
+
+Community.hijackViewHistory=function(){
+if(typeof addViewHistory!=='function'||addViewHistory._communityHijacked)return;
+addViewHistory._communityHijacked=true;
+var orig=addViewHistory;
+window.addViewHistory=function(id){
+orig(id);
+Community.addHistoryCloud(id);
+};
+};
+
 Community.injectDetail=function(soft){
 if(!soft)return;
 var modalBody=document.getElementById('modalBody');
@@ -168,10 +243,11 @@ Community.loadDiscussions(soft.id);
 document.getElementById('communitySubmitReview').onclick=function(){Community.submitReview(soft.id);};
 document.getElementById('communitySubmitDiscussion').onclick=function(){Community.submitDiscussion(soft.id);};
 };
+
 Community.loadReviews=async function(softwareId){
 var list=document.getElementById('communityReviewList');
 if(!list)return;
-var res=await supabaseClient.from('software_reviews').select('*').eq('software_id',softwareId).order('created_at',{ascending:false});
+var res=await supabaseClient.from('software_reviews').select('*').eq('software_id',String(softwareId)).order('created_at',{ascending:false});
 if(res.error){list.innerHTML='<p style="color:var(--text-dim);font-size:0.8rem;">暂无评价</p>';return;}
 var data=res.data||[];
 if(data.length===0){list.innerHTML='<p style="color:var(--text-dim);font-size:0.8rem;">暂无评价，来写第一条吧</p>';return;}
@@ -182,48 +258,59 @@ var r=data[i];
 avg+=r.rating;
 var stars='';
 for(var j=1;j<=5;j++){stars+=j<=r.rating?'★':'☆';}
-html+='<div style="padding:8px 0;border-bottom:1px solid var(--border-glow);"><div style="display:flex;justify-content:space-between;font-size:0.75rem;"><span style="color:var(--accent-cyan);">'+stars+'</span><span style="color:var(--text-dim);">'+timeAgo(r.created_at)+'</span></div><div style="font-size:0.8rem;margin-top:2px;">'+Community.escapeHTML(r.content||'')+'</div></div>';
+html+='<div style="padding:8px 0;border-bottom:1px solid var(--border-glow);"><div style="display:flex;justify-content:space-between;font-size:0.75rem;"><span style="color:var(--accent-cyan);">'+stars+'</span><span style="color:var(--text-dim);">'+(typeof timeAgo==='function'?timeAgo(r.created_at):'')+'</span></div><div style="font-size:0.8rem;margin-top:2px;">'+Community.escapeHTML(r.content||'')+'</div></div>';
 }
 avg=(avg/data.length).toFixed(1);
 var ratingBox=document.getElementById('communityRatingBox');
 if(ratingBox)ratingBox.innerHTML='<div style="font-size:1.2rem;font-weight:700;color:var(--accent-cyan);">'+avg+' 分</div><div style="font-size:0.7rem;color:var(--text-dim);">共 '+data.length+' 条评价</div>';
 list.innerHTML=html;
 };
+
 Community.submitReview=async function(softwareId){
-if(!currentUser){toast('请先登录','warning');return;}
-var content=document.getElementById('communityReviewContent').value.trim();
-var rating=parseInt(document.getElementById('communityRatingSelect').value);
+if(!window.currentUser){if(typeof toast==='function')toast('请先登录','warning');document.getElementById('loginModal').classList.add('open');return;}
+var contentEl=document.getElementById('communityReviewContent');
+var ratingEl=document.getElementById('communityRatingSelect');
+if(!contentEl||!ratingEl)return;
+var content=contentEl.value.trim();
+var rating=parseInt(ratingEl.value);
 if(!content){toast('请填写评价内容','warning');return;}
-var res=await supabaseClient.from('software_reviews').upsert({user_id:currentUser.id,software_id:softwareId,rating:rating,content:content},{onConflict:'user_id,software_id'});
-if(res.error){toast('评价失败','error');return;}
+var res=await supabaseClient.from('software_reviews').upsert({user_id:window.currentUser.id,software_id:String(softwareId),rating:rating,content:content},{onConflict:'user_id,software_id'});
+if(res.error){toast('评价失败: '+res.error.message,'error');return;}
 toast('评价成功','success');
-document.getElementById('communityReviewContent').value='';
+contentEl.value='';
 Community.loadReviews(softwareId);
+await Community.addPoints(5);
 };
+
 Community.loadDiscussions=async function(softwareId){
 var list=document.getElementById('communityDiscussionList');
 if(!list)return;
-var res=await supabaseClient.from('software_discussions').select('*').eq('software_id',softwareId).is('parent_id',null).order('created_at',{ascending:false});
+var res=await supabaseClient.from('software_discussions').select('*').eq('software_id',String(softwareId)).is('parent_id',null).order('created_at',{ascending:false});
 if(res.error){list.innerHTML='<p style="color:var(--text-dim);font-size:0.8rem;">暂无讨论</p>';return;}
 var data=res.data||[];
 if(data.length===0){list.innerHTML='<p style="color:var(--text-dim);font-size:0.8rem;">暂无讨论，来发表第一条吧</p>';return;}
 var html='';
 for(var i=0;i<data.length;i++){
 var d=data[i];
-html+='<div style="padding:8px 0;border-bottom:1px solid var(--border-glow);"><div style="font-size:0.7rem;color:var(--text-dim);">'+timeAgo(d.created_at)+'</div><div style="font-size:0.8rem;margin-top:2px;">'+Community.escapeHTML(d.content)+'</div></div>';
+html+='<div style="padding:8px 0;border-bottom:1px solid var(--border-glow);"><div style="font-size:0.7rem;color:var(--text-dim);">'+(typeof timeAgo==='function'?timeAgo(d.created_at):'')+'</div><div style="font-size:0.8rem;margin-top:2px;">'+Community.escapeHTML(d.content)+'</div></div>';
 }
 list.innerHTML=html;
 };
+
 Community.submitDiscussion=async function(softwareId){
-if(!currentUser){toast('请先登录','warning');return;}
-var content=document.getElementById('communityDiscussionContent').value.trim();
+if(!window.currentUser){toast('请先登录','warning');document.getElementById('loginModal').classList.add('open');return;}
+var contentEl=document.getElementById('communityDiscussionContent');
+if(!contentEl)return;
+var content=contentEl.value.trim();
 if(!content){toast('请填写讨论内容','warning');return;}
-var res=await supabaseClient.from('software_discussions').insert({user_id:currentUser.id,software_id:softwareId,content:content});
-if(res.error){toast('发表失败','error');return;}
+var res=await supabaseClient.from('software_discussions').insert({user_id:window.currentUser.id,software_id:String(softwareId),content:content});
+if(res.error){toast('发表失败: '+res.error.message,'error');return;}
 toast('发表成功','success');
-document.getElementById('communityDiscussionContent').value='';
+contentEl.value='';
 Community.loadDiscussions(softwareId);
+await Community.addPoints(3);
 };
+
 Community.injectProfile=function(){
 var container=document.getElementById('profileContent');
 if(!container)return;
@@ -246,6 +333,14 @@ container.appendChild(section);
 Community.updateProfileStats();
 document.getElementById('communityCheckinBtn').onclick=Community.doCheckin;
 };
+
+Community.refreshProfileIfVisible=function(){
+var pageProfile=document.getElementById('pageProfile');
+if(pageProfile&&!pageProfile.classList.contains('hidden')){
+Community.injectProfile();
+}
+};
+
 Community.updateProfileStats=function(){
 var p=document.getElementById('communityPoints');
 var l=document.getElementById('communityLevel');
@@ -254,24 +349,22 @@ if(p)p.textContent=window.userPoints||0;
 if(l)l.textContent='Lv'+(window.userLevel||1);
 if(s)s.textContent=window.userStreak||0;
 };
+
 Community.doCheckin=async function(){
-if(!currentUser){toast('请先登录','warning');return;}
+if(!window.currentUser){toast('请先登录','warning');return;}
 var today=new Date().toISOString().slice(0,10);
-var res=await supabaseClient.from('checkins').select('id').eq('user_id',currentUser.id).eq('checkin_date',today).maybeSingle();
-if(res.data){toast('今天已经签到过了','warning');return;}
+var exist=await supabaseClient.from('checkins').select('id').eq('user_id',window.currentUser.id).eq('checkin_date',today).maybeSingle();
+if(exist.data){toast('今天已经签到过了','warning');return;}
 var points=10;
 var streak=(window.userStreak||0)+1;
-if(streak>1){
-var last=window.userLastCheckin;
-if(last){
-var diff=(new Date(today)-new Date(last))/86400000;
+if(streak>1&&window.userLastCheckin){
+var diff=(new Date(today)-new Date(window.userLastCheckin))/86400000;
 if(diff>1)streak=1;
-}
 }
 var newPoints=(window.userPoints||0)+points;
 var level=Math.floor(newPoints/100)+1;
-await supabaseClient.from('checkins').insert({user_id:currentUser.id,checkin_date:today,points:points});
-await supabaseClient.from('profiles').update({points:newPoints,level:level,streak:streak,last_checkin:today}).eq('id',currentUser.id);
+await supabaseClient.from('checkins').insert({user_id:window.currentUser.id,checkin_date:today,points:points});
+await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:newPoints,level:level,streak:streak,last_checkin:today,updated_at:new Date().toISOString()});
 window.userPoints=newPoints;
 window.userLevel=level;
 window.userStreak=streak;
@@ -280,6 +373,7 @@ Community.updateProfileStats();
 Community.updateAvatarLevel();
 toast('签到成功 +'+points+' 积分','success');
 };
+
 Community.addRandomButton=function(){
 var hero=document.querySelector('.hero');
 if(!hero||document.getElementById('communityRandomBtn'))return;
@@ -289,36 +383,62 @@ btn.className='btn btn-outline';
 btn.style.cssText='margin-top:10px;';
 btn.innerHTML='<i class="fas fa-dice"></i> 手气不错';
 btn.onclick=function(){
-var all=DB.getSoftware();
-if(!all.length)return;
+var all=(window.DB&&DB.getSoftware)?DB.getSoftware():[];
+if(!all.length){toast('暂无软件','warning');return;}
 var s=all[Math.floor(Math.random()*all.length)];
-Detail.open(s);
+if(window.Detail)Detail.open(s);
 };
-hero.appendChild(btn);
+var searchHints=hero.querySelector('.search-hints');
+if(searchHints){searchHints.parentNode.insertBefore(btn,searchHints.nextSibling);}
+else{hero.appendChild(btn);}
 };
+
 Community.addLeaderboard=function(){
-var home=document.getElementById('pageHome');
-if(!home||document.getElementById('communityLeaderboard'))return;
+if(document.getElementById('communityLeaderboard'))return;
+if(window.innerWidth<=820)return;
 var div=document.createElement('div');
 div.id='communityLeaderboard';
-div.style.cssText='margin-top:24px;';
-div.innerHTML='<h2 class="section-title">🏆 社区排行榜</h2><div id="communityLeaderboardContent" style="background:var(--bg-card);border-radius:12px;padding:16px;border:1px solid var(--border-glow);margin-top:8px;">加载中...</div>';
-home.appendChild(div);
+div.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:60;display:flex;align-items:center;font-family:inherit;';
+div.innerHTML='<div id="communityLeaderboardToggle" style="writing-mode:vertical-lr;background:var(--accent-gradient);color:#fff;padding:12px 6px;border-radius:8px 0 0 8px;cursor:pointer;font-size:0.7rem;font-weight:600;letter-spacing:2px;box-shadow:-2px 0 12px rgba(0,119,255,0.2);user-select:none;">🏆 排行榜</div>'+
+'<div id="communityLeaderboardPanel" style="width:0;overflow:hidden;transition:width 0.3s cubic-bezier(0.2,0,0,1);background:var(--bg-card-solid);border-left:1px solid var(--border-glow);box-shadow:-4px 0 20px rgba(0,0,0,0.08);">'+
+'<div style="width:240px;padding:14px 12px;">'+
+'<div style="font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;"><span>🏆 社区排行榜</span></div>'+
+'<div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:60vh;overflow-y:auto;">加载中...</div>'+
+'</div></div>';
+document.body.appendChild(div);
+var toggle=document.getElementById('communityLeaderboardToggle');
+var panel=document.getElementById('communityLeaderboardPanel');
+var expanded=false;
+toggle.addEventListener('click',function(){
+if(expanded){panel.style.width='0';}
+else{panel.style.width='240px';}
+expanded=!expanded;
+});
 Community.loadLeaderboard();
 };
+
 Community.loadLeaderboard=async function(){
 var el=document.getElementById('communityLeaderboardContent');
 if(!el)return;
 var res=await supabaseClient.from('profiles').select('username,points,level').order('points',{ascending:false}).limit(10);
 if(res.error){el.innerHTML='<p style="color:var(--text-dim);">暂无数据</p>';return;}
-var html='<ol style="padding-left:20px;font-size:0.85rem;">';
-for(var i=0;i<res.data.length;i++){
-var u=res.data[i];
-html+='<li style="padding:4px 0;"><span style="font-weight:600;">'+(u.username||'匿名')+'</span> <span style="color:var(--accent-cyan);">'+u.points+' 积分</span> <span style="color:var(--text-dim);">Lv'+u.level+'</span></li>';
+var data=res.data||[];
+if(data.length===0){el.innerHTML='<p style="color:var(--text-dim);">暂无数据</p>';return;}
+var html='';
+for(var i=0;i<data.length;i++){
+var u=data[i];
+var rankColor=i===0?'#f39c12':i===1?'#95a5a6':i===2?'#cd7f32':'var(--text-dim)';
+var medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border-glow);">'+
+'<span style="width:20px;text-align:center;font-weight:700;color:'+rankColor+';flex-shrink:0;">'+medal+'</span>'+
+'<span style="flex:1;font-weight:500;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+Community.escapeHTML(u.username||'匿名')+'</span>'+
+'<span style="font-size:0.7rem;color:var(--accent-cyan);font-weight:600;flex-shrink:0;">'+(u.points||0)+'</span>'+
+'<span style="font-size:0.6rem;color:var(--text-dim);flex-shrink:0;">Lv'+(u.level||1)+'</span>'+
+'</div>';
 }
-html+='</ol>';
 el.innerHTML=html;
 };
+
 Community.initEasterEggs=function(){
 var logo=document.getElementById('logoHome');
 if(logo){
@@ -328,8 +448,9 @@ count++;
 if(count>=5){
 count=0;
 toast('🎉 彩蛋触发！','success');
-document.documentElement.style.setProperty('--accent-cyan','#ff00ff');
-setTimeout(function(){document.documentElement.style.setProperty('--accent-cyan','#0077ff');},3000);
+var root=document.documentElement;
+root.style.setProperty('--accent-cyan','#ff00ff');
+setTimeout(function(){root.style.setProperty('--accent-cyan','#0077ff');},3000);
 }
 });
 }
@@ -341,30 +462,56 @@ pos++;
 if(pos===konami.length){
 pos=0;
 toast('🎮 Konami 彩蛋！','success');
+document.body.style.transition='transform 1s';
 document.body.style.transform='rotate(360deg)';
-setTimeout(function(){document.body.style.transform='';},1000);
+setTimeout(function(){document.body.style.transform='';document.body.style.transition='';},1000);
 }
 }else{pos=0;}
 });
 };
+
 Community.initThemes=function(){
-var themes=['light','dark','cyber','purple'];
 var current=localStorage.getItem('theme')||'light';
-if(current==='cyber'){document.documentElement.setAttribute('data-theme','dark');document.documentElement.style.setProperty('--accent-cyan','#00ffcc');document.documentElement.style.setProperty('--accent-purple','#ff00ff');}
-if(current==='purple'){document.documentElement.setAttribute('data-theme','dark');document.documentElement.style.setProperty('--accent-cyan','#a855f7');document.documentElement.style.setProperty('--accent-purple','#ec4899');}
+if(current==='cyber'){
+document.documentElement.setAttribute('data-theme','dark');
+document.documentElement.style.setProperty('--accent-cyan','#00ffcc');
+document.documentElement.style.setProperty('--accent-purple','#ff00ff');
+}
+if(current==='purple'){
+document.documentElement.setAttribute('data-theme','dark');
+document.documentElement.style.setProperty('--accent-cyan','#a855f7');
+document.documentElement.style.setProperty('--accent-purple','#ec4899');
+}
 };
+
 Community.initPWA=function(){
-if(document.querySelector('link[rel="manifest"]'))return;
-var manifest={name:'乐哲软件',short_name:'乐哲',start_url:'/',display:'standalone',background_color:'#f0f4fa',theme_color:'#0077ff',icons:[{src:'./icon-192.png',sizes:'192x192',type:'image/png'},{src:'./icon-512.png',sizes:'512x512',type:'image/png'}]};
+if(!document.querySelector('link[rel="manifest"]')){
+var manifest={
+name:'乐哲软件',
+short_name:'乐哲',
+start_url:'./',
+display:'standalone',
+background_color:'#f0f4fa',
+theme_color:'#0077ff',
+icons:[
+{src:'./icon-192.png',sizes:'192x192',type:'image/png'},
+{src:'./icon-512.png',sizes:'512x512',type:'image/png'}
+]
+};
 var blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
-var url=URL.createObjectURL(blob);
 var link=document.createElement('link');
 link.rel='manifest';
-link.href=url;
+link.href=URL.createObjectURL(blob);
 document.head.appendChild(link);
+}
 if('serviceWorker' in navigator){
 navigator.serviceWorker.register('./sw.js').catch(function(){});
 }
 };
-if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',Community.init);}else{Community.init();}
+
+if(document.readyState==='loading'){
+document.addEventListener('DOMContentLoaded',Community.init);
+}else{
+Community.init();
+}
 })();
