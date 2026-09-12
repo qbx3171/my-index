@@ -57,20 +57,25 @@ var bell=document.getElementById('communityBell');
 if(bell)bell.style.display='none';
 var badge=document.getElementById('communityLevelBadge');
 if(badge)badge.remove();
+window.userPoints=0;
+window.userLevel=1;
+window.userStreak=0;
+window.userLastCheckin=null;
 };
 
 Community.ensureProfile=async function(){
 if(!window.currentUser)return;
 var res=await supabaseClient.from('profiles').select('id').eq('id',window.currentUser.id).maybeSingle();
-if(res.error)return;
+if(res.error){console.warn('ensureProfile 查询失败:',res.error);return;}
 if(res.data)return;
-await supabaseClient.from('profiles').insert({
+var ins=await supabaseClient.from('profiles').insert({
 id:window.currentUser.id,
 points:0,
 level:1,
 streak:0,
 updated_at:new Date().toISOString()
 });
+if(ins.error)console.warn('ensureProfile 创建失败:',ins.error);
 };
 
 Community.syncFavorites=async function(){
@@ -105,14 +110,15 @@ if(!window.currentUser)return;
 await supabaseClient.from('view_history').upsert({user_id:window.currentUser.id,software_id:String(softwareId),viewed_at:new Date().toISOString()},{onConflict:'user_id,software_id'});
 };
 
-Community.loadPoints=async function(){
+Community.reloadPoints=async function(){
 if(!window.currentUser)return;
 var res=await supabaseClient.from('profiles').select('points,level,streak,last_checkin').eq('id',window.currentUser.id).maybeSingle();
+if(res.error){console.warn('加载积分失败:',res.error);return;}
 if(res.data){
 window.userPoints=res.data.points||0;
 window.userLevel=res.data.level||1;
 window.userStreak=res.data.streak||0;
-window.userLastCheckin=res.data.last_checkin;
+window.userLastCheckin=res.data.last_checkin||null;
 }else{
 window.userPoints=0;
 window.userLevel=1;
@@ -121,14 +127,24 @@ window.userLastCheckin=null;
 }
 };
 
+Community.loadPoints=async function(){
+await Community.reloadPoints();
+};
+
 Community.addPoints=async function(points){
 if(!window.currentUser)return;
-var newPoints=(window.userPoints||0)+points;
+var profileRes=await supabaseClient.from('profiles').select('points').eq('id',window.currentUser.id).maybeSingle();
+var curPoints=(profileRes.data&&profileRes.data.points)||0;
+var newPoints=curPoints+points;
 var level=Math.floor(newPoints/100)+1;
-var res=await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:newPoints,level:level,updated_at:new Date().toISOString()});
+var res=await supabaseClient.from('profiles').upsert({
+id:window.currentUser.id,
+points:newPoints,
+level:level,
+updated_at:new Date().toISOString()
+},{onConflict:'id'});
 if(res.error){toast('积分保存失败: '+res.error.message,'error');return;}
-window.userPoints=newPoints;
-window.userLevel=level;
+await Community.reloadPoints();
 Community.updateAvatarLevel();
 Community.refreshProfileIfVisible();
 if(typeof toast==='function')toast('积分 +'+points,'success');
@@ -214,7 +230,7 @@ App._communityHijacked=true;
 var orig=App.goProfile;
 App.goProfile=function(){
 orig.call(App);
-setTimeout(Community.injectProfile,80);
+setTimeout(function(){Community.reloadPoints().then(Community.injectProfile);},80);
 };
 };
 
@@ -351,7 +367,6 @@ section.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12
 '<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">连续签到 <span id="communityStreak">'+(window.userStreak||0)+'</span> 天</div></div>'+
 '</div>';
 container.appendChild(section);
-Community.updateProfileStats();
 document.getElementById('communityCheckinBtn').onclick=Community.doCheckin;
 };
 
@@ -362,15 +377,6 @@ Community.injectProfile();
 }
 };
 
-Community.updateProfileStats=function(){
-var p=document.getElementById('communityPoints');
-var l=document.getElementById('communityLevel');
-var s=document.getElementById('communityStreak');
-if(p)p.textContent=window.userPoints||0;
-if(l)l.textContent='Lv'+(window.userLevel||1);
-if(s)s.textContent=window.userStreak||0;
-};
-
 Community.doCheckin=async function(){
 if(!window.currentUser){toast('请先登录','warning');return;}
 var btn=document.getElementById('communityCheckinBtn');
@@ -378,26 +384,44 @@ if(btn){btn.disabled=true;btn.textContent='签到中...';}
 try{
 var today=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10);
 var exist=await supabaseClient.from('checkins').select('id').eq('user_id',window.currentUser.id).eq('checkin_date',today).maybeSingle();
-if(exist.data){toast('今天已经签到过了','warning');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
-var points=10;
-var streak=(window.userStreak||0)+1;
-if(streak>1&&window.userLastCheckin){
-var diff=(new Date(today)-new Date(window.userLastCheckin))/86400000;
-if(diff>1)streak=1;
-}
-var newPoints=(window.userPoints||0)+points;
-var level=Math.floor(newPoints/100)+1;
-var insertRes=await supabaseClient.from('checkins').insert({user_id:window.currentUser.id,checkin_date:today,points:points});
-if(insertRes.error){toast('签到记录失败: '+insertRes.error.message,'error');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
-var upsertRes=await supabaseClient.from('profiles').upsert({id:window.currentUser.id,points:newPoints,level:level,streak:streak,last_checkin:today,updated_at:new Date().toISOString()});
-if(upsertRes.error){toast('积分保存失败: '+upsertRes.error.message,'error');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
-window.userPoints=newPoints;
-window.userLevel=level;
-window.userStreak=streak;
-window.userLastCheckin=today;
+if(exist.error){toast('查询签到失败: '+exist.error.message,'error');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
+if(exist.data){
+toast('今天已经签到过了','warning');
+if(btn){btn.disabled=false;btn.textContent='每日签到';}
+await Community.reloadPoints();
 Community.injectProfile();
 Community.updateAvatarLevel();
-toast('签到成功 +'+points+' 积分','success');
+return;
+}
+var profileRes=await supabaseClient.from('profiles').select('points,streak,last_checkin').eq('id',window.currentUser.id).maybeSingle();
+var curPoints=0,curStreak=0,lastCheckin=null;
+if(profileRes.data){
+curPoints=profileRes.data.points||0;
+curStreak=profileRes.data.streak||0;
+lastCheckin=profileRes.data.last_checkin||null;
+}
+var streak=curStreak+1;
+if(streak>1&&lastCheckin){
+var diff=(new Date(today)-new Date(lastCheckin))/86400000;
+if(diff>1)streak=1;
+}
+var newPoints=curPoints+10;
+var level=Math.floor(newPoints/100)+1;
+var insertRes=await supabaseClient.from('checkins').insert({user_id:window.currentUser.id,checkin_date:today,points:10});
+if(insertRes.error){toast('签到记录失败: '+insertRes.error.message,'error');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
+var upsertRes=await supabaseClient.from('profiles').upsert({
+id:window.currentUser.id,
+points:newPoints,
+level:level,
+streak:streak,
+last_checkin:today,
+updated_at:new Date().toISOString()
+},{onConflict:'id'});
+if(upsertRes.error){toast('积分保存失败: '+upsertRes.error.message,'error');if(btn){btn.disabled=false;btn.textContent='每日签到';}return;}
+await Community.reloadPoints();
+Community.injectProfile();
+Community.updateAvatarLevel();
+toast('签到成功 +10 积分','success');
 }catch(e){
 toast('签到异常: '+e.message,'error');
 if(btn){btn.disabled=false;btn.textContent='每日签到';}
@@ -425,15 +449,14 @@ else{hero.appendChild(btn);}
 
 Community.addLeaderboard=function(){
 if(document.getElementById('communityLeaderboard'))return;
-if(window.innerWidth<=820)return;
 var div=document.createElement('div');
 div.id='communityLeaderboard';
 div.style.cssText='position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:60;display:flex;align-items:center;font-family:inherit;';
 div.innerHTML='<div id="communityLeaderboardToggle" style="writing-mode:vertical-lr;background:var(--accent-gradient);color:#fff;padding:12px 6px;border-radius:8px 0 0 8px;cursor:pointer;font-size:0.7rem;font-weight:600;letter-spacing:2px;box-shadow:-2px 0 12px rgba(0,119,255,0.2);user-select:none;">🏆 排行榜</div>'+
 '<div id="communityLeaderboardPanel" style="width:0;overflow:hidden;transition:width 0.3s cubic-bezier(0.2,0,0,1);background:var(--bg-card-solid);border-left:1px solid var(--border-glow);box-shadow:-4px 0 20px rgba(0,0,0,0.08);">'+
 '<div style="width:240px;padding:14px 12px;">'+
-'<div style="font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;"><span>🏆 社区排行榜</span></div>'+
-'<div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:60vh;overflow-y:auto;">加载中...</div>'+
+'<div style="font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:10px;">🏆 社区排行榜</div>'+
+'<div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:60vh;overflow-y:auto;">点击加载...</div>'+
 '</div></div>';
 document.body.appendChild(div);
 var toggle=document.getElementById('communityLeaderboardToggle');
@@ -449,6 +472,7 @@ expanded=!expanded;
 Community.loadLeaderboard=async function(){
 var el=document.getElementById('communityLeaderboardContent');
 if(!el)return;
+el.innerHTML='加载中...';
 var res=await supabaseClient.from('profiles').select('username,points,level').order('points',{ascending:false}).limit(10);
 if(res.error){el.innerHTML='<p style="color:var(--text-dim);">加载失败：'+Community.escapeHTML(res.error.message||'')+'</p>';return;}
 var data=res.data||[];
@@ -534,7 +558,9 @@ link.href=URL.createObjectURL(blob);
 document.head.appendChild(link);
 }
 if('serviceWorker' in navigator){
-navigator.serviceWorker.register('./sw.js').catch(function(){});
+navigator.serviceWorker.register('./sw.js').then(function(reg){
+if(reg&&reg.update)reg.update();
+}).catch(function(){});
 }
 };
 
