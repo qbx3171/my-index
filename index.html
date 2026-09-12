@@ -201,25 +201,65 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .section-sub{color:var(--text-secondary);font-weight:400;margin-bottom:14px;font-size:.8rem}
 @media (max-width:640px){.section-title{font-size:1.1rem}.section-sub{font-size:.72rem;margin-bottom:10px}}
 @media (max-width:480px){.section-title{font-size:.95rem}.section-sub{font-size:.68rem;margin-bottom:8px}}
-.software-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-top:4px}
-.software-card{padding:20px 18px 16px;transition:var(--transition);cursor:pointer;display:flex;flex-direction:column;background:var(--bg-card);backdrop-filter:blur(16px);border-radius:var(--radius-lg);border:1px solid var(--border-glow);box-shadow:var(--shadow-card);min-height:250px;position:relative}
-.software-card:hover{transform:translateY(-6px);border-color:var(--border-glow-strong);box-shadow:0 12px 40px rgba(0,0,0,0.08)}
-.software-card .card-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:8px}
-.software-card .card-icon{width:48px;height:48px;border-radius:var(--radius-md);background:rgba(0,136,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(0,136,255,0.08);overflow:hidden;font-size:24px}
+
+.software-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:6px;align-items:start}
+.software-card{padding:18px 16px 14px;transition:var(--transition);cursor:pointer;display:flex;flex-direction:column;background:var(--bg-card);backdrop-filter:blur(16px);border-radius:var(--radius-lg);border:1px solid var(--border-glow);box-shadow:var(--shadow-card);position:relative;overflow:hidden}
+.software-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent-gradient);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.2,0,0,1)}
+.software-card:hover::before{transform:scaleX(1)}
+.software-card:hover{transform:translateY(-4px);border-color:var(--border-glow-strong);box-shadow:0 12px 32px rgba(0,20,40,0.10)}
+.software-card .card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:0}
+.software-card .card-icon{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,rgba(0,136,255,0.08),rgba(108,92,231,0.08));display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(0,136,255,0.10);overflow:hidden;font-size:26px}
 .software-card .card-icon img{width:100%;height:100%;object-fit:cover}
 .software-card .card-info{flex:1;min-width:0}
-.software-card .card-info h3{font-size:.95rem;font-weight:600;margin-bottom:2px;color:var(--text-primary);word-break:break-word;min-height:1.3em}
-.software-card .card-info .meta{font-size:.65rem;color:var(--text-secondary);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.software-card .card-info h3{font-size:0.92rem;font-weight:700;margin:0 0 6px;color:var(--text-primary);word-break:break-word;line-height:1.35;letter-spacing:-0.15px;padding-right:28px}
+.software-card .card-info .meta{font-size:0.66rem;color:var(--text-secondary);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .software-card .card-info .meta .version{color:var(--accent-cyan);font-weight:600}
-.software-card .card-info .platform-badges{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap}
-.software-card .desc{font-size:.78rem;color:var(--text-secondary);margin:6px 0 10px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
-.software-card .card-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border-glow);padding-top:10px;flex-wrap:wrap;gap:6px}
-.software-card .card-footer .stats{font-size:.65rem;color:var(--text-dim);display:flex;gap:12px}
-.software-card .card-footer .btn{padding:3px 14px;font-size:.65rem;font-weight:600}
-.software-card .card-top .fav-wrap .favorite-btn{font-size:.8rem;background:none;border:none;color:var(--text-dim);cursor:pointer;padding:3px 5px;border-radius:4px}
-.software-card .card-top .fav-wrap .favorite-btn.active{color:var(--danger)}
-@media (max-width:768px){.software-grid{gap:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}.software-card{padding:14px 12px 10px;min-height:180px;border-radius:var(--radius-md)}.software-card .card-top{gap:10px;margin-bottom:4px}.software-card .card-icon{width:38px;height:38px;font-size:18px}.software-card .card-info h3{font-size:.85rem}.software-card .card-info .meta{font-size:.58rem;gap:4px}.software-card .desc{font-size:.7rem;margin:4px 0 6px}.software-card .card-footer{padding-top:6px}.software-card .card-footer .stats{font-size:.58rem;gap:8px}.software-card .card-footer .btn{font-size:.6rem;padding:2px 10px}}
-@media (max-width:480px){.software-grid{gap:10px;grid-template-columns:1fr 1fr}.software-card{padding:10px 8px 8px;min-height:140px;border-radius:var(--radius-sm)}.software-card .card-top{gap:6px;margin-bottom:2px}.software-card .card-icon{width:28px;height:28px;font-size:14px}.software-card .card-info h3{font-size:.72rem}.software-card .card-info .meta{font-size:.5rem;gap:3px}.software-card .desc{font-size:.6rem;margin:2px 0 4px}.software-card .card-footer{padding-top:4px}.software-card .card-footer .stats{font-size:.5rem;gap:5px}.software-card .card-footer .btn{font-size:.5rem;padding:1px 6px}}
+.software-card .card-info .platform-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.software-card .card-info .platform-badges .badge{font-size:0.58rem;padding:1px 8px}
+.software-card .card-footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border-glow);padding-top:10px;margin-top:12px;gap:6px;flex-wrap:wrap}
+.software-card .card-footer .stats{font-size:0.62rem;color:var(--text-dim);display:flex;gap:10px}
+.software-card .card-footer .stats span{display:flex;align-items:center;gap:3px}
+.software-card .card-footer .btn{padding:4px 14px;font-size:0.68rem;font-weight:600}
+.software-card .card-top .fav-wrap{position:absolute;top:12px;right:12px;display:flex;align-items:center;z-index:2}
+.software-card .card-top .fav-wrap .favorite-btn{font-size:0.8rem;background:rgba(255,255,255,0.55);backdrop-filter:blur(6px);border:1px solid var(--border-glow);color:var(--text-dim);cursor:pointer;padding:0;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.software-card .card-top .fav-wrap .favorite-btn:hover{color:var(--danger);background:rgba(231,76,60,0.10);border-color:rgba(231,76,60,0.25)}
+.software-card .card-top .fav-wrap .favorite-btn.active{color:var(--danger);background:rgba(231,76,60,0.12);border-color:rgba(231,76,60,0.30)}
+@media (max-width:768px){
+.software-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.software-card{padding:14px 12px 10px;border-radius:var(--radius-md)}
+.software-card .card-icon{width:42px;height:42px;font-size:20px;border-radius:11px}
+.software-card .card-info h3{font-size:0.84rem;padding-right:24px}
+.software-card .card-info .meta{font-size:0.6rem}
+.software-card .card-info .platform-badges .badge{font-size:0.52rem;padding:0 6px}
+.software-card .card-footer{padding-top:8px;margin-top:10px}
+.software-card .card-footer .stats{font-size:0.55rem;gap:8px}
+.software-card .card-footer .btn{font-size:0.62rem;padding:3px 10px}
+.software-card .card-top .fav-wrap{top:8px;right:8px}
+.software-card .card-top .fav-wrap .favorite-btn{width:24px;height:24px;font-size:0.7rem}
+}
+@media (max-width:480px){
+.software-grid{grid-template-columns:1fr 1fr;gap:10px}
+.software-card{padding:12px 10px 8px;border-radius:var(--radius-sm)}
+.software-card .card-top{gap:8px}
+.software-card .card-icon{width:36px;height:36px;font-size:17px;border-radius:10px}
+.software-card .card-info h3{font-size:0.76rem;margin-bottom:4px;line-height:1.3;padding-right:22px}
+.software-card .card-info .meta{font-size:0.55rem;gap:4px}
+.software-card .card-info .platform-badges{margin-top:4px}
+.software-card .card-info .platform-badges .badge{font-size:0.48rem;padding:0 5px}
+.software-card .card-footer{padding-top:6px;margin-top:8px}
+.software-card .card-footer .stats{font-size:0.5rem;gap:6px}
+.software-card .card-footer .btn{font-size:0.55rem;padding:2px 8px}
+.software-card .card-top .fav-wrap{top:6px;right:6px}
+.software-card .card-top .fav-wrap .favorite-btn{width:22px;height:22px;font-size:0.6rem}
+}
+@media (max-width:360px){
+.software-grid{grid-template-columns:1fr 1fr;gap:8px}
+.software-card{padding:10px 8px 6px}
+.software-card .card-icon{width:32px;height:32px;font-size:15px}
+.software-card .card-info h3{font-size:0.7rem}
+.software-card .card-info .meta{font-size:0.5rem}
+}
+
 .badge{display:inline-block;padding:2px 12px;border-radius:50px;font-size:.65rem;font-weight:600;text-transform:uppercase;background:rgba(0,136,255,0.10);color:var(--accent-cyan);border:1px solid rgba(0,136,255,0.12);line-height:1.5}
 .badge-mac{background:rgba(108,92,231,0.10);color:#6c5ce7;border-color:rgba(108,92,231,0.12)}
 .badge-windows{background:rgba(0,136,255,0.10);color:var(--accent-cyan);border-color:rgba(0,136,255,0.12)}
@@ -642,7 +682,50 @@ var Render={
 renderAnnouncements:function(container){if(!container)return;var quotes=["生活就像一盒巧克力，你永远不知道下一颗是什么味道。","不积跬步，无以至千里。","梦想还是要有的，万一实现了呢。","世界那么大，我想去看看。","人生没有白走的路，每一步都算数。"];var quote=quotes[Math.floor(Math.random()*quotes.length)];var now=new Date();var dateStr=(now.getMonth()+1)+'/'+now.getDate();container.innerHTML='<div class="announcement-item"><span class="dot">◆</span><span class="time">'+dateStr+'</span><span class="text">🌸 '+quote+'</span><span class="badge-new">今日</span></div>';},
 renderTodayNew:function(container){if(!container)return;var all=DB.getSoftware();var todayItems=all.filter(function(s){return isToday(s.created_at);});var countEl=document.getElementById('todayCount');if(countEl){countEl.textContent='今日 '+todayItems.length+' 款新软件';}if(todayItems.length===0){container.innerHTML='<div class="stack-empty"><span class="empty-icon">📭</span><span class="empty-text">今日暂无新软件上架</span></div>';return;}todayItems.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});var stackHTML='<div class="stack-wrapper"><div class="stack-container" id="stackContainer">';for(var i=0;i<todayItems.length;i++){var s=todayItems[i];var displayName=s.name||'未命名软件';var cat=s.category||'未分类';var time=timeAgo(s.created_at);var iconHtml=renderIcon(s);var platforms=s.platforms||[];var platHtml='';if(platforms.includes('mac'))platHtml+='<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';if(platforms.includes('windows'))platHtml+='<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';if(!(platHtml))platHtml='<span class="badge" style="opacity:0.4;">—</span>';var descText=s.description||'';var sizeText=s.size||'—';var views=s.views||0;var downloads=s.downloads||0;var cardClass='stack-card';if(i===0)cardClass+=' card-current';else if(i===1)cardClass+=' card-next';else if(i===2)cardClass+=' card-next2';else if(i===3)cardClass+=' card-next3';else if(i===4)cardClass+=' card-next4';else cardClass+=' card-hidden';stackHTML+='<div class="'+cardClass+'" data-index="'+i+'" data-id="'+escapeAttr(s.id)+'"><span class="new-badge">✦ NEW</span><span class="card-index-badge">'+(i+1)+' / '+todayItems.length+'</span><div class="card-top-row"><div class="card-icon">'+iconHtml+'</div><div class="card-title"><div class="name">'+escapeHTML(displayName)+'</div><div class="meta"><span class="cat-tag">'+escapeHTML(cat)+'</span><span class="version">v'+escapeHTML(s.version||'1.0')+'</span><span class="size">'+escapeHTML(sizeText)+'</span></div></div></div><div class="card-desc">'+escapeHTML(descText)+'</div><div class="card-footer-row"><div class="badge-platforms">'+platHtml+'</div><div class="stats-info"><span><i class="far fa-eye"></i> '+views+'</span><span><i class="fas fa-download"></i> '+downloads+'</span></div><span class="time-ago"><i class="far fa-clock"></i> '+time+'</span></div></div>';}stackHTML+='</div></div><div class="stack-controls" id="stackControls"><button class="ctrl-btn" id="stackPrev" aria-label="上一张"><span class="icon">‹</span></button><div class="stack-dots" id="stackDots"></div><span class="stack-counter" id="stackCounter">1 / '+todayItems.length+'</span><button class="ctrl-btn" id="stackNext" aria-label="下一张"><span class="icon">›</span></button></div>';container.innerHTML=stackHTML;var stackContainer=document.getElementById('stackContainer');var cards=stackContainer.querySelectorAll('.stack-card');var total=cards.length;var current=0;var isAnimating=false;function updateStack(newIndex,direction){if(isAnimating)return;if(newIndex<0||newIndex>=total)return;isAnimating=true;current=newIndex;var prevIndex=(current>0)?current-1:-1;var nextIndex=(current<total-1)?current+1:-1;var next2Index=(nextIndex!==-1&&nextIndex<total-1)?nextIndex+1:-1;var next3Index=(next2Index!==-1&&next2Index<total-1)?next2Index+1:-1;var next4Index=(next3Index!==-1&&next3Index<total-1)?next3Index+1:-1;cards.forEach(function(card,idx){card.classList.remove('card-current','card-next','card-next2','card-next3','card-next4','card-prev','card-hidden');if(idx===current){card.classList.add('card-current');}else if(idx===nextIndex){card.classList.add('card-next');}else if(idx===next2Index){card.classList.add('card-next2');}else if(idx===next3Index){card.classList.add('card-next3');}else if(idx===next4Index){card.classList.add('card-next4');}else if(idx===prevIndex&&direction===-1){card.classList.add('card-prev');}else{card.classList.add('card-hidden');}});updateDotsAndCounter();setTimeout(function(){isAnimating=false;},550);}function updateDotsAndCounter(){var dotsContainer=document.getElementById('stackDots');if(dotsContainer){var dotsHTML='';for(var i=0;i<total;i++){dotsHTML+='<span class="dot'+(i===current?' active':'')+'"></span>';}dotsContainer.innerHTML=dotsHTML;dotsContainer.querySelectorAll('.dot').forEach(function(dot,idx){dot.addEventListener('click',function(){if(idx!==current){var dir=idx>current?1:-1;updateStack(idx,dir);}});});}var counter=document.getElementById('stackCounter');if(counter)counter.textContent=(current+1)+' / '+total;var prevBtn=document.getElementById('stackPrev');var nextBtn=document.getElementById('stackNext');if(prevBtn)prevBtn.disabled=(current===0);if(nextBtn)nextBtn.disabled=(current===total-1);}document.getElementById('stackPrev').addEventListener('click',function(){if(current>0)updateStack(current-1,-1);});document.getElementById('stackNext').addEventListener('click',function(){if(current<total-1)updateStack(current+1,1);});var touchStartY=0,touchStartTime=0,touchStartX=0;stackContainer.addEventListener('touchstart',function(e){touchStartY=e.touches[0].clientY;touchStartX=e.touches[0].clientX;touchStartTime=Date.now();},{passive:true});stackContainer.addEventListener('touchend',function(e){var touchEndY=e.changedTouches[0].clientY;var touchEndX=e.changedTouches[0].clientX;var deltaY=touchStartY-touchEndY;var deltaX=touchStartX-touchEndX;var deltaTime=Date.now()-touchStartTime;if(Math.abs(deltaY)>Math.abs(deltaX)*1.5&&Math.abs(deltaY)>35&&deltaTime<500){if(deltaY>0&&current<total-1){updateStack(current+1,1);}else if(deltaY<0&&current>0){updateStack(current-1,-1);}}},{passive:true});updateDotsAndCounter();cards.forEach(function(card){card.addEventListener('click',function(){var id=this.dataset.id;if(id){var soft=DB.getSoftware().find(function(s){return s.id===id;});if(soft){App._scrollPos=window.scrollY;Detail.open(soft);}}});});},
 renderCategories:function(container,active,onClick){if(!container)return;var all=DB.getSoftware();var categories=DB.getCategories();var countMap={};all.forEach(function(s){var cat=s.category||'未分类';countMap[cat]=(countMap[cat]||0)+1;});var groupMap={};GROUP_CONFIG.groups.forEach(function(g){g.cats.forEach(function(c){groupMap[c]=g.id;});});var grouped={};GROUP_CONFIG.groups.forEach(function(g){grouped[g.id]={group:g,items:[]};});var fallbackItems=[];categories.forEach(function(cat){var gid=groupMap[cat];if(gid&&grouped[gid]){grouped[gid].items.push(cat);}else{fallbackItems.push(cat);}});if(fallbackItems.length){var fg=GROUP_CONFIG.fallbackGroup;grouped[fg.id]={group:fg,items:fallbackItems};}var states=getGroupStates();var totalCount=all.length;var html='';var isAllActive=(active===null||active==='all'||active===undefined);html+='<div class="category-item-all '+(isAllActive?'active':'')+'" data-cat="all"><span class="icon">◇</span><span class="name">全部</span><span class="count">'+totalCount+'</span></div>';var groupOrder=GROUP_CONFIG.groups.map(function(g){return g.id;});if(fallbackItems.length)groupOrder.push(GROUP_CONFIG.fallbackGroup.id);groupOrder.forEach(function(gid){var entry=grouped[gid];if(!entry||entry.items.length===0)return;var g=entry.group;var isOpen=states[gid]===true;var icon=g.icon||'📁';html+='<div class="category-group">';html+='<div class="group-header" data-group="'+escapeAttr(gid)+'"><span class="group-icon">'+icon+'</span><span class="group-name">'+escapeHTML(g.name)+'</span><span class="group-badge">'+entry.items.length+'</span><span class="toggle-icon '+(isOpen?'open':'')+'">▶</span></div>';html+='<div class="group-items '+(isOpen?'open':'')+'">';entry.items.forEach(function(cat){var count=countMap[cat]||0;var isActive=(active===cat);var emoji=getIconEmoji(cat);html+='<div class="category-item-side '+(isActive?'active':'')+'" data-cat="'+escapeAttr(cat)+'"><span class="icon">'+emoji+'</span><span class="name">'+escapeHTML(cat)+'</span><span class="count">'+count+'</span></div>';});html+='</div></div>';});container.innerHTML=html;var allEl=container.querySelector('.category-item-all');if(allEl){allEl.addEventListener('click',function(){if(onClick)onClick('all');});}container.querySelectorAll('.group-header').forEach(function(header){header.addEventListener('click',function(e){e.stopPropagation();var gid=this.dataset.group;if(gid)toggleGroup(gid);});});container.querySelectorAll('.category-item-side').forEach(function(el){el.addEventListener('click',function(e){e.stopPropagation();var cat=this.dataset.cat;if(cat&&onClick){onClick(cat);}});});var totalEl=document.getElementById('sidebarTotalCount');if(totalEl)totalEl.textContent='共 '+totalCount+' 款软件';scrollToActiveItem();if(active&&active!=='all'){var target=null;container.querySelectorAll('.category-item-side').forEach(function(el){if(el.dataset.cat===active)target=el;});if(target){var group=target.closest('.category-group');if(group){var header=group.querySelector('.group-header');var items=group.querySelector('.group-items');if(header&&items){var gid=header.dataset.group;var states2=getGroupStates();if(!states2[gid]){states2[gid]=true;saveGroupStates(states2);items.classList.add('open');var icon=header.querySelector('.toggle-icon');if(icon)icon.classList.add('open');}}}target.classList.add('active');requestAnimationFrame(function(){target.scrollIntoView({block:'nearest',behavior:'smooth'});});}}},
-renderCards:function(container,list,showCategory,keyword){showCategory=showCategory!==false;if(!(container))return;if(!list||list.length===0){container.innerHTML='<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p>'+(keyword?'<button class="btn btn-sm btn-outline" id="clearSearchBtn">清空搜索</button>':'')+'</div>';var clearBtn=container.querySelector('#clearSearchBtn');if(clearBtn){clearBtn.addEventListener('click',function(){document.getElementById('searchInput').value='';document.getElementById('sidebarSearchInput').value='';App.goHome();});}return;}var html='';for(var s of list){var displayName=(s.name&&s.name.trim())?s.name:'未命名软件';var displayDesc=s.description||'';if(keyword){displayName=highlightText(displayName,keyword);displayDesc=highlightText(displayDesc,keyword);}else{displayName=escapeHTML(displayName);displayDesc=escapeHTML(displayDesc);}var fav=isFavorited(s.id)?'active':'';var listMode=currentView==='list'?' list-mode':'';html+='<div class="software-card card'+listMode+'" data-id="'+escapeAttr(s.id)+'" tabindex="0" role="button" aria-label="查看 '+escapeAttr(s.name)+' 详情"><div class="card-top"><div class="card-icon">'+renderIcon(s)+'</div><div class="card-info"><h3>'+displayName+'</h3><div class="meta">'+(showCategory?'<span>'+escapeHTML(s.category)+'</span>':'')+'<span class="version">v'+escapeHTML(s.version)+'</span><span>'+escapeHTML(s.size||'—')+'</span></div><div class="platform-badges">'+renderPlatformBadges(s)+'</div></div><div class="fav-wrap"><button class="favorite-btn '+fav+'" data-id="'+escapeAttr(s.id)+'" aria-label="收藏"><i class="fas fa-heart"></i></button></div></div>'+(displayDesc?'<div class="desc">'+displayDesc+'</div>':'')+'<div class="card-footer"><div class="stats"><span><i class="far fa-eye"></i> '+(s.views||0)+'</span><span><i class="fas fa-download"></i> '+(s.downloads||0)+'</span></div><button class="btn btn-sm btn-primary detail-trigger" data-id="'+escapeAttr(s.id)+'">详情</button></div></div>';}container.innerHTML=html;container.querySelectorAll('.favorite-btn').forEach(function(btn){btn.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;var nowFav=toggleFavorite(id);if(nowFav){this.classList.add('active');toast('已收藏','success');}else{this.classList.remove('active');toast('已取消收藏','warning');}var detailFav=document.querySelector('.detail-fav-btn[data-id="'+id+'"], #detailViewFav[data-id="'+id+'"]');if(detailFav){if(nowFav)detailFav.classList.add('active');else detailFav.classList.remove('active');}});});}
+renderCards:function(container,list,showCategory,keyword){
+showCategory=showCategory!==false;
+if(!container)return;
+if(!list||list.length===0){
+container.innerHTML='<div class="empty-state"><div class="icon">◆</div><h3>暂无软件</h3><p>换个筛选条件试试</p>'+(keyword?'<button class="btn btn-sm btn-outline" id="clearSearchBtn">清空搜索</button>':'')+'</div>';
+var clearBtn=container.querySelector('#clearSearchBtn');
+if(clearBtn){clearBtn.addEventListener('click',function(){document.getElementById('searchInput').value='';document.getElementById('sidebarSearchInput').value='';App.goHome();});}
+return;
+}
+var html='';
+for(var s of list){
+var displayName=(s.name&&s.name.trim())?s.name:'未命名软件';
+if(keyword){displayName=highlightText(displayName,keyword);}else{displayName=escapeHTML(displayName);}
+var fav=isFavorited(s.id)?'active':'';
+var listMode=currentView==='list'?' list-mode':'';
+html+='<div class="software-card card'+listMode+'" data-id="'+escapeAttr(s.id)+'" tabindex="0" role="button" aria-label="查看 '+escapeAttr(s.name)+' 详情">'+
+'<div class="fav-wrap"><button class="favorite-btn '+fav+'" data-id="'+escapeAttr(s.id)+'" aria-label="收藏"><i class="fas fa-heart"></i></button></div>'+
+'<div class="card-top">'+
+'<div class="card-icon">'+renderIcon(s)+'</div>'+
+'<div class="card-info">'+
+'<h3 title="'+escapeAttr(s.name)+'">'+displayName+'</h3>'+
+'<div class="meta">'+(showCategory?'<span>'+escapeHTML(s.category)+'</span>':'')+'<span class="version">v'+escapeHTML(s.version)+'</span>'+(s.size?'<span>'+escapeHTML(s.size)+'</span>':'')+'</div>'+
+'<div class="platform-badges">'+renderPlatformBadges(s)+'</div>'+
+'</div>'+
+'</div>'+
+'<div class="card-footer">'+
+'<div class="stats"><span><i class="far fa-eye"></i> '+(s.views||0)+'</span><span><i class="fas fa-download"></i> '+(s.downloads||0)+'</span></div>'+
+'<button class="btn btn-sm btn-primary detail-trigger" data-id="'+escapeAttr(s.id)+'">详情</button>'+
+'</div>'+
+'</div>';
+}
+container.innerHTML=html;
+container.querySelectorAll('.favorite-btn').forEach(function(btn){
+btn.addEventListener('click',function(e){
+e.stopPropagation();
+var id=this.dataset.id;
+var nowFav=toggleFavorite(id);
+if(nowFav){this.classList.add('active');toast('已收藏','success');}
+else{this.classList.remove('active');toast('已取消收藏','warning');}
+var detailFav=document.querySelector('.detail-fav-btn[data-id="'+id+'"], #detailViewFav[data-id="'+id+'"]');
+if(detailFav){if(nowFav)detailFav.classList.add('active');else detailFav.classList.remove('active');}
+});
+});
+}
 };
 var viewHistory=JSON.parse(localStorage.getItem('lezhe_view_history')||'[]');
 function addViewHistory(softwareId){viewHistory=[softwareId,...viewHistory.filter(function(id){return id!==softwareId;})].slice(0,6);localStorage.setItem('lezhe_view_history',JSON.stringify(viewHistory));}
