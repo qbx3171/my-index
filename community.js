@@ -6,6 +6,21 @@ C.esc=function(s){if(s===null||s===undefined)return '';var d=document.createElem
 C.tip=function(m,t){if(typeof toast==='function')toast(m,t||'success');};
 C.needLogin=function(){C.tip('请先登录','warning');var lm=document.getElementById('loginModal');if(lm)lm.classList.add('open');};
 
+C.maskName=function(name){
+  if(name===null||name===undefined)return '匿名';
+  var s=String(name).trim();
+  if(!s)return '匿名';
+  if(/^1\d{10}$/.test(s)){return s.slice(0,3)+'XXXX'+s.slice(7);}
+  if(/^[^\s@]+@[^\s@]+$/.test(s)){
+    var parts=s.split('@');
+    var local=parts[0];
+    if(local.length<=2)return local.charAt(0)+'***@'+parts[1];
+    return local.slice(0,2)+'***@'+parts[1];
+  }
+  if(/^\d{7,}$/.test(s)){return s.slice(0,3)+'****'+s.slice(-3);}
+  return s;
+};
+
 C.injectGlobalStyle=function(){
   if(document.getElementById('communityGlobalStyle'))return;
   var s=document.createElement('style');
@@ -637,7 +652,7 @@ C.loadBoard=async function(){
     var u=d[i];
     var rc=i===0?'#f39c12':i===1?'#95a5a6':i===2?'#cd7f32':'#7a8ca3';
     var md=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-    h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:4px;border-radius:10px;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.5);"><span style="width:22px;text-align:center;font-weight:700;color:'+rc+';flex-shrink:0;font-size:0.85rem;">'+md+'</span><span style="flex:1;font-weight:500;color:#0f1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+C.esc(u.username||'匿名')+'</span><span style="font-size:0.75rem;color:#0077ff;font-weight:700;flex-shrink:0;">'+(u.points||0)+'</span><span style="font-size:0.6rem;color:#7a8ca3;flex-shrink:0;">Lv'+(u.level||1)+'</span></div>';
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:4px;border-radius:10px;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.5);"><span style="width:22px;text-align:center;font-weight:700;color:'+rc+';flex-shrink:0;font-size:0.85rem;">'+md+'</span><span style="flex:1;font-weight:500;color:#0f1a2e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+C.esc(C.maskName(u.username))+'</span><span style="font-size:0.75rem;color:#0077ff;font-weight:700;flex-shrink:0;">'+(u.points||0)+'</span><span style="font-size:0.6rem;color:#7a8ca3;flex-shrink:0;">Lv'+(u.level||1)+'</span></div>';
   }
   el.innerHTML=h;
 };
