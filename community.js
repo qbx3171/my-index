@@ -1,4 +1,4 @@
-console.log('community.js v12 loaded');
+console.log('community.js v14 loaded');
 
 (function () {
   'use strict';
@@ -39,14 +39,35 @@ console.log('community.js v12 loaded');
   var POINT_FIELDS = ['checkin_points', 'points', 'total_points', 'score', 'credits', 'sign_points', 'integral'];
   var NAME_FIELDS = ['username', 'nickname', 'display_name', 'name', 'full_name'];
 
-  function getProfilePoints(p) {
-    if (!p) return { field: POINT_FIELDS[0], value: 0 };
-    for (var i = 0; i < POINT_FIELDS.length; i++) {
-      if (p[POINT_FIELDS[i]] !== undefined && p[POINT_FIELDS[i]] !== null) {
-        return { field: POINT_FIELDS[i], value: Number(p[POINT_FIELDS[i]]) || 0 };
+  function detectPointField(records) {
+    if (window.userProfile) {
+      for (var i = 0; i < POINT_FIELDS.length; i++) {
+        if (window.userProfile[POINT_FIELDS[i]] !== undefined &&
+            window.userProfile[POINT_FIELDS[i]] !== null) {
+          return POINT_FIELDS[i];
+        }
       }
     }
-    return { field: POINT_FIELDS[0], value: 0 };
+    if (records && records.length) {
+      for (var j = 0; j < POINT_FIELDS.length; j++) {
+        for (var k = 0; k < records.length; k++) {
+          if (records[k][POINT_FIELDS[j]] !== undefined &&
+              records[k][POINT_FIELDS[j]] !== null) {
+            return POINT_FIELDS[j];
+          }
+        }
+      }
+    }
+    return POINT_FIELDS[0];
+  }
+
+  function getProfilePoints(p) {
+    var field = detectPointField(p ? [p] : []);
+    var val = 0;
+    if (p && p[field] !== undefined && p[field] !== null) {
+      val = Number(p[field]) || 0;
+    }
+    return { field: field, value: val };
   }
 
   function getName(p) {
@@ -58,54 +79,31 @@ console.log('community.js v12 loaded');
     return '匿名用户';
   }
 
-  /* ========== 样式 ========== */
   function injectStyles() {
     if ($('communityModuleStyles')) return;
     var st = document.createElement('style');
     st.id = 'communityModuleStyles';
     st.textContent =
-      '.rank-popover{position:fixed;bottom:90px;right:70px;width:260px;' +
-      'max-height:400px;background:var(--bg-card-solid,#fff);' +
-      'border:1px solid var(--border-glow,rgba(0,120,255,0.18));border-radius:14px;' +
-      'box-shadow:0 12px 40px rgba(0,0,0,0.14);z-index:300;' +
-      'display:flex;flex-direction:column;overflow:hidden;' +
-      'opacity:0;visibility:hidden;transform:translateY(12px) scale(0.94);' +
-      'transition:opacity .22s ease,transform .22s ease,visibility .22s;}' +
+      '.rank-popover{position:fixed;bottom:90px;right:70px;width:260px;max-height:400px;background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,rgba(0,120,255,0.18));border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.14);z-index:300;display:flex;flex-direction:column;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(12px) scale(0.94);transition:opacity .22s ease,transform .22s ease,visibility .22s;}' +
       '.rank-popover.open{opacity:1;visibility:visible;transform:translateY(0) scale(1);}' +
-      '.rank-popover .rank-head{padding:12px 14px;display:flex;align-items:center;gap:8px;' +
-      'background:linear-gradient(135deg,#0077ff,#6c5ce7);' +
-      'color:#fff;font-size:0.85rem;font-weight:700;letter-spacing:.3px;}' +
+      '.rank-popover .rank-head{padding:12px 14px;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:0.85rem;font-weight:700;letter-spacing:.3px;}' +
       '.rank-popover .rank-head i{font-size:0.95rem;}' +
-      '.rank-popover .rank-head .close{margin-left:auto;background:none;border:none;' +
-      'color:rgba(255,255,255,0.85);font-size:1.15rem;cursor:pointer;line-height:1;padding:0 2px;}' +
-      '.rank-popover .rank-body{overflow-y:auto;max-height:340px;padding:4px 0;' +
-      'scrollbar-width:thin;}' +
-      '.rank-popover .rank-body::-webkit-scrollbar{width:4px;}' +
-      '.rank-popover .rank-body::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.2);border-radius:4px;}' +
-      '.rank-popover .rank-item{display:flex;align-items:center;gap:8px;padding:7px 12px;' +
-      'border-bottom:1px solid var(--border-glow,rgba(0,120,255,0.12));font-size:0.78rem;}' +
+      '.rank-popover .rank-head .close{margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.85);font-size:1.15rem;cursor:pointer;line-height:1;padding:0 2px;}' +
+      '.rank-popover .rank-body{overflow-y:auto;max-height:340px;padding:4px 0;scrollbar-width:none;-ms-overflow-style:none;}' +
+      '.rank-popover .rank-body::-webkit-scrollbar{width:0;height:0;display:none;}' +
+      '.rank-popover .rank-item{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border-glow,rgba(0,120,255,0.12));font-size:0.78rem;}' +
       '.rank-popover .rank-item:last-child{border-bottom:none;}' +
-      '.rank-popover .rank-item .n{width:22px;text-align:center;font-weight:700;' +
-      'color:var(--text-secondary,#3d5068);flex-shrink:0;}' +
-      '.rank-popover .rank-item .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;' +
-      'text-overflow:ellipsis;color:var(--text-primary,#0f1a2e);}' +
-      '.rank-popover .rank-item .pt{font-size:0.72rem;color:#f39c12;font-weight:600;' +
-      'flex-shrink:0;white-space:nowrap;}' +
+      '.rank-popover .rank-item .n{width:22px;text-align:center;font-weight:700;color:var(--text-secondary,#3d5068);flex-shrink:0;}' +
+      '.rank-popover .rank-item .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-primary,#0f1a2e);}' +
+      '.rank-popover .rank-item .pt{font-size:0.72rem;color:#f39c12;font-weight:600;flex-shrink:0;white-space:nowrap;}' +
       '.rank-popover .rank-item .pt i{margin-right:2px;}' +
-      '.rank-popover .rank-empty{padding:24px 12px;text-align:center;' +
-      'color:var(--text-dim,#7a8ca3);font-size:0.78rem;}' +
-      '.checkin-card{margin-top:16px;padding:18px 20px;background:var(--bg-card,#fff);' +
-      'border:1px solid var(--border-glow,rgba(0,120,255,0.18));border-radius:12px;' +
-      'display:flex;align-items:center;gap:16px;flex-wrap:wrap;}' +
-      '.checkin-card .checkin-icon{width:52px;height:52px;border-radius:50%;' +
-      'background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;' +
-      'display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}' +
+      '.rank-popover .rank-empty{padding:24px 12px;text-align:center;color:var(--text-dim,#7a8ca3);font-size:0.78rem;}' +
+      '.checkin-card{margin-top:16px;padding:18px 20px;background:var(--bg-card,#fff);border:1px solid var(--border-glow,rgba(0,120,255,0.18));border-radius:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}' +
+      '.checkin-card .checkin-icon{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}' +
       '.checkin-card .checkin-info{flex:1;min-width:140px;}' +
       '.checkin-card .checkin-info .t{font-size:1rem;font-weight:700;color:var(--text-primary,#0f1a2e);}' +
       '.checkin-card .checkin-info .s{font-size:0.75rem;color:var(--text-dim,#7a8ca3);margin-top:2px;}' +
-      '.checkin-card .checkin-btn{padding:10px 22px;border-radius:50px;font-weight:700;' +
-      'font-size:0.85rem;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;' +
-      'border:none;cursor:pointer;transition:transform .15s;}' +
+      '.checkin-card .checkin-btn{padding:10px 22px;border-radius:50px;font-weight:700;font-size:0.85rem;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;border:none;cursor:pointer;transition:transform .15s;}' +
       '.checkin-card .checkin-btn:hover{transform:translateY(-2px);}' +
       '.checkin-card .checkin-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}' +
       '.review-star{cursor:pointer;transition:color .2s;}' +
@@ -113,7 +111,6 @@ console.log('community.js v12 loaded');
     document.head.appendChild(st);
   }
 
-  /* ========== 奖杯按钮 ========== */
   function placeButton() {
     var box = $('shareFloat');
     if (!box) return;
@@ -144,7 +141,6 @@ console.log('community.js v12 loaded');
     }
   }
 
-  /* ========== 排行榜浮层 ========== */
   function ensurePopover() {
     var p = $('rankPopover');
     if (p) return p;
@@ -174,7 +170,6 @@ console.log('community.js v12 loaded');
     if (p) p.classList.remove('open');
   }
 
-  /* ========== 排行榜：前端排序，不依赖数据库字段 ========== */
   function loadRanking() {
     var body = $('rankBody');
     if (!body) return;
@@ -196,23 +191,8 @@ console.log('community.js v12 loaded');
         return;
       }
 
-      /* 找出真实存在的积分字段：取第一条有非零值的字段 */
-      var realField = null;
-      for (var f = 0; f < POINT_FIELDS.length; f++) {
-        for (var k = 0; k < list.length; k++) {
-          if (list[k][POINT_FIELDS[f]] !== undefined && list[k][POINT_FIELDS[f]] !== null) {
-            realField = POINT_FIELDS[f];
-            break;
-          }
-        }
-        if (realField) break;
-      }
-      if (!realField) {
-        /* 若全表都没有积分字段，默认用第一个字段名展示 */
-        realField = POINT_FIELDS[0];
-      }
+      var realField = detectPointField(list);
 
-      /* 前端排序 */
       var sorted = list.slice().sort(function (a, b) {
         var av = Number(a[realField]) || 0;
         var bv = Number(b[realField]) || 0;
@@ -241,8 +221,7 @@ console.log('community.js v12 loaded');
     });
   }
 
-  /* ========== 签到卡片 ========== */
-  var checkinState = { loading: false, cardRendered: false, cardSignInToday: false };
+  var checkinState = { loading: false, cardRendered: false };
 
   function ensureCheckinCard() {
     if (checkinState.cardRendered) return;
@@ -255,7 +234,6 @@ console.log('community.js v12 loaded');
     checkinState.cardRendered = true;
 
     var renderCard = function (profile) {
-      /* 清理旧的卡片（保险） */
       var old = $('checkinCard');
       if (old) old.parentNode.removeChild(old);
 
@@ -280,7 +258,6 @@ console.log('community.js v12 loaded');
         btn.addEventListener('click', function () { doCheckin(profile); });
       }
 
-      /* 检查今天是否已签到（失败不阻塞，默认允许签到） */
       var today = todayStr();
       sb.from('checkins')
         .select('id')
@@ -289,7 +266,6 @@ console.log('community.js v12 loaded');
         .limit(1)
         .then(function (res) {
           if (res.data && res.data.length > 0) {
-            checkinState.cardSignInToday = true;
             var b = $('checkinBtn');
             if (b) {
               b.disabled = true;
@@ -297,9 +273,7 @@ console.log('community.js v12 loaded');
             }
           }
         })
-        .catch(function () {
-          /* checkins 表可能不存在，忽略错误，允许用户尝试签到 */
-        });
+        .catch(function () {});
     };
 
     if (window.userProfile) {
@@ -330,45 +304,43 @@ console.log('community.js v12 loaded');
 
     var today = todayStr();
 
-    /* 先尝试写入签到记录 */
     sb.from('checkins')
       .insert([{ user_id: user.id, checkin_date: today, points: 1 }])
       .then(function (insRes) {
         if (insRes.error) {
-          /* 唯一键冲突代表今天已签到，其余错误也提示 */
-          if (insRes.error.code === '23505' || (insRes.error.message || '').indexOf('duplicate') !== -1) {
+          if (insRes.error.code === '23505' ||
+              (insRes.error.message || '').indexOf('duplicate') !== -1) {
             toast('今天已经签到过啦～', 'warning');
-          } else {
-            /* checkins 表可能不存在，直接加积分兜底 */
-            toast('签到表异常，尝试直接加积分...', 'warning');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
+            checkinState.loading = false;
+            return;
           }
-          addPoints(sb, user.id, 1, profile, btn, insRes.error.code === '23505');
-          return;
         }
-        addPoints(sb, user.id, 1, profile, btn, false);
+        addPoints(sb, user.id, 1, profile, btn);
       })
       .catch(function () {
-        /* 网络错误，也尝试直接加积分 */
-        addPoints(sb, user.id, 1, profile, btn, false);
+        addPoints(sb, user.id, 1, profile, btn);
       });
   }
 
-  function addPoints(sb, userId, delta, profile, btn, isDuplicate) {
+  function addPoints(sb, userId, delta, profile, btn) {
     var pts = getProfilePoints(profile);
     var field = pts.field;
     var newVal = (pts.value || 0) + delta;
     var update = {};
     update[field] = newVal;
 
+    if (window.userProfile) {
+      try { window.userProfile[field] = newVal; } catch (e) {}
+    }
+
     sb.from('profiles')
       .update(update)
       .eq('id', userId)
       .then(function (res) {
         if (res.error) {
-          if (!isDuplicate) {
-            toast('签到成功，但积分更新失败：' + res.error.message, 'warning');
-          }
-        } else if (!isDuplicate) {
+          toast('签到成功，但积分更新失败：' + res.error.message, 'warning');
+        } else {
           toast('签到成功！+' + delta + ' 积分', 'success');
           var ptsEl = $('checkinPointsVal');
           if (ptsEl) ptsEl.textContent = newVal;
@@ -378,26 +350,19 @@ console.log('community.js v12 loaded');
           btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到';
         }
         checkinState.loading = false;
-        checkinState.cardSignInToday = true;
-        if (window.userProfile) {
-          try { window.userProfile[field] = newVal; } catch (e) {}
-        }
       })
       .catch(function () {
         toast('签到成功，积分同步异常', 'warning');
         if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
         checkinState.loading = false;
-        checkinState.cardSignInToday = true;
       });
   }
 
-  /* ========== 轮询：进入个人中心插入卡片 ========== */
   function startProfileWatch() {
     setInterval(function () {
       var pageProfile = $('pageProfile');
       if (!pageProfile) return;
       if (pageProfile.classList.contains('hidden')) {
-        /* 离开个人中心时重置标记，方便下次进入重建 */
         if (checkinState.cardRendered && !$('checkinCard')) {
           checkinState.cardRendered = false;
         }
@@ -410,7 +375,6 @@ console.log('community.js v12 loaded');
     }, 800);
   }
 
-  /* ========== 软件评价 ========== */
   function injectReviewButton() {
     var actions = document.querySelector('.detail-actions');
     if (!actions) return;
@@ -590,7 +554,6 @@ console.log('community.js v12 loaded');
     observer.observe(overlay, { attributes: true });
   }
 
-  /* ========== 全局点击：点击空白处收回排行榜 ========== */
   function onDocClick(e) {
     var t = e.target;
     if (!t) return;
@@ -628,7 +591,6 @@ console.log('community.js v12 loaded');
     if (revModal && revModal.classList.contains('open')) closeReviewModal();
   }
 
-  /* ========== 启动 ========== */
   var started = false;
   function start() {
     if (started) return;
