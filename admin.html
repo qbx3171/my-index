@@ -256,6 +256,12 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 #replyModal .modal-body textarea{width:100%;padding:12px 16px;border-radius:10px;border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);font-size:.95rem;resize:vertical;min-height:100px;font-family:var(--fn)}
 #replyModal .modal-body textarea:focus{border-color:var(--cy)}
 #replyModal .modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;border-top:1px solid var(--bd);padding-top:16px}
+.msg-target-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;}
+.msg-target-hint{font-size:.72rem;color:var(--dim);padding:4px 12px;background:rgba(13,124,255,.04);border-radius:50px;border:1px dashed var(--bd);display:inline-flex;align-items:center;gap:6px;margin-top:6px;}
+.msg-target-hint strong{color:var(--cy);}
+.msg-del-btn{background:rgba(239,68,68,.08)!important;color:var(--rd)!important;border:1px solid rgba(239,68,68,.12)!important;padding:3px 12px!important;border-radius:50px!important;font-size:.65rem!important;font-weight:600!important;min-height:26px!important;transition:.2s!important;white-space:nowrap;}
+.msg-del-btn:hover:not(:disabled){background:var(--rd)!important;color:#fff!important;border-color:var(--rd)!important;}
+.msg-del-btn:disabled{opacity:.5;cursor:not-allowed;}
 @media (max-width:1024px){.admin-sidebar{width:60px;padding:14px 6px}
 .admin-sidebar .logo-sm span,.admin-sidebar .nav-item span:not(.icon),.admin-sidebar .logout-btn span,.admin-sidebar .theme-toggle span,.admin-sidebar .admin-info{display:none}
 .admin-sidebar .logo-sm{justify-content:center;padding:0 0 12px;font-size:1.2rem}
@@ -564,18 +570,40 @@ if(pf.error)throw pf.error;
 var ids=(pf.data||[]).map(function(x){return x.id;});
 if(ids.length===0)return 0;
 var now=new Date().toISOString();
-var rows=ids.map(function(uid){return {user_id:uid,content:content,is_read:false,created_at:now};});
+var rows=ids.map(function(uid){return {user_id:uid,type:'system',content:content,is_read:false,created_at:now};});
 var r=await this._t(supabaseClient.from('notifications').insert(rows));
 if(r.error)throw r.error;
 return ids.length;
 },
+async sendNotificationToUser(userId,content){
+if(!supabaseClient)throw new Error('客户端未初始化');
+var r=await this._t(supabaseClient.from('notifications').insert([{
+user_id:userId,
+type:'system',
+content:content,
+is_read:false,
+created_at:new Date().toISOString()
+}]));
+if(r.error)throw r.error;
+return 1;
+},
 async getNotificationHistory(){
 if(!supabaseClient)return [];
 try{
-var r=await this._t(supabaseClient.from('notifications').select('content,created_at').order('created_at',{ascending:false}).limit(500));
+var r=await this._t(supabaseClient.from('notifications').select('id,content,created_at').order('created_at',{ascending:false}).limit(500));
 if(r.error)return [];
 return r.data||[];
 }catch(e){return [];}
+},
+async deleteNotificationGroup(content,createdAt){
+if(!supabaseClient)throw new Error('客户端未初始化');
+var r1=await this._t(supabaseClient.from('notifications').select('id').eq('content',content).eq('created_at',createdAt));
+if(r1.error)throw r1.error;
+var ids=(r1.data||[]).map(function(x){return x.id;});
+if(ids.length===0)return 0;
+var r2=await this._t(supabaseClient.from('notifications').delete().in('id',ids));
+if(r2.error)throw r2.error;
+return ids.length;
 },
 getLogs:function(){try{return JSON.parse(localStorage.getItem('lezhe_logs'))||[];}catch(e){return [];}},
 addLog:function(a,d){var l=this.getLogs();l.unshift({id:Date.now().toString(36),time:new Date().toISOString(),action:a,detail:d,user:currentAdminUser?currentAdminUser.email:'admin'});if(l.length>200)l=l.slice(0,200);localStorage.setItem('lezhe_logs',JSON.stringify(l));},
@@ -583,7 +611,7 @@ clearLogs:function(){localStorage.setItem('lezhe_logs','[]');}
 };
 
 var App={
-_tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,_editSource:null,_pubDraftId:null,
+_tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,_editSource:null,_pubDraftId:null,_msgHistoryList:[],
 
 sel:function(){return this._selByTab[this._tab]||[];},
 setSel:function(ids){this._selByTab[this._tab]=ids;},
@@ -848,33 +876,73 @@ if(t==='qa'){this.renderQA(m);return;}
 
 renderMessages:function(c){
 var self=this;
-var h='<h2 class="page-title">✉ 站内信</h2><p class="page-sub">向所有已注册用户发送系统通知</p>';
-h+='<div class="admin-form" style="max-width:720px;">';
+var h='<h2 class="page-title">✉ 站内信</h2><p class="page-sub">向指定用户或所有用户发送系统通知，可撤回已发送的通知</p>';
+h+='<div class="admin-form" style="max-width:760px;">';
+h+='<div class="form-group"><label>接收对象 <span class="required">*</span></label>';
+h+='<select id="msgTarget" style="width:100%;padding:9px 14px;border-radius:6px;border:1.5px solid var(--bd);background:var(--inp);font-size:.88rem;color:var(--tx);min-height:44px;cursor:pointer;">';
+h+='<option value="all">📢 所有用户</option>';
+h+='</select>';
+h+='<div id="msgTargetHint" class="msg-target-hint">💡 将发送给 <strong>所有已注册用户</strong></div>';
+h+='</div>';
 h+='<div class="form-group"><label>通知标题 <span class="hint">(可选)</span></label><input type="text" id="msgTitle" placeholder="例如：系统更新通知" /></div>';
-h+='<div class="form-group"><label>通知内容 <span class="required">*</span></label><textarea id="msgContent" placeholder="输入要发送给所有用户的通知内容..." style="min-height:120px;"></textarea></div>';
-h+='<div class="form-actions"><button class="btn btn-primary" id="sendMsgBtn">📨 发送给所有用户</button></div></div>';
+h+='<div class="form-group"><label>通知内容 <span class="required">*</span></label><textarea id="msgContent" placeholder="输入要发送的通知内容..." style="min-height:120px;"></textarea></div>';
+h+='<div class="form-actions"><button class="btn btn-primary" id="sendMsgBtn">📨 发送</button></div></div>';
 h+='<h3 style="font-size:1rem;font-weight:600;margin:28px 0 12px;">📋 最近发送记录</h3>';
 h+='<div class="table-wrap" id="msgHistoryWrap"><div class="loading-spinner"><span class="spinner"></span> 加载中...</div></div>';
 c.innerHTML=h;
+
+DB.pf(true).then(function(users){
+var sel=document.getElementById('msgTarget');
+if(!sel)return;
+(users||[]).forEach(function(u){
+var opt=document.createElement('option');
+opt.value=u.id;
+var label=u.username?(u.username+' ('+(u.email||u.id.slice(0,8))+')'):(u.email||u.id.slice(0,8));
+opt.textContent='👤 '+label;
+sel.appendChild(opt);
+});
+});
+
+var targetSel=document.getElementById('msgTarget');
+if(targetSel){
+targetSel.addEventListener('change',function(){
+var hint=document.getElementById('msgTargetHint');
+if(this.value==='all'){
+hint.innerHTML='💡 将发送给 <strong>所有已注册用户</strong>';
+}else{
+var t=this.options[this.selectedIndex].textContent.replace('👤 ','');
+hint.innerHTML='💡 将只发送给：<strong>'+escapeHTML(t)+'</strong>';
+}
+});
+}
+
 c.querySelector('#sendMsgBtn').addEventListener('click',async function(){
 var btn=this;
+var target=document.getElementById('msgTarget').value;
 var title=document.getElementById('msgTitle').value.trim();
 var content=document.getElementById('msgContent').value.trim();
 if(!content){toast('请输入通知内容','error');return;}
-if(!confirm('确定要发送给所有用户吗？'))return;
+var targetText=target==='all'?'所有用户':'该用户';
+if(!confirm('确定要发送给'+targetText+'吗？'))return;
 btn.disabled=true;btn.textContent='⏳ 发送中...';
 try{
 var full=title?'【'+title+'】'+content:content;
-var n=await DB.sendNotificationToAll(full);
-DB.addLog('发送站内信','共发送给 '+n+' 位用户');
-toast('✅ 已发送给 '+n+' 位用户');
+var n;
+if(target==='all'){
+n=await DB.sendNotificationToAll(full);
+}else{
+await DB.sendNotificationToUser(target,full);
+n=1;
+}
+DB.addLog('发送站内信','发送给 '+targetText+'，共 '+n+' 条');
+toast('✅ 已发送给 '+targetText+'（'+n+' 条）');
 document.getElementById('msgContent').value='';
 document.getElementById('msgTitle').value='';
 self._loadMsgHistory();
 }catch(e){
 toast('❌ 发送失败: '+(e.message||'未知错误'),'error');
 }finally{
-btn.disabled=false;btn.textContent='📨 发送给所有用户';
+btn.disabled=false;btn.textContent='📨 发送';
 }
 });
 this._loadMsgHistory();
@@ -888,19 +956,48 @@ if(!data.length){wrap.innerHTML='<div class="empty-state"><div class="icon">✉<
 var groups={};
 for(var i=0;i<data.length;i++){
 var n=data[i];
-var key=(n.content||'')+'|'+((n.created_at||'').slice(0,16));
+var key=(n.content||'')+'|'+(n.created_at||'');
 if(!groups[key]){groups[key]={content:n.content,created_at:n.created_at,count:0};}
 groups[key].count++;
 }
 var list=Object.keys(groups).map(function(k){return groups[k];});
 list.sort(function(a,b){return (b.created_at||'').localeCompare(a.created_at||'');});
-var h='<table><thead><tr><th style="width:160px;">时间</th><th>内容</th><th style="width:90px;">接收人数</th></tr></thead><tbody>';
+this._msgHistoryList=list;
+var h='<table><thead><tr><th style="width:160px;">时间</th><th>内容</th><th style="width:90px;">接收人数</th><th style="width:100px;">操作</th></tr></thead><tbody>';
 for(var j=0;j<list.length;j++){
 var g=list[j];
-h+='<tr><td style="font-size:.72rem;white-space:nowrap;color:var(--tx2);">'+escapeHTML(formatDate(g.created_at))+'</td><td style="font-size:.8rem;">'+escapeHTML(g.content||'')+'</td><td><span class="badge badge-cyan">'+g.count+' 人</span></td></tr>';
+h+='<tr data-idx="'+j+'">';
+h+='<td style="font-size:.72rem;white-space:nowrap;color:var(--tx2);">'+escapeHTML(formatDate(g.created_at))+'</td>';
+h+='<td style="font-size:.8rem;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+escapeHTML(g.content||'')+'">'+escapeHTML(g.content||'')+'</td>';
+h+='<td><span class="badge badge-cyan">'+g.count+' 人</span></td>';
+h+='<td><button class="msg-del-btn" data-idx="'+j+'">🗑 撤回</button></td>';
+h+='</tr>';
 }
 h+='</tbody></table>';
 wrap.innerHTML=h;
+
+wrap.querySelectorAll('.msg-del-btn').forEach(function(btn){
+btn.addEventListener('click',async function(){
+var idx=parseInt(this.dataset.idx);
+var g=App._msgHistoryList[idx];
+if(!g)return;
+var preview=(g.content||'').slice(0,50)+((g.content||'').length>50?'...':'');
+if(!confirm('确定撤回这条通知吗？\n\n内容预览：'+preview+'\n影响：'+g.count+' 位用户\n\n撤回后用户端的通知将同时消失。'))return;
+var self=this;
+this.disabled=true;
+this.textContent='处理中...';
+try{
+var n=await DB.deleteNotificationGroup(g.content,g.created_at);
+DB.addLog('撤回站内信','删除 '+n+' 条通知');
+toast('✅ 已撤回，共删除 '+n+' 条');
+App._loadMsgHistory();
+}catch(e){
+toast('❌ 撤回失败: '+(e.message||'未知错误'),'error');
+self.disabled=false;
+self.textContent='🗑 撤回';
+}
+});
+});
 },
 
 renderDash:async function(c){
