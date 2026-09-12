@@ -1,4 +1,4 @@
-console.log('community.js v11 loaded');
+console.log('community.js v12 loaded');
 
 (function () {
   'use strict';
@@ -10,16 +10,6 @@ console.log('community.js v11 loaded');
     var d = document.createElement('div');
     d.textContent = String(s);
     return d.innerHTML;
-  }
-
-  function escA(s) {
-    if (s === null || s === undefined) return '';
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
   }
 
   function getClient() {
@@ -46,23 +36,25 @@ console.log('community.js v11 loaded');
     return y + '-' + m + '-' + day;
   }
 
-  var POINT_FIELDS = ['checkin_points', 'points', 'total_points', 'score', 'credits', 'sign_points'];
-  var NAME_FIELDS = ['username', 'nickname', 'display_name', 'name'];
+  var POINT_FIELDS = ['checkin_points', 'points', 'total_points', 'score', 'credits', 'sign_points', 'integral'];
+  var NAME_FIELDS = ['username', 'nickname', 'display_name', 'name', 'full_name'];
 
   function getProfilePoints(p) {
+    if (!p) return { field: POINT_FIELDS[0], value: 0 };
     for (var i = 0; i < POINT_FIELDS.length; i++) {
-      if (p && p[POINT_FIELDS[i]] !== undefined && p[POINT_FIELDS[i]] !== null) {
-        return { field: POINT_FIELDS[i], value: p[POINT_FIELDS[i]] };
+      if (p[POINT_FIELDS[i]] !== undefined && p[POINT_FIELDS[i]] !== null) {
+        return { field: POINT_FIELDS[i], value: Number(p[POINT_FIELDS[i]]) || 0 };
       }
     }
     return { field: POINT_FIELDS[0], value: 0 };
   }
 
   function getName(p) {
+    if (!p) return '匿名用户';
     for (var i = 0; i < NAME_FIELDS.length; i++) {
-      if (p && p[NAME_FIELDS[i]]) return p[NAME_FIELDS[i]];
+      if (p[NAME_FIELDS[i]]) return p[NAME_FIELDS[i]];
     }
-    if (p && p.email) return p.email.split('@')[0];
+    if (p.email) return p.email.split('@')[0];
     return '匿名用户';
   }
 
@@ -81,13 +73,13 @@ console.log('community.js v11 loaded');
       'transition:opacity .22s ease,transform .22s ease,visibility .22s;}' +
       '.rank-popover.open{opacity:1;visibility:visible;transform:translateY(0) scale(1);}' +
       '.rank-popover .rank-head{padding:12px 14px;display:flex;align-items:center;gap:8px;' +
-      'background:var(--accent-gradient,linear-gradient(135deg,#0077ff,#6c5ce7));' +
+      'background:linear-gradient(135deg,#0077ff,#6c5ce7);' +
       'color:#fff;font-size:0.85rem;font-weight:700;letter-spacing:.3px;}' +
       '.rank-popover .rank-head i{font-size:0.95rem;}' +
       '.rank-popover .rank-head .close{margin-left:auto;background:none;border:none;' +
       'color:rgba(255,255,255,0.85);font-size:1.15rem;cursor:pointer;line-height:1;padding:0 2px;}' +
       '.rank-popover .rank-body{overflow-y:auto;max-height:340px;padding:4px 0;' +
-      'scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.2) transparent;}' +
+      'scrollbar-width:thin;}' +
       '.rank-popover .rank-body::-webkit-scrollbar{width:4px;}' +
       '.rank-popover .rank-body::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.2);border-radius:4px;}' +
       '.rank-popover .rank-item{display:flex;align-items:center;gap:8px;padding:7px 12px;' +
@@ -182,6 +174,7 @@ console.log('community.js v11 loaded');
     if (p) p.classList.remove('open');
   }
 
+  /* ========== 排行榜：前端排序，不依赖数据库字段 ========== */
   function loadRanking() {
     var body = $('rankBody');
     if (!body) return;
@@ -192,85 +185,77 @@ console.log('community.js v11 loaded');
     }
     body.innerHTML = '<div class="rank-empty">加载中...</div>';
 
-    sb.from('profiles').select('*').limit(1).then(function (probeRes) {
-      if (probeRes.error || !probeRes.data || probeRes.data.length === 0) {
-        body.innerHTML = '<div class="rank-empty">暂无积分数据</div>';
+    sb.from('profiles').select('*').limit(200).then(function (res) {
+      if (res.error) {
+        body.innerHTML = '<div class="rank-empty">加载失败: ' + esc(res.error.message) + '</div>';
         return;
       }
-      var sample = probeRes.data[0];
-      var realField = null;
-      for (var i = 0; i < POINT_FIELDS.length; i++) {
-        if (sample[POINT_FIELDS[i]] !== undefined) {
-          realField = POINT_FIELDS[i];
-          break;
-        }
-      }
-      if (!realField) {
-        body.innerHTML = '<div class="rank-empty">未找到积分字段</div>';
+      var list = res.data || [];
+      if (list.length === 0) {
+        body.innerHTML = '<div class="rank-empty">暂无用户数据</div>';
         return;
       }
 
-      sb.from('profiles')
-        .select('*')
-        .order(realField, { ascending: false })
-        .limit(10)
-        .then(function (res) {
-          if (res.error) {
-            body.innerHTML = '<div class="rank-empty">加载失败</div>';
-            return;
+      /* 找出真实存在的积分字段：取第一条有非零值的字段 */
+      var realField = null;
+      for (var f = 0; f < POINT_FIELDS.length; f++) {
+        for (var k = 0; k < list.length; k++) {
+          if (list[k][POINT_FIELDS[f]] !== undefined && list[k][POINT_FIELDS[f]] !== null) {
+            realField = POINT_FIELDS[f];
+            break;
           }
-          var list = res.data || [];
-          if (list.length === 0) {
-            body.innerHTML = '<div class="rank-empty">暂无积分数据</div>';
-            return;
-          }
-          var html = '';
-          for (var i = 0; i < list.length; i++) {
-            var it = list[i];
-            var medal = (i + 1) + '';
-            if (i === 0) medal = '🥇';
-            else if (i === 1) medal = '🥈';
-            else if (i === 2) medal = '🥉';
-            var nm = getName(it);
-            var pt = it[realField] || 0;
-            html +=
-              '<div class="rank-item">' +
-                '<span class="n">' + medal + '</span>' +
-                '<span class="nm">' + esc(nm) + '</span>' +
-                '<span class="pt"><i class="fas fa-coins"></i>' + pt + '</span>' +
-              '</div>';
-          }
-          body.innerHTML = html;
-        })
-        .catch(function () {
-          body.innerHTML = '<div class="rank-empty">网络异常</div>';
-        });
-    }).catch(function () {
-      body.innerHTML = '<div class="rank-empty">网络异常</div>';
+        }
+        if (realField) break;
+      }
+      if (!realField) {
+        /* 若全表都没有积分字段，默认用第一个字段名展示 */
+        realField = POINT_FIELDS[0];
+      }
+
+      /* 前端排序 */
+      var sorted = list.slice().sort(function (a, b) {
+        var av = Number(a[realField]) || 0;
+        var bv = Number(b[realField]) || 0;
+        return bv - av;
+      }).slice(0, 10);
+
+      var html = '';
+      for (var i = 0; i < sorted.length; i++) {
+        var it = sorted[i];
+        var medal = (i + 1) + '';
+        if (i === 0) medal = '🥇';
+        else if (i === 1) medal = '🥈';
+        else if (i === 2) medal = '🥉';
+        var nm = getName(it);
+        var pt = Number(it[realField]) || 0;
+        html +=
+          '<div class="rank-item">' +
+            '<span class="n">' + medal + '</span>' +
+            '<span class="nm">' + esc(nm) + '</span>' +
+            '<span class="pt"><i class="fas fa-coins"></i>' + pt + '</span>' +
+          '</div>';
+      }
+      body.innerHTML = html;
+    }).catch(function (err) {
+      body.innerHTML = '<div class="rank-empty">网络异常: ' + esc(err.message || '') + '</div>';
     });
   }
 
   /* ========== 签到卡片 ========== */
-  var checkinState = { loading: false, rendering: false };
+  var checkinState = { loading: false, cardRendered: false, cardSignInToday: false };
 
   function ensureCheckinCard() {
-    if (checkinState.rendering) return;
+    if (checkinState.cardRendered) return;
     var container = $('profileContent');
     if (!container) return;
-
-    /* 已存在卡片，且已被标记为已签到 → 不重建 */
-    var existing = $('checkinCard');
-    if (existing && existing.getAttribute('data-rendered') === '1') return;
 
     var sb = getClient();
     if (!sb || !window.currentUser) return;
 
-    checkinState.rendering = true;
+    checkinState.cardRendered = true;
 
-    var doRender = function (profile) {
-      /* 再次确认没有卡片 */
-      var c2 = $('profileContent');
-      if (!c2) { checkinState.rendering = false; return; }
+    var renderCard = function (profile) {
+      /* 清理旧的卡片（保险） */
       var old = $('checkinCard');
       if (old) old.parentNode.removeChild(old);
 
@@ -278,7 +263,6 @@ console.log('community.js v11 loaded');
       var card = document.createElement('div');
       card.className = 'checkin-card';
       card.id = 'checkinCard';
-      card.setAttribute('data-rendered', '1');
       card.innerHTML =
         '<div class="checkin-icon"><i class="fas fa-calendar-check"></i></div>' +
         '<div class="checkin-info">' +
@@ -286,6 +270,9 @@ console.log('community.js v11 loaded');
           '<div class="s">当前积分：<span id="checkinPointsVal">' + esc(pts.value) + '</span> 分</div>' +
         '</div>' +
         '<button class="checkin-btn" id="checkinBtn"><i class="fas fa-check-circle"></i> 立即签到</button>';
+
+      var c2 = $('profileContent');
+      if (!c2) return;
       c2.insertBefore(card, c2.firstChild);
 
       var btn = $('checkinBtn');
@@ -293,39 +280,39 @@ console.log('community.js v11 loaded');
         btn.addEventListener('click', function () { doCheckin(profile); });
       }
 
-      /* 判断今日是否已签到 */
+      /* 检查今天是否已签到（失败不阻塞，默认允许签到） */
       var today = todayStr();
       sb.from('checkins')
         .select('id')
         .eq('user_id', window.currentUser.id)
         .eq('checkin_date', today)
-        .maybeSingle()
+        .limit(1)
         .then(function (res) {
-          if (res.data) {
+          if (res.data && res.data.length > 0) {
+            checkinState.cardSignInToday = true;
             var b = $('checkinBtn');
             if (b) {
               b.disabled = true;
               b.innerHTML = '<i class="fas fa-check"></i> 今日已签到';
             }
           }
-          checkinState.rendering = false;
         })
         .catch(function () {
-          checkinState.rendering = false;
+          /* checkins 表可能不存在，忽略错误，允许用户尝试签到 */
         });
     };
 
     if (window.userProfile) {
-      doRender(window.userProfile);
+      renderCard(window.userProfile);
     } else {
       sb.from('profiles').select('*').eq('id', window.currentUser.id).maybeSingle()
         .then(function (r) {
           var p = r.data || {};
           window.userProfile = p;
-          doRender(p);
+          renderCard(p);
         })
         .catch(function () {
-          doRender({});
+          renderCard({});
         });
     }
   }
@@ -343,43 +330,30 @@ console.log('community.js v11 loaded');
 
     var today = todayStr();
 
+    /* 先尝试写入签到记录 */
     sb.from('checkins')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('checkin_date', today)
-      .maybeSingle()
-      .then(function (res) {
-        if (res.data) {
-          toast('今天已经签到过啦～', 'warning');
-          if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
-          checkinState.loading = false;
+      .insert([{ user_id: user.id, checkin_date: today, points: 1 }])
+      .then(function (insRes) {
+        if (insRes.error) {
+          /* 唯一键冲突代表今天已签到，其余错误也提示 */
+          if (insRes.error.code === '23505' || (insRes.error.message || '').indexOf('duplicate') !== -1) {
+            toast('今天已经签到过啦～', 'warning');
+          } else {
+            /* checkins 表可能不存在，直接加积分兜底 */
+            toast('签到表异常，尝试直接加积分...', 'warning');
+          }
+          addPoints(sb, user.id, 1, profile, btn, insRes.error.code === '23505');
           return;
         }
-        sb.from('checkins')
-          .insert([{ user_id: user.id, checkin_date: today, points: 1 }])
-          .then(function (insRes) {
-            if (insRes.error) {
-              toast('签到失败：' + insRes.error.message, 'error');
-              if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
-              checkinState.loading = false;
-              return;
-            }
-            addPoints(sb, user.id, 1, profile, btn);
-          })
-          .catch(function () {
-            toast('签到异常，请稍后重试', 'error');
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
-            checkinState.loading = false;
-          });
+        addPoints(sb, user.id, 1, profile, btn, false);
       })
       .catch(function () {
-        toast('签到异常，请稍后重试', 'error');
-        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
-        checkinState.loading = false;
+        /* 网络错误，也尝试直接加积分 */
+        addPoints(sb, user.id, 1, profile, btn, false);
       });
   }
 
-  function addPoints(sb, userId, delta, profile, btn) {
+  function addPoints(sb, userId, delta, profile, btn, isDuplicate) {
     var pts = getProfilePoints(profile);
     var field = pts.field;
     var newVal = (pts.value || 0) + delta;
@@ -391,14 +365,20 @@ console.log('community.js v11 loaded');
       .eq('id', userId)
       .then(function (res) {
         if (res.error) {
-          toast('签到成功，但积分更新失败', 'warning');
-        } else {
+          if (!isDuplicate) {
+            toast('签到成功，但积分更新失败：' + res.error.message, 'warning');
+          }
+        } else if (!isDuplicate) {
           toast('签到成功！+' + delta + ' 积分', 'success');
           var ptsEl = $('checkinPointsVal');
           if (ptsEl) ptsEl.textContent = newVal;
         }
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到';
+        }
         checkinState.loading = false;
+        checkinState.cardSignInToday = true;
         if (window.userProfile) {
           try { window.userProfile[field] = newVal; } catch (e) {}
         }
@@ -407,19 +387,27 @@ console.log('community.js v11 loaded');
         toast('签到成功，积分同步异常', 'warning');
         if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
         checkinState.loading = false;
+        checkinState.cardSignInToday = true;
       });
   }
 
-  /* ========== 轮询检查：进入个人中心时插入卡片 ========== */
+  /* ========== 轮询：进入个人中心插入卡片 ========== */
   function startProfileWatch() {
     setInterval(function () {
       var pageProfile = $('pageProfile');
       if (!pageProfile) return;
-      if (pageProfile.classList.contains('hidden')) return;
+      if (pageProfile.classList.contains('hidden')) {
+        /* 离开个人中心时重置标记，方便下次进入重建 */
+        if (checkinState.cardRendered && !$('checkinCard')) {
+          checkinState.cardRendered = false;
+        }
+        return;
+      }
       if (!$('checkinCard')) {
+        checkinState.cardRendered = false;
         ensureCheckinCard();
       }
-    }, 700);
+    }, 800);
   }
 
   /* ========== 软件评价 ========== */
@@ -612,11 +600,8 @@ console.log('community.js v11 loaded');
       e.preventDefault();
       e.stopPropagation();
       var pop = $('rankPopover');
-      if (pop && pop.classList.contains('open')) {
-        closeRanking();
-      } else {
-        openRanking();
-      }
+      if (pop && pop.classList.contains('open')) closeRanking();
+      else openRanking();
       return;
     }
 
