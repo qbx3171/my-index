@@ -243,85 +243,164 @@ if(existing){existing.remove();return;}
 if(!document.getElementById('communityNotifStyles')){
 var s=document.createElement('style');
 s.id='communityNotifStyles';
-s.textContent='@keyframes notifIn{from{opacity:0;transform:translateY(-12px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes notifOut{to{opacity:0;transform:translateY(-8px) scale(.97)}}@keyframes notifPulse{0%,100%{box-shadow:0 0 0 0 currentColor;opacity:1}50%{box-shadow:0 0 0 4px transparent;opacity:.7}}#communityNotifBody::-webkit-scrollbar{width:5px}#communityNotifBody::-webkit-scrollbar-track{background:transparent}#communityNotifBody::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.2);border-radius:10px}#communityNotifBody::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.35)}';
+s.textContent=[
+'@keyframes notifIn{from{opacity:0;transform:translateY(-14px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}',
+'@keyframes notifOut{to{opacity:0;transform:translateY(-10px) scale(.97)}}',
+'@keyframes notifDotPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.6}}',
+'#communityNotifBody::-webkit-scrollbar{width:5px}',
+'#communityNotifBody::-webkit-scrollbar-track{background:transparent}',
+'#communityNotifBody::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.2);border-radius:10px}',
+'#communityNotifBody::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.35)}',
+'.notif-card{transition:all .25s cubic-bezier(.2,.8,.3,1);}',
+'.notif-card:hover{transform:translateX(2px);}'
+].join('');
 document.head.appendChild(s);
 }
 var res=await supabaseClient.from('notifications').select('*').eq('user_id',window.currentUser.id).order('created_at',{ascending:false}).limit(30);
 var data=res.data||[];
 var unreadCount=data.filter(function(n){return !n.is_read;}).length;
+
 var panel=document.createElement('div');
 panel.id='communityNotifPanel';
-panel.style.cssText='position:fixed;top:70px;right:16px;width:360px;max-width:calc(100vw - 32px);max-height:480px;background:var(--bg-card-solid);border:1px solid var(--border-glow-strong);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.16),0 2px 8px rgba(0,0,0,0.06);z-index:9999;overflow:hidden;display:flex;flex-direction:column;font-family:var(--font);animation:notifIn .28s cubic-bezier(.2,.8,.3,1);';
+panel.style.cssText='position:fixed;top:70px;right:16px;width:380px;max-width:calc(100vw - 32px);max-height:520px;background:var(--bg-card-solid);border:1px solid var(--border-glow-strong);border-radius:18px;box-shadow:0 20px 56px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.06);z-index:9999;overflow:hidden;display:flex;flex-direction:column;font-family:var(--font);animation:notifIn .3s cubic-bezier(.2,.8,.3,1);';
+
 var header=document.createElement('div');
-header.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border-glow);background:linear-gradient(135deg,rgba(0,119,255,0.05),rgba(108,92,231,0.04));';
-var titleHtml='<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:1.1rem;">🔔</span><strong style="font-size:0.95rem;font-weight:700;color:var(--text-primary);">消息通知</strong>';
-if(unreadCount>0){titleHtml+='<span style="background:var(--accent-gradient);color:#fff;font-size:0.65rem;font-weight:700;padding:1px 8px;border-radius:20px;">'+unreadCount+' 条未读</span>';}
-else{titleHtml+='<span style="background:rgba(0,0,0,0.06);color:var(--text-dim);font-size:0.65rem;padding:1px 8px;border-radius:20px;">全部已读</span>';}
-titleHtml+='</div>';
-header.innerHTML=titleHtml;
+header.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:16px 20px 14px;border-bottom:1px solid var(--border-glow);';
+header.innerHTML='<div style="display:flex;align-items:center;gap:10px;">'+
+'<div style="width:32px;height:32px;border-radius:10px;background:var(--accent-gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.95rem;box-shadow:0 4px 12px rgba(0,119,255,0.25);">'+
+'<i class="fas fa-bell"></i></div>'+
+'<div>'+
+'<div style="font-size:0.95rem;font-weight:700;color:var(--text-primary);line-height:1.2;">消息通知</div>'+
+'<div style="font-size:0.68rem;color:var(--text-dim);margin-top:2px;">'+(unreadCount>0?('<span style="color:#0077ff;font-weight:600;">'+unreadCount+'</span> 条未读'):'全部已读')+'</div>'+
+'</div>'+
+'</div>';
+
 var closeBtn=document.createElement('button');
 closeBtn.innerHTML='&times;';
-closeBtn.style.cssText='background:rgba(0,0,0,0.04);border:none;width:28px;height:28px;border-radius:50%;color:var(--text-dim);font-size:1.15rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:.2s;';
-closeBtn.onmouseover=function(){this.style.background='rgba(239,68,68,0.12)';this.style.color='#ef4444';};
-closeBtn.onmouseout=function(){this.style.background='rgba(0,0,0,0.04)';this.style.color='var(--text-dim)';};
+closeBtn.style.cssText='background:rgba(0,0,0,0.04);border:none;width:30px;height:30px;border-radius:50%;color:var(--text-dim);font-size:1.2rem;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;';
+closeBtn.onmouseover=function(){this.style.background='rgba(239,68,68,0.12)';this.style.color='#ef4444';this.style.transform='rotate(90deg)';};
+closeBtn.onmouseout=function(){this.style.background='rgba(0,0,0,0.04)';this.style.color='var(--text-dim)';this.style.transform='rotate(0)';};
 header.appendChild(closeBtn);
 panel.appendChild(header);
+
 var body=document.createElement('div');
 body.id='communityNotifBody';
-body.style.cssText='flex:1;overflow-y:auto;padding:6px 0;scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.2) transparent;';
+body.style.cssText='flex:1;overflow-y:auto;padding:10px;scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.2) transparent;background:var(--bg-primary);';
+
 if(data.length===0){
-body.innerHTML='<div style="text-align:center;padding:48px 20px;"><div style="font-size:2.4rem;opacity:0.3;margin-bottom:8px;">📭</div><div style="font-size:0.85rem;color:var(--text-dim);">暂无新消息</div><div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;opacity:0.7;">有新动态时会在这里通知你</div></div>';
+body.innerHTML='<div style="text-align:center;padding:56px 20px;">'+
+'<div style="font-size:2.8rem;opacity:0.25;margin-bottom:10px;">📭</div>'+
+'<div style="font-size:0.88rem;color:var(--text-secondary);font-weight:500;">暂无新消息</div>'+
+'<div style="font-size:0.72rem;color:var(--text-dim);margin-top:6px;">有新动态时会在这里通知你</div>'+
+'</div>';
 }else{
+var typeConfig={
+'software':{color:'#0b9e5a',bg:'rgba(11,158,90,0.1)',icon:'🚀',label:'新软件'},
+'update':{color:'#f59e0b',bg:'rgba(245,158,11,0.1)',icon:'⚡',label:'更新'},
+'tutorial':{color:'#7c3aed',bg:'rgba(124,58,237,0.1)',icon:'📖',label:'教程'},
+'activity':{color:'#ec4899',bg:'rgba(236,72,153,0.1)',icon:'🎉',label:'活动'},
+'system':{color:'#0077ff',bg:'rgba(0,119,255,0.1)',icon:'🔔',label:'系统'}
+};
+
 data.forEach(function(n){
-var item=document.createElement('div');
 var unread=!n.is_read;
 var contentStr=String(n.content||'');
 var titleMatch=contentStr.match(/^【([^】]+)】([\s\S]+)$/);
 var title=titleMatch?titleMatch[1]:'系统通知';
 var bodyText=titleMatch?titleMatch[2]:contentStr;
-var color='#0077ff';
-var icon='🔔';
-if(title.indexOf('新软件')!==-1||title.indexOf('上架')!==-1){color='#0b9e5a';icon='🚀';}
-else if(title.indexOf('更新')!==-1){color='#f59e0b';icon='⚡';}
-else if(title.indexOf('教程')!==-1){color='#7c3aed';icon='📖';}
-else if(title.indexOf('活动')!==-1||title.indexOf('🎉')!==-1){color='#ec4899';icon='🎉';}
-item.style.cssText='display:flex;gap:12px;padding:12px 16px;cursor:pointer;transition:background .2s;'+(unread?'background:linear-gradient(90deg,'+color+'0d,transparent 60%);border-left:3px solid '+color+';':'border-left:3px solid transparent;');
+
+var cfg=typeConfig.system;
+if(title.indexOf('新软件')!==-1||title.indexOf('上架')!==-1){cfg=typeConfig.software;}
+else if(title.indexOf('更新')!==-1){cfg=typeConfig.update;}
+else if(title.indexOf('教程')!==-1){cfg=typeConfig.tutorial;}
+else if(title.indexOf('活动')!==-1||title.indexOf('🎉')!==-1){cfg=typeConfig.activity;}
+
+var card=document.createElement('div');
+card.className='notif-card';
+card.style.cssText='position:relative;background:var(--bg-card-solid);border-radius:12px;padding:14px 16px 13px;margin-bottom:8px;border:1px solid '+(unread?cfg.color+'30':'var(--border-glow)')+';'+(unread?'box-shadow:0 2px 10px '+cfg.color+'10;':'')+'cursor:pointer;';
+
+var topRow=document.createElement('div');
+topRow.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+
 var iconBox=document.createElement('div');
-iconBox.style.cssText='width:36px;height:36px;border-radius:10px;background:'+color+'15;color:'+color+';display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;';
-iconBox.textContent=icon;
-var contentBox=document.createElement('div');
-contentBox.style.cssText='flex:1;min-width:0;';
-var innerHtml='<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><strong style="font-size:0.83rem;font-weight:700;color:var(--text-primary);">'+Community.escapeHTML(title)+'</strong>'+(unread?'<span style="width:6px;height:6px;border-radius:50%;background:'+color+';flex-shrink:0;"></span>':'')+'</div>';
-innerHtml+='<div style="font-size:0.78rem;line-height:1.5;color:var(--text-secondary);word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">'+Community.escapeHTML(bodyText)+'</div>';
-innerHtml+='<div style="font-size:0.65rem;color:var(--text-dim);margin-top:6px;display:flex;align-items:center;gap:4px;"><i class="far fa-clock"></i> '+(typeof timeAgo==='function'?timeAgo(n.created_at):'刚刚')+'</div>';
-contentBox.innerHTML=innerHtml;
-item.appendChild(iconBox);
-item.appendChild(contentBox);
-item.onmouseover=function(){this.style.background=unread?'linear-gradient(90deg,'+color+'18,transparent 60%)':'rgba(0,0,0,0.025)';};
-item.onmouseout=function(){this.style.background=unread?'linear-gradient(90deg,'+color+'0d,transparent 60%)':'transparent';};
-body.appendChild(item);
+iconBox.style.cssText='width:28px;height:28px;border-radius:8px;background:'+cfg.bg+';display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;';
+iconBox.textContent=cfg.icon;
+
+var titleWrap=document.createElement('div');
+titleWrap.style.cssText='flex:1;min-width:0;display:flex;align-items:center;gap:6px;';
+var titleText=document.createElement('span');
+titleText.style.cssText='font-size:0.85rem;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+titleText.textContent=title;
+titleWrap.appendChild(titleText);
+if(unread){
+var dot=document.createElement('span');
+dot.style.cssText='width:7px;height:7px;border-radius:50%;background:'+cfg.color+';flex-shrink:0;animation:notifDotPulse 2s ease-in-out infinite;';
+titleWrap.appendChild(dot);
+}
+
+var timeEl=document.createElement('span');
+timeEl.style.cssText='font-size:0.65rem;color:var(--text-dim);flex-shrink:0;font-variant-numeric:tabular-nums;';
+timeEl.textContent=(typeof timeAgo==='function'?timeAgo(n.created_at):'刚刚');
+
+topRow.appendChild(iconBox);
+topRow.appendChild(titleWrap);
+topRow.appendChild(timeEl);
+card.appendChild(topRow);
+
+var bodyEl=document.createElement('div');
+bodyEl.style.cssText='font-size:0.8rem;line-height:1.6;color:var(--text-secondary);padding-left:36px;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;';
+bodyEl.textContent=bodyText;
+card.appendChild(bodyEl);
+
+if(unread){
+var leftBar=document.createElement('div');
+leftBar.style.cssText='position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:'+cfg.color+';';
+card.appendChild(leftBar);
+}
+
+card.onmouseover=function(){
+this.style.borderColor=cfg.color+'50';
+this.style.boxShadow='0 4px 16px '+cfg.color+'20';
+};
+card.onmouseout=function(){
+this.style.borderColor=unread?cfg.color+'30':'var(--border-glow)';
+this.style.boxShadow=unread?('0 2px 10px '+cfg.color+'10'):'none';
+};
+
+body.appendChild(card);
 });
 }
 panel.appendChild(body);
+
 if(data.length>0){
 var footer=document.createElement('div');
-footer.style.cssText='padding:10px 16px;border-top:1px solid var(--border-glow);text-align:center;background:var(--bg-primary);';
-footer.innerHTML='<div style="font-size:0.7rem;color:var(--text-dim);">显示最近 '+data.length+' 条通知</div>';
+footer.style.cssText='padding:12px 16px;border-top:1px solid var(--border-glow);text-align:center;background:var(--bg-card-solid);';
+footer.innerHTML='<button style="background:transparent;border:1px solid var(--border-glow);color:var(--text-secondary);font-size:0.75rem;font-weight:500;padding:6px 18px;border-radius:20px;cursor:pointer;transition:.2s;font-family:inherit;" onmouseover="this.style.borderColor=\'var(--accent-cyan)\';this.style.color=\'var(--accent-cyan)\';" onmouseout="this.style.borderColor=\'var(--border-glow)\';this.style.color=\'var(--text-secondary)\';">显示最近 '+data.length+' 条通知</button>';
 panel.appendChild(footer);
 }
+
 document.body.appendChild(panel);
-var closePanel=function(){panel.style.animation='notifOut .22s ease forwards';setTimeout(function(){if(panel.parentNode)panel.remove();document.removeEventListener('click',outsideClick);},200);};
+
+var closePanel=function(){
+panel.style.animation='notifOut .22s ease forwards';
+setTimeout(function(){
+if(panel.parentNode)panel.remove();
+document.removeEventListener('click',outsideClick);
+},200);
+};
 closeBtn.onclick=closePanel;
+
 var outsideClick=function(e){
 if(!panel.contains(e.target)&&!e.target.closest('#communityBell')){
 closePanel();
 }
 };
 setTimeout(function(){document.addEventListener('click',outsideClick);},10);
+
 if(unreadCount>0){
 await supabaseClient.from('notifications').update({is_read:true}).eq('user_id',window.currentUser.id).eq('is_read',false);
-var dot=document.getElementById('communityBellDot');
-if(dot)dot.style.display='none';
+var bellDot=document.getElementById('communityBellDot');
+if(bellDot)bellDot.style.display='none';
 }
 };
 
