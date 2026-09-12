@@ -2,6 +2,7 @@
 var Community={};
 window.Community=Community;
 Community.currentSoft=null;
+Community._injectingProfile=false;
 
 Community.escapeHTML=function(str){
 if(str===null||str===undefined)return '';
@@ -12,6 +13,7 @@ return d.innerHTML;
 
 Community.toast=function(msg,type){
 if(typeof toast==='function')toast(msg,type||'success');
+else console.log('[Community]',msg);
 };
 
 Community.requireLogin=function(){
@@ -22,7 +24,12 @@ if(lm)lm.classList.add('open');
 
 Community.init=function(){
 if(typeof supabaseClient==='undefined'||!supabaseClient){setTimeout(Community.init,500);return;}
-var steps=[
+Community.runInit();
+Community.startRetry();
+};
+
+Community.runInit=function(){
+var fns=[
 Community.hijackDetailOpen,
 Community.hijackGoProfile,
 Community.hijackFavoriteToggle,
@@ -35,25 +42,35 @@ Community.initThemes,
 Community.initPWA,
 Community.bindAuthListener
 ];
-for(var i=0;i<steps.length;i++){
-try{steps[i]();}catch(e){console.warn('Community init step failed:',e);}
+for(var i=0;i<fns.length;i++){
+try{fns[i]();}catch(e){console.warn('[Community] init step failed:',e);}
 }
 };
 
-Community.hijackWithRetry=function(checkFn,doHijack){
-var tryHijack=function(){
+Community.startRetry=function(){
+if(Community._retryTimer)return;
+var retry=0;
+Community._retryTimer=setInterval(function(){
+retry++;
+if(retry>60){clearInterval(Community._retryTimer);Community._retryTimer=null;return;}
 try{
-if(checkFn()){
-doHijack();
-return;
+if(!document.getElementById('communityLeaderboard'))Community.addLeaderboard();
+if(!document.getElementById('communityBell'))Community.addNotificationBell();
+if(window.App&&!App._communityHijacked)Community.hijackGoProfile();
+if(window.Detail&&!Detail._communityHijacked)Community.hijackDetailOpen();
+if(typeof toggleFavorite==='function'&&!toggleFavorite._communityHijacked)Community.hijackFavoriteToggle();
+if(typeof addViewHistory==='function'&&!addViewHistory._communityHijacked)Community.hijackViewHistory();
+var pp=document.getElementById('pageProfile');
+if(pp&&!pp.classList.contains('hidden')&&!document.getElementById('communityProfileSection')){
+Community.injectProfile();
 }
 }catch(e){}
-setTimeout(tryHijack,300);
-};
-tryHijack();
+},1000);
 };
 
 Community.bindAuthListener=function(){
+if(Community._authBound)return;
+Community._authBound=true;
 try{
 supabaseClient.auth.onAuthStateChange(function(event,session){
 if(session&&session.user){
@@ -64,7 +81,7 @@ window.currentUser=null;
 Community.onLogout();
 }
 });
-}catch(e){console.warn('onAuthStateChange error:',e);}
+}catch(e){console.warn('[Community] onAuthStateChange error:',e);}
 setTimeout(function(){
 if(window.currentUser){Community.onLogin();}
 },1500);
@@ -72,7 +89,7 @@ if(window.currentUser){Community.onLogin();}
 
 Community.onLogin=async function(){
 Community.refreshProfileIfVisible();
-try{await Community.ensureProfile();}catch(e){console.warn('ensureProfile:',e);}
+try{await Community.ensureProfile();}catch(e){console.warn('[Community] ensureProfile:',e);}
 await Promise.all([
 Community.syncFavorites().catch(function(e){console.warn('syncFavorites:',e);}),
 Community.syncHistory().catch(function(e){console.warn('syncHistory:',e);}),
@@ -247,6 +264,7 @@ document.getElementById('communityNotifClose').onclick=function(){panel.remove()
 
 Community.hijackDetailOpen=function(){
 if(!window.Detail||Detail._communityHijacked)return;
+if(typeof Detail.open!=='function')return;
 Detail._communityHijacked=true;
 var orig=Detail.open;
 Detail.open=function(soft){
@@ -259,6 +277,7 @@ Community.injectDetail(soft);
 
 Community.hijackGoProfile=function(){
 if(!window.App||App._communityHijacked)return;
+if(typeof App.goProfile!=='function')return;
 App._communityHijacked=true;
 var orig=App.goProfile;
 App.goProfile=function(){
@@ -390,6 +409,9 @@ return d.toISOString().slice(0,10);
 };
 
 Community.injectProfile=function(){
+if(Community._injectingProfile)return;
+Community._injectingProfile=true;
+setTimeout(function(){Community._injectingProfile=false;},200);
 var container=document.getElementById('profileContent');
 if(!container)return;
 var old=document.getElementById('communityProfileSection');
@@ -441,7 +463,6 @@ return;
 if(exist.data){
 Community.toast('今天已经签到过了','warning');
 window.userLastCheckin=today;
-if(btn){btn.disabled=true;btn.textContent='✅ 已签到';btn.style.background='#0b9e5a';btn.style.borderColor='#0b9e5a';}
 await Community.reloadPoints();
 Community.injectProfile();
 Community.updateAvatarLevel();
@@ -513,9 +534,9 @@ Community.addLeaderboard=function(){
 if(document.getElementById('communityLeaderboard'))return;
 var div=document.createElement('div');
 div.id='communityLeaderboard';
-div.style.cssText='position:fixed;right:0;bottom:100px;z-index:60;display:flex;align-items:flex-end;font-family:inherit;max-height:70vh;';
-div.innerHTML='<div id="communityLeaderboardToggle" style="writing-mode:vertical-lr;background:var(--accent-gradient);color:#fff;padding:12px 6px;border-radius:8px 0 0 8px;cursor:pointer;font-size:0.7rem;font-weight:600;letter-spacing:2px;box-shadow:-2px 0 12px rgba(0,119,255,0.2);user-select:none;">🏆 排行榜</div>'+
-'<div id="communityLeaderboardPanel" style="width:0;overflow:hidden;transition:width 0.3s cubic-bezier(0.2,0,0,1);background:var(--bg-card-solid);border-left:1px solid var(--border-glow);box-shadow:-4px 0 20px rgba(0,0,0,0.08);max-height:70vh;">'+
+div.style.cssText='position:fixed;right:0;bottom:150px;z-index:65;display:flex;align-items:flex-end;font-family:inherit;max-height:65vh;pointer-events:auto;';
+div.innerHTML='<div id="communityLeaderboardToggle" style="writing-mode:vertical-lr;background:var(--accent-gradient);color:#fff;padding:12px 6px;border-radius:8px 0 0 8px;cursor:pointer;font-size:0.7rem;font-weight:600;letter-spacing:2px;box-shadow:-2px 0 12px rgba(0,119,255,0.25);user-select:none;">🏆 排行榜</div>'+
+'<div id="communityLeaderboardPanel" style="width:0;overflow:hidden;transition:width 0.3s cubic-bezier(0.2,0,0,1);background:var(--bg-card-solid);border-left:1px solid var(--border-glow);box-shadow:-4px 0 20px rgba(0,0,0,0.08);max-height:65vh;">'+
 '<div style="width:240px;padding:14px 12px;">'+
 '<div style="font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:10px;">🏆 社区排行榜</div>'+
 '<div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:55vh;overflow-y:auto;">点击加载...</div>'+
@@ -556,7 +577,8 @@ el.innerHTML=html;
 
 Community.initEasterEggs=function(){
 var logo=document.getElementById('logoHome');
-if(logo){
+if(logo&&!logo._ee){
+logo._ee=true;
 var count=0;
 logo.addEventListener('click',function(){
 count++;
@@ -569,6 +591,8 @@ setTimeout(function(){root.style.setProperty('--accent-cyan','#0077ff');},3000);
 }
 });
 }
+if(!Community._konami){
+Community._konami=true;
 var konami=[38,38,40,40,37,39,37,39,66,65];
 var pos=0;
 document.addEventListener('keydown',function(e){
@@ -583,6 +607,7 @@ setTimeout(function(){document.body.style.transform='';document.body.style.trans
 }
 }else{pos=0;}
 });
+}
 };
 
 Community.initThemes=function(){
