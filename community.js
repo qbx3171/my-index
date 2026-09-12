@@ -534,7 +534,7 @@ Community.addLeaderboard=function(){
 if(document.getElementById('communityLeaderboard'))return;
 var div=document.createElement('div');
 div.id='communityLeaderboard';
-div.style.cssText='position:fixed;right:16px;bottom:16px;z-index:70;font-family:inherit;';
+div.style.cssText='position:fixed;right:16px;bottom:90px;z-index:70;font-family:inherit;';
 div.innerHTML='<div id="communityLeaderboardPanel" style="display:none;position:absolute;bottom:56px;right:0;width:240px;max-height:60vh;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:12px;overflow:hidden;">'+
 '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+
 '<span style="font-size:0.85rem;font-weight:700;color:var(--text-primary);">🏆 社区排行榜</span>'+
