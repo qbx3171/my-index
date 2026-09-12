@@ -1094,6 +1094,10 @@ si.addEventListener('input',function(){
 self._pfKw=si.value;
 self._page=1;
 self._renderUsersTableOnly(c);
+setTimeout(function(){
+var n=c.querySelector('#userSearch');
+if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}
+},0);
 });
 }
 var rb=c.querySelector('#userRefresh');
@@ -1211,11 +1215,13 @@ h+='<tr><td><strong>'+escapeHTML(cat.name)+'</strong></td><td>'+cnt+'</td><td><b
 h+='</tbody></table></div>';
 c.innerHTML=h;
 c.querySelector('#addCatBtn').addEventListener('click',async function(){
+var btn=this;
+btn.disabled=true;
 var n=document.getElementById('newCatName').value.trim();
-if(!n){toast('请输入分类名称','error');return;}
+if(!n){toast('请输入分类名称','error');btn.disabled=false;return;}
 var list=await DB.cats();
-if(list.some(function(x){return x.name===n;})){toast('该分类已存在','error');return;}
-try{await DB.addCat(n);DB.addLog('添加分类','分类: '+n);toast('分类已添加');self.renderCats(c);}catch(e){toast('添加失败: '+(e.message||''),'error');}
+if(list.some(function(x){return x.name===n;})){toast('该分类已存在','error');btn.disabled=false;return;}
+try{await DB.addCat(n);DB.addLog('添加分类','分类: '+n);toast('分类已添加');self.renderCats(c);}catch(e){toast('添加失败: '+(e.message||''),'error');btn.disabled=false;}
 });
 c.querySelectorAll('.del-btn[data-cat]').forEach(function(b){b.addEventListener('click',async function(){
 var btn=this;var cat=btn.dataset.cat;
@@ -1909,7 +1915,12 @@ var editSource=this._editSource||'new';
 var pubDraftId=this._pubDraftId;
 var data={title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:'')};
 var saveToDrafts=function(msg){
-var did=(editSource==='draft'&&pubDraftId)?pubDraftId:((editSource==='published'&&editId)?editId:Date.now().toString(36)+Math.random().toString(36).slice(2,6));
+var did;
+if(pubDraftId){
+did=pubDraftId;
+}else{
+did=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+}
 var d={id:did,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
 try{saveDraft(d);toast('💾 已自动保存到草稿箱'+(msg?' ('+msg+')':''),'warning');}catch(e){toast('❌ 草稿保存失败','error');}
 document.getElementById('tutEditModal').classList.add('hidden');
