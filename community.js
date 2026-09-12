@@ -384,9 +384,11 @@ body.innerHTML='<div style="text-align:center;padding:56px 20px;">'+
 }
 var subtitle=document.getElementById('communityNotifSubtitle');
 if(subtitle){
-var nowUnread=body.querySelectorAll('.notif-card').length;
 if(unread){
-var unreadNow=Array.prototype.filter.call(body.querySelectorAll('.notif-card'),function(el){return el.querySelector('.notif-card-dot');}).length;
+var unreadNow=0;
+body.querySelectorAll('.notif-card').forEach(function(el){
+if(el.querySelector('.notif-card-dot'))unreadNow++;
+});
 subtitle.innerHTML=unreadNow>0?('<span style="color:#0077ff;font-weight:600;">'+unreadNow+'</span> 条未读'):'全部已读';
 }
 }
@@ -485,6 +487,7 @@ orig.call(App);
 Community.injectProfile();
 setTimeout(function(){
 Community.reloadPoints().then(Community.injectProfile);
+if(typeof renderRecentHistory==='function')renderRecentHistory();
 },100);
 };
 };
@@ -508,6 +511,10 @@ var orig=addViewHistory;
 window.addViewHistory=function(id){
 orig(id);
 Community.addHistoryCloud(id);
+if(typeof renderRecentHistory==='function'){
+var pp=document.getElementById('pageProfile');
+if(pp&&!pp.classList.contains('hidden'))renderRecentHistory();
+}
 };
 };
 
@@ -625,18 +632,25 @@ var btnText=checkedIn?'✅ 已签到':'每日签到';
 var btnExtra=checkedIn?'background:#0b9e5a;border-color:#0b9e5a;':'';
 var section=document.createElement('div');
 section.id='communityProfileSection';
-section.style.cssText='margin-top:16px;';
-section.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'+
-'<div style="background:var(--bg-card);border-radius:12px;padding:16px;border:1px solid var(--border-glow);text-align:center;">'+
+section.className='profile-card';
+section.style.cssText='';
+section.innerHTML='<div class="box-header" style="display:flex;justify-content:space-between;align-items:center;margin:0 0 12px;"><h4 style="font-size:.9rem;margin:0;"><i class="fas fa-gift" style="color:var(--accent-cyan);"></i> 我的积分</h4></div>'+
+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'+
+'<div style="background:var(--bg-primary);border-radius:12px;padding:14px;border:1px solid var(--border-glow);text-align:center;">'+
 '<div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan);" id="communityPoints">'+points+'</div>'+
-'<div style="font-size:0.75rem;color:var(--text-dim);">积分</div>'+
-'<button class="btn btn-sm btn-primary" id="communityCheckinBtn" style="margin-top:8px;'+btnExtra+'" '+(checkedIn?'disabled':'')+'>'+btnText+'</button></div>'+
-'<div style="background:var(--bg-card);border-radius:12px;padding:16px;border:1px solid var(--border-glow);text-align:center;">'+
+'<div style="font-size:0.72rem;color:var(--text-dim);">积分</div>'+
+'<button class="btn btn-sm btn-primary" id="communityCheckinBtn" style="margin-top:8px;font-size:.72rem;padding:4px 12px;'+btnExtra+'" '+(checkedIn?'disabled':'')+'>'+btnText+'</button></div>'+
+'<div style="background:var(--bg-primary);border-radius:12px;padding:14px;border:1px solid var(--border-glow);text-align:center;">'+
 '<div style="font-size:1.5rem;font-weight:700;color:var(--accent-cyan);" id="communityLevel">Lv'+level+'</div>'+
-'<div style="font-size:0.75rem;color:var(--text-dim);">等级</div>'+
-'<div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">连续签到 <span id="communityStreak">'+streak+'</span> 天</div></div>'+
+'<div style="font-size:0.72rem;color:var(--text-dim);">等级</div>'+
+'<div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;">连续签到 <span id="communityStreak">'+streak+'</span> 天</div></div>'+
 '</div>';
+var recentSection=document.getElementById('profileRecentSection');
+if(recentSection&&recentSection.parentNode===container){
+container.insertBefore(section,recentSection);
+}else{
 container.appendChild(section);
+}
 var btn=document.getElementById('communityCheckinBtn');
 if(btn&&!checkedIn)btn.onclick=Community.doCheckin;
 };
@@ -645,6 +659,7 @@ Community.refreshProfileIfVisible=function(){
 var pageProfile=document.getElementById('pageProfile');
 if(pageProfile&&!pageProfile.classList.contains('hidden')){
 Community.injectProfile();
+if(typeof renderRecentHistory==='function')renderRecentHistory();
 }
 };
 
@@ -712,50 +727,52 @@ if(btn){btn.disabled=false;btn.textContent='每日签到';}
 };
 
 Community.addRandomButton=function(){
-var hero=document.querySelector('.hero');
-if(!hero||document.getElementById('communityRandomBtn'))return;
-var btn=document.createElement('button');
-btn.id='communityRandomBtn';
-btn.className='btn btn-outline';
-btn.style.cssText='margin-top:10px;';
-btn.innerHTML='<i class="fas fa-dice"></i> 手气不错';
-btn.onclick=function(){
-var all=(window.DB&&DB.getSoftware)?DB.getSoftware():[];
-if(!all.length){Community.toast('暂无软件','warning');return;}
-var s=all[Math.floor(Math.random()*all.length)];
-if(window.Detail)Detail.open(s);
-};
-var searchHints=hero.querySelector('.search-hints');
-if(searchHints){searchHints.parentNode.insertBefore(btn,searchHints.nextSibling);}
-else{hero.appendChild(btn);}
+return;
 };
 
 Community.addLeaderboard=function(){
 if(document.getElementById('communityLeaderboard'))return;
 var div=document.createElement('div');
 div.id='communityLeaderboard';
-div.style.cssText='position:fixed;left:16px;bottom:160px;z-index:70;font-family:inherit;';
-div.innerHTML='<div id="communityLeaderboardPanel" style="display:none;position:absolute;bottom:56px;left:0;width:240px;max-height:60vh;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:12px;overflow:hidden;">'+
-'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+
-'<span style="font-size:0.85rem;font-weight:700;color:var(--text-primary);">🏆 社区排行榜</span>'+
+div.style.cssText='position:fixed;right:16px;bottom:170px;z-index:70;font-family:inherit;';
+div.innerHTML='<div id="communityLeaderboardPanel" style="display:none;position:absolute;bottom:56px;right:0;width:260px;max-height:60vh;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,0.18);padding:14px;overflow:hidden;">'+
+'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'+
+'<span style="font-size:0.88rem;font-weight:700;color:var(--text-primary);">🏆 社区排行榜</span>'+
 '<button id="communityLeaderboardClose" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text-dim);padding:0 4px;">&times;</button>'+
 '</div>'+
 '<div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:50vh;overflow-y:auto;">点击加载...</div>'+
 '</div>'+
-'<button id="communityLeaderboardToggle" style="width:48px;height:48px;border-radius:50%;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;font-size:1.3rem;box-shadow:0 4px 16px rgba(0,119,255,0.4);display:flex;align-items:center;justify-content:center;">🏆</button>';
+'<button id="communityLeaderboardToggle" style="width:50px;height:50px;border-radius:50%;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;font-size:1.35rem;box-shadow:0 6px 20px rgba(0,119,255,0.4);display:flex;align-items:center;justify-content:center;transition:transform .2s;" onmouseover="this.style.transform=\'scale(1.08)\'" onmouseout="this.style.transform=\'scale(1)\'">🏆</button>';
 document.body.appendChild(div);
 var toggle=document.getElementById('communityLeaderboardToggle');
 var panel=document.getElementById('communityLeaderboardPanel');
 var closeBtn=document.getElementById('communityLeaderboardClose');
 var expanded=false;
-toggle.addEventListener('click',function(){
-if(expanded){panel.style.display='none';}
-else{panel.style.display='block';Community.loadLeaderboard();}
-expanded=!expanded;
-});
-closeBtn.addEventListener('click',function(){
+function openPanel(){
+panel.style.display='block';
+expanded=true;
+Community.loadLeaderboard();
+}
+function closePanel(){
 panel.style.display='none';
 expanded=false;
+}
+toggle.addEventListener('click',function(e){
+e.stopPropagation();
+if(expanded){closePanel();}
+else{openPanel();}
+});
+closeBtn.addEventListener('click',function(e){
+e.stopPropagation();
+closePanel();
+});
+panel.addEventListener('click',function(e){
+e.stopPropagation();
+});
+document.addEventListener('click',function(e){
+if(expanded&&!div.contains(e.target)){
+closePanel();
+}
 });
 };
 
