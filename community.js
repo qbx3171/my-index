@@ -1,5 +1,6 @@
-(function(){
-var C={};window.Community=C;C.currentSoft=null;
+window.Community = window.Community || {};
+(function(C){
+C.currentSoft=null;
 
 C.esc=function(s){if(s===null||s===undefined)return '';var d=document.createElement('div');d.textContent=String(s);return d.innerHTML;};
 C.tip=function(m,t){if(typeof toast==='function')toast(m,t||'success');};
@@ -172,7 +173,7 @@ C.updateLv=function(){
 C.addBell=function(){
   if(document.getElementById('communityBell'))return;
   var hi=document.querySelector('.header-inner');
-  if(!hi){return;}
+  if(!hi)return;
   var b=document.createElement('button');
   b.id='communityBell';
   b.className='header-theme-btn';
@@ -680,4 +681,4 @@ C.pwa=function(){
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',C.init);}
 else{C.init();}
-})();
+})(window.Community);
