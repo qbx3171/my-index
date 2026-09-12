@@ -534,21 +534,28 @@ Community.addLeaderboard=function(){
 if(document.getElementById('communityLeaderboard'))return;
 var div=document.createElement('div');
 div.id='communityLeaderboard';
-div.style.cssText='position:fixed;right:0;bottom:150px;z-index:65;display:flex;align-items:flex-end;font-family:inherit;max-height:65vh;pointer-events:auto;';
-div.innerHTML='<div id="communityLeaderboardToggle" style="writing-mode:vertical-lr;background:var(--accent-gradient);color:#fff;padding:12px 6px;border-radius:8px 0 0 8px;cursor:pointer;font-size:0.7rem;font-weight:600;letter-spacing:2px;box-shadow:-2px 0 12px rgba(0,119,255,0.25);user-select:none;">🏆 排行榜</div>'+
-'<div id="communityLeaderboardPanel" style="width:0;overflow:hidden;transition:width 0.3s cubic-bezier(0.2,0,0,1);background:var(--bg-card-solid);border-left:1px solid var(--border-glow);box-shadow:-4px 0 20px rgba(0,0,0,0.08);max-height:65vh;">'+
-'<div style="width:240px;padding:14px 12px;">'+
-'<div style="font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:10px;">🏆 社区排行榜</div>'+
-'<div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:55vh;overflow-y:auto;">点击加载...</div>'+
-'</div></div>';
+div.style.cssText='position:fixed;right:16px;bottom:16px;z-index:70;font-family:inherit;';
+div.innerHTML='<div id="communityLeaderboardPanel" style="display:none;position:absolute;bottom:56px;right:0;width:240px;max-height:60vh;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:12px;overflow:hidden;">'+
+'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+
+'<span style="font-size:0.85rem;font-weight:700;color:var(--text-primary);">🏆 社区排行榜</span>'+
+'<button id="communityLeaderboardClose" style="background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--text-dim);padding:0 4px;">&times;</button>'+
+'</div>'+
+'<div id="communityLeaderboardContent" style="font-size:0.78rem;color:var(--text-secondary);max-height:50vh;overflow-y:auto;">点击加载...</div>'+
+'</div>'+
+'<button id="communityLeaderboardToggle" style="width:48px;height:48px;border-radius:50%;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;font-size:1.3rem;box-shadow:0 4px 16px rgba(0,119,255,0.4);display:flex;align-items:center;justify-content:center;">🏆</button>';
 document.body.appendChild(div);
 var toggle=document.getElementById('communityLeaderboardToggle');
 var panel=document.getElementById('communityLeaderboardPanel');
+var closeBtn=document.getElementById('communityLeaderboardClose');
 var expanded=false;
 toggle.addEventListener('click',function(){
-if(expanded){panel.style.width='0';}
-else{panel.style.width='240px';Community.loadLeaderboard();}
+if(expanded){panel.style.display='none';}
+else{panel.style.display='block';Community.loadLeaderboard();}
 expanded=!expanded;
+});
+closeBtn.addEventListener('click',function(){
+panel.style.display='none';
+expanded=false;
 });
 };
 
