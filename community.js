@@ -1,4 +1,4 @@
-console.log('community.js v15 loaded');
+console.log('community.js v16 loaded');
 
 (function () {
   'use strict';
@@ -39,30 +39,31 @@ console.log('community.js v15 loaded');
   var POINT_FIELDS = ['checkin_points', 'points', 'total_points', 'score', 'credits', 'sign_points', 'integral'];
   var NAME_FIELDS = ['username', 'nickname', 'display_name', 'name', 'full_name'];
 
-  function detectPointField(records) {
-    if (records && records.length) {
-      for (var j = 0; j < POINT_FIELDS.length; j++) {
-        for (var k = 0; k < records.length; k++) {
-          if (records[k] && records[k][POINT_FIELDS[j]] !== undefined &&
-              records[k][POINT_FIELDS[j]] !== null) {
-            return POINT_FIELDS[j];
-          }
+  function detectPointFieldFromProfile(p) {
+    if (!p) return null;
+    for (var i = 0; i < POINT_FIELDS.length; i++) {
+      if (p[POINT_FIELDS[i]] !== undefined && p[POINT_FIELDS[i]] !== null) {
+        return POINT_FIELDS[i];
+      }
+    }
+    return null;
+  }
+
+  function detectPointFieldFromList(records) {
+    if (!records || !records.length) return null;
+    for (var j = 0; j < POINT_FIELDS.length; j++) {
+      for (var k = 0; k < records.length; k++) {
+        if (records[k] && records[k][POINT_FIELDS[j]] !== undefined &&
+            records[k][POINT_FIELDS[j]] !== null) {
+          return POINT_FIELDS[j];
         }
       }
     }
-    if (window.userProfile) {
-      for (var i = 0; i < POINT_FIELDS.length; i++) {
-        if (window.userProfile[POINT_FIELDS[i]] !== undefined &&
-            window.userProfile[POINT_FIELDS[i]] !== null) {
-          return POINT_FIELDS[i];
-        }
-      }
-    }
-    return POINT_FIELDS[0];
+    return null;
   }
 
   function getProfilePoints(p) {
-    var field = detectPointField(p ? [p] : []);
+    var field = detectPointFieldFromProfile(p) || POINT_FIELDS[0];
     var val = 0;
     if (p && p[field] !== undefined && p[field] !== null) {
       val = Number(p[field]) || 0;
@@ -180,45 +181,71 @@ console.log('community.js v15 loaded');
     }
     body.innerHTML = '<div class="rank-empty">加载中...</div>';
 
-    sb.from('profiles').select('*').limit(200).then(function (res) {
-      if (res.error) {
-        body.innerHTML = '<div class="rank-empty">加载失败: ' + esc(res.error.message) + '</div>';
-        return;
-      }
-      var list = res.data || [];
-      if (list.length === 0) {
-        body.innerHTML = '<div class="rank-empty">暂无用户数据</div>';
-        return;
-      }
+    var renderWithField = function (field) {
+      sb.from('profiles').select('*').limit(200).then(function (res) {
+        if (res.error) {
+          body.innerHTML = '<div class="rank-empty">加载失败: ' + esc(res.error.message) + '</div>';
+          return;
+        }
+        var list = res.data || [];
+        if (list.length === 0) {
+          body.innerHTML = '<div class="rank-empty">暂无用户数据</div>';
+          return;
+        }
 
-      var realField = detectPointField(list);
+        var realField = field || detectPointFieldFromList(list) || POINT_FIELDS[0];
 
-      var sorted = list.slice().sort(function (a, b) {
-        var av = Number(a[realField]) || 0;
-        var bv = Number(b[realField]) || 0;
-        return bv - av;
-      }).slice(0, 10);
+        var sorted = list.slice().sort(function (a, b) {
+          var av = Number(a[realField]) || 0;
+          var bv = Number(b[realField]) || 0;
+          return bv - av;
+        }).slice(0, 10);
 
-      var html = '';
-      for (var i = 0; i < sorted.length; i++) {
-        var it = sorted[i];
-        var medal = (i + 1) + '';
-        if (i === 0) medal = '🥇';
-        else if (i === 1) medal = '🥈';
-        else if (i === 2) medal = '🥉';
-        var nm = getName(it);
-        var pt = Number(it[realField]) || 0;
-        html +=
-          '<div class="rank-item">' +
-            '<span class="n">' + medal + '</span>' +
-            '<span class="nm">' + esc(nm) + '</span>' +
-            '<span class="pt"><i class="fas fa-coins"></i>' + pt + '</span>' +
-          '</div>';
-      }
-      body.innerHTML = html;
-    }).catch(function (err) {
-      body.innerHTML = '<div class="rank-empty">网络异常: ' + esc(err.message || '') + '</div>';
-    });
+        var html = '';
+        for (var i = 0; i < sorted.length; i++) {
+          var it = sorted[i];
+          var medal = (i + 1) + '';
+          if (i === 0) medal = '🥇';
+          else if (i === 1) medal = '🥈';
+          else if (i === 2) medal = '🥉';
+          var nm = getName(it);
+          var pt = Number(it[realField]) || 0;
+          html +=
+            '<div class="rank-item">' +
+              '<span class="n">' + medal + '</span>' +
+              '<span class="nm">' + esc(nm) + '</span>' +
+              '<span class="pt"><i class="fas fa-coins"></i>' + pt + '</span>' +
+            '</div>';
+        }
+        body.innerHTML = html;
+      }).catch(function (err) {
+        body.innerHTML = '<div class="rank-empty">网络异常: ' + esc(err.message || '') + '</div>';
+      });
+    };
+
+    var fieldFromUser = window.userProfile ? detectPointFieldFromProfile(window.userProfile) : null;
+
+    if (fieldFromUser) {
+      renderWithField(fieldFromUser);
+      return;
+    }
+
+    if (window.currentUser) {
+      sb.from('profiles').select('*').eq('id', window.currentUser.id).maybeSingle()
+        .then(function (r) {
+          var p = r.data || null;
+          if (p) {
+            window.userProfile = p;
+            var f = detectPointFieldFromProfile(p);
+            renderWithField(f);
+          } else {
+            renderWithField(null);
+          }
+        })
+        .catch(function () { renderWithField(null); });
+    } else {
+      renderWithField(null);
+    }
   }
 
   var checkinState = { loading: false, cardRendered: false };
@@ -334,8 +361,8 @@ console.log('community.js v15 loaded');
       .maybeSingle()
       .then(function (readRes) {
         if (readRes.error) {
-          toast('签到成功，但读取积分失败：' + readRes.error.message, 'warning');
-          if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-check"></i> 今日已签到'; }
+          toast('签到失败，读取积分出错：' + readRes.error.message, 'error');
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-check-circle"></i> 立即签到'; }
           checkinState.loading = false;
           return;
         }
