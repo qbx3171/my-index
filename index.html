@@ -29,9 +29,6 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .sidebar-categories.open{transform:translateX(0)}
 [data-theme="dark"] .sidebar-categories{background:rgba(15,23,42,0.94);border-right-color:rgba(99,160,255,0.12)}
 .category-list{flex:1 1 0;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:4px;padding-bottom:6px;scroll-behavior:smooth;display:flex;flex-direction:column;gap:2px}
-.category-list::-webkit-scrollbar{width:5px}
-.category-list::-webkit-scrollbar-track{background:transparent}
-.category-list::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.20);border-radius:6px}
 .category-group{margin-bottom:2px;border-radius:var(--radius-sm);overflow:visible;background:rgba(0,0,0,0.02);border:1px solid transparent;transition:border-color .2s,background .2s;flex-shrink:0}
 .category-group:hover{border-color:var(--border-glow);background:rgba(0,119,255,0.02)}
 .group-header{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:.8rem;font-weight:600;color:var(--text-secondary);transition:all .2s ease;user-select:none;background:transparent}
@@ -296,12 +293,13 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .footer .brand{font-size:.95rem;font-weight:600;color:var(--text-secondary);margin-bottom:2px}
 .footer p{margin-top:4px;font-size:.75rem;color:var(--text-secondary)}
 .footer p a{color:var(--accent-cyan);font-weight:500}
-.footer .links{margin-top:10px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 20px;font-size:.65rem;color:var(--text-dim)}
-.footer .links a{color:var(--text-secondary)}
+.footer .links{margin-top:10px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px 20px;font-size:.65rem;color:var(--text-dim);align-items:center}
+.footer .links a{color:var(--text-secondary);display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
 .footer .links a:hover{color:var(--accent-cyan)}
+.footer .links a img{display:inline-block;vertical-align:middle;width:16px;height:16px}
 .footer .disclaimer{margin-top:6px;font-size:.65rem;color:var(--text-dim);max-width:600px;margin-left:auto;margin-right:auto;line-height:1.5;opacity:.7}
 .footer .stats{margin-top:12px;font-size:0.7rem;color:var(--text-dim)}
-@media (max-width:480px){.footer{padding:16px 12px 12px}.footer .brand{font-size:.8rem}.footer p{font-size:.65rem}.footer .links{font-size:.55rem;gap:6px 12px}.footer .disclaimer{font-size:.55rem}}
+@media (max-width:480px){.footer{padding:16px 12px 12px}.footer .brand{font-size:.8rem}.footer p{font-size:.65rem}.footer .links{font-size:.55rem;gap:6px 12px}.footer .disclaimer{font-size:.55rem}.footer .links a img{width:14px;height:14px}}
 .share-float{position:fixed;bottom:90px;right:16px;z-index:100;display:flex;flex-direction:column;gap:8px}
 .share-float a{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:var(--bg-card-solid);box-shadow:var(--shadow-card);border:1px solid var(--border-glow);color:var(--text-secondary);font-size:1.1rem;transition:all .3s}
 .share-float a:hover{background:var(--accent-gradient);color:#fff;transform:scale(1.08);border-color:transparent}
@@ -455,6 +453,44 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .profile-recent-grid{grid-template-columns:1fr 1fr;gap:6px}
 .profile-mini-card .mini-icon{width:26px;height:26px;font-size:13px}
 }
+html{scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.22) transparent}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:8px;height:8px;background:transparent}
+html::-webkit-scrollbar-track,body::-webkit-scrollbar-track{background:transparent;border:none;box-shadow:none}
+html::-webkit-scrollbar-thumb,body::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.22);border-radius:8px;border:none}
+html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.40)}
+html::-webkit-scrollbar-corner,body::-webkit-scrollbar-corner{background:transparent}
+*{scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.20) transparent}
+*::-webkit-scrollbar{width:6px;height:6px;background:transparent}
+*::-webkit-scrollbar-track{background:transparent;border:none;box-shadow:none}
+*::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.20);border-radius:6px;border:none}
+*::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.38)}
+*::-webkit-scrollbar-corner{background:transparent}
+#tutorialDetailModal .modal-box{scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.18) transparent}
+#tutorialDetailModal .modal-box::-webkit-scrollbar{width:6px;height:6px;background:transparent}
+#tutorialDetailModal .modal-box::-webkit-scrollbar-track{background:transparent;border:none}
+#tutorialDetailModal .modal-box::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.18);border-radius:6px;border:none}
+#tutorialDetailModal .modal-box::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.35)}
+#tutorialDetailContent{scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.18) transparent}
+#tutorialDetailContent::-webkit-scrollbar{width:6px;background:transparent}
+#tutorialDetailContent::-webkit-scrollbar-track{background:transparent;border:none}
+#tutorialDetailContent::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.18);border-radius:6px;border:none}
+#tutorialDetailContent::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.35)}
+#tutorialComments{scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.18) transparent}
+#tutorialComments::-webkit-scrollbar{width:6px;background:transparent}
+#tutorialComments::-webkit-scrollbar-track{background:transparent;border:none}
+#tutorialComments::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.18);border-radius:6px;border:none}
+.category-list{scrollbar-width:thin;scrollbar-color:rgba(0,119,255,0.20) transparent}
+.category-list::-webkit-scrollbar{width:6px;background:transparent}
+.category-list::-webkit-scrollbar-track{background:transparent;border:none}
+.category-list::-webkit-scrollbar-thumb{background:rgba(0,119,255,0.20);border-radius:6px;border:none}
+.category-list::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.38)}
+[data-theme="dark"] html,[data-theme="dark"] body{scrollbar-color:rgba(99,160,255,0.25) transparent}
+[data-theme="dark"] html::-webkit-scrollbar-thumb,[data-theme="dark"] body::-webkit-scrollbar-thumb{background:rgba(99,160,255,0.25)}
+[data-theme="dark"] html::-webkit-scrollbar-thumb:hover,[data-theme="dark"] body::-webkit-scrollbar-thumb:hover{background:rgba(99,160,255,0.45)}
+[data-theme="dark"] *::-webkit-scrollbar-thumb{background:rgba(99,160,255,0.22)}
+[data-theme="dark"] *::-webkit-scrollbar-thumb:hover{background:rgba(99,160,255,0.42)}
+[data-theme="dark"] *{scrollbar-color:rgba(99,160,255,0.22) transparent}
+[data-theme="dark"] .category-list::-webkit-scrollbar-thumb{background:rgba(99,160,255,0.25)}
 </style>
 </head>
 <body>
@@ -549,7 +585,7 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 </div>
 <footer class="footer">
 <div class="brand">◆ 乐哲软件</div>
-<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection#97dbf2cdfff2c4f8f1e3d7f8e2e3fbf8f8fcb9f4f8fa"><span class="__cf_email__" data-cfemail="ffb39aa5979aac90998bbf908a8b93909094d19c9092">[email&#160;protected]</span></a></p>
+<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection#97dbf2cdfff2c4f8f1e3d7f8e2e3fbf8f8fcb9f4f8fa"><span class="__cf_email__" data-cfemail="ffb39aa5979aac90998bbf908a8b93909094d19c9092">LeZheSoft@outlook.com</span></a></p>
 <div class="links">
 <span>友情链接：</span>
 <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> | 
@@ -557,6 +593,7 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 <a href="https://www.oschina.net" target="_blank" rel="noopener">开源中国</a> | 
 <a href="https://www.csdn.net" target="_blank" rel="noopener">CSDN</a> | 
 <a href="https://www.zhihu.com" target="_blank" rel="noopener">知乎</a> | 
+<a href="https://lizhi.shop/" target="_blank" rel="noopener"><img src="https://shop-cdn.lizhi.shop/views/lizhi_new/javascript/assets/img/digitalychee-m.svg" alt="荔枝数码" loading="lazy" onerror="this.style.display='none';">荔枝数码</a> | 
 <a href="#" onclick="openDonateModal();return false;">赞助打赏</a>
 </div>
 <div class="disclaimer">免责声明：本站提供的软件资源仅供个人学习、研究或交流使用，请勿用于商业用途。所有软件版权归原作者所有，如有侵权请联系删除。</div>
