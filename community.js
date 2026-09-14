@@ -48,11 +48,13 @@ C.init=function(){
   C.retry();
 };
 
+/* [修改] 移除 C.addBoard 调用 */
 C.run=function(){
-  var fns=[C.addBell,C.addBoard,C.bindAuth,C.hijackDetail,C.hijackProfile,C.hijackFav,C.hijackHist,C.egg,C.pwa];
+  var fns=[C.addBell,C.bindAuth,C.hijackDetail,C.hijackProfile,C.hijackFav,C.hijackHist,C.egg,C.pwa];
   for(var i=0;i<fns.length;i++){try{fns[i]();}catch(e){console.warn('init err',e);}}
 };
 
+/* [修改] retry 里去掉 addBoard 的重复检查 */
 C.retry=function(){
   if(C._rt)return;
   var n=0;
@@ -60,7 +62,6 @@ C.retry=function(){
     n++;
     if(n>300){clearInterval(C._rt);C._rt=null;return;}
     try{
-      if(!document.getElementById('communityLeaderboard'))C.addBoard();
       if(!document.getElementById('communityBell'))C.addBell();
       if(window.App&&!App._ch)C.hijackProfile();
       if(window.Detail&&!Detail._ch)C.hijackDetail();
@@ -571,74 +572,12 @@ C.doCheckin=async function(){
   }
 };
 
+/* [修改] addBoard 保留为空函数，不再往 shareFloat 里插入按钮 */
 C.addBoard=function(){
-  if(document.getElementById('communityLeaderboard'))return;
-  if(!document.getElementById('communityRankGlassStyle')){
-    var sty=document.createElement('style');
-    sty.id='communityRankGlassStyle';
-    sty.textContent='@keyframes rankGlassIn{0%{opacity:0;transform:translateX(-12px) scale(0.94);backdrop-filter:blur(0px);}100%{opacity:1;transform:translateX(0) scale(1);backdrop-filter:blur(24px);}}@keyframes rankGlassGlow{0%,100%{box-shadow:0 12px 40px rgba(0,122,255,0.18),inset 0 1px 0 rgba(255,255,255,0.6),inset 0 -1px 0 rgba(255,255,255,0.15);}50%{box-shadow:0 18px 50px rgba(0,122,255,0.28),inset 0 1px 0 rgba(255,255,255,0.7),inset 0 -1px 0 rgba(255,255,255,0.2);}}';
-    document.head.appendChild(sty);
-  }
-  var wrap=document.createElement('div');
-  wrap.id='communityLeaderboard';
-  var btn=document.createElement('a');
-  btn.id='communityLeaderboardToggle';
-  btn.href='#';
-  btn.title='社区排行榜';
-  btn.innerHTML='<i class="fas fa-trophy"></i>';
-  btn.style.cssText='display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:var(--bg-card-solid);box-shadow:var(--shadow-card);border:1px solid var(--border-glow);color:var(--text-secondary);font-size:1.1rem;transition:all .3s;text-decoration:none;cursor:pointer;';
-  btn.onmouseenter=function(){btn.style.background='var(--accent-gradient)';btn.style.color='#fff';btn.style.transform='scale(1.08)';btn.style.borderColor='transparent';};
-  btn.onmouseleave=function(){btn.style.background='var(--bg-card-solid)';btn.style.color='var(--text-secondary)';btn.style.transform='';btn.style.borderColor='var(--border-glow)';};
-  wrap.appendChild(btn);
-
-  var panel=document.createElement('div');
-  panel.id='communityLeaderboardPanel';
-  panel.style.cssText='display:none;position:fixed;width:280px;max-height:60vh;border-radius:20px;padding:16px;overflow:hidden;z-index:200;background:linear-gradient(135deg,rgba(255,255,255,0.72) 0%,rgba(255,255,255,0.55) 50%,rgba(240,246,255,0.65) 100%);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,0.65);box-shadow:0 12px 40px rgba(0,122,255,0.18),inset 0 1px 0 rgba(255,255,255,0.6),inset 0 -1px 0 rgba(255,255,255,0.15);animation:rankGlassIn .35s cubic-bezier(0.2,0,0,1) forwards;';
-  panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><span style="font-size:0.9rem;font-weight:700;color:#0f1a2e;letter-spacing:.3px;">🏆 社区排行榜</span><button id="communityLeaderboardClose" style="background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);width:26px;height:26px;border-radius:50%;font-size:0.85rem;cursor:pointer;color:#3d5068;display:flex;align-items:center;justify-content:center;transition:all .2s;">&times;</button></div><div id="communityLeaderboardContent" style="font-size:0.78rem;color:#3d5068;max-height:50vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;">点击加载...</div><style>#communityLeaderboardContent::-webkit-scrollbar{display:none;}</style>';
-  document.body.appendChild(panel);
-
-  var sf=document.getElementById('shareFloat');
-  if(sf&&sf.parentNode){
-    wrap.style.cssText='position:relative;';
-    var wechat=null;
-    var as=sf.getElementsByTagName('a');
-    for(var i=0;i<as.length;i++){
-      var ti=as[i].getAttribute('title')||'';
-      var oc=as[i].getAttribute('onclick')||'';
-      if(ti.indexOf('微信')!==-1||oc.indexOf('wechat')!==-1){wechat=as[i];break;}
-    }
-    if(wechat&&wechat.parentNode===sf){sf.insertBefore(wrap,wechat);}
-    else{sf.insertBefore(wrap,sf.firstChild);}
-  }else{
-    wrap.style.cssText='position:fixed;bottom:200px;right:16px;z-index:100;display:flex;flex-direction:column;gap:8px;';
-    document.body.appendChild(wrap);
-  }
-
-  var isOpen=false;
-  var placePanel=function(){
-    var r=btn.getBoundingClientRect();
-    var pw=280;
-    var ph=panel.offsetHeight||420;
-    var left=r.left-pw-12;
-    var top=r.top+r.height/2-ph/2;
-    if(left<10)left=r.right+12;
-    if(top<10)top=10;
-    var maxTop=window.innerHeight-ph-10;
-    if(top>maxTop)top=maxTop;
-    panel.style.left=left+'px';
-    panel.style.top=top+'px';
-  };
-  var open=function(){placePanel();panel.style.display='block';isOpen=true;C.loadBoard();};
-  var close=function(){panel.style.display='none';isOpen=false;};
-  btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();if(isOpen)close();else open();});
-  var cb=document.getElementById('communityLeaderboardClose');
-  if(cb)cb.addEventListener('click',function(e){e.stopPropagation();close();});
-  panel.addEventListener('click',function(e){e.stopPropagation();});
-  document.addEventListener('click',function(e){if(isOpen&&!wrap.contains(e.target)&&!panel.contains(e.target))close();});
-  window.addEventListener('resize',function(){if(isOpen)placePanel();});
-  window.addEventListener('scroll',function(){if(isOpen)placePanel();},true);
+  /* 已移除：原 shareFloat 侧边排行榜按钮与顶部导航「排行榜」重复，故停用 */
 };
 
+/* [保留] 若以后需要恢复，可调用 C.loadBoard() 渲染面板 */
 C.loadBoard=async function(){
   var el=document.getElementById('communityLeaderboardContent');
   if(!el)return;
