@@ -48,13 +48,13 @@ C.init=function(){
   C.retry();
 };
 
-/* [修改] 移除 C.addBoard 调用 */
+/* [修改] 已移除 C.addBoard 调用 */
 C.run=function(){
   var fns=[C.addBell,C.bindAuth,C.hijackDetail,C.hijackProfile,C.hijackFav,C.hijackHist,C.egg,C.pwa];
   for(var i=0;i<fns.length;i++){try{fns[i]();}catch(e){console.warn('init err',e);}}
 };
 
-/* [修改] retry 里去掉 addBoard 的重复检查 */
+/* [修改] retry 里不再检查 addBoard */
 C.retry=function(){
   if(C._rt)return;
   var n=0;
@@ -572,12 +572,12 @@ C.doCheckin=async function(){
   }
 };
 
-/* [修改] addBoard 保留为空函数，不再往 shareFloat 里插入按钮 */
+/* [修改] addBoard 已停用：shareFloat 侧边的排行榜按钮与顶部导航「排行榜」重复 */
 C.addBoard=function(){
-  /* 已移除：原 shareFloat 侧边排行榜按钮与顶部导航「排行榜」重复，故停用 */
+  /* 已停用 */
 };
 
-/* [保留] 若以后需要恢复，可调用 C.loadBoard() 渲染面板 */
+/* [保留] 若以后需要恢复侧边排行榜面板，可调用 C.loadBoard() 渲染面板 */
 C.loadBoard=async function(){
   var el=document.getElementById('communityLeaderboardContent');
   if(!el)return;
@@ -614,23 +614,16 @@ C.egg=function(){
   }
 };
 
+/* [修改] PWA 已停用：主动注销旧 SW，避免 sw.js / icon-*.png 404 */
 C.pwa=function(){
-  if(!('serviceWorker' in navigator))return;
-  if(!document.querySelector('link[rel="manifest"]')){
-    var m={name:'乐哲软件',short_name:'乐哲',start_url:'./',display:'standalone',background_color:'#f0f4fa',theme_color:'#0077ff',icons:[{src:'./icon-192.png',sizes:'192x192',type:'image/png'},{src:'./icon-512.png',sizes:'512x512',type:'image/png'}]};
-    var b=new Blob([JSON.stringify(m)],{type:'application/json'});
-    var l=document.createElement('link');
-    l.rel='manifest';
-    l.href=URL.createObjectURL(b);
-    document.head.appendChild(l);
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){
+        try{ r.unregister(); }catch(e){}
+      });
+    }).catch(function(){});
   }
-  window.addEventListener('load',function(){
-    navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(function(reg){
-      if(reg&&reg.update)reg.update();
-    }).catch(function(err){
-      console.warn('SW register failed',err);
-    });
-  });
+  return;
 };
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',C.init);}
