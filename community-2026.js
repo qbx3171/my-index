@@ -480,51 +480,9 @@ C.getToday=function(){
   return d.toISOString().slice(0,10);
 };
 
+/* [修改] 已移除个人中心「我的积分」模块，其他功能保持不变 */
 C.injectProfile=function(){
-  if(C._ip)return;
-  var ct=document.getElementById('profileContent');
-  if(!ct){C._ip=false;return;}
-  C._ip=true;
-  setTimeout(function(){C._ip=false;},200);
-  var old=document.getElementById('communityProfileSection');
-  if(old)old.remove();
-  var p=window.userPoints||0;
-  var lv=window.userLevel||1;
-  var sk=window.userStreak||0;
-  var td=C.getToday();
-  var ck=!!(window.userLastCheckin&&window.userLastCheckin===td);
-  var bt=ck?'<i class="fas fa-check"></i> 已签到':'<i class="fas fa-gift"></i> 签到 +10';
-  var bg=ck?'background:#0b9e5a;border-color:#0b9e5a;cursor:default;opacity:.85;':'';
-  var sec=document.createElement('div');
-  sec.id='communityProfileSection';
-  sec.className='profile-card';
-  sec.style.cssText='margin-top:16px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border-glow);border-radius:var(--radius-md);';
-  sec.innerHTML=
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;">'+
-    '<h4 style="font-size:.9rem;margin:0;display:flex;align-items:center;gap:8px;font-weight:700;">'+
-    '<i class="fas fa-gift" style="color:var(--accent-cyan);"></i> 我的积分'+
-    '</h4>'+
-    '<button class="btn btn-sm btn-primary" id="communityCheckinBtn" style="font-size:.72rem;padding:5px 14px;border-radius:50px;'+bg+'" '+(ck?'disabled':'')+'>'+bt+'</button>'+
-    '</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">'+
-    '<div style="text-align:center;padding:12px 6px;background:linear-gradient(135deg,rgba(0,119,255,0.06),rgba(108,92,231,0.08));border-radius:12px;border:1px solid var(--border-glow);">'+
-    '<div style="font-size:1.5rem;font-weight:800;color:var(--accent-cyan);line-height:1.1;letter-spacing:-0.5px;">'+p+'</div>'+
-    '<div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;">积分</div>'+
-    '</div>'+
-    '<div style="text-align:center;padding:12px 6px;background:linear-gradient(135deg,rgba(108,92,231,0.06),rgba(0,119,255,0.08));border-radius:12px;border:1px solid var(--border-glow);">'+
-    '<div style="font-size:1.5rem;font-weight:800;color:var(--accent-purple);line-height:1.1;letter-spacing:-0.5px;">'+lv+'</div>'+
-    '<div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;">等级</div>'+
-    '</div>'+
-    '<div style="text-align:center;padding:12px 6px;background:linear-gradient(135deg,rgba(243,156,18,0.06),rgba(231,76,60,0.08));border-radius:12px;border:1px solid var(--border-glow);">'+
-    '<div style="font-size:1.5rem;font-weight:800;color:#f39c12;line-height:1.1;letter-spacing:-0.5px;">'+sk+'</div>'+
-    '<div style="font-size:0.68rem;color:var(--text-dim);margin-top:4px;">连续(天)</div>'+
-    '</div>'+
-    '</div>';
-  var rs=document.getElementById('profileRecentSection');
-  if(rs&&rs.parentNode===ct){ct.insertBefore(sec,rs);}
-  else{ct.appendChild(sec);}
-  var b=document.getElementById('communityCheckinBtn');
-  if(b&&!ck)b.onclick=C.doCheckin;
+  return;
 };
 
 C.refreshProfile=function(){
