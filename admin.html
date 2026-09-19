@@ -433,22 +433,14 @@ var supabaseClient=(typeof supabase!=='undefined')?supabase.createClient(SUPABAS
 var quill=null,currentAdminUser=null;
 function toast(m,t){t=t||'success';var c=document.getElementById('toastContainer');var e=document.createElement('div');e.className='toast '+t;var i={success:'◆',error:'✕',warning:'⚠'};e.innerHTML='<span class="icon">'+(i[t]||'◆')+'</span> '+escapeHTML(m);c.appendChild(e);setTimeout(function(){e.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){e.remove();},500);},2800);}
 function escapeHTML(s){if(s===null||s===undefined)return '';var d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
+/* ⬅️ 新增：属性转义函数，防止属性值中的引号破坏 HTML */
+function escapeAttr(s){if(s===null||s===undefined)return '';return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function formatDate(iso){if(!iso)return '-';var d=new Date(iso);return d.toLocaleDateString('zh-CN')+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});}
 function shortId(id){return id?id.slice(0,8):'';}
 function timeAgo(d){if(!d)return '刚刚';var n=new Date(),df=Math.max(0,n-new Date(d)),m=Math.floor(df/60000);if(m<1)return '刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';var dd=Math.floor(h/24);if(dd<7)return dd+'天前';return new Date(d).toLocaleDateString('zh-CN');}
 function getIconEmoji(c){var m={'设计工具':'✎','开发工具':'⚙','办公软件':'📋','媒体工具':'🎬','实用工具':'🔧'};return m[c]||'📦';}
 
-/* ============ 平台标签（新增 android） ============ */
-function getPlatformLabels(p){
-if(!p)return '-';
-if(typeof p==='string'){
-try{p=JSON.parse(p);}catch(e){p=p.split(',').map(function(x){return x.trim();}).filter(Boolean);}
-}
-if(!Array.isArray(p)||p.length===0)return '-';
-var m={'mac':'🍎 Mac','windows':'🪟 Win','android':'🤖 Android'};
-return p.map(function(x){return m[x]||x;}).join(' · ');
-}
-/* ============ 平台映射工具（统一给表格/详情使用） ============ */
+/* ============ 平台标签（已重构：统一入口） ============ */
 function normalizePlatforms(raw){
 if(typeof raw==='string'){
 try{raw=JSON.parse(raw);}catch(e){raw=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);}
@@ -463,8 +455,24 @@ if(arr.length===0)return '-';
 var m={mac:'🍎 Mac',windows:'🪟 Win',android:'🤖 Android'};
 return arr.map(function(x){return m[x]||x;}).join(sep);
 }
+/* ⬅️ 修复：getPlatformLabels 直接复用 platformText，避免重复逻辑 */
+function getPlatformLabels(p){return platformText(p,' · ');}
 
-function renderIconThumb(s){var fb=s.icon||'📦';if(s.icon_url&&s.icon_url.trim()){var u=s.icon_url.trim();if(!u.startsWith('http://')&&!u.startsWith('https://'))return escapeHTML(fb);var safeFb=escapeHTML(fb).replace(/'/g,"\\'");return '<img src="'+escapeHTML(u)+'" alt="'+escapeHTML(s.name||'')+'" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+safeFb+'\'" />';}return escapeHTML(fb);}
+/* ⬅️ 修复：renderIconThumb 移除内联 onerror，改用延迟绑定事件 */
+function renderIconThumb(s){
+var fb=s.icon||'📦';
+if(s.icon_url&&s.icon_url.trim()){
+var u=s.icon_url.trim();
+if(!u.startsWith('http://')&&!u.startsWith('https://'))return escapeHTML(fb);
+var rid='icon_'+Math.random().toString(36).slice(2,10);
+setTimeout(function(){
+var el=document.getElementById(rid);
+if(el){el.onerror=function(){this.style.display='none';if(this.parentElement)this.parentElement.textContent=fb;};}
+},0);
+return '<img id="'+rid+'" src="'+escapeAttr(u)+'" alt="'+escapeAttr(s.name||'')+'" />';
+}
+return escapeHTML(fb);
+}
 function getCategoryTagClass(c){var m={'设计':'design','开发':'dev','办公':'office','媒体':'media','实用':'tool'};return m[c]||'design';}
 function getDrafts(){try{return JSON.parse(localStorage.getItem('lezhe_tutorial_drafts')||'[]');}catch(e){return [];}}
 function saveDrafts(d){localStorage.setItem('lezhe_tutorial_drafts',JSON.stringify(d));}
@@ -573,7 +581,20 @@ async cm(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this
 async addCm(c){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('tutorial_comments').insert(c).select());if(r.error)return null;this._cm=null;return r.data?r.data[0]:null;}catch(e){return null;}},
 async delCm(id){if(!supabaseClient)return {success:false,error:'未初始化'};try{var r=await this._t(supabaseClient.from('tutorial_comments').delete().eq('id',id).select('id'));if(r.error)return {success:false,error:r.error.message};if(!r.data||r.data.length===0)return {success:false,error:'删除失败或权限不足'};this._cm=null;return {success:true};}catch(e){return {success:false,error:e.message||'网络异常'};}},
 async sub(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sb&&n-this._sbT<this._ttl)return this._sb;try{var r=await this._t(supabaseClient.from('software_submissions').select('*').order('created_at',{ascending:false}));if(r.error)return this._sb||[];this._sb=r.data||[];this._sbT=n;return this._sb;}catch(e){return this._sb||[];}},
-async approve(id,s){if(!supabaseClient)throw new Error('未初始化');var r1=await this._t(supabaseClient.from('software').insert([s]));if(r1.error)throw r1.error;var r2=await this._t(supabaseClient.from('software_submissions').update({status:'approved'}).eq('id',id));if(r2.error)throw r2.error;this.invalidate();},
+/* ⬅️ 修复：approve 先插入并确认，submission 更新失败时回滚 software */
+async approve(id,s){
+if(!supabaseClient)throw new Error('未初始化');
+var r1=await this._t(supabaseClient.from('software').insert([s]).select());
+if(r1.error)throw r1.error;
+if(!r1.data||r1.data.length===0)throw new Error('插入失败或权限不足');
+var newId=r1.data[0].id;
+var r2=await this._t(supabaseClient.from('software_submissions').update({status:'approved'}).eq('id',id).select('id'));
+if(r2.error||!r2.data||r2.data.length===0){
+try{await this._t(supabaseClient.from('software').delete().eq('id',newId));}catch(e){}
+throw new Error(r2.error?r2.error.message:'更新提交状态失败，已回滚');
+}
+this.invalidate();
+},
 async reject(id){if(!supabaseClient)throw new Error('未初始化');var r=await this._t(supabaseClient.from('software_submissions').update({status:'rejected'}).eq('id',id));if(r.error)throw r.error;this._sb=null;},
 async delSub(id){if(!supabaseClient)throw new Error('未初始化');var r=await this._t(supabaseClient.from('software_submissions').delete().eq('id',id));if(r.error)throw r.error;this._sb=null;},
 async pf(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._pf&&n-this._pfT<this._ttl)return this._pf;try{var r=await this._t(supabaseClient.from('profiles').select('*').order('created_at',{ascending:false}));if(r.error)return this._pf||[];this._pf=r.data||[];this._pfT=n;return this._pf;}catch(e){return this._pf||[];}},
@@ -734,7 +755,7 @@ if(u&&u.trim()){
 var s=u.trim();
 if(s.startsWith('//'))s='https:'+s;
 if(!s.startsWith('http://')&&!s.startsWith('https://')&&!s.startsWith('data:image/')){toast('⚠️ 请填写有效的图片链接','warning');return;}
-setQuillHTML(getQuillHTML()+'<p><img src="'+escapeHTML(s)+'" style="max-width:100%;" /></p>');
+setQuillHTML(getQuillHTML()+'<p><img src="'+escapeAttr(s)+'" style="max-width:100%;" /></p>');
 toast('✅ 图片已插入');
 }
 });
@@ -968,7 +989,7 @@ for(var j=0;j<list.length;j++){
 var g=list[j];
 h+='<tr data-idx="'+j+'">';
 h+='<td style="font-size:.72rem;white-space:nowrap;color:var(--tx2);">'+escapeHTML(formatDate(g.created_at))+'</td>';
-h+='<td style="font-size:.8rem;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+escapeHTML(g.content||'')+'">'+escapeHTML(g.content||'')+'</td>';
+h+='<td style="font-size:.8rem;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+escapeAttr(g.content||'')+'">'+escapeHTML(g.content||'')+'</td>';
 h+='<td><span class="badge badge-cyan">'+g.count+' 人</span></td>';
 h+='<td><button class="msg-del-btn" data-idx="'+j+'">🗑 撤回</button></td>';
 h+='</tr>';
@@ -1063,14 +1084,13 @@ for(var i=0;i<all.length;i++){var cc=all[i].category;if(cc&&!cs[cc]){cs[cc]=true
 cn.sort();
 var sel=this.sel();
 var h='<h2 class="page-title">⊞ 软件管理</h2><p class="page-sub">共 '+total+' 款资源</p><div class="toolbar">';
-h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="搜索软件名称..." value="'+escapeHTML(this._kw)+'" /></div>';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="搜索软件名称..." value="'+escapeAttr(this._kw)+'" /></div>';
 h+='<select id="categoryFilter"><option value="all" '+(this._catF==='all'?'selected':'')+'>全部分类</option>';
-for(var ci=0;ci<cn.length;ci++){h+='<option value="'+escapeHTML(cn[ci])+'" '+(cn[ci]===this._catF?'selected':'')+'>'+escapeHTML(cn[ci])+'</option>';}
+for(var ci=0;ci<cn.length;ci++){h+='<option value="'+escapeAttr(cn[ci])+'" '+(cn[ci]===this._catF?'selected':'')+'>'+escapeHTML(cn[ci])+'</option>';}
 h+='</select>';
 h+='<div class="btn-group">';
 h+='<button class="btn btn-sm btn-outline" id="refreshBtn">⟳ 刷新</button>';
 h+='<button class="btn btn-sm btn-success" id="exportBtn">📥 导出</button>';
-/* ⬇️ 修复：批量按钮常驻 DOM，初始用 hidden 类隐藏，靠 updT 切换 */
 h+='<button class="btn btn-sm btn-success hidden" id="batchRecBtn">⭐ 推荐</button>';
 h+='<button class="btn btn-sm btn-outline hidden" id="batchUnRecBtn">☆ 取消推荐</button>';
 h+='<button class="btn btn-sm btn-danger hidden" id="batchDelBtn">🗑 删除</button>';
@@ -1093,15 +1113,15 @@ else{
 for(var k=0;k<pi.length;k++){
 var s=pi[k];
 var ch=sel.indexOf(s.id)!==-1?'checked':'';
-h2+='<tr data-id="'+s.id+'">';
-h2+='<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="'+s.id+'" '+ch+' /></td>';
+h2+='<tr data-id="'+escapeAttr(s.id)+'">';
+h2+='<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="'+escapeAttr(s.id)+'" '+ch+' /></td>';
 h2+='<td><span class="icon-thumb">'+renderIconThumb(s)+'</span></td>';
 h2+='<td><strong>'+escapeHTML(s.name||'')+'</strong></td>';
 h2+='<td style="color:var(--tx2);font-size:.75rem;">'+escapeHTML(s.category||'未分类')+'</td>';
 h2+='<td>v'+escapeHTML(s.version||'')+'</td>';
 h2+='<td style="font-size:.7rem;color:var(--tx2);white-space:nowrap;">'+escapeHTML(platformText(s.platforms))+'</td>';
 h2+='<td>'+(s.downloads||0)+'</td>';
-h2+='<td><div class="actions"><button class="view-btn" data-id="'+s.id+'">详情</button><button class="edit-btn" data-id="'+s.id+'">编辑</button><button class="del-btn" data-id="'+s.id+'">删除</button></div></td></tr>';
+h2+='<td><div class="actions"><button class="view-btn" data-id="'+escapeAttr(s.id)+'">详情</button><button class="edit-btn" data-id="'+escapeAttr(s.id)+'">编辑</button><button class="del-btn" data-id="'+escapeAttr(s.id)+'">删除</button></div></td></tr>';
 }
 }
 h2+='</tbody></table>';
@@ -1119,7 +1139,13 @@ if(bu){if(ids.length>0)bu.classList.remove('hidden');else bu.classList.add('hidd
 }
 if(sa)sa.addEventListener('change',function(){var v=this.checked;for(var x=0;x<rcb.length;x++)rcb[x].checked=v;updT();});
 for(var r=0;r<rcb.length;r++)rcb[r].addEventListener('change',updT);
-updT(); /* 页面重渲染后同步一次按钮状态 */
+/* ⬅️ 修复：初始化 selectAll 的勾选状态（当前页全部选中时勾选） */
+if(sa){
+var allChecked=rcb.length>0;
+for(var ai=0;ai<rcb.length;ai++){if(!rcb[ai].checked){allChecked=false;break;}}
+sa.checked=allChecked;
+}
+updT();
 w.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;var s=self._all.find(function(x){return x.id===id;});if(s)App.showSoft(s);});});
 w.querySelectorAll('.edit-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;self._editId=id;self.setSel([]);self.renderTab('add');});});
 w.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;if(!confirm('确定要删除此软件吗？'))return;DB.delSoft(id).then(function(){DB.addLog('删除软件','ID: '+shortId(id));toast('已删除');DB.soft(true).then(function(d){self._all=d;self._fil=d.slice();self._renderSoftPage(c);});}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');});});});
@@ -1143,7 +1169,8 @@ _exportCSV:function(d){
 if(!d||d.length===0){toast('没有数据可导出','error');return;}
 var hs=['名称','分类','版本','平台','下载量','浏览数','推荐','日期'];
 var csvEscape=function(val){if(val===null||val===undefined)return '';var str=String(val);if(str.includes(',')||str.includes('"')||str.includes('\n')){return '"'+str.replace(/"/g,'""')+'"';}return str;};
-var rows=d.map(function(s){return [s.name,s.category,'v'+s.version,platformText(s.platforms,'/'),s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||''];});
+/* ⬅️ 修复：CSV 平台分隔符改用 " | " 避免歧义 */
+var rows=d.map(function(s){return [s.name,s.category,'v'+s.version,platformText(s.platforms,' | '),s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||''];}); 
 var csv=hs.join(',')+'\n'+rows.map(function(r){return r.map(csvEscape).join(',');}).join('\n');
 var bl=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
 var a=document.createElement('a');
@@ -1181,7 +1208,7 @@ var s=pi[i];
 var plat=platformText(s.platforms,' · ');
 var stt=s.status||'pending';
 var stLb=stt==='pending'?'<span class="badge badge-orange">待审核</span>':stt==='approved'?'<span class="badge badge-green">已批准</span>':'<span class="badge badge-red">已拒绝</span>';
-h+='<tr data-id="'+s.id+'">';
+h+='<tr data-id="'+escapeAttr(s.id)+'">';
 h+='<td><strong>'+escapeHTML(s.name||'')+'</strong></td>';
 h+='<td>'+escapeHTML(s.category||'')+'</td>';
 h+='<td>v'+escapeHTML(s.version||'1.0')+'</td>';
@@ -1190,12 +1217,12 @@ h+='<td style="font-size:.72rem;">'+escapeHTML(s.contact||'-')+'</td>';
 h+='<td style="font-size:.7rem;">'+timeAgo(s.created_at)+'</td>';
 h+='<td>'+stLb+'</td>';
 h+='<td><div class="actions">';
-h+='<button class="view-btn" data-id="'+s.id+'">详情</button>';
+h+='<button class="view-btn" data-id="'+escapeAttr(s.id)+'">详情</button>';
 if(stt==='pending'){
-h+='<button class="approve-btn" data-id="'+s.id+'">✅ 批准</button>';
-h+='<button class="reject-btn" data-id="'+s.id+'">❌ 拒绝</button>';
+h+='<button class="approve-btn" data-id="'+escapeAttr(s.id)+'">✅ 批准</button>';
+h+='<button class="reject-btn" data-id="'+escapeAttr(s.id)+'">❌ 拒绝</button>';
 }
-h+='<button class="del-btn" data-id="'+s.id+'">删除</button>';
+h+='<button class="del-btn" data-id="'+escapeAttr(s.id)+'">删除</button>';
 h+='</div></td></tr>';
 }
 }
@@ -1230,7 +1257,7 @@ var h='<div class="detail-row"><div class="label">名称</div><div class="value"
 '<div class="detail-row"><div class="label">大小</div><div class="value">'+escapeHTML(s.size||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">简介</div><div class="value">'+escapeHTML(s.description||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">详情</div><div class="value">'+escapeHTML(s.detail||'-')+'</div></div>'+
-'<div class="detail-row"><div class="label">下载链接</div><div class="value">'+(s.download_url?'<a href="'+escapeHTML(s.download_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;">'+escapeHTML(s.download_url)+'</a>':'-')+'</div></div>'+
+'<div class="detail-row"><div class="label">下载链接</div><div class="value">'+(s.download_url?'<a href="'+escapeAttr(s.download_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;">'+escapeHTML(s.download_url)+'</a>':'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">图标链接</div><div class="value">'+escapeHTML(s.icon_url||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">联系方式</div><div class="value">'+escapeHTML(s.contact||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">提交时间</div><div class="value">'+(s.created_at?formatDate(s.created_at):'-')+'</div></div>';
@@ -1248,7 +1275,7 @@ var self=this;
 var data=this._pfs||[];
 var adminCount=data.filter(function(p){return p.is_admin===true;}).length;
 var h='<h2 class="page-title">👤 用户管理</h2><p class="page-sub" id="userSub">共 '+data.length+' 位用户，'+adminCount+' 位管理员</p><div class="toolbar">';
-h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="userSearch" placeholder="搜索昵称 / 邮箱 / ID..." value="'+escapeHTML(this._pfKw)+'" autocomplete="off" /></div>';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="userSearch" placeholder="搜索昵称 / 邮箱 / ID..." value="'+escapeAttr(this._pfKw)+'" autocomplete="off" /></div>';
 h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="userRefresh">⟳ 刷新</button><span class="selected-info" id="userCountInfo">共 '+data.length+' 人</span></div></div>';
 h+='<div id="userTableArea"></div>';
 c.innerHTML=h;
@@ -1299,7 +1326,7 @@ var u=pi[i];
 var idx=st+i+1;
 var isSelf=currentAdminUser&&currentAdminUser.id===u.id;
 var roleHtml=u.is_admin===true?'<span class="badge badge-green">管理员</span>':'<span class="badge badge-cyan">普通用户</span>';
-h+='<tr data-id="'+u.id+'">';
+h+='<tr data-id="'+escapeAttr(u.id)+'">';
 h+='<td style="font-size:.7rem;color:var(--dim);">'+idx+'</td>';
 h+='<td><strong>'+escapeHTML(u.username||'(未设置)')+'</strong>'+(isSelf?' <span class="badge badge-orange" style="font-size:.5rem;">当前</span>':'')+'</td>';
 h+='<td style="font-size:.72rem;color:var(--tx2);word-break:break-all;">'+escapeHTML(u.email||'-')+'</td>';
@@ -1311,7 +1338,7 @@ h+='<td><div class="actions">';
 if(isSelf){
 h+='<span style="font-size:.65rem;color:var(--dim);">(当前账号)</span>';
 }else{
-h+='<button class="toggle-admin-btn '+(u.is_admin?'on':'')+'" data-id="'+u.id+'" data-admin="'+(u.is_admin?'1':'0')+'">'+(u.is_admin?'🛡 取消管理员':'🛡 设为管理员')+'</button>';
+h+='<button class="toggle-admin-btn '+(u.is_admin?'on':'')+'" data-id="'+escapeAttr(u.id)+'" data-admin="'+(u.is_admin?'1':'0')+'">'+(u.is_admin?'🛡 取消管理员':'🛡 设为管理员')+'</button>';
 }
 h+='</div></td></tr>';
 }
@@ -1371,7 +1398,7 @@ else{
 for(var i=0;i<cats.length;i++){
 var cat=cats[i];
 var cnt=all.filter(function(s){return s.category===cat.name;}).length;
-h+='<tr><td><strong>'+escapeHTML(cat.name)+'</strong></td><td>'+cnt+'</td><td><button class="del-btn" data-cat="'+escapeHTML(cat.name)+'" style="padding:3px 12px;border-radius:50px;font-size:.65rem;background:rgba(239,68,68,.08);color:var(--rd);border:1px solid rgba(239,68,68,.1);min-height:28px;">删除</button></td></tr>';
+h+='<tr><td><strong>'+escapeHTML(cat.name)+'</strong></td><td>'+cnt+'</td><td><button class="del-btn" data-cat="'+escapeAttr(cat.name)+'" style="padding:3px 12px;border-radius:50px;font-size:.65rem;background:rgba(239,68,68,.08);color:var(--rd);border:1px solid rgba(239,68,68,.1);min-height:28px;">删除</button></td></tr>';
 }
 }
 h+='</tbody></table></div>';
@@ -1394,9 +1421,18 @@ if(!confirm('确定删除分类 "'+cat+'" 吗？')){btn.disabled=false;return;}
 try{await DB.delCat(cat);DB.addLog('删除分类','分类: '+cat);toast('已删除');self.renderCats(c);}catch(e){toast('删除失败: '+(e.message||''),'error');btn.disabled=false;}
 });});
 },
-renderAddForm:function(c){
+/* ⬅️ 修复：编辑时先确保 _all 已加载，避免表单不回填 */
+renderAddForm:async function(c){
 var self=this;
-if(!this._all)this._all=[]; /* ⬅️ 修复：防止 _all 未加载时报错 */
+if(this._editId){
+c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
+try{
+var fresh=await DB.soft(true);
+this._all=fresh||[];
+this._fil=(fresh||[]).slice();
+}catch(e){ this._all=this._all||[]; }
+}
+if(!this._all)this._all=[];
 var isEdit=!!this._editId;
 var editName=isEdit?((this._all.find(function(s){return s.id===self._editId;})||{}).name||''):'';
 var h='<h2 class="page-title">';
@@ -1406,7 +1442,7 @@ h+=' <span class="back-link" id="backFromAdd"><span style="font-size:1rem;">←<
 c.innerHTML=h;
 var sel=c.querySelector('[name="category"]');
 DB.cats().then(function(cats){
-if(sel){sel.innerHTML=cats.map(function(x){return '<option value="'+escapeHTML(x.name)+'">'+escapeHTML(x.name)+'</option>';}).join('');
+if(sel){sel.innerHTML=cats.map(function(x){return '<option value="'+escapeAttr(x.name)+'">'+escapeHTML(x.name)+'</option>';}).join('');
 if(self._editId){var s=self._all.find(function(x){return x.id===self._editId;});if(s)sel.value=s.category||'';}
 }
 if(self._editId){
@@ -1506,10 +1542,16 @@ _updIconPreview:function(form){
 if(!form)return;
 var u=form.querySelector('[name="iconUrl"]').value.trim();
 var p=form.querySelector('.preview-box');
-if(!p)return; /* ⬅️ 修复：preview-box 不存在时直接返回 */
+if(!p)return;
 var e=form.querySelector('[name="icon"]').value.trim()||'📦';
-if(u&&(u.startsWith('http://')||u.startsWith('https://')))p.innerHTML='<img src="'+escapeHTML(u)+'" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeHTML(e).replace(/'/g,"\\'")+'\'" />';
-else p.textContent=e;
+if(u&&(u.startsWith('http://')||u.startsWith('https://'))){
+var rid='prev_'+Math.random().toString(36).slice(2,10);
+p.innerHTML='<img id="'+rid+'" src="'+escapeAttr(u)+'" alt="icon" />';
+setTimeout(function(){
+var el=document.getElementById(rid);
+if(el){el.onerror=function(){this.style.display='none';this.parentElement.textContent=e;};}
+},0);
+}else p.textContent=e;
 },
 renderTuts:async function(c){
 var self=this;
@@ -1526,7 +1568,7 @@ var st=(this._page-1)*ps;
 var en=Math.min(st+ps,total);
 var pi=fil.slice(st,en);
 var h='<h2 class="page-title">📖 教程管理</h2><p class="page-sub">共 '+total+' 篇教程</p><div class="toolbar">';
-h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="tutSearch" placeholder="搜索教程..." value="'+escapeHTML(this._tutKw)+'" /></div>';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="tutSearch" placeholder="搜索教程..." value="'+escapeAttr(this._tutKw)+'" /></div>';
 h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="tutRefresh">⟳ 刷新</button><button class="btn btn-sm btn-success" id="tutNew">⊕ 发布教程</button><span class="selected-info">共 '+total+' 篇</span></div></div>';
 h+='<div class="tutorial-card-grid" id="tutGrid"></div>';
 h+='<div class="pagination"><div class="info">共 '+total+' 条，第 '+(total?st+1:0)+'-'+en+' 条</div><div class="pages">';
@@ -1587,10 +1629,10 @@ try{if(t.videos)v=typeof t.videos==='string'?JSON.parse(t.videos):t.videos;}catc
 var catC=getCategoryTagClass(t.category);
 var catL=t.category||'未分类';
 var cover='';
-if(t.cover)cover='<img src="'+escapeHTML(t.cover)+'" alt="'+escapeHTML(t.title||'')+'" onerror="this.style.display=\'none\'" />';
+if(t.cover)cover='<img src="'+escapeAttr(t.cover)+'" alt="'+escapeAttr(t.title||'')+'" onerror="this.style.display=\'none\'" />';
 else cover='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--dim);">📖</div>';
 var hv=v&&v.length>0;
-h+='<div class="tutorial-card" data-id="'+t.id+'">';
+h+='<div class="tutorial-card" data-id="'+escapeAttr(t.id)+'">';
 h+='<div class="card-cover">'+cover;
 if(hv)h+='<div class="video-play"><span class="play-icon">▶</span></div>';
 h+='<div style="position:absolute;top:8px;right:8px;display:flex;gap:4px;flex-wrap:wrap;">';
@@ -1601,7 +1643,7 @@ h+='</div></div>';
 h+='<div class="card-body">';
 h+='<div class="title">'+escapeHTML(t.title||'')+'</div>';
 h+='<div class="summary">'+escapeHTML(t.summary||'')+'</div>';
-h+='<div class="meta-row"><div class="left"><span>'+timeAgo(t.created_at)+'</span></div><div class="right"><button class="view-btn" data-id="'+t.id+'">查看</button><button class="edit-btn" data-id="'+t.id+'">编辑</button><button class="del-btn" data-id="'+t.id+'">删除</button></div></div>';
+h+='<div class="meta-row"><div class="left"><span>'+timeAgo(t.created_at)+'</span></div><div class="right"><button class="view-btn" data-id="'+escapeAttr(t.id)+'">查看</button><button class="edit-btn" data-id="'+escapeAttr(t.id)+'">编辑</button><button class="del-btn" data-id="'+escapeAttr(t.id)+'">删除</button></div></div>';
 h+='</div></div>';
 }
 c.innerHTML=h;
@@ -1647,13 +1689,17 @@ if(eb){
 var eu=url;
 if(p==='youtube'){var yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/);if(yt)eu='https://www.youtube.com/embed/'+yt[1];}
 else if(p==='bilibili'){var bm=url.match(/b23\.tv\/([a-zA-Z0-9]+)/)||url.match(/bilibili\.com\/video\/([a-zA-Z0-9]+)/);if(bm)eu='https://player.bilibili.com/player.html?bvid='+bm[1];}
-return '<div style="margin:6px 0;border-radius:6px;overflow:hidden;"><iframe src="'+escapeHTML(eu)+'" style="width:100%;min-height:200px;border:none;border-radius:6px;" allowfullscreen loading="lazy"></iframe></div>';
+/* ⬅️ 修复：iframe src 必须通过白名单校验，不通过则降级为链接 */
+if(!isAllowedIframeSrc(eu)){
+return '<div style="margin:4px 0;"><a href="'+escapeAttr(url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;font-size:.8rem;">'+escapeHTML(url)+'</a><div style="font-size:.65rem;color:var(--dim);margin-top:2px;">💡 该视频源未通过安全校验，点击链接在新窗口观看</div></div>';
 }
-return '<div style="margin:4px 0;"><a href="'+escapeHTML(url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;font-size:.8rem;">'+escapeHTML(url)+'</a><div style="font-size:.65rem;color:var(--dim);margin-top:2px;">💡 该平台视频不支持直接嵌入，点击链接在新窗口观看</div></div>';
+return '<div style="margin:6px 0;border-radius:6px;overflow:hidden;"><iframe src="'+escapeAttr(eu)+'" style="width:100%;min-height:200px;border:none;border-radius:6px;" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe></div>';
+}
+return '<div style="margin:4px 0;"><a href="'+escapeAttr(url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;font-size:.8rem;">'+escapeHTML(url)+'</a><div style="font-size:.65rem;color:var(--dim);margin-top:2px;">💡 该平台视频不支持直接嵌入，点击链接在新窗口观看</div></div>';
 }).join('');
 }
 var cov='';
-if(t.cover)cov='<img src="'+escapeHTML(t.cover)+'" style="max-width:100%;max-height:200px;border-radius:6px;margin:4px;border:1px solid var(--bd);" onerror="this.style.display=\'none\'" />';
+if(t.cover)cov='<img src="'+escapeAttr(t.cover)+'" style="max-width:100%;max-height:200px;border-radius:6px;margin:4px;border:1px solid var(--bd);" onerror="this.style.display=\'none\'" />';
 var content=t.content?sanitizeHTML(t.content):'';
 body.innerHTML='<div class="detail-row"><div class="label">标题</div><div class="value">'+escapeHTML(t.title||'')+'</div></div>'+
 '<div class="detail-row"><div class="label">分类</div><div class="value"><span class="category-tag '+catC+'">'+escapeHTML(t.category||'')+'</span></div></div>'+
@@ -1680,7 +1726,7 @@ body.innerHTML='<div class="detail-row"><div class="label">图标</div><div clas
 '<div class="detail-row"><div class="label">推荐</div><div class="value">'+(s.recommend?'✅ 是':'❌ 否')+'</div></div>'+
 '<div class="detail-row"><div class="label">简介</div><div class="value">'+escapeHTML(s.description||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">详情</div><div class="value">'+escapeHTML(s.detail||'-')+'</div></div>'+
-'<div class="detail-row"><div class="label">下载链接</div><div class="value">'+(s.download_url?'<a href="'+escapeHTML(s.download_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;">'+escapeHTML(s.download_url)+'</a>':'-')+'</div></div>'+
+'<div class="detail-row"><div class="label">下载链接</div><div class="value">'+(s.download_url?'<a href="'+escapeAttr(s.download_url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;">'+escapeHTML(s.download_url)+'</a>':'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">创建时间</div><div class="value">'+(s.created_at?formatDate(s.created_at):s.date||'-')+'</div></div>'+
 '<div class="detail-row"><div class="label">ID</div><div class="value" style="font-size:.7rem;color:var(--dim);">'+escapeHTML(s.id||'')+'</div></div>';
 m.classList.remove('hidden');
@@ -1703,8 +1749,8 @@ var en=Math.min(st+ps,total);
 var pi=fil.slice(st,en);
 var tOpt=[{v:'all',l:'全部教程'}].concat(tuts.map(function(t){return {v:t.id,l:t.title};}));
 var h='<h2 class="page-title">💬 评论管理</h2><p class="page-sub">共 '+total+' 条评论</p><div class="toolbar">';
-h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="cmSearch" placeholder="搜索评论..." value="'+escapeHTML(this._cmKw)+'" /></div>';
-h+='<select id="cmFilterTut">'+tOpt.map(function(o){return '<option value="'+escapeHTML(o.v)+'" '+(o.v===self._cmTutF?'selected':'')+'>'+escapeHTML(o.l)+'</option>';}).join('')+'</select>';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="cmSearch" placeholder="搜索评论..." value="'+escapeAttr(this._cmKw)+'" /></div>';
+h+='<select id="cmFilterTut">'+tOpt.map(function(o){return '<option value="'+escapeAttr(o.v)+'" '+(o.v===self._cmTutF?'selected':'')+'>'+escapeHTML(o.l)+'</option>';}).join('')+'</select>';
 h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="cmRefresh">⟳ 刷新</button><span class="selected-info">共 '+total+' 条</span></div></div>';
 h+='<div class="table-wrap comment-table-wrap"><table><thead><tr><th>教程</th><th>作者</th><th>评论内容</th><th>时间</th><th style="width:180px;">操作</th></tr></thead><tbody>';
 if(pi.length===0)h+='<tr class="empty-row"><td colspan="5">暂无评论</td></tr>';
@@ -1713,12 +1759,13 @@ for(var i=0;i<pi.length;i++){
 var x=pi[i];
 var ttl='未知教程';
 for(var ti=0;ti<tuts.length;ti++){if(tuts[ti].id===x.tutorial_id){ttl=tuts[ti].title;break;}}
-h+='<tr data-id="'+x.id+'">';
+h+='<tr data-id="'+escapeAttr(x.id)+'">';
 h+='<td style="font-size:.75rem;">'+escapeHTML(ttl)+'</td>';
 h+='<td>'+escapeHTML(x.author||'匿名用户')+'</td>';
-h+='<td class="comment-content-cell" title="'+escapeHTML(x.content||'')+'">'+escapeHTML(x.content||'')+'</td>';
+h+='<td class="comment-content-cell" title="'+escapeAttr(x.content||'')+'">'+escapeHTML(x.content||'')+'</td>';
 h+='<td style="font-size:.7rem;">'+timeAgo(x.created_at)+'</td>';
-h+='<td><div class="actions"><button class="reply-btn" data-id="'+x.id+'" data-tut="'+x.tutorial_id+'" data-author="'+escapeHTML(x.author||'匿名用户')+'">💬 回复</button><button class="del-btn" data-id="'+x.id+'">🗑 删除</button></div></td></tr>';
+/* ⬅️ 修复：data-* 用 escapeAttr */
+h+='<td><div class="actions"><button class="reply-btn" data-id="'+escapeAttr(x.id)+'" data-tut="'+escapeAttr(x.tutorial_id)+'" data-author="'+escapeAttr(x.author||'匿名用户')+'">💬 回复</button><button class="del-btn" data-id="'+escapeAttr(x.id)+'">🗑 删除</button></div></td></tr>';
 }
 }
 h+='</tbody></table></div>';
@@ -1785,9 +1832,9 @@ allC.sort();
 var ansCount={};
 for(var ai=0;ai<this._ans.length;ai++){var qid=this._ans[ai].question_id;ansCount[qid]=(ansCount[qid]||0)+1;}
 var h='<h2 class="page-title">💬 问答管理</h2><p class="page-sub">共 '+total+' 个问题</p><div class="toolbar">';
-h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="qaSearch" placeholder="搜索问题..." value="'+escapeHTML(this._qaKw)+'" /></div>';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="qaSearch" placeholder="搜索问题..." value="'+escapeAttr(this._qaKw)+'" /></div>';
 h+='<select id="qaFilter"><option value="all" '+(this._qaF==='all'?'selected':'')+'>全部分类</option>';
-for(var ci=0;ci<allC.length;ci++)h+='<option value="'+escapeHTML(allC[ci])+'" '+(allC[ci]===this._qaF?'selected':'')+'>'+escapeHTML(allC[ci])+'</option>';
+for(var ci=0;ci<allC.length;ci++)h+='<option value="'+escapeAttr(allC[ci])+'" '+(allC[ci]===this._qaF?'selected':'')+'>'+escapeHTML(allC[ci])+'</option>';
 h+='</select>';
 h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="qaRefresh">⟳ 刷新</button><span class="selected-info">共 '+total+' 条</span></div></div>';
 h+='<div class="table-wrap"><table><thead><tr><th>问题</th><th>分类</th><th>👍 投票</th><th>💬 回答</th><th>创建时间</th><th style="width:180px;">操作</th></tr></thead><tbody>';
@@ -1795,13 +1842,13 @@ if(pi.length===0)h+='<tr class="empty-row"><td colspan="6">暂无问题</td></tr
 else{
 for(var k=0;k<pi.length;k++){
 var q=pi[k];
-h+='<tr class="clickable" data-id="'+q.id+'">';
+h+='<tr class="clickable" data-id="'+escapeAttr(q.id)+'">';
 h+='<td><strong>'+escapeHTML(q.title||'')+'</strong></td>';
 h+='<td>'+escapeHTML(q.category||'')+'</td>';
 h+='<td>'+(q.votes||0)+'</td>';
 h+='<td>'+(ansCount[q.id]||0)+'</td>';
 h+='<td style="font-size:.7rem;">'+timeAgo(q.created_at)+'</td>';
-h+='<td><div class="actions"><button class="view-btn" data-id="'+q.id+'">查看</button><button class="del-btn" data-id="'+q.id+'">删除</button></div></td></tr>';
+h+='<td><div class="actions"><button class="view-btn" data-id="'+escapeAttr(q.id)+'">查看</button><button class="del-btn" data-id="'+escapeAttr(q.id)+'">删除</button></div></td></tr>';
 }
 }
 h+='</tbody></table></div>';
@@ -1848,7 +1895,7 @@ renderDrafts:function(c){
 var self=this;
 if(!c)c=document.getElementById('adminMain');
 var drafts=this._getFilteredDrafts();
-drafts.sort(function(a,b){return (b.updated_at||'').localeCompare(a.updated_at||'');}); /* ⬅️ 按更新时间倒序 */
+drafts.sort(function(a,b){return (b.updated_at||'').localeCompare(a.updated_at||'');});
 var total=drafts.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
@@ -1858,7 +1905,7 @@ var st=(this._page-1)*ps;
 var en=Math.min(st+ps,total);
 var pi=drafts.slice(st,en);
 var h='<h2 class="page-title">📝 草稿箱</h2><p class="page-sub">共 '+total+' 篇草稿（自动保存，发布失败时会留在这里）</p><div class="toolbar">';
-h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="draftSearch" placeholder="搜索草稿..." value="'+escapeHTML(this._draftKw)+'" /></div>';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="draftSearch" placeholder="搜索草稿..." value="'+escapeAttr(this._draftKw)+'" /></div>';
 h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="draftRefresh">⟳ 刷新</button><button class="btn btn-sm btn-danger" id="draftClearAll">清空所有草稿</button></div></div>';
 h+='<div class="tutorial-card-grid" id="draftGrid"></div>';
 h+='<div class="pagination"><div class="info">共 '+total+' 条，第 '+(total?st+1:0)+'-'+en+' 条</div><div class="pages">';
@@ -1890,11 +1937,11 @@ var catL=t.category||'未分类';
 var v=[],im=[];
 try{if(t.videos)v=typeof t.videos==='string'?JSON.parse(t.videos):t.videos;if(t.images)im=typeof t.images==='string'?JSON.parse(t.images):t.images;}catch(e){}
 var cov='';
-if(t.cover)cov='<img src="'+escapeHTML(t.cover)+'" alt="" onerror="this.style.display=\'none\'" />';
-else if(im&&im.length>0)cov='<img src="'+escapeHTML(im[0])+'" alt="" onerror="this.style.display=\'none\'" />';
+if(t.cover)cov='<img src="'+escapeAttr(t.cover)+'" alt="" onerror="this.style.display=\'none\'" />';
+else if(im&&im.length>0)cov='<img src="'+escapeAttr(im[0])+'" alt="" onerror="this.style.display=\'none\'" />';
 else cov='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--dim);">📖</div>';
 var hv=v&&v.length>0;
-h+='<div class="tutorial-card" data-id="'+t.id+'">';
+h+='<div class="tutorial-card" data-id="'+escapeAttr(t.id)+'">';
 h+='<div class="card-cover">'+cov;
 if(hv)h+='<div class="video-play"><span class="play-icon">▶</span></div>';
 h+='<div style="position:absolute;top:8px;right:8px;display:flex;gap:4px;"><span class="category-tag '+catC+'">'+escapeHTML(catL)+'</span><span style="background:rgba(0,0,0,.4);color:#fff;font-size:.55rem;padding:0 8px;border-radius:50px;">📝 草稿</span></div>';
@@ -1902,7 +1949,7 @@ h+='</div>';
 h+='<div class="card-body">';
 h+='<div class="title">'+escapeHTML(t.title||'')+' <span style="font-size:.55rem;color:var(--dim);">('+(t.updated_at?timeAgo(t.updated_at):'刚刚')+')</span></div>';
 h+='<div class="summary">'+escapeHTML(t.summary||'')+'</div>';
-h+='<div class="meta-row"><div class="left"><span style="font-size:.6rem;color:var(--dim);">未发布</span></div><div class="right"><button class="edit-draft-btn" data-id="'+t.id+'" style="background:rgba(13,124,255,.06);color:var(--cy);">编辑</button><button class="pub-draft-btn" data-id="'+t.id+'" style="background:rgba(11,158,90,.06);color:var(--gr);">发布</button><button class="del-draft-btn" data-id="'+t.id+'" style="background:rgba(239,68,68,.06);color:var(--rd);">删除</button></div></div>';
+h+='<div class="meta-row"><div class="left"><span style="font-size:.6rem;color:var(--dim);">未发布</span></div><div class="right"><button class="edit-draft-btn" data-id="'+escapeAttr(t.id)+'" style="background:rgba(13,124,255,.06);color:var(--cy);">编辑</button><button class="pub-draft-btn" data-id="'+escapeAttr(t.id)+'" style="background:rgba(11,158,90,.06);color:var(--gr);">发布</button><button class="del-draft-btn" data-id="'+escapeAttr(t.id)+'" style="background:rgba(239,68,68,.06);color:var(--rd);">删除</button></div></div>';
 h+='</div></div>';
 }
 c.innerHTML=h;
@@ -2046,7 +2093,7 @@ var p=detectVideoPlatform(u);
 return '<div class="media-item"><span class="thumb" style="background:rgba(13,124,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;">▶</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;">'+escapeHTML(u)+'</span><span class="platform-badge">'+escapeHTML(p)+'</span><span class="remove-media" data-type="v" data-idx="'+i+'">✕</span></div>';
 }).join('');
 ic.innerHTML=this._il.map(function(u,i){
-return '<div class="media-item"><span class="thumb"><img src="'+escapeHTML(u)+'" alt="" onerror="this.parentElement.textContent=\'🖼\'" /></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;">'+escapeHTML(u)+'</span><span class="remove-media" data-type="i" data-idx="'+i+'">✕</span></div>';
+return '<div class="media-item"><span class="thumb"><img src="'+escapeAttr(u)+'" alt="" onerror="this.parentElement.textContent=\'🖼\'" /></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;">'+escapeHTML(u)+'</span><span class="remove-media" data-type="i" data-idx="'+i+'">✕</span></div>';
 }).join('');
 vc.querySelectorAll('.remove-media').forEach(function(el){el.addEventListener('click',function(){var i=parseInt(this.dataset.idx);self._vl.splice(i,1);self._renderMedia();self._autoSaveDraft();});});
 ic.querySelectorAll('.remove-media').forEach(function(el){el.addEventListener('click',function(){var i=parseInt(this.dataset.idx);self._il.splice(i,1);self._renderMedia();self._autoSaveDraft();});});
@@ -2098,8 +2145,10 @@ try{saveDraft(d);toast('✅ 草稿已更新');closeAndReset();self.renderTab(sel
 return;
 }
 if(editSource==='published'&&editId){
-supabaseClient.from('tutorials').update(data).eq('id',editId).then(function(r){
+/* ⬅️ 修复：加 .select() 并校验更新结果 */
+supabaseClient.from('tutorials').update(data).eq('id',editId).select().then(function(r){
 if(r.error){saveToDrafts(r.error.message);return;}
+if(!r.data||r.data.length===0){saveToDrafts('更新失败或权限不足');return;}
 var drafts=getDrafts();
 if(drafts.some(function(d){return d.id===editId;}))deleteDraft(editId);
 toast('✅ 更新成功');
@@ -2109,10 +2158,18 @@ self.renderTab(self._tab);
 return;
 }
 var insertData=Object.assign({likes:0},data);
-supabaseClient.from('tutorials').insert([insertData]).then(function(r){
+/* ⬅️ 修复：加 .select() 校验插入结果；成功后清理自动保存产生的草稿 */
+supabaseClient.from('tutorials').insert([insertData]).select().then(function(r){
 if(r.error){saveToDrafts(r.error.message);return;}
+if(!r.data||r.data.length===0){saveToDrafts('插入失败或权限不足');return;}
 toast('🎉 发布成功');
 if(editSource==='draftPub'&&pubDraftId){deleteDraft(pubDraftId);}
+if(editId){deleteDraft(editId);}
+/* 清理同标题同内容的草稿（自动保存产生的） */
+var allDrafts=getDrafts();
+for(var di=0;di<allDrafts.length;di++){
+if(allDrafts[di].title===title&&allDrafts[di].content===content){deleteDraft(allDrafts[di].id);}
+}
 DB.sendNotificationToAll('【新教程发布】'+title+'，快来看看吧！').catch(function(){});
 closeAndReset();
 self.renderTab(self._tab);
