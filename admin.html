@@ -437,15 +437,33 @@ function formatDate(iso){if(!iso)return '-';var d=new Date(iso);return d.toLocal
 function shortId(id){return id?id.slice(0,8):'';}
 function timeAgo(d){if(!d)return '刚刚';var n=new Date(),df=Math.max(0,n-new Date(d)),m=Math.floor(df/60000);if(m<1)return '刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';var dd=Math.floor(h/24);if(dd<7)return dd+'天前';return new Date(d).toLocaleDateString('zh-CN');}
 function getIconEmoji(c){var m={'设计工具':'✎','开发工具':'⚙','办公软件':'📋','媒体工具':'🎬','实用工具':'🔧'};return m[c]||'📦';}
+
+/* ============ 平台标签（新增 android） ============ */
 function getPlatformLabels(p){
 if(!p)return '-';
 if(typeof p==='string'){
 try{p=JSON.parse(p);}catch(e){p=p.split(',').map(function(x){return x.trim();}).filter(Boolean);}
 }
 if(!Array.isArray(p)||p.length===0)return '-';
-var m={'mac':'🍎 Mac','windows':'🪟 Win'};
+var m={'mac':'🍎 Mac','windows':'🪟 Win','android':'🤖 Android'};
 return p.map(function(x){return m[x]||x;}).join(' · ');
 }
+/* ============ 平台映射工具（统一给表格/详情使用） ============ */
+function normalizePlatforms(raw){
+if(typeof raw==='string'){
+try{raw=JSON.parse(raw);}catch(e){raw=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);}
+}
+if(!Array.isArray(raw))raw=[];
+return raw;
+}
+function platformText(raw,sep){
+sep=sep||' · ';
+var arr=normalizePlatforms(raw);
+if(arr.length===0)return '-';
+var m={mac:'🍎 Mac',windows:'🪟 Win',android:'🤖 Android'};
+return arr.map(function(x){return m[x]||x;}).join(sep);
+}
+
 function renderIconThumb(s){var fb=s.icon||'📦';if(s.icon_url&&s.icon_url.trim()){var u=s.icon_url.trim();if(!u.startsWith('http://')&&!u.startsWith('https://'))return escapeHTML(fb);var safeFb=escapeHTML(fb).replace(/'/g,"\\'");return '<img src="'+escapeHTML(u)+'" alt="'+escapeHTML(s.name||'')+'" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+safeFb+'\'" />';}return escapeHTML(fb);}
 function getCategoryTagClass(c){var m={'设计':'design','开发':'dev','办公':'office','媒体':'media','实用':'tool'};return m[c]||'design';}
 function getDrafts(){try{return JSON.parse(localStorage.getItem('lezhe_tutorial_drafts')||'[]');}catch(e){return [];}}
@@ -1036,6 +1054,7 @@ var total=fil.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
 if(this._page>tp)this._page=tp;
+if(this._page<1)this._page=1;
 var st=(this._page-1)*ps;
 var en=Math.min(st+ps,total);
 var pi=fil.slice(st,en);
@@ -1051,11 +1070,10 @@ h+='</select>';
 h+='<div class="btn-group">';
 h+='<button class="btn btn-sm btn-outline" id="refreshBtn">⟳ 刷新</button>';
 h+='<button class="btn btn-sm btn-success" id="exportBtn">📥 导出</button>';
-if(sel.length>0){
-h+='<button class="btn btn-sm btn-success" id="batchRecBtn">⭐ 推荐 ('+sel.length+')</button>';
-h+='<button class="btn btn-sm btn-outline" id="batchUnRecBtn">☆ 取消推荐</button>';
-h+='<button class="btn btn-sm btn-danger" id="batchDelBtn">🗑 删除 ('+sel.length+')</button>';
-}
+/* ⬇️ 修复：批量按钮常驻 DOM，初始用 hidden 类隐藏，靠 updT 切换 */
+h+='<button class="btn btn-sm btn-success hidden" id="batchRecBtn">⭐ 推荐</button>';
+h+='<button class="btn btn-sm btn-outline hidden" id="batchUnRecBtn">☆ 取消推荐</button>';
+h+='<button class="btn btn-sm btn-danger hidden" id="batchDelBtn">🗑 删除</button>';
 h+='<span class="selected-info">已选 '+sel.length+' 项</span>';
 h+='</div></div>';
 h+='<div class="table-wrap" id="softTableWrap"></div>';
@@ -1069,8 +1087,8 @@ h+='<button class="page-btn" data-page="next" '+(this._page>=tp?'disabled':'')+'
 h+='</div></div>';
 c.innerHTML=h;
 var w=document.getElementById('softTableWrap');
-var h2='<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="selectAll" /></th><th style="width:50px;">图标</th><th>名称</th><th>分类</th><th>版本</th><th>下载</th><th style="width:180px;">操作</th></tr></thead><tbody>';
-if(pi.length===0)h2+='<tr class="empty-row"><td colspan="7">暂无软件</td></tr>';
+var h2='<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="selectAll" /></th><th style="width:50px;">图标</th><th>名称</th><th>分类</th><th>版本</th><th>平台</th><th>下载</th><th style="width:180px;">操作</th></tr></thead><tbody>';
+if(pi.length===0)h2+='<tr class="empty-row"><td colspan="8">暂无软件</td></tr>';
 else{
 for(var k=0;k<pi.length;k++){
 var s=pi[k];
@@ -1081,6 +1099,7 @@ h2+='<td><span class="icon-thumb">'+renderIconThumb(s)+'</span></td>';
 h2+='<td><strong>'+escapeHTML(s.name||'')+'</strong></td>';
 h2+='<td style="color:var(--tx2);font-size:.75rem;">'+escapeHTML(s.category||'未分类')+'</td>';
 h2+='<td>v'+escapeHTML(s.version||'')+'</td>';
+h2+='<td style="font-size:.7rem;color:var(--tx2);white-space:nowrap;">'+escapeHTML(platformText(s.platforms))+'</td>';
 h2+='<td>'+(s.downloads||0)+'</td>';
 h2+='<td><div class="actions"><button class="view-btn" data-id="'+s.id+'">详情</button><button class="edit-btn" data-id="'+s.id+'">编辑</button><button class="del-btn" data-id="'+s.id+'">删除</button></div></td></tr>';
 }
@@ -1094,12 +1113,13 @@ var ids=[];var cc2=w.querySelectorAll('.row-checkbox:checked');for(var x=0;x<cc2
 self.setSel(ids);
 var info=c.querySelector('.selected-info');if(info)info.textContent='已选 '+ids.length+' 项';
 var bd=document.getElementById('batchDelBtn'),br=document.getElementById('batchRecBtn'),bu=document.getElementById('batchUnRecBtn');
-if(bd){if(ids.length>0){bd.textContent='🗑 删除 ('+ids.length+')';bd.style.display='inline-flex';}else bd.style.display='none';}
-if(br){if(ids.length>0){br.textContent='⭐ 推荐 ('+ids.length+')';br.style.display='inline-flex';}else br.style.display='none';}
-if(bu){if(ids.length>0)bu.style.display='inline-flex';else bu.style.display='none';}
+if(bd){if(ids.length>0){bd.textContent='🗑 删除 ('+ids.length+')';bd.classList.remove('hidden');}else bd.classList.add('hidden');}
+if(br){if(ids.length>0){br.textContent='⭐ 推荐 ('+ids.length+')';br.classList.remove('hidden');}else br.classList.add('hidden');}
+if(bu){if(ids.length>0)bu.classList.remove('hidden');else bu.classList.add('hidden');}
 }
 if(sa)sa.addEventListener('change',function(){var v=this.checked;for(var x=0;x<rcb.length;x++)rcb[x].checked=v;updT();});
 for(var r=0;r<rcb.length;r++)rcb[r].addEventListener('change',updT);
+updT(); /* 页面重渲染后同步一次按钮状态 */
 w.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;var s=self._all.find(function(x){return x.id===id;});if(s)App.showSoft(s);});});
 w.querySelectorAll('.edit-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;self._editId=id;self.setSel([]);self.renderTab('add');});});
 w.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;if(!confirm('确定要删除此软件吗？'))return;DB.delSoft(id).then(function(){DB.addLog('删除软件','ID: '+shortId(id));toast('已删除');DB.soft(true).then(function(d){self._all=d;self._fil=d.slice();self._renderSoftPage(c);});}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');});});});
@@ -1121,9 +1141,9 @@ c.querySelectorAll('.page-btn').forEach(function(b){b.addEventListener('click',f
 },
 _exportCSV:function(d){
 if(!d||d.length===0){toast('没有数据可导出','error');return;}
-var hs=['名称','分类','版本','下载量','浏览数','推荐','日期'];
+var hs=['名称','分类','版本','平台','下载量','浏览数','推荐','日期'];
 var csvEscape=function(val){if(val===null||val===undefined)return '';var str=String(val);if(str.includes(',')||str.includes('"')||str.includes('\n')){return '"'+str.replace(/"/g,'""')+'"';}return str;};
-var rows=d.map(function(s){return [s.name,s.category,'v'+s.version,s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||''];});
+var rows=d.map(function(s){return [s.name,s.category,'v'+s.version,platformText(s.platforms,'/'),s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||''];});
 var csv=hs.join(',')+'\n'+rows.map(function(r){return r.map(csvEscape).join(',');}).join('\n');
 var bl=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
 var a=document.createElement('a');
@@ -1145,6 +1165,7 @@ var total=fil.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
 if(this._page>tp)this._page=tp;
+if(this._page<1)this._page=1;
 var st=(this._page-1)*ps;
 var en=Math.min(st+ps,total);
 var pi=fil.slice(st,en);
@@ -1157,17 +1178,14 @@ if(pi.length===0)h+='<tr class="empty-row"><td colspan="8">暂无提交</td></tr
 else{
 for(var i=0;i<pi.length;i++){
 var s=pi[i];
-var rawPlat=s.platforms;
-if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=rawPlat.split(',').map(function(x){return x.trim();}).filter(Boolean);}}
-if(!Array.isArray(rawPlat))rawPlat=[];
-var plat=rawPlat.length?rawPlat.join(', '):'-';
+var plat=platformText(s.platforms,' · ');
 var stt=s.status||'pending';
 var stLb=stt==='pending'?'<span class="badge badge-orange">待审核</span>':stt==='approved'?'<span class="badge badge-green">已批准</span>':'<span class="badge badge-red">已拒绝</span>';
 h+='<tr data-id="'+s.id+'">';
 h+='<td><strong>'+escapeHTML(s.name||'')+'</strong></td>';
 h+='<td>'+escapeHTML(s.category||'')+'</td>';
 h+='<td>v'+escapeHTML(s.version||'1.0')+'</td>';
-h+='<td style="font-size:.7rem;">'+escapeHTML(plat)+'</td>';
+h+='<td style="font-size:.7rem;white-space:nowrap;">'+escapeHTML(plat)+'</td>';
 h+='<td style="font-size:.72rem;">'+escapeHTML(s.contact||'-')+'</td>';
 h+='<td style="font-size:.7rem;">'+timeAgo(s.created_at)+'</td>';
 h+='<td>'+stLb+'</td>';
@@ -1196,7 +1214,7 @@ if(sf)sf.addEventListener('change',function(){self._subF=this.value;self._page=1
 var rb=c.querySelector('#subRefreshBtn');
 if(rb)rb.addEventListener('click',function(){DB.sub(true).then(function(d){self._subs=d;self.renderSubs(c);self.refreshSubBadge();toast('已刷新');});});
 c.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(s)App.showSubmission(s);});});
-c.querySelectorAll('.approve-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(!s)return;if(!confirm('确认批准「'+s.name+'」上架？'))return;btn.disabled=true;btn.textContent='处理中...';var rawPlat=s.platforms;if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=[];}}if(!Array.isArray(rawPlat))rawPlat=[];var soft={name:s.name,category:s.category,version:s.version||'1.0',description:s.description||'',detail:s.detail||'',platforms:rawPlat,download_url:s.download_url||'',icon_url:s.icon_url||'',icon:s.icon||'📦',size:s.size||'—',views:0,downloads:0,recommend:false,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()};DB.approve(id,soft).then(function(){toast('✅ 已批准上架');DB.addLog('批准提交','软件: '+s.name);DB.sendNotificationToAll('【新软件上架】'+s.name+' 已经上架，快来看看吧！').catch(function(){});self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('批准失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='✅ 批准';});});});
+c.querySelectorAll('.approve-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;var s=self._subs.find(function(x){return x.id===id;});if(!s)return;if(!confirm('确认批准「'+s.name+'」上架？'))return;btn.disabled=true;btn.textContent='处理中...';var rawPlat=normalizePlatforms(s.platforms);var soft={name:s.name,category:s.category,version:s.version||'1.0',description:s.description||'',detail:s.detail||'',platforms:rawPlat,download_url:s.download_url||'',icon_url:s.icon_url||'',icon:s.icon||'📦',size:s.size||'—',views:0,downloads:0,recommend:false,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString()};DB.approve(id,soft).then(function(){toast('✅ 已批准上架');DB.addLog('批准提交','软件: '+s.name);DB.sendNotificationToAll('【新软件上架】'+s.name+' 已经上架，快来看看吧！').catch(function(){});self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('批准失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='✅ 批准';});});});
 c.querySelectorAll('.reject-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;if(!confirm('确认拒绝该提交？'))return;btn.disabled=true;btn.textContent='处理中...';DB.reject(id).then(function(){toast('已拒绝');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('拒绝失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='❌ 拒绝';});});});
 c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',function(){var btn=this;var id=btn.dataset.id;if(!confirm('确定要删除此提交记录吗？'))return;btn.disabled=true;btn.textContent='处理中...';DB.delSub(id).then(function(){toast('已删除');self.renderSubs(c);self.refreshSubBadge();}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');btn.disabled=false;btn.textContent='删除';});});});
 c.querySelectorAll('.sub-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil((self._subs.filter(function(x){return self._subF==='all'||x.status===self._subF;})).length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderSubs(c);});});
@@ -1204,10 +1222,7 @@ c.querySelectorAll('.sub-page-btn').forEach(function(b){b.addEventListener('clic
 showSubmission:function(s){
 var m=document.getElementById('submissionModal');
 document.getElementById('submissionTitle').textContent='📥 '+(s.name||'提交详情');
-var rawPlat=s.platforms;
-if(typeof rawPlat==='string'){try{rawPlat=JSON.parse(rawPlat);}catch(e){rawPlat=[];}}
-if(!Array.isArray(rawPlat))rawPlat=[];
-var plat=rawPlat.map(function(p){return p==='mac'?'🍎 Mac':p==='windows'?'🪟 Windows':p;}).join(', ')||'-';
+var plat=platformText(s.platforms,', ');
 var h='<div class="detail-row"><div class="label">名称</div><div class="value">'+escapeHTML(s.name||'')+'</div></div>'+
 '<div class="detail-row"><div class="label">分类</div><div class="value">'+escapeHTML(s.category||'')+'</div></div>'+
 '<div class="detail-row"><div class="label">版本</div><div class="value">v'+escapeHTML(s.version||'1.0')+'</div></div>'+
@@ -1381,12 +1396,13 @@ try{await DB.delCat(cat);DB.addLog('删除分类','分类: '+cat);toast('已删�
 },
 renderAddForm:function(c){
 var self=this;
+if(!this._all)this._all=[]; /* ⬅️ 修复：防止 _all 未加载时报错 */
 var isEdit=!!this._editId;
-var editName=isEdit?(this._all.find(function(s){return s.id===self._editId;})||{}).name||'':'';
+var editName=isEdit?((this._all.find(function(s){return s.id===self._editId;})||{}).name||''):'';
 var h='<h2 class="page-title">';
 if(isEdit)h+='<span>✎ 编辑资源 <span style="font-weight:400;font-size:.9rem;color:var(--tx2);">· '+escapeHTML(editName)+'</span></span>';
 else h+='⊕ 上传软件';
-h+=' <span class="back-link" id="backFromAdd"><span style="font-size:1rem;">←</span> 返回列表</span></h2><p class="page-sub">'+(isEdit?'更新软件信息':'向工坊提交新软件')+'</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required></select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 <span class="hint">(备选)</span></label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 <span class="hint">(推荐，优先显示)</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:.7rem;color:var(--dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接</label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:18px;height:18px;accent-color:var(--cy);" /><span style="font-size:.8rem;color:var(--tx2);">设为推荐</span></div></div></div><div class="form-group"><label>支持平台 <span class="required">*</span></label><div class="checkbox-group"><label><input type="checkbox" name="platformMac" value="mac" /> 🍎 Mac</label><label><input type="checkbox" name="platformWin" value="windows" /> 🪟 Windows</label></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary" id="submitFormBtn">'+(isEdit?'✎ 更新':'⊕ 上传')+'</button><button type="button" class="btn btn-outline '+(isEdit?'':'hidden')+'" id="cancelEditBtn">取消</button></div></form>';
+h+=' <span class="back-link" id="backFromAdd"><span style="font-size:1rem;">←</span> 返回列表</span></h2><p class="page-sub">'+(isEdit?'更新软件信息':'向工坊提交新软件')+'</p><form class="admin-form" id="adminForm"><div class="form-row"><div class="form-group"><label>软件名称 <span class="required">*</span></label><input type="text" name="name" placeholder="如：乐哲笔记" required /></div><div class="form-group"><label>分类 <span class="required">*</span></label><select name="category" required></select></div></div><div class="form-row"><div class="form-group"><label>版本 <span class="required">*</span></label><input type="text" name="version" placeholder="如：2.0.0" required /></div><div class="form-group"><label>Emoji 图标 <span class="hint">(备选)</span></label><input type="text" name="icon" placeholder="📦" /></div></div><div class="form-group"><label>图床链接 <span class="hint">(推荐，优先显示)</span></label><input type="url" name="iconUrl" placeholder="https://example.com/icon.png" /><div class="icon-preview"><span>预览：</span><span class="preview-box">📦</span><span style="font-size:.7rem;color:var(--dim);">支持 PNG / JPG / SVG</span></div></div><div class="form-group"><label>下载链接</label><input type="url" name="downloadUrl" placeholder="https://example.com/software.zip" /></div><div class="form-row"><div class="form-group"><label>文件大小</label><input type="text" name="size" placeholder="如：18.5 MB" /></div><div class="form-group"><label>推荐</label><div style="display:flex;align-items:center;gap:8px;padding-top:6px;"><input type="checkbox" name="recommend" style="width:18px;height:18px;accent-color:var(--cy);" /><span style="font-size:.8rem;color:var(--tx2);">设为推荐</span></div></div></div><div class="form-group"><label>支持平台 <span class="required">*</span></label><div class="checkbox-group"><label><input type="checkbox" name="platformMac" value="mac" /> 🍎 Mac</label><label><input type="checkbox" name="platformWin" value="windows" /> 🪟 Windows</label><label><input type="checkbox" name="platformAndroid" value="android" /> <i class="fab fa-android" style="color:#3ddc84;font-size:1rem;"></i> Android</label></div></div><div class="form-group"><label>简介 <span class="required">*</span></label><input type="text" name="description" placeholder="一句话介绍软件" required /></div><div class="form-group"><label>详细介绍</label><textarea name="detail" placeholder="详细描述功能、特点……"></textarea></div><div class="form-actions"><button type="submit" class="btn btn-primary" id="submitFormBtn">'+(isEdit?'✎ 更新':'⊕ 上传')+'</button><button type="button" class="btn btn-outline '+(isEdit?'':'hidden')+'" id="cancelEditBtn">取消</button></div></form>';
 c.innerHTML=h;
 var sel=c.querySelector('[name="category"]');
 DB.cats().then(function(cats){
@@ -1397,6 +1413,7 @@ if(self._editId){
 var s=self._all.find(function(x){return x.id===self._editId;});
 if(s){
 var f=document.getElementById('adminForm');
+if(!f)return;
 f.querySelector('[name="name"]').value=s.name||'';
 f.querySelector('[name="version"]').value=s.version||'';
 f.querySelector('[name="icon"]').value=s.icon||'📦';
@@ -1406,11 +1423,11 @@ f.querySelector('[name="size"]').value=s.size||'';
 f.querySelector('[name="description"]').value=s.description||'';
 f.querySelector('[name="detail"]').value=s.detail||'';
 f.querySelector('[name="recommend"]').checked=!!s.recommend;
-var p=s.platforms||[];
-if(typeof p==='string'){try{p=JSON.parse(p);}catch(e){p=p.split(',').map(function(x){return x.trim();}).filter(Boolean);}}
-if(!Array.isArray(p))p=[];
+var p=normalizePlatforms(s.platforms);
 f.querySelector('[name="platformMac"]').checked=p.indexOf('mac')!==-1;
 f.querySelector('[name="platformWin"]').checked=p.indexOf('windows')!==-1;
+var pa=f.querySelector('[name="platformAndroid"]');
+if(pa)pa.checked=p.indexOf('android')!==-1;
 App._updIconPreview(f);
 }
 }
@@ -1435,6 +1452,8 @@ try{
 var p=[];
 if(form.querySelector('[name="platformMac"]').checked)p.push('mac');
 if(form.querySelector('[name="platformWin"]').checked)p.push('windows');
+var paEl=form.querySelector('[name="platformAndroid"]');
+if(paEl&&paEl.checked)p.push('android');
 var d={
 name:form.querySelector('[name="name"]').value.trim(),
 category:form.querySelector('[name="category"]').value,
@@ -1487,6 +1506,7 @@ _updIconPreview:function(form){
 if(!form)return;
 var u=form.querySelector('[name="iconUrl"]').value.trim();
 var p=form.querySelector('.preview-box');
+if(!p)return; /* ⬅️ 修复：preview-box 不存在时直接返回 */
 var e=form.querySelector('[name="icon"]').value.trim()||'📦';
 if(u&&(u.startsWith('http://')||u.startsWith('https://')))p.innerHTML='<img src="'+escapeHTML(u)+'" alt="icon" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeHTML(e).replace(/'/g,"\\'")+'\'" />';
 else p.textContent=e;
@@ -1501,6 +1521,7 @@ var total=fil.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
 if(this._page>tp)this._page=tp;
+if(this._page<1)this._page=1;
 var st=(this._page-1)*ps;
 var en=Math.min(st+ps,total);
 var pi=fil.slice(st,en);
@@ -1676,6 +1697,7 @@ var total=fil.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
 if(this._page>tp)this._page=tp;
+if(this._page<1)this._page=1;
 var st=(this._page-1)*ps;
 var en=Math.min(st+ps,total);
 var pi=fil.slice(st,en);
@@ -1753,6 +1775,7 @@ var total=fil.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
 if(this._page>tp)this._page=tp;
+if(this._page<1)this._page=1;
 var st=(this._page-1)*ps;
 var en=Math.min(st+ps,total);
 var pi=fil.slice(st,en);
@@ -1825,10 +1848,12 @@ renderDrafts:function(c){
 var self=this;
 if(!c)c=document.getElementById('adminMain');
 var drafts=this._getFilteredDrafts();
+drafts.sort(function(a,b){return (b.updated_at||'').localeCompare(a.updated_at||'');}); /* ⬅️ 按更新时间倒序 */
 var total=drafts.length;
 var ps=this._ps;
 var tp=Math.ceil(total/ps)||1;
 if(this._page>tp)this._page=tp;
+if(this._page<1)this._page=1;
 var st=(this._page-1)*ps;
 var en=Math.min(st+ps,total);
 var pi=drafts.slice(st,en);
@@ -2116,5 +2141,6 @@ if(cb)cb.addEventListener('click',function(){if(!confirm('确定清空所有操�
 };
 document.addEventListener('DOMContentLoaded',function(){App.init();});
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
