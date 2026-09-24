@@ -227,11 +227,7 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .section-sub{color:var(--text-secondary);font-weight:400;margin-bottom:14px;font-size:.8rem}
 @media (max-width:640px){.section-title{font-size:1.1rem}.section-sub{font-size:.72rem;margin-bottom:10px}}
 @media (max-width:480px){.section-title{font-size:.95rem}.section-sub{font-size:.68rem;margin-bottom:8px}}
-.software-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:8px;align-items:stretch;grid-auto-rows:1fr;min-height:400px;contain:layout}
-#listGrid{min-height:600px}
-#recommendGrid,#latestGrid{min-height:400px}
-#tutorialList{min-height:300px}
-#questionList{min-height:300px}
+.software-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:8px;align-items:stretch;align-content:start}
 .software-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;background:var(--bg-card);border:1px solid var(--border-glow);box-shadow:0 1px 3px rgba(0,20,40,0.04);cursor:pointer;overflow:hidden;transition:transform .25s cubic-bezier(.2,0,0,1),border-color .25s,box-shadow .25s;min-height:180px;contain:layout style paint}
 .software-card::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;background:var(--accent-gradient);transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.2,0,0,1)}
 .software-card:hover::before{transform:scaleX(1)}
@@ -245,7 +241,7 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .software-card .card-sub .cat{flex-shrink:0;color:var(--accent-cyan);font-weight:600;background:rgba(0,136,255,.08);padding:1px 7px;border-radius:20px;line-height:1.6}
 .software-card .card-sub .ver{color:var(--text-secondary);flex-shrink:0}
 .software-card .card-sub .size{color:var(--text-dim);flex-shrink:0}
-.software-card .card-desc{margin:0;font-size:.75rem;line-height:1.55;color:var(--text-secondary);opacity:.85;min-height:2.4em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.software-card .card-desc{margin:0;font-size:.75rem;line-height:1.55;color:var(--text-secondary);opacity:.85;min-height:3.1em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .software-card .card-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid var(--border-glow)}
 .software-card .card-foot .plat-list{display:flex;gap:4px;align-items:center;flex-shrink:0;flex-wrap:nowrap}
 .software-card .card-foot .stats{display:flex;gap:10px;font-size:.62rem;color:var(--text-dim);flex-shrink:0;white-space:nowrap}
@@ -727,8 +723,6 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
   [data-theme="dark"] .header,[data-theme="dark"] .sidebar-categories,[data-theme="dark"] .mobile-bottom-nav{background:rgba(15,23,42,0.98) !important;}
   [data-theme="glass"] .header,[data-theme="glass"] .sidebar-categories,[data-theme="glass"] .mobile-bottom-nav{background:#0a1220 !important;}
 }
-.today-section,#recommendGrid,#latestGrid,.footer,.page-section{content-visibility:auto;contain-intrinsic-size:400px;}
-.software-card{content-visibility:auto;contain-intrinsic-size:200px;}
 </style>
 </head>
 <body>
@@ -837,7 +831,7 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
 </div>
 <footer class="footer">
 <div class="brand">◆ 乐哲软件</div>
-<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 LeZheSoft@outlook.com</p>
+<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7b371e21131e28141d0f3b140e0f1714141055181416">LeZheSoft@outlook.com</a></p>
 <div class="links">
 <span>友情链接：</span>
 <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> |
@@ -915,7 +909,7 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
 </div>
 </div>
 </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 var supabaseClient=null;
@@ -2119,7 +2113,19 @@ var App={
     document.getElementById('sortSelect').addEventListener('change',function(){self.sortBy=this.value;localStorage.setItem('lezhe_sort_by',self.sortBy);currentPage=1;self.refreshListWithFilters();});
     document.getElementById('jumpPageBtn').addEventListener('click',function(){var p=parseInt(document.getElementById('jumpPageInput').value);var total=Math.ceil(currentFilteredList.length/PAGE_SIZE);if(p>=1&&p<=total){currentPage=p;self.renderListPage();}});
     document.getElementById('platformFilter').addEventListener('change',function(){self.platformFilter=this.value;currentPage=1;self.refreshListWithFilters();});
-    document.getElementById('resetFiltersBtn').addEventListener('click',function(){document.getElementById('platformFilter').value='all';self.platformFilter='all';document.getElementById('searchInput').value='';document.getElementById('sidebarSearchInput').value='';self.searchKeyword='';currentPage=1;self.refreshList(null);});
+    document.getElementById('resetFiltersBtn').addEventListener('click',function(){
+      document.getElementById('platformFilter').value='all';
+      self.platformFilter='all';
+      document.getElementById('searchInput').value='';
+      document.getElementById('sidebarSearchInput').value='';
+      self.searchKeyword='';
+      self.currentCategory='all';
+      currentPage=1;
+      self.refreshList(null);
+      self.updateSidebarHighlight(null);
+      var ft=document.getElementById('filterTags');
+      if(ft){ft.querySelectorAll('button').forEach(function(b){b.classList.remove('active');if(b.dataset.cat==='all')b.classList.add('active');});}
+    });
     var wechatContact=document.getElementById('wechatContact');
     if(wechatContact){wechatContact.addEventListener('click',function(){var wechatId='Adob_123';if(navigator.clipboard){navigator.clipboard.writeText(wechatId).then(function(){toast('已复制微信号: '+wechatId,'success');});}else{var input=document.createElement('input');input.value=wechatId;document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);toast('已复制微信号: '+wechatId,'success');}});}
     var wechatContact2=document.getElementById('wechatContact2');
@@ -2412,6 +2418,7 @@ var App={
   renderListPage:function(keyword){
     var total=currentFilteredList.length,totalPages=Math.ceil(total/PAGE_SIZE)||1;
     if(currentPage>totalPages)currentPage=totalPages;
+    if(currentPage<1)currentPage=1;
     var items=currentFilteredList.slice((currentPage-1)*PAGE_SIZE,currentPage*PAGE_SIZE);
     var grid=document.getElementById('listGrid');
     Render.renderCards(grid,items,true,keyword||this.searchKeyword);
@@ -2969,6 +2976,7 @@ setupAuthListener();
 </script>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script src="./community-2026.js?v=2" defer onerror="console.warn('community.js 未加载，忽略（不影响主流程）');"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
