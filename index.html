@@ -269,6 +269,8 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .btn-outline{background:transparent;border-color:var(--border-glow);color:var(--text-secondary)}
 .btn-outline:hover{background:rgba(0,136,255,0.06);border-color:var(--accent-cyan);color:var(--text-primary)}
 .btn-sm{padding:4px 14px;font-size:.75rem}
+.btn-xs{padding:3px 10px;font-size:.65rem;border-radius:50px;font-weight:600;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border-glow);background:var(--bg-card);color:var(--text-primary);cursor:pointer;transition:.2s}
+.btn-xs:hover{border-color:var(--accent-cyan);color:var(--accent-cyan)}
 .btn:disabled{opacity:.45;pointer-events:none;cursor:not-allowed}
 @media (max-width:480px){.btn{font-size:.75rem;padding:6px 14px}.btn-sm{font-size:.65rem;padding:3px 10px}}
 [data-theme="glass"] .btn{background:linear-gradient(180deg,rgba(255,255,255,0.20) 0%,rgba(255,255,255,0.06) 100%);border:1px solid rgba(255,255,255,0.30);color:#f5f8ff;box-shadow:0 4px 20px rgba(0,10,30,0.35),inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -1px 0 rgba(255,255,255,0.08)}
@@ -551,15 +553,27 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
 .rank-sub{font-size:.7rem;color:var(--text-dim);margin-top:3px}
 .rank-points{font-weight:700;color:var(--accent-cyan);font-size:1rem;flex-shrink:0;white-space:nowrap}
 @media (max-width:480px){.rank-item{padding:10px 12px;gap:10px}.rank-num{width:28px;height:28px;font-size:.75rem}.rank-avatar{width:36px;height:36px;font-size:.85rem}.rank-name{font-size:.82rem}.rank-points{font-size:.9rem}}
-.liquid-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,0.25);opacity:0;visibility:hidden;transition:opacity .35s cubic-bezier(0.2,0,0,1),visibility .35s}
+.liquid-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,0.55);opacity:0;visibility:hidden;transition:opacity .35s cubic-bezier(0.2,0,0,1),visibility .35s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .liquid-overlay.open{opacity:1;visibility:visible}
-.liquid-modal{position:relative;width:100%;max-width:380px;padding:32px 28px 24px;border-radius:28px;overflow:hidden;isolation:isolate;background:linear-gradient(135deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.32) 45%,rgba(240,246,255,0.42) 100%);border:1px solid rgba(255,255,255,0.7);box-shadow:0 24px 64px rgba(0,20,60,0.18),0 8px 24px rgba(0,20,60,0.08),inset 0 1px 0 rgba(255,255,255,0.95),inset 0 -1px 0 rgba(255,255,255,0.35);transform:scale(0.9) translateY(20px);opacity:0;transition:transform .45s cubic-bezier(0.22,1.2,0.36,1),opacity .3s ease}
+.liquid-modal{position:relative;width:100%;max-width:380px;padding:32px 28px 24px;border-radius:28px;overflow:hidden;isolation:isolate;background:linear-gradient(135deg,rgba(255,255,255,0.55) 0%,rgba(255,255,255,0.32) 45%,rgba(240,246,255,0.42) 100%);border:1px solid rgba(255,255,255,0.7);box-shadow:0 24px 64px rgba(0,20,60,0.18),0 8px 24px rgba(0,20,60,0.08),inset 0 1px 0 rgba(255,255,255,0.95),inset 0 -1px 0 rgba(255,255,255,0.35);transform:scale(0.9) translateY(20px);opacity:0;transition:transform .45s cubic-bezier(0.22,1.2,0.36,1),opacity .3s ease;color:var(--text-primary)}
 .liquid-overlay.open .liquid-modal{transform:scale(1) translateY(0);opacity:1}
 .liquid-modal::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1.5px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.95) 50%,transparent 100%);border-radius:2px;pointer-events:none}
 .liquid-modal[data-type="danger"]{--liq-1:#ff6b6b;--liq-2:#e74c3c;--liq-3:#c0392b;--liq-glow:rgba(231,76,60,0.35)}
 .liquid-modal[data-type="warning"]{--liq-1:#fbbf24;--liq-2:#f39c12;--liq-3:#d68910;--liq-glow:rgba(243,156,18,0.35)}
 .liquid-modal[data-type="info"]{--liq-1:#60a5fa;--liq-2:#0077ff;--liq-3:#0055cc;--liq-glow:rgba(0,119,255,0.35)}
 .liquid-modal[data-type="success"]{--liq-1:#4ade80;--liq-2:#10b981;--liq-3:#059669;--liq-glow:rgba(16,185,129,0.35)}
+.liquid-modal.solid{background:linear-gradient(135deg,rgba(255,255,255,0.98) 0%,rgba(250,252,255,0.97) 50%,rgba(242,248,255,0.98) 100%);border:1.5px solid rgba(255,255,255,0.9);box-shadow:0 32px 80px rgba(0,20,60,0.28),0 12px 32px rgba(0,20,60,0.14),inset 0 1px 0 rgba(255,255,255,1)}
+.liquid-modal.solid .liquid-title{color:#0f1a2e;font-weight:800}
+.liquid-modal.solid .liquid-desc{color:#3d5068}
+.liquid-modal.solid .liquid-content{color:#0f1a2e}
+[data-theme="dark"] .liquid-modal.solid{background:linear-gradient(135deg,rgba(30,41,59,0.98) 0%,rgba(24,34,54,0.97) 50%,rgba(30,41,59,0.98) 100%);border-color:rgba(255,255,255,0.16)}
+[data-theme="dark"] .liquid-modal.solid .liquid-title{color:#f1f5f9}
+[data-theme="dark"] .liquid-modal.solid .liquid-desc{color:#cbd5e1}
+[data-theme="dark"] .liquid-modal.solid .liquid-content{color:#f1f5f9}
+[data-theme="glass"] .liquid-modal.solid{background:linear-gradient(135deg,rgba(28,40,62,0.96) 0%,rgba(20,30,52,0.97) 100%);border-color:rgba(255,255,255,0.18)}
+[data-theme="glass"] .liquid-modal.solid .liquid-title{color:#f5f8ff}
+[data-theme="glass"] .liquid-modal.solid .liquid-desc{color:#c8d3e8}
+[data-theme="glass"] .liquid-modal.solid .liquid-content{color:#f5f8ff}
 .liquid-orb{position:absolute;border-radius:50%;filter:blur(40px);pointer-events:none;z-index:-1;opacity:0.7}
 .liquid-orb-1{width:180px;height:180px;top:-60px;left:-40px;background:radial-gradient(circle,rgba(0,119,255,0.5),rgba(0,119,255,0));animation:liquidFloat 8s ease-in-out infinite}
 .liquid-orb-2{width:150px;height:150px;bottom:-50px;right:-30px;background:radial-gradient(circle,rgba(108,92,231,0.5),rgba(108,92,231,0));animation:liquidFloat 10s ease-in-out infinite reverse}
@@ -583,6 +597,17 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
 [data-theme="glass"] .liquid-btn-cancel{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.16);color:var(--text-secondary)}
 [data-theme="glass"] .liquid-btn-cancel:hover{background:rgba(255,255,255,0.14);color:var(--text-primary)}
 @media (max-width:480px){.liquid-modal{max-width:calc(100vw - 32px);padding:28px 22px 20px;border-radius:24px}.liquid-icon{width:56px;height:56px;font-size:1.4rem}.liquid-title{font-size:1.1rem}.liquid-desc{font-size:0.78rem}.liquid-btn{padding:10px 14px;font-size:0.8rem}}
+.liquid-field{width:100%;padding:11px 14px;border:1.5px solid var(--border-glow);border-radius:10px;background:var(--bg-primary);color:var(--text-primary);font-size:.9rem;box-sizing:border-box}
+.liquid-field:focus{border-color:var(--accent-cyan);box-shadow:0 0 0 3px rgba(0,119,255,0.12)}
+[data-theme="dark"] .liquid-field{background:#0b1526;border-color:rgba(148,163,184,0.28);color:#e2e8f0}
+[data-theme="glass"] .liquid-field{background:#0a1424;border-color:rgba(255,255,255,0.22);color:#f5f8ff}
+[data-theme="glass"] .liquid-field:focus{border-color:rgba(94,184,255,0.6);box-shadow:0 0 0 3px rgba(94,184,255,0.18)}
+.liquid-pre{margin:0;font-family:var(--font);font-size:.82rem;color:var(--text-primary);white-space:pre-wrap;word-break:break-all;line-height:1.7}
+[data-theme="dark"] .liquid-pre{color:#f1f5f9}
+[data-theme="glass"] .liquid-pre{color:#f5f8ff}
+.liquid-content-box{background:rgba(0,0,0,0.04);border:1px solid var(--border-glow);border-radius:12px;padding:14px;margin:14px 0;text-align:left}
+[data-theme="dark"] .liquid-content-box{background:rgba(0,0,0,0.25)}
+[data-theme="glass"] .liquid-content-box{background:rgba(0,0,0,0.28)}
 #themePickerModal .modal-box{max-width:560px;padding:24px 24px 20px;border-radius:20px}
 .theme-picker-header{text-align:center;margin-bottom:18px}
 .theme-picker-header h3{font-size:1.2rem;font-weight:700;margin:0 0 4px;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -628,8 +653,73 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
 }
 .reset-hint{background:rgba(0,119,255,0.06);border:1px solid var(--border-glow);border-radius:10px;padding:10px 12px;font-size:0.75rem;color:var(--text-secondary);line-height:1.7;margin-bottom:12px}
 .reset-hint .hint-title{font-weight:600;color:var(--text-primary);margin-bottom:4px}
+[data-theme="glass"] .reset-hint{background:linear-gradient(180deg,rgba(94,184,255,0.14) 0%,rgba(94,184,255,0.05) 100%);border-color:rgba(94,184,255,0.32);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
 .reset-hint-warn{background:rgba(243,156,18,0.10);border-color:rgba(243,156,18,0.30)}
 .reset-hint-warn .hint-title{color:var(--warning)}
+[data-theme="glass"] .reset-hint-warn{background:linear-gradient(180deg,rgba(243,156,18,0.16) 0%,rgba(243,156,18,0.05) 100%);border-color:rgba(243,156,18,0.38);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
+[data-theme="glass"] .filter-panel .filter-group select,
+[data-theme="glass"] .toolbar .sort-group select,
+[data-theme="glass"] #sortSelect,
+[data-theme="glass"] #platformFilter,
+[data-theme="glass"] #qCategory,
+[data-theme="glass"] #subCategory{background-color:#131b2e !important;color:#f5f8ff !important;border-color:rgba(255,255,255,0.22)}
+[data-theme="glass"] select option{background-color:#131b2e;color:#f5f8ff}
+[data-theme="glass"] .software-card{background:linear-gradient(135deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.04) 50%,rgba(94,184,255,0.06) 100%);border:1px solid rgba(255,255,255,0.18);box-shadow:0 8px 32px rgba(0,10,30,0.45),inset 0 1px 0 rgba(255,255,255,0.18),inset 0 -1px 0 rgba(255,255,255,0.03)}
+[data-theme="glass"] .software-card::after{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);pointer-events:none}
+[data-theme="glass"] .software-card::before{background:linear-gradient(90deg,transparent,rgba(94,184,255,0.8),transparent);height:1px}
+[data-theme="glass"] .software-card:hover{background:linear-gradient(135deg,rgba(94,184,255,0.14) 0%,rgba(183,148,246,0.08) 50%,rgba(255,255,255,0.06) 100%);border-color:rgba(94,184,255,0.5);box-shadow:0 14px 44px rgba(94,184,255,0.28),inset 0 1px 0 rgba(255,255,255,0.25),inset 0 -1px 0 rgba(255,255,255,0.05)}
+[data-theme="glass"] .stack-card{background:linear-gradient(135deg,rgba(24,34,54,0.9) 0%,rgba(16,24,42,0.95) 100%);border:1px solid rgba(255,255,255,0.16);box-shadow:0 12px 40px rgba(0,10,30,0.5),inset 0 1px 0 rgba(255,255,255,0.12)}
+[data-theme="glass"] .stack-card.card-current{box-shadow:0 18px 56px rgba(94,184,255,0.28),inset 0 1px 0 rgba(255,255,255,0.22);border-color:rgba(94,184,255,0.4)}
+[data-theme="glass"] .software-card .card-icon,
+[data-theme="glass"] .stack-card .card-icon,
+[data-theme="glass"] .related-card .icon-wrap,
+[data-theme="glass"] .profile-mini-card .mini-icon{background:linear-gradient(135deg,rgba(94,184,255,0.18) 0%,rgba(183,148,246,0.12) 100%) !important;border:1px solid rgba(94,184,255,0.30) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,0.20)}
+[data-theme="glass"] .software-card:hover .card-icon{background:linear-gradient(135deg,rgba(94,184,255,0.28) 0%,rgba(183,148,246,0.20) 100%) !important;border-color:rgba(94,184,255,0.5) !important}
+[data-theme="glass"] .profile-card,
+[data-theme="glass"] .profile-list-box,
+[data-theme="glass"] .profile-stats>div,
+[data-theme="glass"] .checkin-card,
+[data-theme="glass"] .rank-item,
+[data-theme="glass"] .card-item{background:linear-gradient(135deg,rgba(255,255,255,0.09) 0%,rgba(255,255,255,0.03) 100%);border:1px solid rgba(255,255,255,0.16);box-shadow:0 8px 32px rgba(0,10,30,0.4),inset 0 1px 0 rgba(255,255,255,0.14)}
+[data-theme="glass"] .rank-item.top1{background:linear-gradient(135deg,rgba(255,215,0,0.20),rgba(255,140,0,0.06));border-color:rgba(255,215,0,0.4)}
+[data-theme="glass"] .rank-item.top2{background:linear-gradient(135deg,rgba(200,200,200,0.18),rgba(160,160,160,0.05));border-color:rgba(200,200,200,0.4)}
+[data-theme="glass"] .rank-item.top3{background:linear-gradient(135deg,rgba(205,127,50,0.18),rgba(184,115,51,0.05));border-color:rgba(205,127,50,0.4)}
+[data-theme="glass"] .service-scroll .service-item{background:linear-gradient(180deg,rgba(255,255,255,0.14) 0%,rgba(255,255,255,0.04) 100%);border:1px solid rgba(255,255,255,0.20);box-shadow:0 4px 18px rgba(0,10,30,0.3),inset 0 1px 0 rgba(255,255,255,0.22)}
+[data-theme="glass"] .service-scroll .service-item:hover{border-color:rgba(94,184,255,0.5);box-shadow:0 8px 28px rgba(94,184,255,0.28),inset 0 1px 0 rgba(255,255,255,0.3)}
+[data-theme="glass"] .search-wrapper .search-box{background:linear-gradient(180deg,rgba(255,255,255,0.14) 0%,rgba(255,255,255,0.04) 100%);border:1px solid rgba(255,255,255,0.22);box-shadow:0 8px 32px rgba(0,10,30,0.4),inset 0 1px 0 rgba(255,255,255,0.22)}
+[data-theme="glass"] .search-wrapper .search-box input{color:#fff}
+[data-theme="glass"] .search-wrapper .search-box input::placeholder{color:rgba(255,255,255,0.5)}
+[data-theme="glass"] .search-suggestions,[data-theme="glass"] .search-history{background:linear-gradient(180deg,rgba(24,34,54,0.95) 0%,rgba(16,24,42,0.98) 100%);border:1px solid rgba(255,255,255,0.16);box-shadow:0 16px 48px rgba(0,10,30,0.55),inset 0 1px 0 rgba(255,255,255,0.10)}
+[data-theme="glass"] .hero h1{background:linear-gradient(135deg,#ffffff 30%,#8ccaff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+[data-theme="glass"] .badge{background:linear-gradient(180deg,rgba(94,184,255,0.20) 0%,rgba(94,184,255,0.08) 100%);border-color:rgba(94,184,255,0.30)}
+[data-theme="glass"] .badge-mac{background:linear-gradient(180deg,rgba(183,148,246,0.22) 0%,rgba(183,148,246,0.08) 100%);color:#c9b2ff;border-color:rgba(183,148,246,0.35)}
+[data-theme="glass"] .badge-windows{background:linear-gradient(180deg,rgba(94,184,255,0.22) 0%,rgba(94,184,255,0.08) 100%);color:#8ccaff;border-color:rgba(94,184,255,0.35)}
+[data-theme="glass"] .badge-android{background:linear-gradient(180deg,rgba(61,220,132,0.22) 0%,rgba(61,220,132,0.08) 100%);color:#7ef0b0;border-color:rgba(61,220,132,0.35)}
+[data-theme="glass"] .divider-cyber::before,[data-theme="glass"] .divider-cyber::after{background:linear-gradient(90deg,transparent,rgba(94,184,255,0.35),transparent)}
+[data-theme="glass"] .group-items .category-item-side.active,[data-theme="glass"] .category-item-all.active{background:linear-gradient(135deg,rgba(94,184,255,0.8),rgba(183,148,246,0.7));box-shadow:0 4px 20px rgba(94,184,255,0.5),inset 0 1px 0 rgba(255,255,255,0.4)}
+[data-theme="glass"] .group-header:hover,[data-theme="glass"] .group-items .category-item-side:hover,[data-theme="glass"] .category-item-all:hover{background:rgba(94,184,255,0.10)}
+[data-theme="glass"] .pagination button{background:linear-gradient(180deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 100%);border:1px solid rgba(255,255,255,0.20);box-shadow:inset 0 1px 0 rgba(255,255,255,0.15)}
+[data-theme="glass"] .pagination button:hover:not(:disabled){background:linear-gradient(180deg,rgba(94,184,255,0.20) 0%,rgba(94,184,255,0.06) 100%);border-color:rgba(94,184,255,0.5)}
+[data-theme="glass"] .pagination button.active{background:var(--accent-gradient);border-color:transparent;box-shadow:0 4px 20px rgba(94,184,255,0.5),inset 0 1px 0 rgba(255,255,255,0.4)}
+[data-theme="glass"] .view-toggle{background:linear-gradient(180deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 100%);border-color:rgba(255,255,255,0.20)}
+[data-theme="glass"] .view-toggle button.active{background:var(--accent-gradient);box-shadow:0 2px 14px rgba(94,184,255,0.5),inset 0 1px 0 rgba(255,255,255,0.4)}
+[data-theme="glass"] .stack-controls .ctrl-btn{background:linear-gradient(180deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 100%);border:1px solid rgba(255,255,255,0.20)}
+[data-theme="glass"] .stack-controls .ctrl-btn:hover:not(:disabled){border-color:rgba(94,184,255,0.5);background:linear-gradient(180deg,rgba(94,184,255,0.18) 0%,rgba(94,184,255,0.05) 100%)}
+[data-theme="glass"] .sidebar-bottom .sidebar-search .search-box-side{background:linear-gradient(180deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 100%);border-color:rgba(255,255,255,0.20)}
+[data-theme="glass"] .sidebar-bottom .sidebar-theme-toggle{background:linear-gradient(180deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 100%);border-color:rgba(255,255,255,0.20)}
+[data-theme="glass"] .footer{border-top-color:rgba(255,255,255,0.10)}
+[data-theme="glass"] .donate-qr-box{background:rgba(0,10,30,0.35);border-color:rgba(255,255,255,0.20)}
+[data-theme="glass"] .donate-header{background:linear-gradient(180deg,rgba(94,184,255,0.10) 0%,transparent 100%)}
+[data-theme="glass"] .question-detail,[data-theme="glass"] .answer-item{background:linear-gradient(135deg,rgba(255,255,255,0.09) 0%,rgba(255,255,255,0.03) 100%);border:1px solid rgba(255,255,255,0.14);box-shadow:0 8px 32px rgba(0,10,30,0.4),inset 0 1px 0 rgba(255,255,255,0.12)}
+[data-theme="glass"] .comment-input-area input[type="text"]{background:rgba(0,10,30,0.35);border-color:rgba(255,255,255,0.16)}
+[data-theme="glass"] .comment-input-area input[type="text"]:focus{border-color:rgba(94,184,255,0.55)}
+[data-theme="glass"] .nav-links a:hover{background:rgba(94,184,255,0.12)}
+[data-theme="glass"] .nav-links a.active{background:linear-gradient(135deg,rgba(94,184,255,0.85),rgba(183,148,246,0.75));box-shadow:0 4px 20px rgba(94,184,255,0.5),inset 0 1px 0 rgba(255,255,255,0.4)}
+[data-theme="glass"] .mobile-bottom-nav a.active{background:linear-gradient(135deg,rgba(94,184,255,0.22),rgba(183,148,246,0.18));color:#8ccaff;box-shadow:0 2px 12px rgba(94,184,255,0.35),inset 0 1px 0 rgba(255,255,255,0.15)}
+[data-theme="glass"] .profile-avatar{background:linear-gradient(135deg,rgba(94,184,255,0.85),rgba(183,148,246,0.75));box-shadow:0 8px 28px rgba(94,184,255,0.5),inset 0 1px 0 rgba(255,255,255,0.5)}
+[data-theme="glass"] .rank-avatar{background:linear-gradient(135deg,rgba(94,184,255,0.85),rgba(183,148,246,0.75));box-shadow:0 4px 16px rgba(94,184,255,0.45),inset 0 1px 0 rgba(255,255,255,0.4)}
+[data-theme="glass"] .rank-num{background:rgba(94,184,255,0.15);color:#8ccaff;border:1px solid rgba(94,184,255,0.3)}
+[data-theme="glass"] .auth-avatar{background:linear-gradient(135deg,rgba(94,184,255,0.85),rgba(183,148,246,0.75));box-shadow:0 2px 10px rgba(94,184,255,0.5),inset 0 1px 0 rgba(255,255,255,0.4)}
 .header-bell-btn{position:relative;font-size:1.05rem;color:var(--text-secondary);padding:6px 10px;border-radius:50%;transition:.2s;background:rgba(0,0,0,0.02);margin-left:4px}
 .header-bell-btn:hover{color:var(--accent-cyan);background:rgba(0,119,255,0.08)}
 [data-theme="dark"] .header-bell-btn{color:#fbbf24}
@@ -669,8 +759,8 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
 .mall-card{background:var(--bg-card);border:1px solid var(--border-glow);border-radius:var(--radius-md);padding:20px 16px;text-align:center;transition:.25s;display:flex;flex-direction:column;gap:8px;position:relative}
 .mall-card:hover{border-color:var(--accent-cyan);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,119,255,.12)}
 .mall-card .icon{font-size:2.2rem;height:56px;display:flex;align-items:center;justify-content:center}
-.mall-card .icon img{width:56px;height:56px;object-fit:cover;border-radius:12px}
-.mall-card .name{font-weight:700;font-size:.95rem}
+.mall-card .icon img{width:56px;height:56px;object-fit:cover;border-radius:12px;display:block}
+.mall-card .name{font-weight:700;font-size:.95rem;color:var(--text-primary)}
 .mall-card .desc{font-size:.72rem;color:var(--text-secondary);line-height:1.5;flex:1}
 .mall-card .cost{font-weight:700;color:var(--accent-cyan)}
 .mall-card .cost::after{content:' 积分';font-weight:400;font-size:.7rem;color:var(--text-dim)}
@@ -1131,6 +1221,16 @@ setTimeout(function(){if(el.parentNode){el.style.animation='toastOut 0.4s ease f
 }
 function escapeHTML(str){if(str===null||str===undefined)return '';var d=document.createElement('div');d.textContent=String(str);return d.innerHTML;}
 function escapeAttr(str){if(str===null||str===undefined)return '';return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function isImageUrl(v){
+if(!v||typeof v!=='string')return false;
+var s=v.trim();
+if(!s)return false;
+if(/^https?:\/\//i.test(s))return true;
+if(/^\/\//.test(s))return true;
+if(/^data:image\//i.test(s))return true;
+if(/^\.?\/[^\s]+\.(png|jpe?g|gif|webp|svg|bmp|avif|ico)(\?[^\s]*)?$/i.test(s))return true;
+return false;
+}
 window.liquidConfirm=function(options){
 return new Promise(function(resolve){
 options=options||{};
@@ -1178,6 +1278,26 @@ function requireAuth(){if(!currentUser){toast('请先登录','warning');document
 function closeSearchSuggestions(){var sug=document.getElementById('searchSuggestions');var hist=document.getElementById('searchHistory');if(sug){sug.classList.remove('open');sug.innerHTML='';}if(hist){hist.classList.remove('open');hist.innerHTML='';}clearTimeout(searchDebounceTimer);}
 function openDonateModal(){var modal=document.getElementById('donateModal');if(modal){modal.classList.add('open');}}
 function closeDonateModal(){var modal=document.getElementById('donateModal');if(modal){modal.classList.remove('open');}}
+function copyTextToClipboard(text){
+return new Promise(function(resolve){
+if(navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(text).then(function(){resolve(true);}).catch(function(){resolve(fallbackCopy(text));});
+}else{resolve(fallbackCopy(text));}
+});
+}
+function fallbackCopy(text){
+try{
+var input=document.createElement('textarea');
+input.value=text;
+input.style.position='fixed';
+input.style.opacity='0';
+document.body.appendChild(input);
+input.select();
+var ok=document.execCommand('copy');
+document.body.removeChild(input);
+return ok;
+}catch(e){return false;}
+}
 function showSuggestions(keyword){
 clearTimeout(searchDebounceTimer);
 var sug=document.getElementById('searchSuggestions');
@@ -2069,19 +2189,19 @@ var title=isAuto?'🎉 兑换成功，已自动发货':'✅ 兑换成功';
 var desc=isAuto?'网盘地址已发放到下方，请及时保存':'客服会尽快通过您填写的联系方式发放';
 var contentHtml='';
 if(isAuto&&data.autoContent){
-contentHtml='<div style="background:var(--bg-primary);border:1px solid var(--border-glow);border-radius:12px;padding:14px;margin:14px 0;text-align:left;">'+
+contentHtml='<div class="liquid-content-box">'+
 '<div style="font-size:.72rem;color:var(--text-dim);margin-bottom:6px;"><i class="fas fa-box-open"></i> 自动发货内容</div>'+
-'<pre id="_redeemAutoContent" style="margin:0;font-family:var(--font);font-size:.82rem;color:var(--text-primary);white-space:pre-wrap;word-break:break-all;line-height:1.7;">'+escapeHTML(data.autoContent)+'</pre>'+
+'<pre id="_redeemAutoContent" class="liquid-pre">'+escapeHTML(data.autoContent)+'</pre>'+
 '<button id="_redeemCopyBtn" class="btn btn-sm btn-primary" style="margin-top:10px;width:100%;"><i class="fas fa-copy"></i> 复制内容</button>'+
 '</div>';
 }else{
-contentHtml='<div style="background:rgba(243,156,18,.08);border:1px solid rgba(243,156,18,.25);border-radius:12px;padding:12px;margin:14px 0;text-align:left;font-size:.78rem;color:var(--text-secondary);line-height:1.7;">'+
+contentHtml='<div style="background:rgba(243,156,18,.10);border:1px solid rgba(243,156,18,.28);border-radius:12px;padding:12px;margin:14px 0;text-align:left;font-size:.78rem;color:var(--text-secondary);line-height:1.7;">'+
 '<div style="font-weight:600;color:var(--warning);margin-bottom:4px;"><i class="fas fa-clock"></i> 等待客服发放</div>'+
 '<div>联系方式：<b style="color:var(--text-primary);">'+escapeHTML(data.contact||'-')+'</b></div>'+
 '<div>客服微信：<b style="color:var(--text-primary);">Adob_123</b>（点击下方按钮复制）</div>'+
 '</div>';
 }
-overlay.innerHTML='<div class="liquid-modal" data-type="success" style="max-width:440px;"><div class="liquid-orb liquid-orb-1"></div><div class="liquid-orb liquid-orb-2"></div><div class="liquid-content"><div class="liquid-icon" style="margin:0 auto 16px;"><i class="fas '+(isAuto?'fa-gift':'fa-check')+'"></i></div><h3 class="liquid-title" style="text-align:center;">'+title+'</h3><p class="liquid-desc" style="text-align:center;margin-bottom:6px;">'+desc+'</p><p style="font-size:.75rem;color:var(--text-dim);text-align:center;margin:0;">商品：<b style="color:var(--text-secondary);">'+escapeHTML(data.itemName)+'</b> · 消耗 <b style="color:var(--accent-cyan);">'+data.cost+'</b> 积分</p>'+contentHtml+'<div class="liquid-actions" style="margin-top:14px;"><button class="liquid-btn liquid-btn-cancel" id="_redeemGoMine" type="button">查看我的兑换</button><button class="liquid-btn liquid-btn-confirm" id="_redeemOk" type="button"><i class="fas fa-check"></i> 知道了</button></div></div></div>';
+overlay.innerHTML='<div class="liquid-modal solid" data-type="success" style="max-width:440px;"><div class="liquid-orb liquid-orb-1"></div><div class="liquid-orb liquid-orb-2"></div><div class="liquid-content"><div class="liquid-icon" style="margin:0 auto 16px;"><i class="fas '+(isAuto?'fa-gift':'fa-check')+'"></i></div><h3 class="liquid-title" style="text-align:center;">'+title+'</h3><p class="liquid-desc" style="text-align:center;margin-bottom:6px;">'+desc+'</p><p style="font-size:.75rem;color:var(--text-dim);text-align:center;margin:0;">商品：<b style="color:var(--text-secondary);">'+escapeHTML(data.itemName)+'</b> · 消耗 <b style="color:var(--accent-cyan);">'+data.cost+'</b> 积分</p>'+contentHtml+'<div class="liquid-actions" style="margin-top:14px;"><button class="liquid-btn liquid-btn-cancel" id="_redeemGoMine" type="button">查看我的兑换</button><button class="liquid-btn liquid-btn-confirm" id="_redeemOk" type="button"><i class="fas fa-check"></i> 知道了</button></div></div></div>';
 document.body.appendChild(overlay);
 requestAnimationFrame(function(){overlay.classList.add('open');});
 function close(){overlay.classList.remove('open');setTimeout(function(){if(overlay.parentNode)overlay.parentNode.removeChild(overlay);},350);}
@@ -2091,8 +2211,7 @@ overlay.onclick=function(e){if(e.target===overlay)close();};
 var copyBtn=overlay.querySelector('#_redeemCopyBtn');
 if(copyBtn)copyBtn.onclick=function(){
 var text=data.autoContent||'';
-if(navigator.clipboard)navigator.clipboard.writeText(text).then(function(){toast('已复制发货内容','success');});
-else{var i=document.createElement('input');i.value=text;document.body.appendChild(i);i.select();document.execCommand('copy');document.body.removeChild(i);toast('已复制','success');}
+copyTextToClipboard(text).then(function(ok){if(ok)toast('已复制发货内容','success');else toast('复制失败，请手动选择','warning');});
 };
 }
 };
@@ -2120,8 +2239,11 @@ var pointsBar='<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:
 '<a href="#" onclick="App.goMyRedeems();return false;" style="color:var(--accent-cyan);font-weight:600;">我的兑换 ('+myRedeemCount+') →</a>'+
 '</div>';
 c.innerHTML=pointsBar+'<div class="mall-grid">'+items.map(function(it){
-var iconHtml=(it.icon_url&&it.icon_url.trim())
-? '<img src="'+escapeAttr(it.icon_url.trim())+'" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(it.icon||'🎁')+'\';">'
+var imgLink='';
+if(it.icon_url&&typeof it.icon_url==='string'&&isImageUrl(it.icon_url.trim()))imgLink=it.icon_url.trim();
+else if(it.icon&&typeof it.icon==='string'&&isImageUrl(it.icon.trim()))imgLink=it.icon.trim();
+var iconHtml=imgLink
+? '<img src="'+escapeAttr(imgLink)+'" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(it.icon||'🎁')+'\';">'
 : escapeHTML(it.icon||'🎁');
 var stock=typeof it.stock==='number'?it.stock:-1;
 var stockTag='';
@@ -2167,7 +2289,7 @@ if(!ok)return;
 }else{
 contact=await Mall.askContact(item.name,cost,points);
 if(contact===null)return;
-if(!contact.trim()){toast('请填写联系方式，方便客服发放','warning');return;}
+if(!String(contact||'').trim()){toast('请填写联系方式，方便客服发放','warning');return;}
 }
 if(stock!==-1){
 var updStock=await supabaseClient.from('mall_items').update({stock:stock-1}).eq('id',itemId).eq('stock',stock).select('stock');
@@ -2185,7 +2307,7 @@ item_name:item.name,
 item_cost:cost,
 item_icon:item.icon||'🎁',
 item_icon_url:item.icon_url||'',
-contact:contact.trim(),
+contact:String(contact||'').trim(),
 delivery_type:deliveryType,
 auto_content:isAuto?(item.auto_content||''):'',
 status:isAuto?'delivered':'pending'
@@ -2208,15 +2330,12 @@ contact:contact,
 autoContent:item.auto_content||''
 });
 Mall.load();
-if(isAuto){
-try{await supabaseClient.from('notifications').insert([{user_id:currentUser.id,type:'system',content:'【兑换成功】您兑换的「'+item.name+'」已自动发货，可前往「我的兑换」查看。',is_read:false,created_at:new Date().toISOString()}]);}catch(e){}
-}
 },
 askContact:function(itemName,cost,points){
 return new Promise(function(resolve){
 var ov=document.createElement('div');
 ov.className='liquid-overlay';
-ov.innerHTML='<div class="liquid-modal" data-type="info" style="max-width:420px;"><div class="liquid-orb liquid-orb-1"></div><div class="liquid-orb liquid-orb-2"></div><div class="liquid-content" style="text-align:left;"><div class="liquid-icon" style="margin:0 auto 16px;"><i class="fas fa-gift"></i></div><h3 class="liquid-title" style="text-align:center;">确认兑换</h3><p class="liquid-desc" style="text-align:center;margin-bottom:14px;">'+escapeHTML(itemName)+'<br><span style="font-size:.75rem;">当前 <b>'+points+'</b> 积分 → 兑换后剩余 <b>'+(points-cost)+'</b></span></p><label style="display:block;font-size:.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">联系方式 <span style="color:var(--danger);">*</span></label><input type="text" id="_mallContact" placeholder="微信号 / 邮箱 / QQ" style="width:100%;padding:11px 14px;border:1.5px solid var(--border-glow);border-radius:10px;background:var(--bg-primary);color:var(--text-primary);font-size:.9rem;box-sizing:border-box;" /><p style="font-size:.68rem;color:var(--text-dim);margin:8px 0 0;line-height:1.5;">💡 客服将通过此联系方式发放商品，请务必填写有效信息</p><div class="liquid-actions" style="margin-top:16px;"><button class="liquid-btn liquid-btn-cancel" id="_mallCancel" type="button">取消</button><button class="liquid-btn liquid-btn-confirm" id="_mallOk" type="button"><i class="fas fa-check"></i> 确认兑换</button></div></div></div>';
+ov.innerHTML='<div class="liquid-modal solid" data-type="info" style="max-width:420px;"><div class="liquid-orb liquid-orb-1"></div><div class="liquid-orb liquid-orb-2"></div><div class="liquid-content" style="text-align:left;"><div class="liquid-icon" style="margin:0 auto 16px;"><i class="fas fa-gift"></i></div><h3 class="liquid-title" style="text-align:center;">确认兑换</h3><p class="liquid-desc" style="text-align:center;margin-bottom:14px;">'+escapeHTML(itemName)+'<br><span style="font-size:.75rem;">当前 <b>'+points+'</b> 积分 → 兑换后剩余 <b>'+(points-cost)+'</b></span></p><label style="display:block;font-size:.78rem;font-weight:600;color:var(--text-secondary);margin-bottom:4px;">联系方式 <span style="color:var(--danger);">*</span></label><input type="text" id="_mallContact" class="liquid-field" placeholder="微信号 / 邮箱 / QQ" /><p style="font-size:.68rem;color:var(--text-dim);margin:8px 0 0;line-height:1.5;">💡 客服将通过此联系方式发放商品，请务必填写有效信息</p><div class="liquid-actions" style="margin-top:16px;"><button class="liquid-btn liquid-btn-cancel" id="_mallCancel" type="button">取消</button><button class="liquid-btn liquid-btn-confirm" id="_mallOk" type="button"><i class="fas fa-check"></i> 确认兑换</button></div></div></div>';
 document.body.appendChild(ov);
 requestAnimationFrame(function(){ov.classList.add('open');});
 var inp=ov.querySelector('#_mallContact');
@@ -2253,19 +2372,24 @@ if(!r.delivery_type)r.delivery_type=it.delivery_type||'manual';
 if(!r.auto_content)r.auto_content=it.auto_content||'';
 }
 if(!r.delivery_type)r.delivery_type='manual';
+if(r.status!==null&&r.status!==undefined)r.status=String(r.status);else r.status='pending';
 return r;
 });
-var stMap={pending:'待发放',delivered:'已发放',rejected:'已拒绝'};
+var stMap={pending:'待发放',delivered:'已发放',rejected:'已拒绝',done:'已发放',completed:'已发放',success:'已发放',cancelled:'已取消',failed:'已取消'};
 var html='<div class="redeem-list">'+list.map(function(r){
-var iconHtml=(r.item_icon_url&&r.item_icon_url.trim())
-? '<img src="'+escapeAttr(r.item_icon_url.trim())+'" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(r.item_icon||'🎁')+'\';">'
+var imgLink='';
+if(r.item_icon_url&&typeof r.item_icon_url==='string'&&isImageUrl(r.item_icon_url.trim()))imgLink=r.item_icon_url.trim();
+else if(r.item_icon&&typeof r.item_icon==='string'&&isImageUrl(r.item_icon.trim()))imgLink=r.item_icon.trim();
+var iconHtml=imgLink
+? '<img src="'+escapeAttr(imgLink)+'" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(r.item_icon||'🎁')+'\';">'
 : escapeHTML(r.item_icon||'🎁');
 var status=r.status||'pending';
 var statusText=stMap[status]||'待发放';
+var statusCls=status==='delivered'||status==='done'||status==='completed'||status==='success'?'delivered':(status==='rejected'||status==='cancelled'||status==='failed'?'rejected':'pending');
 var actionBtn='';
 if(r.delivery_type==='auto'&&r.auto_content){
 actionBtn='<button class="btn btn-xs btn-primary" data-action="view-content" data-id="'+escapeAttr(r.id)+'" style="margin-top:6px;"><i class="fas fa-box-open"></i> 查看内容</button>';
-}else if(status==='pending'){
+}else if(status==='pending'||statusCls==='pending'){
 actionBtn='<div style="font-size:.62rem;color:var(--warning);text-align:right;margin-top:6px;">请等待客服联系</div>';
 }
 return '<div class="redeem-item">'+
@@ -2278,7 +2402,7 @@ return '<div class="redeem-item">'+
 '</div>'+
 '<div class="r-right">'+
 '<div class="r-cost">-'+(r.cost||0)+'</div>'+
-'<span class="r-status '+status+'">'+statusText+'</span>'+
+'<span class="r-status '+statusCls+'">'+statusText+'</span>'+
 actionBtn+
 '</div></div>';
 }).join('')+'</div>';
@@ -2290,15 +2414,14 @@ var r=list.find(function(x){return x.id===id;});
 if(!r||!r.auto_content)return;
 var ov=document.createElement('div');
 ov.className='liquid-overlay';
-ov.innerHTML='<div class="liquid-modal" data-type="info" style="max-width:440px;"><div class="liquid-orb liquid-orb-1"></div><div class="liquid-orb liquid-orb-2"></div><div class="liquid-content"><div class="liquid-icon" style="margin:0 auto 16px;"><i class="fas fa-box-open"></i></div><h3 class="liquid-title" style="text-align:center;">'+escapeHTML(r.item_name||'发货内容')+'</h3><div style="background:var(--bg-primary);border:1px solid var(--border-glow);border-radius:12px;padding:14px;margin:14px 0;text-align:left;"><pre id="_myredeemContent" style="margin:0;font-family:var(--font);font-size:.82rem;color:var(--text-primary);white-space:pre-wrap;word-break:break-all;line-height:1.7;">'+escapeHTML(r.auto_content)+'</pre></div><div class="liquid-actions"><button class="liquid-btn liquid-btn-cancel" id="_myredeemClose" type="button">关闭</button><button class="liquid-btn liquid-btn-confirm" id="_myredeemCopy" type="button"><i class="fas fa-copy"></i> 复制内容</button></div></div></div>';
+ov.innerHTML='<div class="liquid-modal solid" data-type="info" style="max-width:440px;"><div class="liquid-orb liquid-orb-1"></div><div class="liquid-orb liquid-orb-2"></div><div class="liquid-content"><div class="liquid-icon" style="margin:0 auto 16px;"><i class="fas fa-box-open"></i></div><h3 class="liquid-title" style="text-align:center;">'+escapeHTML(r.item_name||'发货内容')+'</h3><div class="liquid-content-box"><pre id="_myredeemContent" class="liquid-pre">'+escapeHTML(r.auto_content)+'</pre></div><div class="liquid-actions"><button class="liquid-btn liquid-btn-cancel" id="_myredeemClose" type="button">关闭</button><button class="liquid-btn liquid-btn-confirm" id="_myredeemCopy" type="button"><i class="fas fa-copy"></i> 复制内容</button></div></div></div>';
 document.body.appendChild(ov);
 requestAnimationFrame(function(){ov.classList.add('open');});
 function close(){ov.classList.remove('open');setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);},350);}
 ov.querySelector('#_myredeemClose').onclick=close;
 ov.querySelector('#_myredeemCopy').onclick=function(){
 var text=r.auto_content||'';
-if(navigator.clipboard)navigator.clipboard.writeText(text).then(function(){toast('已复制','success');});
-else{var i=document.createElement('input');i.value=text;document.body.appendChild(i);i.select();document.execCommand('copy');document.body.removeChild(i);toast('已复制','success');}
+copyTextToClipboard(text).then(function(ok){if(ok)toast('已复制','success');else toast('复制失败，请手动选择','warning');});
 };
 ov.onclick=function(e){if(e.target===ov)close();};
 });
@@ -2574,9 +2697,9 @@ var ft=document.getElementById('filterTags');
 if(ft){ft.querySelectorAll('button').forEach(function(b){b.classList.remove('active');if(b.dataset.cat==='all')b.classList.add('active');});}
 });
 var wechatContact=document.getElementById('wechatContact');
-if(wechatContact){wechatContact.addEventListener('click',function(){var wechatId='Adob_123';if(navigator.clipboard){navigator.clipboard.writeText(wechatId).then(function(){toast('已复制微信号: '+wechatId,'success');});}else{var input=document.createElement('input');input.value=wechatId;document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);toast('已复制微信号: '+wechatId,'success');}});}
+if(wechatContact){wechatContact.addEventListener('click',function(){copyTextToClipboard('Adob_123').then(function(ok){if(ok)toast('已复制微信号: Adob_123','success');else toast('请手动复制微信号: Adob_123','warning');});});}
 var wechatContact2=document.getElementById('wechatContact2');
-if(wechatContact2){wechatContact2.addEventListener('click',function(){var wechatId='Adob_123';if(navigator.clipboard){navigator.clipboard.writeText(wechatId).then(function(){toast('已复制微信号: '+wechatId,'success');});}else{var input=document.createElement('input');input.value=wechatId;document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);toast('已复制微信号: '+wechatId,'success');}});}
+if(wechatContact2){wechatContact2.addEventListener('click',function(){copyTextToClipboard('Adob_123').then(function(ok){if(ok)toast('已复制微信号: Adob_123','success');else toast('请手动复制微信号: Adob_123','warning');});});}
 document.getElementById('newQuestionBtn').addEventListener('click',function(){if(!requireAuth())return;document.getElementById('questionModal').classList.add('open');});
 document.getElementById('questionModalClose').addEventListener('click',function(){document.getElementById('questionModal').classList.remove('open');});
 document.getElementById('qCancel').addEventListener('click',function(){document.getElementById('questionModal').classList.remove('open');});
