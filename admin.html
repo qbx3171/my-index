@@ -266,6 +266,25 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 .msg-del-btn{background:rgba(239,68,68,.08)!important;color:var(--rd)!important;border:1px solid rgba(239,68,68,.12)!important;padding:3px 12px!important;border-radius:50px!important;font-size:.65rem!important;font-weight:600!important;min-height:26px!important;transition:.2s!important;white-space:nowrap;}
 .msg-del-btn:hover:not(:disabled){background:var(--rd)!important;color:#fff!important;border-color:var(--rd)!important;}
 .msg-del-btn:disabled{opacity:.5;cursor:not-allowed;}
+.mall-icon-preview{display:inline-flex;align-items:center;gap:10px;font-size:.8rem;color:var(--tx2);flex-wrap:wrap}
+.mall-icon-preview .preview-box{width:48px;height:48px;border-radius:10px;border:1px solid var(--bd);overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--inp);font-size:26px;flex-shrink:0}
+.mall-icon-preview .preview-box img{width:100%;height:100%;object-fit:cover}
+.emoji-picks{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.emoji-picks span{width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;border:1px solid transparent;transition:.15s}
+.emoji-picks span:hover{background:var(--inp);border-color:var(--bd);transform:scale(1.12)}
+.redeem-item-card{background:var(--card);border-radius:var(--rM);border:1px solid var(--bd);box-shadow:var(--sh);padding:16px 20px;margin-bottom:10px}
+.redeem-item-card .r-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.redeem-item-card .r-head .r-icon{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--inp);font-size:26px;overflow:hidden;flex-shrink:0;border:1px solid var(--bd)}
+.redeem-item-card .r-head .r-icon img{width:100%;height:100%;object-fit:cover}
+.redeem-item-card .r-head .r-title{flex:1;min-width:0}
+.redeem-item-card .r-head .r-title .r-name{font-weight:700;font-size:1rem}
+.redeem-item-card .r-head .r-title .r-meta{font-size:.75rem;color:var(--dim);margin-top:2px}
+.redeem-item-card .r-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:10px 0;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);margin-bottom:10px}
+.redeem-item-card .r-grid .r-field{display:flex;flex-direction:column;gap:2px}
+.redeem-item-card .r-grid .r-field .lbl{font-size:.68rem;color:var(--dim);letter-spacing:.3px;text-transform:uppercase}
+.redeem-item-card .r-grid .r-field .val{font-size:.85rem;color:var(--tx);word-break:break-all}
+.redeem-item-card .r-grid .r-field .val.highlight{color:var(--cy);font-weight:600}
+.redeem-item-card .r-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 @media (max-width:1024px){.admin-sidebar{width:60px;padding:14px 6px}
 .admin-sidebar .logo-sm span,.admin-sidebar .nav-item span:not(.icon),.admin-sidebar .logout-btn span,.admin-sidebar .theme-toggle span,.admin-sidebar .admin-info{display:none}
 .admin-sidebar .logo-sm{justify-content:center;padding:0 0 12px;font-size:1.2rem}
@@ -367,6 +386,8 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 <div class="nav-item" data-tab="add"><span class="icon">⊕</span><span>上传软件</span></div>
 <div class="nav-item" data-tab="users"><span class="icon">👤</span><span>用户管理</span></div>
 <div class="nav-item" data-tab="messages"><span class="icon">✉</span><span>站内信</span></div>
+<div class="nav-item" data-tab="mall"><span class="icon">🎁</span><span>积分商城</span></div>
+<div class="nav-item" data-tab="redeems"><span class="icon">📦</span><span>兑换订单</span><span class="nav-badge hidden" id="redeemBadge">0</span></div>
 <div class="nav-item" data-tab="settings"><span class="icon">⚙</span><span>系统设置</span></div>
 <div class="theme-toggle" id="themeToggle">🌓<span>主题切换</span></div>
 <div class="logout-btn" id="adminLogout"><span class="icon">↺</span><span>退 出</span></div>
@@ -426,6 +447,42 @@ input,textarea,select{font-family:inherit;border:none;outline:none;background:no
 <div class="modal-footer"><button class="btn btn-outline" id="replyCancel">取消</button><button class="btn btn-primary" id="replySend">✉ 发送</button></div>
 </div>
 </div>
+<div class="modal-overlay hidden" id="mallEditModal">
+<div class="modal-box" style="max-width:560px;">
+<div class="modal-header"><h3 id="mallEditTitle">🎁 新增商品</h3><span class="close-btn" id="mallEditClose">✕</span></div>
+<div class="modal-body">
+<div class="form-group" style="margin-bottom:12px;"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--tx2);margin-bottom:4px;">商品名称 <span style="color:var(--rd);">*</span></label><input type="text" id="miName" placeholder="例如：Adobe 正版全家桶 · 1个月" style="width:100%;padding:9px 14px;border-radius:var(--rS);border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);font-size:.88rem;min-height:40px;box-sizing:border-box;" /></div>
+<div class="form-group" style="margin-bottom:12px;"><label style="display:block;font-size:.82rem;font-weight:600;color:var(--tx2);margin-bottom:4px;">描述</label><textarea id="miDesc" rows="2" placeholder="商品说明..." style="width:100%;padding:9px 14px;border-radius:var(--rS);border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);min-height:60px;font-family:var(--fn);font-size:.85rem;box-sizing:border-box;resize:vertical;"></textarea></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+<div><label style="display:block;font-size:.82rem;font-weight:600;color:var(--tx2);margin-bottom:4px;">积分价格 <span style="color:var(--rd);">*</span></label><input type="number" id="miCost" min="0" placeholder="10000" style="width:100%;padding:9px 14px;border-radius:var(--rS);border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);font-size:.88rem;min-height:40px;box-sizing:border-box;" /></div>
+<div><label style="display:block;font-size:.82rem;font-weight:600;color:var(--tx2);margin-bottom:4px;">库存 <span style="font-weight:400;font-size:.7rem;color:var(--dim);">(-1 无限)</span></label><input type="number" id="miStock" value="-1" style="width:100%;padding:9px 14px;border-radius:var(--rS);border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);font-size:.88rem;min-height:40px;box-sizing:border-box;" /></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px;">
+<div><label style="display:block;font-size:.82rem;font-weight:600;color:var(--tx2);margin-bottom:4px;">Emoji 图标</label><input type="text" id="miIcon" value="🎁" maxlength="4" style="width:100%;padding:9px 14px;border-radius:var(--rS);border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);font-size:.88rem;min-height:40px;box-sizing:border-box;" /></div>
+<div><label style="display:block;font-size:.82rem;font-weight:600;color:var(--tx2);margin-bottom:4px;">图标图片 URL</label><input type="url" id="miIconUrl" placeholder="https://... (可选)" style="width:100%;padding:9px 14px;border-radius:var(--rS);border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);font-size:.88rem;min-height:40px;box-sizing:border-box;" /></div>
+</div>
+<div class="emoji-picks" id="emojiPicks">
+<span data-emoji="🎁">🎁</span><span data-emoji="🎨">🎨</span><span data-emoji="📦">📦</span><span data-emoji="⭐">⭐</span><span data-emoji="👑">👑</span><span data-emoji="💎">💎</span><span data-emoji="🔥">🔥</span><span data-emoji="✨">✨</span><span data-emoji="🚀">🚀</span><span data-emoji="🎬">🎬</span><span data-emoji="💻">💻</span><span data-emoji="📊">📊</span><span data-emoji="🖌️">🖌️</span><span data-emoji="📅">📅</span><span data-emoji="🖼️">🖼️</span><span data-emoji="🏅">🏅</span><span data-emoji="🌈">🌈</span><span data-emoji="🔑">🔑</span><span data-emoji="🪟">🪟</span><span data-emoji="📐">📐</span>
+</div>
+<div class="mall-icon-preview" style="margin-top:12px;"><span>预览：</span><span class="preview-box" id="miPreview">🎁</span></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
+<div><label style="display:block;font-size:.82rem;font-weight:600;color:var(--tx2);margin-bottom:4px;">分类</label><select id="miCategory" style="width:100%;padding:9px 14px;border-radius:var(--rS);border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);min-height:40px;font-size:.85rem;box-sizing:border-box;"><option value="software">💻 软件授权</option><option value="material">📦 素材资源</option><option value="privilege">⭐ 专属特权</option><option value="exposure">📌 曝光服务</option><option value="other">🎁 其他</option></select></div>
+<div><label style="display:block;font-size:.82rem;font-weight:600;color:var(--tx2);margin-bottom:4px;">排序 <span style="font-weight:400;font-size:.7rem;color:var(--dim);">(越小越前)</span></label><input type="number" id="miSort" value="0" style="width:100%;padding:9px 14px;border-radius:var(--rS);border:1.5px solid var(--bd);background:var(--inp);color:var(--tx);font-size:.88rem;min-height:40px;box-sizing:border-box;" /></div>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:14px;"><input type="checkbox" id="miActive" checked style="width:18px;height:18px;accent-color:var(--cy);cursor:pointer;" /><label for="miActive" style="font-size:.85rem;font-weight:400;color:var(--tx2);cursor:pointer;">上架（用户可见）</label></div>
+</div>
+<div class="modal-footer"><button class="btn btn-outline" id="mallEditCancel">取消</button><button class="btn btn-primary" id="mallEditSave">保存</button></div>
+</div>
+</div>
+<div class="modal-overlay hidden" id="redeemDetailModal">
+<div class="modal-box" style="max-width:560px;">
+<div class="modal-header"><h3>📦 兑换订单详情</h3><span class="close-btn" id="redeemDetailClose">✕</span></div>
+<div class="modal-body" id="redeemDetailBody"></div>
+<div class="modal-footer" id="redeemDetailFooter" style="flex-wrap:wrap;">
+<button class="btn btn-outline" id="redeemDetailCloseBtn">关闭</button>
+</div>
+</div>
+</div>
 <script>
 var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
@@ -433,14 +490,11 @@ var supabaseClient=(typeof supabase!=='undefined')?supabase.createClient(SUPABAS
 var quill=null,currentAdminUser=null;
 function toast(m,t){t=t||'success';var c=document.getElementById('toastContainer');var e=document.createElement('div');e.className='toast '+t;var i={success:'◆',error:'✕',warning:'⚠'};e.innerHTML='<span class="icon">'+(i[t]||'◆')+'</span> '+escapeHTML(m);c.appendChild(e);setTimeout(function(){e.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){e.remove();},500);},2800);}
 function escapeHTML(s){if(s===null||s===undefined)return '';var d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
-/* ⬅️ 新增：属性转义函数，防止属性值中的引号破坏 HTML */
 function escapeAttr(s){if(s===null||s===undefined)return '';return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function formatDate(iso){if(!iso)return '-';var d=new Date(iso);return d.toLocaleDateString('zh-CN')+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});}
 function shortId(id){return id?id.slice(0,8):'';}
 function timeAgo(d){if(!d)return '刚刚';var n=new Date(),df=Math.max(0,n-new Date(d)),m=Math.floor(df/60000);if(m<1)return '刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';var dd=Math.floor(h/24);if(dd<7)return dd+'天前';return new Date(d).toLocaleDateString('zh-CN');}
 function getIconEmoji(c){var m={'设计工具':'✎','开发工具':'⚙','办公软件':'📋','媒体工具':'🎬','实用工具':'🔧'};return m[c]||'📦';}
-
-/* ============ 平台标签（已重构：统一入口） ============ */
 function normalizePlatforms(raw){
 if(typeof raw==='string'){
 try{raw=JSON.parse(raw);}catch(e){raw=raw.split(',').map(function(x){return x.trim();}).filter(Boolean);}
@@ -455,10 +509,7 @@ if(arr.length===0)return '-';
 var m={mac:'🍎 Mac',windows:'🪟 Win',android:'🤖 Android'};
 return arr.map(function(x){return m[x]||x;}).join(sep);
 }
-/* ⬅️ 修复：getPlatformLabels 直接复用 platformText，避免重复逻辑 */
 function getPlatformLabels(p){return platformText(p,' · ');}
-
-/* ⬅️ 修复：renderIconThumb 移除内联 onerror，改用延迟绑定事件 */
 function renderIconThumb(s){
 var fb=s.icon||'📦';
 if(s.icon_url&&s.icon_url.trim()){
@@ -558,9 +609,9 @@ if(quill.root.tagName==='TEXTAREA')quill.root.value=html||'';
 else quill.root.innerHTML=html||'';
 }
 var DB={
-_sw:null,_swT:0,_ca:null,_caT:0,_tu:null,_tuT:0,_qu:null,_quT:0,_an:null,_anT:0,_cm:null,_cmT:0,_sb:null,_sbT:0,_pf:null,_pfT:0,_ttl:120000,
+_sw:null,_swT:0,_ca:null,_caT:0,_tu:null,_tuT:0,_qu:null,_quT:0,_an:null,_anT:0,_cm:null,_cmT:0,_sb:null,_sbT:0,_pf:null,_pfT:0,_ml:null,_mlT:0,_rd:null,_rdT:0,_ttl:120000,
 _t:function(p,ms){ms=ms||10000;return Promise.race([p,new Promise(function(_,rj){setTimeout(function(){rj(new Error('请求超时'));},ms);})]);},
-invalidate:function(){this._sw=null;this._ca=null;this._tu=null;this._qu=null;this._an=null;this._cm=null;this._sb=null;this._pf=null;},
+invalidate:function(){this._sw=null;this._ca=null;this._tu=null;this._qu=null;this._an=null;this._cm=null;this._sb=null;this._pf=null;this._ml=null;this._rd=null;},
 async soft(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sw&&n-this._swT<this._ttl)return this._sw;try{var r=await this._t(supabaseClient.from('software').select('*').order('created_at',{ascending:false}));if(r.error)return this._sw||[];this._sw=r.data||[];this._swT=n;return this._sw;}catch(e){return this._sw||[];}},
 async cats(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._ca&&n-this._caT<this._ttl)return this._ca;try{var r=await this._t(supabaseClient.from('categories').select('*').order('name'));if(r.error)return [];this._ca=r.data||[];this._caT=n;return this._ca;}catch(e){return [];}},
 async addSoft(s){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').insert(s).select());if(r.error)return null;this.invalidate();return r.data?r.data[0]:null;}catch(e){return null;}},
@@ -581,7 +632,6 @@ async cm(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this
 async addCm(c){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('tutorial_comments').insert(c).select());if(r.error)return null;this._cm=null;return r.data?r.data[0]:null;}catch(e){return null;}},
 async delCm(id){if(!supabaseClient)return {success:false,error:'未初始化'};try{var r=await this._t(supabaseClient.from('tutorial_comments').delete().eq('id',id).select('id'));if(r.error)return {success:false,error:r.error.message};if(!r.data||r.data.length===0)return {success:false,error:'删除失败或权限不足'};this._cm=null;return {success:true};}catch(e){return {success:false,error:e.message||'网络异常'};}},
 async sub(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sb&&n-this._sbT<this._ttl)return this._sb;try{var r=await this._t(supabaseClient.from('software_submissions').select('*').order('created_at',{ascending:false}));if(r.error)return this._sb||[];this._sb=r.data||[];this._sbT=n;return this._sb;}catch(e){return this._sb||[];}},
-/* ⬅️ 修复：approve 先插入并确认，submission 更新失败时回滚 software */
 async approve(id,s){
 if(!supabaseClient)throw new Error('未初始化');
 var r1=await this._t(supabaseClient.from('software').insert([s]).select());
@@ -641,12 +691,67 @@ var r2=await this._t(supabaseClient.from('notifications').delete().in('id',ids))
 if(r2.error)throw r2.error;
 return ids.length;
 },
+async mallItems(f){
+if(!supabaseClient)return [];
+f=f||false;var n=Date.now();
+if(!f&&this._ml&&n-this._mlT<this._ttl)return this._ml;
+try{var r=await this._t(supabaseClient.from('mall_items').select('*').order('sort',{ascending:true}));if(r.error)return this._ml||[];this._ml=r.data||[];this._mlT=n;return this._ml;}catch(e){return this._ml||[];}
+},
+async addMallItem(item){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('mall_items').insert([item]).select());
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('插入失败或权限不足');
+this._ml=null;return r.data[0];
+},
+async updMallItem(id,u){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('mall_items').update(u).eq('id',id).select());
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('更新失败或权限不足');
+this._ml=null;return r.data[0];
+},
+async delMallItem(id){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('mall_items').delete().eq('id',id).select('id'));
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('删除失败（可能已被兑换记录引用，请先下架）');
+this._ml=null;
+},
+async redeems(f){
+if(!supabaseClient)return [];
+f=f||false;var n=Date.now();
+if(!f&&this._rd&&n-this._rdT<this._ttl)return this._rd;
+try{var r=await this._t(supabaseClient.from('redeems').select('*').order('created_at',{ascending:false}));if(r.error)return this._rd||[];this._rd=r.data||[];this._rdT=n;return this._rd;}catch(e){return this._rd||[];}
+},
+async updRedeem(id,u){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('redeems').update(u).eq('id',id).select());
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('更新失败或权限不足');
+this._rd=null;return r.data[0];
+},
+async refundPoints(userId,amount){
+if(!supabaseClient)throw new Error('未初始化');
+var cur=await this._t(supabaseClient.from('user_points').select('points').eq('user_id',userId).maybeSingle());
+var old=(cur.data&&cur.data.points)||0;
+var r=await this._t(supabaseClient.from('user_points').upsert({user_id:userId,points:old+amount,updated_at:new Date().toISOString()},{onConflict:'user_id'}));
+if(r.error)throw r.error;
+return old+amount;
+},
+async delRedeem(id){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('redeems').delete().eq('id',id).select('id'));
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('删除失败或权限不足');
+this._rd=null;
+},
 getLogs:function(){try{return JSON.parse(localStorage.getItem('lezhe_logs'))||[];}catch(e){return [];}},
 addLog:function(a,d){var l=this.getLogs();l.unshift({id:Date.now().toString(36),time:new Date().toISOString(),action:a,detail:d,user:currentAdminUser?currentAdminUser.email:'admin'});if(l.length>200)l=l.slice(0,200);localStorage.setItem('lezhe_logs',JSON.stringify(l));},
 clearLogs:function(){localStorage.setItem('lezhe_logs','[]');}
 };
 var App={
-_tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,_editSource:null,_pubDraftId:null,_msgHistoryList:[],
+_tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,_editSource:null,_pubDraftId:null,_msgHistoryList:[],_mallItems:[],_redeems:[],_mallKw:'',_mallCatF:'all',_redeemF:'all',_mallEditId:null,
 sel:function(){return this._selByTab[this._tab]||[];},
 setSel:function(ids){this._selByTab[this._tab]=ids;},
 init:async function(){
@@ -777,6 +882,53 @@ document.getElementById('replyCancel').addEventListener('click',function(){docum
 document.getElementById('replyModal').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
 document.getElementById('replySend').addEventListener('click',function(){App._sendReply();});
 document.getElementById('replyInput').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();App._sendReply();}});
+document.getElementById('mallEditClose').addEventListener('click',function(){document.getElementById('mallEditModal').classList.add('hidden');});
+document.getElementById('mallEditCancel').addEventListener('click',function(){document.getElementById('mallEditModal').classList.add('hidden');});
+document.getElementById('mallEditModal').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
+document.getElementById('miIconUrl').addEventListener('input',function(){App._updMallPreview();});
+document.getElementById('miIcon').addEventListener('input',function(){App._updMallPreview();});
+document.querySelectorAll('#emojiPicks span').forEach(function(el){
+el.addEventListener('click',function(){
+document.getElementById('miIcon').value=this.dataset.emoji;
+document.getElementById('miIconUrl').value='';
+App._updMallPreview();
+});
+});
+document.getElementById('mallEditSave').addEventListener('click',async function(){
+var btn=this;
+var name=document.getElementById('miName').value.trim();
+var desc=document.getElementById('miDesc').value.trim();
+var cost=parseInt(document.getElementById('miCost').value,10);
+var stock=parseInt(document.getElementById('miStock').value,10);
+var icon=document.getElementById('miIcon').value.trim()||'🎁';
+var iconUrl=document.getElementById('miIconUrl').value.trim();
+var category=document.getElementById('miCategory').value;
+var sort=parseInt(document.getElementById('miSort').value,10)||0;
+var active=document.getElementById('miActive').checked;
+if(!name){toast('请填写商品名称','error');return;}
+if(!(cost>=0)){toast('积分价格需为数字','error');return;}
+if(!(stock>=-1))stock=-1;
+var data={name:name,description:desc,cost:cost,stock:stock,icon:icon,icon_url:iconUrl,category:category,sort:sort,active:active};
+btn.disabled=true;btn.textContent='保存中...';
+try{
+if(App._mallEditId){
+await DB.updMallItem(App._mallEditId,data);
+toast('✅ 已更新');
+DB.addLog('更新商品','商品: '+name);
+}else{
+data.created_at=new Date().toISOString();
+await DB.addMallItem(data);
+toast('✅ 已新增');
+DB.addLog('新增商品','商品: '+name);
+}
+document.getElementById('mallEditModal').classList.add('hidden');
+App.renderMall(document.getElementById('adminMain'));
+}catch(e){toast('保存失败: '+(e.message||''),'error');}
+finally{btn.disabled=false;btn.textContent='保存';}
+});
+document.getElementById('redeemDetailClose').addEventListener('click',function(){document.getElementById('redeemDetailModal').classList.add('hidden');});
+document.getElementById('redeemDetailCloseBtn').addEventListener('click',function(){document.getElementById('redeemDetailModal').classList.add('hidden');});
+document.getElementById('redeemDetailModal').addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');});
 this.checkSession();
 },
 checkSession:async function(){
@@ -859,12 +1011,19 @@ document.getElementById('adminApp').classList.add('active');
 if(currentAdminUser)document.getElementById('adminEmail').textContent=currentAdminUser.email||'-';
 this.preload();
 this.refreshSubBadge();
+this.refreshRedeemBadge();
 this.renderTab('dashboard');
 },
 refreshSubBadge:async function(){
 var s=await DB.sub(true);
 var p=s.filter(function(x){return x.status==='pending';}).length;
 var b=document.getElementById('submissionBadge');
+if(b){if(p>0){b.textContent=p;b.classList.remove('hidden');}else b.classList.add('hidden');}
+},
+refreshRedeemBadge:async function(){
+var list=await DB.redeems(true);
+var p=list.filter(function(x){return (x.status||'pending')==='pending';}).length;
+var b=document.getElementById('redeemBadge');
 if(b){if(p>0){b.textContent=p;b.classList.remove('hidden');}else b.classList.add('hidden');}
 },
 preload:function(){
@@ -896,6 +1055,8 @@ if(t==='categories'){this.renderCats(m);return;}
 if(t==='add'){this.renderAddForm(m);return;}
 if(t==='users'){this.renderUsers(m);return;}
 if(t==='messages'){this.renderMessages(m);return;}
+if(t==='mall'){this.renderMall(m);return;}
+if(t==='redeems'){this.renderRedeems(m);return;}
 if(t==='settings'){this.renderSettings(m);return;}
 if(t==='qa'){this.renderQA(m);return;}
 },
@@ -1022,8 +1183,10 @@ self.textContent='🗑 撤回';
 renderDash:async function(c){
 c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
 var all=await DB.soft(),cats=await DB.cats(),tuts=await DB.tut(),qs=await DB.q(),ans=await DB.an(),cms=await DB.cm(),subs=await DB.sub(),pfs=await DB.pf();
+var redeems=await DB.redeems();
 var drafts=getDrafts();
 var pend=subs.filter(function(s){return s.status==='pending';}).length;
+var pendRedeem=redeems.filter(function(r){return (r.status||'pending')==='pending';}).length;
 var total=all.length,dl=0,vw=0,rec=0,cc={};
 for(var i=0;i<all.length;i++){dl+=all[i].downloads||0;vw+=all[i].views||0;if(all[i].recommend)rec++;var k=all[i].category||'未分类';cc[k]=(cc[k]||0)+1;}
 var recent=all.slice().sort(function(a,b){return (b.created_at||'').localeCompare(a.created_at||'');}).slice(0,5);
@@ -1047,7 +1210,9 @@ var h='<h2 class="page-title">◈ 控制台</h2><p class="page-sub">乐哲软件
 '<div class="stat-card"><div class="num">'+ans.length+'</div><div class="label">回答数</div></div>'+
 '<div class="stat-card"><div class="num">'+cms.length+'</div><div class="label">评论数</div></div>'+
 '<div class="stat-card"><div class="num">'+drafts.length+'</div><div class="label">草稿数</div></div>'+
-'<div class="stat-card"><div class="num" style="color:var(--or);">'+pend+'</div><div class="label">待审核</div></div>'+
+'<div class="stat-card"><div class="num">'+redeems.length+'</div><div class="label">兑换总数</div></div>'+
+'<div class="stat-card"><div class="num" style="color:var(--or);">'+pend+'</div><div class="label">待审提交</div></div>'+
+'<div class="stat-card"><div class="num" style="color:var(--or);">'+pendRedeem+'</div><div class="label">待发兑换</div></div>'+
 '</div>';
 h+='<div class="card chart-card"><div class="chart-header"><h4>📊 分类分布</h4><span style="font-size:.7rem;color:var(--dim);">共 '+sorted.length+' 个分类</span></div><div class="cat-distribution">'+cr+'</div></div>';
 h+='<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:8px;"><h3 style="font-weight:600;color:var(--tx2);font-size:.95rem;">📋 最近添加</h3><button class="btn btn-xs btn-outline" id="refreshDash">⟳ 刷新</button></div>';
@@ -1057,7 +1222,7 @@ else h+='<tr class="empty-row"><td colspan="4">暂无数据</td></tr>';
 h+='</tbody></table></div>';
 c.innerHTML=h;
 var rb=c.querySelector('#refreshDash');
-if(rb)rb.addEventListener('click',function(){DB.invalidate();App.renderTab('dashboard');App.refreshSubBadge();toast('已刷新');});
+if(rb)rb.addEventListener('click',function(){DB.invalidate();App.renderTab('dashboard');App.refreshSubBadge();App.refreshRedeemBadge();toast('已刷新');});
 },
 _renderSoftPage:function(c){
 var self=this;
@@ -1139,7 +1304,6 @@ if(bu){if(ids.length>0)bu.classList.remove('hidden');else bu.classList.add('hidd
 }
 if(sa)sa.addEventListener('change',function(){var v=this.checked;for(var x=0;x<rcb.length;x++)rcb[x].checked=v;updT();});
 for(var r=0;r<rcb.length;r++)rcb[r].addEventListener('change',updT);
-/* ⬅️ 修复：初始化 selectAll 的勾选状态（当前页全部选中时勾选） */
 if(sa){
 var allChecked=rcb.length>0;
 for(var ai=0;ai<rcb.length;ai++){if(!rcb[ai].checked){allChecked=false;break;}}
@@ -1169,7 +1333,6 @@ _exportCSV:function(d){
 if(!d||d.length===0){toast('没有数据可导出','error');return;}
 var hs=['名称','分类','版本','平台','下载量','浏览数','推荐','日期'];
 var csvEscape=function(val){if(val===null||val===undefined)return '';var str=String(val);if(str.includes(',')||str.includes('"')||str.includes('\n')){return '"'+str.replace(/"/g,'""')+'"';}return str;};
-/* ⬅️ 修复：CSV 平台分隔符改用 " | " 避免歧义 */
 var rows=d.map(function(s){return [s.name,s.category,'v'+s.version,platformText(s.platforms,' | '),s.downloads||0,s.views||0,s.recommend?'是':'否',s.created_at?formatDate(s.created_at):s.date||''];}); 
 var csv=hs.join(',')+'\n'+rows.map(function(r){return r.map(csvEscape).join(',');}).join('\n');
 var bl=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
@@ -1421,7 +1584,6 @@ if(!confirm('确定删除分类 "'+cat+'" 吗？')){btn.disabled=false;return;}
 try{await DB.delCat(cat);DB.addLog('删除分类','分类: '+cat);toast('已删除');self.renderCats(c);}catch(e){toast('删除失败: '+(e.message||''),'error');btn.disabled=false;}
 });});
 },
-/* ⬅️ 修复：编辑时先确保 _all 已加载，避免表单不回填 */
 renderAddForm:async function(c){
 var self=this;
 if(this._editId){
@@ -1689,7 +1851,6 @@ if(eb){
 var eu=url;
 if(p==='youtube'){var yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/);if(yt)eu='https://www.youtube.com/embed/'+yt[1];}
 else if(p==='bilibili'){var bm=url.match(/b23\.tv\/([a-zA-Z0-9]+)/)||url.match(/bilibili\.com\/video\/([a-zA-Z0-9]+)/);if(bm)eu='https://player.bilibili.com/player.html?bvid='+bm[1];}
-/* ⬅️ 修复：iframe src 必须通过白名单校验，不通过则降级为链接 */
 if(!isAllowedIframeSrc(eu)){
 return '<div style="margin:4px 0;"><a href="'+escapeAttr(url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--cy);word-break:break-all;font-size:.8rem;">'+escapeHTML(url)+'</a><div style="font-size:.65rem;color:var(--dim);margin-top:2px;">💡 该视频源未通过安全校验，点击链接在新窗口观看</div></div>';
 }
@@ -1764,7 +1925,6 @@ h+='<td style="font-size:.75rem;">'+escapeHTML(ttl)+'</td>';
 h+='<td>'+escapeHTML(x.author||'匿名用户')+'</td>';
 h+='<td class="comment-content-cell" title="'+escapeAttr(x.content||'')+'">'+escapeHTML(x.content||'')+'</td>';
 h+='<td style="font-size:.7rem;">'+timeAgo(x.created_at)+'</td>';
-/* ⬅️ 修复：data-* 用 escapeAttr */
 h+='<td><div class="actions"><button class="reply-btn" data-id="'+escapeAttr(x.id)+'" data-tut="'+escapeAttr(x.tutorial_id)+'" data-author="'+escapeAttr(x.author||'匿名用户')+'">💬 回复</button><button class="del-btn" data-id="'+escapeAttr(x.id)+'">🗑 删除</button></div></td></tr>';
 }
 }
@@ -2145,7 +2305,6 @@ try{saveDraft(d);toast('✅ 草稿已更新');closeAndReset();self.renderTab(sel
 return;
 }
 if(editSource==='published'&&editId){
-/* ⬅️ 修复：加 .select() 并校验更新结果 */
 supabaseClient.from('tutorials').update(data).eq('id',editId).select().then(function(r){
 if(r.error){saveToDrafts(r.error.message);return;}
 if(!r.data||r.data.length===0){saveToDrafts('更新失败或权限不足');return;}
@@ -2158,14 +2317,12 @@ self.renderTab(self._tab);
 return;
 }
 var insertData=Object.assign({likes:0},data);
-/* ⬅️ 修复：加 .select() 校验插入结果；成功后清理自动保存产生的草稿 */
 supabaseClient.from('tutorials').insert([insertData]).select().then(function(r){
 if(r.error){saveToDrafts(r.error.message);return;}
 if(!r.data||r.data.length===0){saveToDrafts('插入失败或权限不足');return;}
 toast('🎉 发布成功');
 if(editSource==='draftPub'&&pubDraftId){deleteDraft(pubDraftId);}
 if(editId){deleteDraft(editId);}
-/* 清理同标题同内容的草稿（自动保存产生的） */
 var allDrafts=getDrafts();
 for(var di=0;di<allDrafts.length;di++){
 if(allDrafts[di].title===title&&allDrafts[di].content===content){deleteDraft(allDrafts[di].id);}
@@ -2174,6 +2331,288 @@ DB.sendNotificationToAll('【新教程发布】'+title+'，快来看看吧！').
 closeAndReset();
 self.renderTab(self._tab);
 }).catch(function(e){saveToDrafts(e.message);});
+},
+renderMall:async function(c){
+var self=this;
+c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载商城数据...</div>';
+var items=await DB.mallItems(true);
+this._mallItems=items;
+var kw=(this._mallKw||'').toLowerCase().trim();
+var catF=this._mallCatF||'all';
+var fil=items.filter(function(it){
+var mkw=!kw||(it.name||'').toLowerCase().includes(kw)||(it.description||'').toLowerCase().includes(kw);
+var mcat=catF==='all'||it.category===catF;
+return mkw&&mcat;
+});
+var total=items.length,activeCount=items.filter(function(x){return x.active!==false;}).length,offlineCount=total-activeCount,stockLow=items.filter(function(x){return typeof x.stock==='number'&&x.stock>=0&&x.stock<=3;}).length;
+var catMap={software:'💻 软件授权',material:'📦 素材资源',privilege:'⭐ 专属特权',exposure:'📌 曝光服务',other:'🎁 其他'};
+var h='<h2 class="page-title">🎁 积分商城管理</h2><p class="page-sub">共 '+total+' 个商品，'+activeCount+' 个上架中</p>';
+h+='<div class="stats-grid">';
+h+='<div class="stat-card"><div class="num">'+total+'</div><div class="label">商品总数</div></div>';
+h+='<div class="stat-card"><div class="num" style="color:var(--gr);">'+activeCount+'</div><div class="label">已上架</div></div>';
+h+='<div class="stat-card"><div class="num" style="color:var(--dim);">'+offlineCount+'</div><div class="label">已下架</div></div>';
+h+='<div class="stat-card"><div class="num" style="color:var(--or);">'+stockLow+'</div><div class="label">库存告急</div></div>';
+h+='</div>';
+h+='<div class="toolbar">';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="mallSearch" placeholder="搜索商品..." value="'+escapeAttr(this._mallKw)+'" /></div>';
+h+='<select id="mallCatFilter"><option value="all" '+(catF==='all'?'selected':'')+'>全部分类</option>';
+for(var ck in catMap){h+='<option value="'+escapeAttr(ck)+'" '+(ck===catF?'selected':'')+'>'+catMap[ck]+'</option>';}
+h+='</select>';
+h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="mallRefresh">⟳ 刷新</button><button class="btn btn-sm btn-primary" id="mallAddBtn">⊕ 新增商品</button></div>';
+h+='</div>';
+h+='<div class="table-wrap"><table><thead><tr><th style="width:60px;">图标</th><th>名称</th><th>分类</th><th>所需积分</th><th>库存</th><th>状态</th><th>排序</th><th style="width:230px;">操作</th></tr></thead><tbody>';
+if(fil.length===0)h+='<tr class="empty-row"><td colspan="8">暂无商品，点击右上角「新增商品」创建</td></tr>';
+else{
+for(var i=0;i<fil.length;i++){
+var it=fil[i];
+var iconHtml='';
+if(it.icon_url&&it.icon_url.trim()){
+iconHtml='<span class="icon-thumb"><img src="'+escapeAttr(it.icon_url.trim())+'" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(it.icon||'🎁')+'\';" /></span>';
+}else{
+iconHtml='<span class="icon-thumb">'+escapeHTML(it.icon||'🎁')+'</span>';
+}
+var catL=catMap[it.category]||'🎁 其他';
+var stock=typeof it.stock==='number'?it.stock:-1;
+var stockText=stock===-1?'<span class="badge badge-cyan">无限</span>':(stock<=0?'<span class="badge badge-red">已售罄</span>':(stock<=3?'<span class="badge badge-orange">'+stock+'</span>':'<span class="badge badge-green">'+stock+'</span>'));
+var activeText=it.active!==false?'<span class="badge badge-green">上架</span>':'<span class="badge badge-red">下架</span>';
+h+='<tr data-id="'+escapeAttr(it.id)+'">';
+h+='<td>'+iconHtml+'</td>';
+h+='<td><strong>'+escapeHTML(it.name||'')+'</strong>'+(it.description?'<div style="font-size:.68rem;color:var(--dim);margin-top:2px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHTML(it.description)+'</div>':'')+'</td>';
+h+='<td style="font-size:.75rem;">'+catL+'</td>';
+h+='<td><strong style="color:var(--cy);">'+(it.cost||0)+'</strong> 分</td>';
+h+='<td>'+stockText+'</td>';
+h+='<td>'+activeText+'</td>';
+h+='<td style="font-size:.75rem;color:var(--dim);">'+(it.sort||0)+'</td>';
+h+='<td><div class="actions">';
+h+='<button class="edit-btn" data-id="'+escapeAttr(it.id)+'">编辑</button>';
+if(it.active!==false)h+='<button class="reject-btn" data-id="'+escapeAttr(it.id)+'" data-active="1">下架</button>';
+else h+='<button class="approve-btn" data-id="'+escapeAttr(it.id)+'" data-active="0">上架</button>';
+h+='<button class="del-btn" data-id="'+escapeAttr(it.id)+'">删除</button>';
+h+='</div></td></tr>';
+}
+}
+h+='</tbody></table></div>';
+c.innerHTML=h;
+var si=c.querySelector('#mallSearch');
+if(si)si.addEventListener('input',function(){clearTimeout(self._timer);self._timer=setTimeout(function(){self._mallKw=si.value;self.renderMall(c);},300);});
+var fs=c.querySelector('#mallCatFilter');
+if(fs)fs.addEventListener('change',function(){self._mallCatF=this.value;self.renderMall(c);});
+var rb=c.querySelector('#mallRefresh');
+if(rb)rb.addEventListener('click',function(){DB.mallItems(true).then(function(d){self._mallItems=d;self.renderMall(c);toast('已刷新');});});
+var nb=c.querySelector('#mallAddBtn');
+if(nb)nb.addEventListener('click',function(){self.openMallEdit(null);});
+c.querySelectorAll('.edit-btn').forEach(function(b){
+b.addEventListener('click',function(){
+var id=this.dataset.id;
+var it=self._mallItems.find(function(x){return x.id===id;});
+if(it)self.openMallEdit(it);
+});
+});
+c.querySelectorAll('.approve-btn,.reject-btn').forEach(function(b){
+b.addEventListener('click',async function(){
+var btn=this;
+var id=btn.dataset.id;
+var cur=btn.dataset.active==='1';
+btn.disabled=true;
+try{
+await DB.updMallItem(id,{active:!cur});
+toast(cur?'✅ 已下架':'✅ 已上架');
+DB.addLog(cur?'下架商品':'上架商品','ID: '+shortId(id));
+self.renderMall(c);
+}catch(e){toast('操作失败: '+(e.message||''),'error');btn.disabled=false;}
+});
+});
+c.querySelectorAll('.del-btn').forEach(function(b){
+b.addEventListener('click',async function(){
+var btn=this;
+var id=btn.dataset.id;
+if(!confirm('确定要删除该商品吗？已有兑换记录将保留。'))return;
+btn.disabled=true;
+try{
+await DB.delMallItem(id);
+toast('已删除');
+DB.addLog('删除商品','ID: '+shortId(id));
+self.renderMall(c);
+}catch(e){toast('删除失败: '+(e.message||''),'error');btn.disabled=false;}
+});
+});
+},
+openMallEdit:function(it){
+var isEdit=!!it;
+document.getElementById('mallEditTitle').textContent=isEdit?'✎ 编辑商品':'🎁 新增商品';
+document.getElementById('miName').value=isEdit?(it.name||''):'';
+document.getElementById('miDesc').value=isEdit?(it.description||''):'';
+document.getElementById('miCost').value=isEdit?(it.cost||0):100;
+document.getElementById('miStock').value=isEdit?(it.stock==null?-1:it.stock):-1;
+document.getElementById('miIcon').value=isEdit?(it.icon||'🎁'):'🎁';
+document.getElementById('miIconUrl').value=isEdit?(it.icon_url||''):'';
+document.getElementById('miCategory').value=isEdit?(it.category||'other'):'other';
+document.getElementById('miSort').value=isEdit?(it.sort||0):0;
+document.getElementById('miActive').checked=isEdit?(it.active!==false):true;
+App._mallEditId=isEdit?it.id:null;
+App._updMallPreview();
+document.getElementById('mallEditModal').classList.remove('hidden');
+setTimeout(function(){document.getElementById('miName').focus();},100);
+},
+_updMallPreview:function(){
+var u=document.getElementById('miIconUrl').value.trim();
+var e=document.getElementById('miIcon').value.trim()||'🎁';
+var p=document.getElementById('miPreview');
+if(u&&(u.startsWith('http://')||u.startsWith('https://'))){
+var rid='miprev_'+Math.random().toString(36).slice(2,10);
+p.innerHTML='<img id="'+rid+'" src="'+escapeAttr(u)+'" style="width:100%;height:100%;object-fit:cover;" />';
+setTimeout(function(){
+var el=document.getElementById(rid);
+if(el){el.onerror=function(){this.parentElement.textContent=e;};}
+},0);
+}else p.textContent=e;
+},
+renderRedeems:async function(c){
+var self=this;
+c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载兑换订单...</div>';
+var list=await DB.redeems(true);
+var items=await DB.mallItems(true);
+var itemMap={};
+(items||[]).forEach(function(it){itemMap[it.id]=it;});
+list=(list||[]).map(function(r){
+var it=itemMap[r.item_id];
+if(it){
+if(!r.item_name)r.item_name=it.name;
+if(!r.item_icon)r.item_icon=it.icon;
+if(!r.item_icon_url)r.item_icon_url=it.icon_url;
+if(!r.cost&&it.cost)r.cost=it.cost;
+}
+if(!r.item_name)r.item_name='商品 #'+shortId(r.item_id||'');
+if(!r.item_icon)r.item_icon='🎁';
+return r;
+});
+this._redeems=list;
+var pending=list.filter(function(x){return (x.status||'pending')==='pending';}).length;
+var delivered=list.filter(function(x){return x.status==='delivered';}).length;
+var rejected=list.filter(function(x){return x.status==='rejected';}).length;
+var h='<h2 class="page-title">📦 兑换订单</h2><p class="page-sub">待发放 '+pending+' · 已发放 '+delivered+' · 已拒绝 '+rejected+'</p>';
+h+='<div class="toolbar"><div class="btn-group">';
+h+='<select id="redeemFilter" style="background:var(--inp);border:1.5px solid var(--bd);border-radius:50px;padding:0 30px 0 14px;font-size:.78rem;color:var(--tx);min-height:36px;appearance:none;background-image:url(\'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"%3E%3Cpath d="M1 1l5 5 5-5" stroke="%238899b0" stroke-width="1.5" fill="none"/%3E%3C/svg%3E\');background-repeat:no-repeat;background-position:right 12px center;"><option value="all">全部订单</option><option value="pending">待发放</option><option value="delivered">已发放</option><option value="rejected">已拒绝</option></select>';
+h+='<button class="btn btn-sm btn-outline" id="redeemRefresh">⟳ 刷新</button>';
+h+='<span class="selected-info">共 '+list.length+' 条</span>';
+h+='</div></div>';
+h+='<div id="redeemList"></div>';
+c.innerHTML=h;
+var fe=c.querySelector('#redeemFilter');
+if(fe)fe.addEventListener('change',function(){
+var v=this.value;
+var fil=(App._redeems||[]).filter(function(x){return v==='all'||(x.status||'pending')===v;});
+App._renderRedeemCards(document.getElementById('redeemList'),fil);
+});
+var rb=c.querySelector('#redeemRefresh');
+if(rb)rb.addEventListener('click',function(){App.renderRedeems(c);toast('已刷新');});
+this._renderRedeemCards(document.getElementById('redeemList'),list);
+},
+_renderRedeemCards:function(container,list){
+if(!container)return;
+if(!list.length){container.innerHTML='<div class="empty-state"><div class="icon">📦</div><h3>暂无兑换订单</h3><p style="color:var(--dim);font-size:.85rem;">用户完成兑换后，订单会显示在这里</p></div>';return;}
+var stMap={pending:'待发放',delivered:'已发放',rejected:'已拒绝'};
+var stBadge={pending:'badge-orange',delivered:'badge-green',rejected:'badge-red'};
+var h='';
+for(var i=0;i<list.length;i++){
+var r=list[i];
+var st=r.status||'pending';
+var name=r.item_name||('商品 #'+shortId(r.item_id||''));
+var iconHtml='';
+if(r.item_icon_url&&r.item_icon_url.trim()){
+iconHtml='<img src="'+escapeAttr(r.item_icon_url.trim())+'" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(r.item_icon||'🎁')+'\';" />';
+}else{
+iconHtml=escapeHTML(r.item_icon||'🎁');
+}
+h+='<div class="redeem-item-card" data-id="'+escapeAttr(r.id)+'">';
+h+='<div class="r-head">';
+h+='<div class="r-icon">'+iconHtml+'</div>';
+h+='<div class="r-title">';
+h+='<div class="r-name">'+escapeHTML(name)+'</div>';
+h+='<div class="r-meta">订单号 '+shortId(r.id)+' · 兑换于 '+(r.created_at?formatDate(r.created_at):'-')+'</div>';
+h+='</div>';
+h+='<span class="badge '+stBadge[st]+'">'+stMap[st]+'</span>';
+h+='</div>';
+h+='<div class="r-grid">';
+h+='<div class="r-field"><span class="lbl">用户ID</span><span class="val" style="font-size:.72rem;color:var(--dim);">'+escapeHTML(r.user_id||'-')+'</span></div>';
+h+='<div class="r-field"><span class="lbl">联系方式</span><span class="val highlight">'+escapeHTML(r.contact||'-')+'</span></div>';
+h+='<div class="r-field"><span class="lbl">消耗积分</span><span class="val highlight">'+(r.cost||0)+' 分</span></div>';
+h+='<div class="r-field"><span class="lbl">发放时间</span><span class="val">'+(r.delivered_at?formatDate(r.delivered_at):'-')+'</span></div>';
+if(r.note)h+='<div class="r-field" style="grid-column:1/-1;"><span class="lbl">处理备注</span><span class="val">'+escapeHTML(r.note)+'</span></div>';
+h+='</div>';
+h+='<div class="r-actions">';
+h+='<button class="btn btn-xs btn-outline" data-act="detail" data-id="'+escapeAttr(r.id)+'">📋 详情</button>';
+if(st==='pending'){
+h+='<button class="btn btn-xs btn-success" data-act="deliver" data-id="'+escapeAttr(r.id)+'">✅ 标记发放</button>';
+h+='<button class="btn btn-xs btn-danger" data-act="reject" data-id="'+escapeAttr(r.id)+'">❌ 拒绝退回</button>';
+}
+h+='</div>';
+h+='</div>';
+}
+container.innerHTML=h;
+container.querySelectorAll('.r-actions button').forEach(function(b){
+b.addEventListener('click',async function(){
+var id=this.dataset.id;
+var act=this.dataset.act;
+var r=(App._redeems||[]).find(function(x){return x.id===id;});
+if(!r)return;
+if(act==='detail'){App.showRedeemDetail(r);return;}
+if(act==='deliver'){
+var note=prompt('请输入处理备注（可留空，例如：已通过微信发放）','')||'';
+if(!confirm('确认已向用户发放「'+(r.item_name||'该商品')+'」？\n\n联系方式：'+(r.contact||'-')))return;
+this.disabled=true;
+this.textContent='处理中...';
+try{
+await DB.updRedeem(id,{status:'delivered',delivered_at:new Date().toISOString(),note:note});
+if(r.user_id){
+await DB.sendNotificationToUser(r.user_id,'【兑换成功】您兑换的「'+(r.item_name||'商品')+'」已发放，请查收。'+(note?'（备注：'+note+'）':'')).catch(function(){});
+}
+DB.addLog('发放兑换','订单 '+shortId(id)+' / '+r.item_name);
+toast('✅ 已标记发放');
+App.renderRedeems(document.getElementById('adminMain'));
+App.refreshRedeemBadge();
+}catch(e){toast('操作失败: '+(e.message||''),'error');this.disabled=false;this.textContent='✅ 标记发放';}
+return;
+}
+if(act==='reject'){
+if(!confirm('确认拒绝此兑换？积分将退还给用户。'))return;
+this.disabled=true;
+this.textContent='处理中...';
+try{
+await DB.updRedeem(id,{status:'rejected'});
+if(r.user_id&&r.cost){
+await DB.refundPoints(r.user_id,r.cost).catch(function(){});
+await DB.sendNotificationToUser(r.user_id,'【兑换未通过】您兑换的「'+(r.item_name||'商品')+'」未通过审核，已退还 '+r.cost+' 积分。').catch(function(){});
+}
+DB.addLog('拒绝兑换','订单 '+shortId(id)+' 退还 '+r.cost+' 积分');
+toast('已拒绝并退还积分');
+App.renderRedeems(document.getElementById('adminMain'));
+App.refreshRedeemBadge();
+}catch(e){toast('操作失败: '+(e.message||''),'error');this.disabled=false;this.textContent='❌ 拒绝退回';}
+return;
+}
+});
+});
+},
+showRedeemDetail:function(r){
+var stMap={pending:'待发放',delivered:'已发放',rejected:'已拒绝'};
+var iconHtml='';
+if(r.item_icon_url&&r.item_icon_url.trim()){
+iconHtml='<span class="icon-thumb"><img src="'+escapeAttr(r.item_icon_url.trim())+'" alt="" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(r.item_icon||'🎁')+'\';" /></span>';
+}else{
+iconHtml='<span class="icon-thumb">'+escapeHTML(r.item_icon||'🎁')+'</span>';
+}
+var h='<div class="detail-row"><div class="label">商品</div><div class="value">'+escapeHTML(r.item_name||('商品 #'+shortId(r.item_id||'')))+'</div></div>'+
+'<div class="detail-row"><div class="label">图标</div><div class="value">'+iconHtml+'</div></div>'+
+'<div class="detail-row"><div class="label">积分</div><div class="value">'+(r.cost||0)+'</div></div>'+
+'<div class="detail-row"><div class="label">用户ID</div><div class="value" style="font-size:.72rem;">'+escapeHTML(r.user_id||'')+'</div></div>'+
+'<div class="detail-row"><div class="label">联系方式</div><div class="value" style="color:var(--cy);font-weight:600;">'+escapeHTML(r.contact||'-')+'</div></div>'+
+'<div class="detail-row"><div class="label">状态</div><div class="value">'+(stMap[r.status||'pending']||'待发放')+'</div></div>'+
+'<div class="detail-row"><div class="label">兑换时间</div><div class="value">'+(r.created_at?formatDate(r.created_at):'-')+'</div></div>'+
+'<div class="detail-row"><div class="label">发放时间</div><div class="value">'+(r.delivered_at?formatDate(r.delivered_at):'-')+'</div></div>'+
+(r.note?'<div class="detail-row"><div class="label">处理备注</div><div class="value">'+escapeHTML(r.note)+'</div></div>':'');
+document.getElementById('redeemDetailBody').innerHTML=h;
+document.getElementById('redeemDetailModal').classList.remove('hidden');
 },
 renderSettings:function(c){
 var logs=DB.getLogs();
