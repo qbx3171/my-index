@@ -37,7 +37,12 @@ C.injectGlobalStyle=function(){
     '#communityNotifDetail *::-webkit-scrollbar-thumb{background:transparent;border-radius:6px;}'+
     '#communityNotifDetail *::-webkit-scrollbar-thumb:hover{background:rgba(0,119,255,0.18);}'+
     '#communityLeaderboardContent{scrollbar-width:none;-ms-overflow-style:none;}'+
-    '#communityLeaderboardContent::-webkit-scrollbar{display:none;width:0;height:0;}';
+    '#communityLeaderboardContent::-webkit-scrollbar{display:none;width:0;height:0;}'+
+    '.notif-item{transition:border-color .2s,background .2s;}'+
+    '.notif-item:hover{border-color:var(--border-glow-strong);}'+
+    '.notif-item.unread{background:linear-gradient(135deg,rgba(0,119,255,0.06),rgba(108,92,231,0.04));}'+
+    '.notif-dot{width:8px;height:8px;border-radius:50%;background:#e74c3c;flex-shrink:0;display:inline-block;}'+
+    '.notif-item.read .notif-dot{display:none;}';
   document.head.appendChild(s);
 };
 
@@ -48,13 +53,11 @@ C.init=function(){
   C.retry();
 };
 
-/* [修改] 已移除 C.addBoard 调用 */
 C.run=function(){
   var fns=[C.addBell,C.bindAuth,C.hijackDetail,C.hijackProfile,C.hijackFav,C.hijackHist,C.egg,C.pwa];
   for(var i=0;i<fns.length;i++){try{fns[i]();}catch(e){console.warn('init err',e);}}
 };
 
-/* [修改] retry 里不再检查 addBoard */
 C.retry=function(){
   if(C._rt)return;
   var n=0;
@@ -91,9 +94,11 @@ C.onLogin=async function(){
   await Promise.all([C.syncFav(),C.syncHist(),C.loadPoints(),C.loadNotifs()].map(function(p){return p.catch(function(){});}));
   C.updateLv();
   C.refreshProfile();
+  C.subscribeNotifs();
 };
 
 C.onLogout=function(){
+  C.unsubscribeNotifs();
   var b=document.getElementById('communityBell');
   if(b)b.style.display='none';
   var lv=document.getElementById('communityLevelBadge');
@@ -201,6 +206,54 @@ C.addBell=function(){
   if(!window.currentUser)b.style.display='none';
 };
 
+C._notifChannel=null;
+
+C.subscribeNotifs=async function(){
+  if(!window.currentUser)return;
+  if(typeof supabaseClient==='undefined'||!supabaseClient)return;
+  await C.unsubscribeNotifs();
+
+  try{
+    var s=await supabaseClient.auth.getSession();
+    var token=s&&s.data&&s.data.session&&s.data.session.access_token;
+    if(token&&supabaseClient.realtime&&supabaseClient.realtime.setAuth){
+      await supabaseClient.realtime.setAuth(token);
+    }
+  }catch(e){}
+
+  var uid=window.currentUser.id;
+
+  C._notifChannel=supabaseClient
+    .channel('notif-'+uid)
+    .on('postgres_changes',
+      { event:'INSERT', schema:'public', table:'notifications',
+        filter:'user_id=eq.'+uid },
+      function(payload){
+        var d=document.getElementById('communityBellDot');
+        if(d)d.style.display='block';
+
+        var c=(payload.new&&payload.new.content)||'';
+        var m=c.match(/^【([^】]+)】/);
+        C.tip('📬 '+(m?m[1]:'新消息'),'success');
+
+        var panel=document.getElementById('communityNotifPanel');
+        if(panel){
+          var bd=document.getElementById('communityNotifBody');
+          if(bd)C.loadNotifContent(bd);
+        }
+      })
+    .subscribe(function(status){
+      console.log('[notif realtime]',status);
+    });
+};
+
+C.unsubscribeNotifs=async function(){
+  if(C._notifChannel){
+    try{await supabaseClient.removeChannel(C._notifChannel);}catch(e){}
+    C._notifChannel=null;
+  }
+};
+
 C.loadNotifs=async function(){
   if(!window.currentUser){
     var b0=document.getElementById('communityBell');
@@ -212,6 +265,24 @@ C.loadNotifs=async function(){
   var r=await supabaseClient.from('notifications').select('id').eq('user_id',window.currentUser.id).eq('is_read',false);
   var d=document.getElementById('communityBellDot');
   if(d)d.style.display=(r.data&&r.data.length>0)?'block':'none';
+};
+
+C.markRead=async function(id,itemEl){
+  if(!window.currentUser||!id)return;
+  try{
+    await supabaseClient.from('notifications').update({is_read:true}).eq('id',id).eq('user_id',window.currentUser.id);
+  }catch(e){}
+  if(itemEl){
+    itemEl.classList.remove('unread');
+    itemEl.classList.add('read');
+    var dot=itemEl.querySelector('.notif-dot');
+    if(dot)dot.style.display='none';
+  }
+  var remain=document.querySelectorAll('#communityNotifBody .notif-item.unread').length;
+  var cntEl=document.getElementById('communityNotifCount');
+  if(cntEl)cntEl.innerHTML=(remain>0?('<span style="color:#0077ff;font-weight:600;">'+remain+'</span> 条未读'):'全部已读');
+  var bellDot=document.getElementById('communityBellDot');
+  if(bellDot)bellDot.style.display=(remain>0)?'block':'none';
 };
 
 C.showNotifDetail=function(title,body,timeStr){
@@ -302,14 +373,16 @@ C.loadNotifContent=async function(bd){
       var body=m?m[2]:tt;
       var timeStr=(typeof timeAgo==='function')?timeAgo(n.created_at):'';
       var isLong=body.length>80||body.split('\n').length>4;
+      var isRead=!!n.is_read;
       var bstyle='font-size:0.8rem;color:var(--text-secondary);line-height:1.65;word-break:break-word;';
       if(isLong){
         bstyle+='display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;';
       }else{
         bstyle+='white-space:pre-wrap;';
       }
-      html+='<div class="notif-item" data-id="'+n.id+'" data-long="'+(isLong?'1':'0')+'" style="background:var(--bg-card-solid);border-radius:12px;padding:14px 16px;margin-bottom:8px;border:1px solid var(--border-glow);position:relative;transition:border-color .2s;'+(isLong?'cursor:pointer;':'')+'">'+
+      html+='<div class="notif-item '+(isRead?'read':'unread')+'" data-id="'+n.id+'" data-long="'+(isLong?'1':'0')+'" style="background:var(--bg-card-solid);border-radius:12px;padding:14px 16px;margin-bottom:8px;border:1px solid var(--border-glow);position:relative;cursor:pointer;">'+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'+
+        '<span class="notif-dot"'+(isRead?' style="display:none;"':'')+'></span>'+
         '<span class="notif-title" style="font-size:0.85rem;font-weight:700;color:var(--text-primary);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+C.esc(title)+'</span>'+
         '<span class="notif-time" style="font-size:0.65rem;color:var(--text-dim);flex-shrink:0;">'+timeStr+'</span>'+
         '<button class="ndel" data-id="'+n.id+'" style="background:transparent;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;opacity:0.5;flex-shrink:0;line-height:1;padding:0 4px;">&times;</button>'+
@@ -321,12 +394,15 @@ C.loadNotifContent=async function(bd){
     bd.innerHTML=html;
 
     bd.querySelectorAll('.notif-item').forEach(function(el){
-      if(el.dataset.long!=='1')return;
-      el.addEventListener('click',function(e){
+      el.addEventListener('click',async function(e){
         if(e.target.closest('.ndel'))return;
-        var titleEl=el.querySelector('.notif-title');
-        var bodyEl=el.querySelector('.notif-body');
-        var timeEl=el.querySelector('.notif-time');
+        var id=this.dataset.id;
+        var wasUnread=this.classList.contains('unread');
+        if(wasUnread)await C.markRead(id,this);
+        if(this.dataset.long!=='1')return;
+        var titleEl=this.querySelector('.notif-title');
+        var bodyEl=this.querySelector('.notif-body');
+        var timeEl=this.querySelector('.notif-time');
         var title=titleEl?titleEl.textContent:'系统通知';
         var body=bodyEl?bodyEl.textContent:'';
         var timeStr=timeEl?timeEl.textContent:'';
@@ -342,15 +418,19 @@ C.loadNotifContent=async function(bd){
         var rr=await supabaseClient.from('notifications').delete().eq('id',id);
         if(rr.error){C.tip('删除失败','error');return;}
         var item=this.closest('.notif-item');
-        if(item)item.remove();
+        if(item){
+          var wasUnread=item.classList.contains('unread');
+          item.remove();
+          if(wasUnread){
+            var remain=document.querySelectorAll('#communityNotifBody .notif-item.unread').length;
+            var cntEl2=document.getElementById('communityNotifCount');
+            if(cntEl2)cntEl2.innerHTML=(remain>0?('<span style="color:#0077ff;font-weight:600;">'+remain+'</span> 条未读'):'全部已读');
+            var bellDot=document.getElementById('communityBellDot');
+            if(bellDot)bellDot.style.display=(remain>0)?'block':'none';
+          }
+        }
       });
     });
-
-    if(ur>0){
-      await supabaseClient.from('notifications').update({is_read:true}).eq('user_id',window.currentUser.id).eq('is_read',false);
-      var d=document.getElementById('communityBellDot');
-      if(d)d.style.display='none';
-    }
   }catch(e){
     bd.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--danger);font-size:0.8rem;">加载失败，请稍后重试</div>';
   }
@@ -480,7 +560,6 @@ C.getToday=function(){
   return d.toISOString().slice(0,10);
 };
 
-/* [修改] 已移除个人中心「我的积分」模块，其他功能保持不变 */
 C.injectProfile=function(){
   return;
 };
@@ -530,12 +609,9 @@ C.doCheckin=async function(){
   }
 };
 
-/* [修改] addBoard 已停用：shareFloat 侧边的排行榜按钮与顶部导航「排行榜」重复 */
 C.addBoard=function(){
-  /* 已停用 */
 };
 
-/* [保留] 若以后需要恢复侧边排行榜面板，可调用 C.loadBoard() 渲染面板 */
 C.loadBoard=async function(){
   var el=document.getElementById('communityLeaderboardContent');
   if(!el)return;
@@ -572,7 +648,6 @@ C.egg=function(){
   }
 };
 
-/* [修改] PWA 已停用：主动注销旧 SW，避免 sw.js / icon-*.png 404 */
 C.pwa=function(){
   if('serviceWorker' in navigator){
     navigator.serviceWorker.getRegistrations().then(function(regs){
