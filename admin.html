@@ -489,10 +489,46 @@ input,select,textarea{font-size:16px!important}
 .toolbar .btn-group{width:100%}
 .toolbar .btn-group .btn{flex:1 1 auto}
 .toolbar select{flex:1 1 46%}
-.table-wrap table{font-size:.79rem;min-width:820px}
-.table-wrap th,.table-wrap td{padding:10px 13px}
-.table-wrap th:first-child,.table-wrap td:first-child{position:sticky;left:0;z-index:2;background:var(--glassHi);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-.table-wrap tbody tr:hover td:first-child{background:var(--glassHi)}
+.table-wrap{overflow:visible;background:transparent;border:0;border-radius:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.table-wrap table{display:block;width:100%;min-width:0;font-size:.86rem}
+.table-wrap thead{display:none}
+.table-wrap tbody{display:block}
+.table-wrap tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:12px;background:var(--glass);-webkit-backdrop-filter:blur(var(--blur)) saturate(180%);backdrop-filter:blur(var(--blur)) saturate(180%);border:1px solid var(--glassBd);border-radius:var(--rM);box-shadow:var(--glassSh);overflow:hidden}
+.table-wrap tr:last-child{margin-bottom:0}
+.table-wrap tbody tr:hover{background:var(--glass)}
+.table-wrap td{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;justify-content:flex-end;padding:11px 14px;border-bottom:1px solid var(--ridge);text-align:right;min-width:0;font-size:.82rem;max-width:none!important;overflow:visible!important;text-overflow:clip!important;white-space:normal!important;word-break:break-word}
+.table-wrap td::before{content:attr(data-label);margin-right:auto;flex:0 0 auto;font-size:.72rem;font-weight:600;color:var(--dim);white-space:nowrap;text-align:left}
+.table-wrap td:not([data-label])::before{content:none}
+.table-wrap td:first-child{grid-column:1/-1;padding:13px 14px;font-size:.94rem;font-weight:600}
+.table-wrap td:last-child{grid-column:1/-1;border-bottom:0;border-top:1px solid var(--ridge);justify-content:flex-end}
+.table-wrap td .actions{justify-content:flex-end;flex-wrap:wrap;gap:8px}
+.table-wrap td .icon-thumb{width:40px;height:40px;font-size:20px}
+.table-wrap td .cell-sub{flex:0 0 100%;font-size:.72rem;color:var(--dim);margin-top:2px;text-align:right;line-height:1.5}
+.table-wrap .comment-content-cell{max-width:none;white-space:normal;overflow:visible;text-overflow:clip}
+.table-wrap .col-index{display:none}
+.table-wrap .checkbox-cell{justify-content:flex-start}
+.table-wrap .checkbox-cell input[type=checkbox]{width:22px;height:22px}
+.table-wrap .empty-row{display:block;background:var(--glass);border:1px dashed var(--glassBd);box-shadow:none}
+.table-wrap .empty-row td{grid-column:1/-1;justify-content:center;text-align:center;color:var(--dim);padding:36px 16px;border:0;font-weight:400;font-size:.86rem}
+.table-wrap .empty-row td::before{content:none}
+.tbl-software tr{grid-template-columns:auto auto 1fr 1fr}
+.tbl-software .checkbox-cell{grid-column:span 1;padding:13px 2px 13px 14px}
+.table-wrap .tbl-software .checkbox-cell{grid-column:span 1}
+.tbl-software td[data-label="图标"]{grid-column:span 1;padding:13px 6px 13px 0}
+.tbl-software td[data-label="图标"]::before{content:none}
+.tbl-software td[data-label="名称"]{grid-column:span 2;justify-content:flex-start;text-align:left;padding:13px 14px 13px 0}
+.tbl-software td[data-label="名称"]::before{content:none}
+.tbl-software td[data-label="分类"],
+.tbl-software td[data-label="版本"],
+.tbl-software td[data-label="平台"],
+.tbl-software td[data-label="下载"]{grid-column:span 2}
+.tbl-software td[data-label="操作"]{grid-column:1/-1}
+.tbl-mall td:first-child{grid-column:auto;padding:11px 14px;font-size:.82rem;font-weight:400}
+.tbl-mall td[data-label="名称"]{order:-1;grid-column:1/-1;justify-content:flex-start;text-align:left;font-size:.94rem;font-weight:600}
+.tbl-mall td[data-label="名称"]::before{content:none}
+.tbl-mall td[data-label="名称"] .cell-sub{text-align:left;font-weight:400}
+.tbl-mall td[data-label="图标"]{grid-column:auto;justify-content:flex-end;padding:11px 14px}
+.table-wrap td>strong{min-width:0;flex:0 1 auto}
 .pagination{flex-direction:column;align-items:center;gap:10px;padding:12px}
 .pagination .pages{justify-content:center}
 .tutorial-card-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
@@ -540,8 +576,7 @@ input,select,textarea{font-size:16px!important}
 .login-page{padding:16px}
 .login-box{padding:28px 20px 24px;max-width:100%}
 .login-box .login-logo{font-size:1.55rem}
-.table-wrap table{font-size:.75rem}
-.table-wrap th,.table-wrap td{padding:9px 11px}
+
 }
 @keyframes sheetUp{from{opacity:.4;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
 
@@ -551,7 +586,7 @@ input,select,textarea{font-size:16px!important}
 .stat-card .num{font-size:1.15rem}
 .stat-card .label{font-size:.6rem;letter-spacing:.03em}
 .admin-sidebar .nav-item{padding:9px 12px;font-size:.85rem;min-height:46px}
-.table-wrap table{font-size:.72rem}
+
 .table-wrap td .actions button{font-size:.66rem;padding:5px 13px;min-height:44px}
 .tutorial-card .card-cover{height:150px}
 }
@@ -1453,10 +1488,10 @@ var h='<table><thead><tr><th style="width:160px;">时间</th><th>内容</th><th 
 for(var j=0;j<list.length;j++){
 var g=list[j];
 h+='<tr data-idx="'+j+'">';
-h+='<td style="font-size:.72rem;white-space:nowrap;color:var(--tx2);">'+escapeHTML(formatDate(g.created_at))+'</td>';
-h+='<td style="font-size:.8rem;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+escapeAttr(g.content||'')+'">'+escapeHTML(g.content||'')+'</td>';
-h+='<td><span class="badge badge-cyan">'+g.count+' 人</span></td>';
-h+='<td><button class="msg-del-btn" data-idx="'+j+'">🗑 撤回</button></td>';
+h+='<td data-label="时间" style="font-size:.72rem;white-space:nowrap;color:var(--tx2);">'+escapeHTML(formatDate(g.created_at))+'</td>';
+h+='<td data-label="内容" style="font-size:.8rem;max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+escapeAttr(g.content||'')+'">'+escapeHTML(g.content||'')+'</td>';
+h+='<td data-label="接收人数"><span class="badge badge-cyan">'+g.count+' 人</span></td>';
+h+='<td data-label="操作"><button class="msg-del-btn" data-idx="'+j+'">🗑 撤回</button></td>';
 h+='</tr>';
 }
 h+='</tbody></table>';
@@ -1524,7 +1559,7 @@ var h='<h2 class="page-title">◈ 控制台</h2><p class="page-sub">乐哲软件
 h+='<div class="card chart-card"><div class="chart-header"><h4>📊 分类分布</h4><span style="font-size:.7rem;color:var(--dim);">共 '+sorted.length+' 个分类</span></div><div class="cat-distribution">'+cr+'</div></div>';
 h+='<div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px;flex-wrap:wrap;gap:8px;"><h3 style="font-weight:600;color:var(--tx2);font-size:.95rem;">📋 最近添加</h3><button class="btn btn-xs btn-outline" id="refreshDash">⟳ 刷新</button></div>';
 h+='<div class="table-wrap"><table><thead><tr><th>名称</th><th>分类</th><th>版本</th><th>日期</th></tr></thead><tbody>';
-if(recent.length){for(var j=0;j<recent.length;j++){var s=recent[j];h+='<tr><td>'+escapeHTML(s.icon||'📦')+' '+escapeHTML(s.name||'')+(s.recommend?' <span class="badge badge-green">推荐</span>':'')+'</td><td>'+escapeHTML(s.category||'')+'</td><td>v'+escapeHTML(s.version||'')+'</td><td>'+escapeHTML(s.created_at?formatDate(s.created_at):(s.date||''))+'</td></tr>';}}
+if(recent.length){for(var j=0;j<recent.length;j++){var s=recent[j];h+='<tr data-id="'+escapeAttr(s.id)+'"><td data-label="名称">'+escapeHTML(s.icon||'📦')+' '+escapeHTML(s.name||'')+(s.recommend?' <span class="badge badge-green">推荐</span>':'')+'</td><td data-label="分类">'+escapeHTML(s.category||'')+'</td><td data-label="版本">v'+escapeHTML(s.version||'')+'</td><td data-label="日期">'+escapeHTML(s.created_at?formatDate(s.created_at):(s.date||''))+'</td></tr>';}}
 else h+='<tr class="empty-row"><td colspan="4">暂无数据</td></tr>';
 h+='</tbody></table></div>';
 c.innerHTML=h;
@@ -1580,7 +1615,7 @@ h+='<button class="page-btn" data-page="next" '+(this._page>=tp?'disabled':'')+'
 h+='</div></div>';
 c.innerHTML=h;this._restoreFocus(c,'searchInput');
 var w=document.getElementById('softTableWrap');
-var h2='<table><thead><tr><th class="checkbox-cell"><input type="checkbox" id="selectAll" /></th><th style="width:50px;">图标</th><th>名称</th><th>分类</th><th>版本</th><th>平台</th><th>下载</th><th style="width:180px;">操作</th></tr></thead><tbody>';
+var h2='<table class="tbl-software"><thead><tr><th class="checkbox-cell"><input type="checkbox" id="selectAll" /></th><th style="width:50px;">图标</th><th>名称</th><th>分类</th><th>版本</th><th>平台</th><th>下载</th><th style="width:180px;">操作</th></tr></thead><tbody>';
 if(pi.length===0)h2+='<tr class="empty-row"><td colspan="8">暂无软件</td></tr>';
 else{
 for(var k=0;k<pi.length;k++){
@@ -1588,13 +1623,13 @@ var s=pi[k];
 var ch=sel.indexOf(s.id)!==-1?'checked':'';
 h2+='<tr data-id="'+escapeAttr(s.id)+'">';
 h2+='<td class="checkbox-cell"><input type="checkbox" class="row-checkbox" data-id="'+escapeAttr(s.id)+'" '+ch+' /></td>';
-h2+='<td><span class="icon-thumb">'+renderIconThumb(s)+'</span></td>';
-h2+='<td><strong>'+escapeHTML(s.name||'')+'</strong></td>';
-h2+='<td style="color:var(--tx2);font-size:.75rem;">'+escapeHTML(s.category||'未分类')+'</td>';
-h2+='<td>v'+escapeHTML(s.version||'')+'</td>';
-h2+='<td style="font-size:.7rem;color:var(--tx2);white-space:nowrap;">'+escapeHTML(platformText(s.platforms))+'</td>';
-h2+='<td>'+(s.downloads||0)+'</td>';
-h2+='<td><div class="actions"><button class="view-btn" data-id="'+escapeAttr(s.id)+'">详情</button><button class="edit-btn" data-id="'+escapeAttr(s.id)+'">编辑</button><button class="del-btn" data-id="'+escapeAttr(s.id)+'">删除</button></div></td></tr>';
+h2+='<td data-label="图标"><span class="icon-thumb">'+renderIconThumb(s)+'</span></td>';
+h2+='<td data-label="名称"><strong>'+escapeHTML(s.name||'')+'</strong></td>';
+h2+='<td data-label="分类" style="color:var(--tx2);font-size:.75rem;">'+escapeHTML(s.category||'未分类')+'</td>';
+h2+='<td data-label="版本">v'+escapeHTML(s.version||'')+'</td>';
+h2+='<td data-label="平台" style="font-size:.7rem;color:var(--tx2);white-space:nowrap;">'+escapeHTML(platformText(s.platforms))+'</td>';
+h2+='<td data-label="下载">'+(s.downloads||0)+'</td>';
+h2+='<td data-label="操作"><div class="actions"><button class="view-btn" data-id="'+escapeAttr(s.id)+'">详情</button><button class="edit-btn" data-id="'+escapeAttr(s.id)+'">编辑</button><button class="del-btn" data-id="'+escapeAttr(s.id)+'">删除</button></div></td></tr>';
 }
 }
 h2+='</tbody></table>';
@@ -1680,14 +1715,14 @@ var plat=platformText(s.platforms,' · ');
 var stt=s.status||'pending';
 var stLb=stt==='pending'?'<span class="badge badge-orange">待审核</span>':stt==='approved'?'<span class="badge badge-green">已批准</span>':'<span class="badge badge-red">已拒绝</span>';
 h+='<tr data-id="'+escapeAttr(s.id)+'">';
-h+='<td><strong>'+escapeHTML(s.name||'')+'</strong></td>';
-h+='<td>'+escapeHTML(s.category||'')+'</td>';
-h+='<td>v'+escapeHTML(s.version||'1.0')+'</td>';
-h+='<td style="font-size:.7rem;white-space:nowrap;">'+escapeHTML(plat)+'</td>';
-h+='<td style="font-size:.72rem;">'+escapeHTML(s.contact||'-')+'</td>';
-h+='<td style="font-size:.7rem;">'+timeAgo(s.created_at)+'</td>';
-h+='<td>'+stLb+'</td>';
-h+='<td><div class="actions">';
+h+='<td data-label="软件名称"><strong>'+escapeHTML(s.name||'')+'</strong></td>';
+h+='<td data-label="分类">'+escapeHTML(s.category||'')+'</td>';
+h+='<td data-label="版本">v'+escapeHTML(s.version||'1.0')+'</td>';
+h+='<td data-label="平台" style="font-size:.7rem;white-space:nowrap;">'+escapeHTML(plat)+'</td>';
+h+='<td data-label="联系方式" style="font-size:.72rem;">'+escapeHTML(s.contact||'-')+'</td>';
+h+='<td data-label="提交时间" style="font-size:.7rem;">'+timeAgo(s.created_at)+'</td>';
+h+='<td data-label="状态">'+stLb+'</td>';
+h+='<td data-label="操作"><div class="actions">';
 h+='<button class="view-btn" data-id="'+escapeAttr(s.id)+'">详情</button>';
 if(stt==='pending'){
 h+='<button class="approve-btn" data-id="'+escapeAttr(s.id)+'">✅ 批准</button>';
@@ -1791,14 +1826,14 @@ var idx=st+i+1;
 var isSelf=currentAdminUser&&currentAdminUser.id===u.id;
 var roleHtml=u.is_admin===true?'<span class="badge badge-green">管理员</span>':'<span class="badge badge-cyan">普通用户</span>';
 h+='<tr data-id="'+escapeAttr(u.id)+'">';
-h+='<td style="font-size:.7rem;color:var(--dim);">'+idx+'</td>';
-h+='<td><strong>'+escapeHTML(u.username||'(未设置)')+'</strong>'+(isSelf?' <span class="badge badge-orange" style="font-size:.5rem;">当前</span>':'')+'</td>';
-h+='<td style="font-size:.72rem;color:var(--tx2);word-break:break-all;">'+escapeHTML(u.email||'-')+'</td>';
-h+='<td style="font-size:.7rem;color:var(--dim);">'+shortId(u.id)+'</td>';
-h+='<td style="font-size:.72rem;color:var(--tx2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHTML(u.bio||'-')+'</td>';
-h+='<td style="font-size:.7rem;">'+(u.created_at?formatDate(u.created_at):'-')+'</td>';
-h+='<td>'+roleHtml+'</td>';
-h+='<td><div class="actions">';
+h+='<td data-label="序号" class="col-index" style="font-size:.7rem;color:var(--dim);">'+idx+'</td>';
+h+='<td data-label="昵称"><strong>'+escapeHTML(u.username||'(未设置)')+'</strong>'+(isSelf?' <span class="badge badge-orange" style="font-size:.5rem;">当前</span>':'')+'</td>';
+h+='<td data-label="邮箱" style="font-size:.72rem;color:var(--tx2);word-break:break-all;">'+escapeHTML(u.email||'-')+'</td>';
+h+='<td data-label="用户ID" style="font-size:.7rem;color:var(--dim);">'+shortId(u.id)+'</td>';
+h+='<td data-label="简介" style="font-size:.72rem;color:var(--tx2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHTML(u.bio||'-')+'</td>';
+h+='<td data-label="注册时间" style="font-size:.7rem;">'+(u.created_at?formatDate(u.created_at):'-')+'</td>';
+h+='<td data-label="角色">'+roleHtml+'</td>';
+h+='<td data-label="操作"><div class="actions">';
 if(isSelf){h+='<span style="font-size:.65rem;color:var(--dim);">(当前账号)</span>';}
 else{h+='<button class="toggle-admin-btn '+(u.is_admin?'on':'')+'" data-id="'+escapeAttr(u.id)+'" data-admin="'+(u.is_admin?'1':'0')+'">'+(u.is_admin?'🛡 取消管理员':'🛡 设为管理员')+'</button>';}
 h+='</div></td></tr>';
@@ -1859,7 +1894,7 @@ else{
 for(var i=0;i<cats.length;i++){
 var cat=cats[i];
 var cnt=all.filter(function(s){return s.category===cat.name;}).length;
-h+='<tr><td><strong>'+escapeHTML(cat.name)+'</strong></td><td>'+cnt+'</td><td><div class="actions"><button class="del-btn" data-cat="'+escapeAttr(cat.name)+'">删除</button></div></td></tr>';
+h+='<tr><td data-label="分类名称"><strong>'+escapeHTML(cat.name)+'</strong></td><td data-label="软件数">'+cnt+'</td><td data-label="操作"><div class="actions"><button class="del-btn" data-cat="'+escapeAttr(cat.name)+'">删除</button></div></td></tr>';
 }
 }
 h+='</tbody></table></div>';
@@ -2213,11 +2248,11 @@ var x=pi[i];
 var ttl='未知教程';
 for(var ti=0;ti<tuts.length;ti++){if(tuts[ti].id===x.tutorial_id){ttl=tuts[ti].title;break;}}
 h+='<tr data-id="'+escapeAttr(x.id)+'">';
-h+='<td style="font-size:.75rem;">'+escapeHTML(ttl)+'</td>';
-h+='<td>'+escapeHTML(x.author||'匿名用户')+'</td>';
-h+='<td class="comment-content-cell" title="'+escapeAttr(x.content||'')+'">'+escapeHTML(x.content||'')+'</td>';
-h+='<td style="font-size:.7rem;">'+timeAgo(x.created_at)+'</td>';
-h+='<td><div class="actions"><button class="reply-btn" data-id="'+escapeAttr(x.id)+'" data-tut="'+escapeAttr(x.tutorial_id)+'" data-author="'+escapeAttr(x.author||'匿名用户')+'">💬 回复</button><button class="del-btn" data-id="'+escapeAttr(x.id)+'">🗑 删除</button></div></td></tr>';
+h+='<td data-label="教程" style="font-size:.75rem;">'+escapeHTML(ttl)+'</td>';
+h+='<td data-label="作者">'+escapeHTML(x.author||'匿名用户')+'</td>';
+h+='<td data-label="评论内容" class="comment-content-cell" title="'+escapeAttr(x.content||'')+'">'+escapeHTML(x.content||'')+'</td>';
+h+='<td data-label="时间" style="font-size:.7rem;">'+timeAgo(x.created_at)+'</td>';
+h+='<td data-label="操作"><div class="actions"><button class="reply-btn" data-id="'+escapeAttr(x.id)+'" data-tut="'+escapeAttr(x.tutorial_id)+'" data-author="'+escapeAttr(x.author||'匿名用户')+'">💬 回复</button><button class="del-btn" data-id="'+escapeAttr(x.id)+'">🗑 删除</button></div></td></tr>';
 }
 }
 h+='</tbody></table></div>';
@@ -2292,12 +2327,12 @@ else{
 for(var k=0;k<pi.length;k++){
 var q=pi[k];
 h+='<tr class="clickable" data-id="'+escapeAttr(q.id)+'">';
-h+='<td><strong>'+escapeHTML(q.title||'')+'</strong></td>';
-h+='<td>'+escapeHTML(q.category||'')+'</td>';
-h+='<td>'+(q.votes||0)+'</td>';
-h+='<td>'+(ansCount[q.id]||0)+'</td>';
-h+='<td style="font-size:.7rem;">'+timeAgo(q.created_at)+'</td>';
-h+='<td><div class="actions"><button class="view-btn" data-id="'+escapeAttr(q.id)+'">查看</button><button class="del-btn" data-id="'+escapeAttr(q.id)+'">删除</button></div></td></tr>';
+h+='<td data-label="问题"><strong>'+escapeHTML(q.title||'')+'</strong></td>';
+h+='<td data-label="分类">'+escapeHTML(q.category||'')+'</td>';
+h+='<td data-label="投票">👍 '+(q.votes||0)+'</td>';
+h+='<td data-label="回答">'+(ansCount[q.id]||0)+'</td>';
+h+='<td data-label="创建时间" style="font-size:.7rem;">'+timeAgo(q.created_at)+'</td>';
+h+='<td data-label="操作"><div class="actions"><button class="view-btn" data-id="'+escapeAttr(q.id)+'">查看</button><button class="del-btn" data-id="'+escapeAttr(q.id)+'">删除</button></div></td></tr>';
 }
 }
 h+='</tbody></table></div>';
@@ -2654,7 +2689,7 @@ for(var ck in catMap){h+='<option value="'+escapeAttr(ck)+'" '+(ck===catF?'selec
 h+='</select>';
 h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="mallRefresh">⟳ 刷新</button><button class="btn btn-sm btn-primary" id="mallAddBtn">⊕ 新增商品</button></div>';
 h+='</div>';
-h+='<div class="table-wrap"><table><thead><tr><th style="width:60px;">图标</th><th>名称</th><th>分类</th><th>所需积分</th><th>库存</th><th>发货</th><th>状态</th><th>排序</th><th style="width:230px;">操作</th></tr></thead><tbody>';
+h+='<div class="table-wrap"><table class="tbl-mall"><thead><tr><th style="width:60px;">图标</th><th>名称</th><th>分类</th><th>所需积分</th><th>库存</th><th>发货</th><th>状态</th><th>排序</th><th style="width:230px;">操作</th></tr></thead><tbody>';
 if(fil.length===0)h+='<tr class="empty-row"><td colspan="9">暂无商品，点击右上角「新增商品」创建</td></tr>';
 else{
 for(var i=0;i<fil.length;i++){
@@ -2669,15 +2704,15 @@ var activeText=it.active!==false?'<span class="badge badge-green">上架</span>'
 var isAuto=it.delivery_type==='auto';
 var deliveryText=isAuto?'<span class="badge badge-cyan">⚡ 自动</span>':'<span class="badge badge-orange">👤 人工</span>';
 h+='<tr data-id="'+escapeAttr(it.id)+'">';
-h+='<td>'+iconHtml+'</td>';
-h+='<td><strong>'+escapeHTML(it.name||'')+'</strong>'+(it.description?'<div style="font-size:.68rem;color:var(--dim);margin-top:2px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHTML(it.description)+'</div>':'')+'</td>';
-h+='<td style="font-size:.75rem;">'+catL+'</td>';
-h+='<td><strong style="color:var(--cy);">'+(it.cost||0)+'</strong> 分</td>';
-h+='<td>'+stockText+'</td>';
-h+='<td>'+deliveryText+'</td>';
-h+='<td>'+activeText+'</td>';
-h+='<td style="font-size:.75rem;color:var(--dim);">'+(it.sort||0)+'</td>';
-h+='<td><div class="actions">';
+h+='<td data-label="图标">'+iconHtml+'</td>';
+h+='<td data-label="名称"><strong>'+escapeHTML(it.name||'')+'</strong>'+(it.description?'<div class="cell-sub">'+escapeHTML(it.description)+'</div>':'')+'</td>';
+h+='<td data-label="分类" style="font-size:.75rem;">'+catL+'</td>';
+h+='<td data-label="所需积分"><strong style="color:var(--cy);">'+(it.cost||0)+'</strong> 分</td>';
+h+='<td data-label="库存">'+stockText+'</td>';
+h+='<td data-label="发货">'+deliveryText+'</td>';
+h+='<td data-label="状态">'+activeText+'</td>';
+h+='<td data-label="排序" style="font-size:.75rem;color:var(--dim);">'+(it.sort||0)+'</td>';
+h+='<td data-label="操作"><div class="actions">';
 h+='<button class="edit-btn" data-id="'+escapeAttr(it.id)+'">编辑</button>';
 if(it.active!==false)h+='<button class="reject-btn" data-id="'+escapeAttr(it.id)+'" data-active="1">下架</button>';
 else h+='<button class="approve-btn" data-id="'+escapeAttr(it.id)+'" data-active="0">上架</button>';
