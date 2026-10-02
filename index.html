@@ -296,7 +296,7 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .pagination .page-info{color:var(--text-secondary);font-size:.8rem}
 .pagination .page-jump{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--text-secondary)}
 .pagination .page-jump input{width:44px;padding:3px 6px;border-radius:50px;border:1px solid var(--border-glow);text-align:center;font-size:.75rem;background:var(--bg-card)}
-.toolbar{display:flex;flex-wrap:nowrap;align-items:center;gap:12px;justify-content:space-between;margin-top:6px}
+.toolbar{display:flex;flex-wrap:nowrap;align-items:center;gap:12px;justify-content:flex-end;margin-top:6px}
 .toolbar .filters{display:flex;flex-wrap:wrap;gap:5px;flex:1 1 auto;min-width:0}
 .toolbar .filters .btn{font-size:.7rem;padding:3px 12px}
 .toolbar .sort-group{display:flex;flex-wrap:nowrap;gap:8px;align-items:center;flex-shrink:0;margin-left:auto}
@@ -925,7 +925,7 @@ body.ls-locked{overflow:hidden !important}
 </section>
 <section id="pageList" class="hidden">
 <div style="padding:12px 0 4px;"><h2 class="section-title">✦ 软件库</h2><p class="section-sub" id="listSub">全部资源</p></div>
-<div class="toolbar"><div class="filters" id="filterTags"><button class="btn btn-sm btn-outline active" data-cat="all">全部</button></div><div class="sort-group"><label for="sortSelect"><i class="fas fa-sort"></i> 排序</label><select id="sortSelect"><option value="date">最新</option><option value="views">热度</option><option value="downloads">下载量</option></select><span class="result-count" id="resultCount"></span><div class="view-toggle" id="viewToggle"><button data-view="grid" class="active"><i class="fas fa-th-large"></i></button><button data-view="list"><i class="fas fa-list"></i></button></div></div></div>
+<div class="toolbar"><div class="filters" id="filterTags" style="display:none;"><button class="btn btn-sm btn-outline active" data-cat="all">全部</button></div><div class="sort-group"><label for="sortSelect"><i class="fas fa-sort"></i> 排序</label><select id="sortSelect"><option value="date">最新</option><option value="views">热度</option><option value="downloads">下载量</option></select><span class="result-count" id="resultCount"></span><div class="view-toggle" id="viewToggle"><button data-view="grid" class="active"><i class="fas fa-th-large"></i></button><button data-view="list"><i class="fas fa-list"></i></button></div></div></div>
 <div class="filter-panel" id="filterPanel"><div class="filter-group"><label for="platformFilter"><i class="fas fa-desktop"></i> 平台</label><select id="platformFilter"><option value="all">全部</option><option value="mac">macOS</option><option value="windows">Windows</option><option value="android">Android</option></select></div><span class="reset-filters" id="resetFiltersBtn"><i class="fas fa-undo-alt"></i> 重置</span></div>
 <div class="software-grid" id="listGrid"></div>
 <div class="pagination" id="paginationControls"><button id="prevPageBtn" disabled><i class="fas fa-chevron-left"></i> 上一页</button><span class="page-info" id="pageInfo">第 1 / 1 页</span><button id="nextPageBtn">下一页 <i class="fas fa-chevron-right"></i></button><span class="page-jump" id="pageJump">跳至 <input type="number" id="jumpPageInput" min="1" value="1" /> 页<button id="jumpPageBtn" class="btn btn-sm btn-outline">GO</button></span></div>
@@ -977,7 +977,7 @@ body.ls-locked{overflow:hidden !important}
 </div>
 <footer class="footer">
 <div class="brand">◆ 乐哲软件</div>
-<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a></p>
+<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection#c985ac93a1ac9aa6afbd89a6bcbda5a6a6a2e7aaa6a4"><span class="__cf_email__" data-cfemail="074b625d6f6254686173476872736b68686c2964686a">[email&#160;protected]</span></a></p>
 <div class="links">
 <span>友情链接：</span>
 <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> |
@@ -1102,7 +1102,7 @@ body.ls-locked{overflow:hidden !important}
 <div class="form-actions"><button class="btn btn-outline" id="fbCancel">取消</button><button class="btn btn-primary" id="fbSubmit">提交</button></div>
 </div>
 </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 var supabaseClient=null;
@@ -2985,7 +2985,8 @@ var mbHome=document.querySelector('#mobileBottomNav a[data-page="home"]');if(mbH
 this.updateSidebarHighlight(null);
 document.getElementById('sidebarSearchWrapper').classList.remove('active');
 document.getElementById('sidebarStats').style.display='block';
-document.getElementById('filterTags').querySelectorAll('button').forEach(function(b){b.classList.remove('active');if(b.dataset.cat==='all')b.classList.add('active');});
+var ft=document.getElementById('filterTags');
+if(ft){ft.querySelectorAll('button').forEach(function(b){b.classList.remove('active');if(b.dataset.cat==='all')b.classList.add('active');});}
 if(isMobile()&&isOpen)closeSidebar();
 if(!isPop)window.history.replaceState(null,'',window.location.pathname);
 },
@@ -3007,8 +3008,9 @@ this.updateSidebarHighlight(cat==='all'?null:cat);
 document.getElementById('sidebarSearchWrapper').classList.add('active');
 document.getElementById('sidebarStats').style.display='none';
 if(isMobile()&&isOpen)closeSidebar();
-document.getElementById('filterTags').querySelectorAll('button').forEach(function(b){b.classList.remove('active');if(b.dataset.cat===cat)b.classList.add('active');});
-if(cat==='all'){var allBtn=document.getElementById('filterTags').querySelector('button[data-cat="all"]');if(allBtn)allBtn.classList.add('active');}
+var ft=document.getElementById('filterTags');
+if(ft){ft.querySelectorAll('button').forEach(function(b){b.classList.remove('active');if(b.dataset.cat===cat)b.classList.add('active');});
+if(cat==='all'){var allBtn=ft.querySelector('button[data-cat="all"]');if(allBtn)allBtn.classList.add('active');}}
 if(!isPop)window.history.pushState(null,'',window.location.pathname+'?cat='+encodeURIComponent(cat));
 },
 goTutorials:function(){
@@ -3157,7 +3159,8 @@ document.getElementById('sidebarSearchWrapper').classList.add('active');
 document.getElementById('sidebarStats').style.display='none';
 if(isMobile()&&isOpen)closeSidebar();
 this.updateSidebarHighlight(null);
-document.getElementById('filterTags').querySelectorAll('button').forEach(function(b){b.classList.remove('active');if(b.dataset.cat==='all')b.classList.add('active');});
+var ft=document.getElementById('filterTags');
+if(ft){ft.querySelectorAll('button').forEach(function(b){b.classList.remove('active');if(b.dataset.cat==='all')b.classList.add('active');});}
 document.getElementById('searchSuggestions').classList.remove('open');
 document.getElementById('searchHistory').classList.remove('open');
 if(!isPop)window.history.pushState(null,'',window.location.pathname+'?search='+encodeURIComponent(keyword));
@@ -3181,6 +3184,7 @@ var all=DB.getSoftware();
 var list=all.slice();
 var cats=DB.getCategories();
 var filterContainer=document.getElementById('filterTags');
+if(filterContainer){
 filterContainer.innerHTML='<button class="btn btn-sm btn-outline active" data-cat="all">全部</button>'+cats.map(function(c){return '<button class="btn btn-sm btn-outline" data-cat="'+escapeAttr(c)+'">'+escapeHTML(c)+'</button>';}).join('');
 filterContainer.querySelectorAll('button').forEach(function(btn){
 if(btn.dataset.cat===self.currentCategory)btn.classList.add('active');
@@ -3198,6 +3202,7 @@ self.updateSidebarHighlight(self.currentCategory==='all'?null:self.currentCatego
 if(isMobile()&&isOpen)closeSidebar();
 });
 });
+}
 if(keyword){var kw=keyword.toLowerCase();list=list.filter(function(s){return matchSearch(s,kw);});}
 if(self.currentCategory!=='all')list=list.filter(function(s){return s.category===self.currentCategory;});
 if(self.platformFilter!=='all')list=list.filter(function(s){return(s.platforms||[]).includes(self.platformFilter);});
@@ -3904,6 +3909,7 @@ setTimeout(finishLoading,2500);
 })();
 </script>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
