@@ -607,6 +607,65 @@ input,select,textarea{font-size:16px!important}
 *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 .aurora span{animation:none!important}
 }
+
+/* ===== 修复：移动端品牌栏固定 + 页面锁定滚动 ===== */
+html,body{
+  height:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
+}
+body{
+  height:100vh;
+  height:100dvh;
+}
+.admin-layout.active{
+  height:100vh;
+  height:100dvh;
+  min-height:0;
+  overflow:hidden;
+}
+.admin-main{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+.login-page{
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+
+@media (max-width:900px){
+  .admin-layout.active{
+    flex-direction:column;
+    height:100vh;
+    height:100dvh;
+    min-height:0;
+    overflow:hidden;
+  }
+  .mobile-topbar{
+    flex:0 0 auto;
+    position:sticky;
+    top:0;
+    z-index:60;
+    width:100%;
+  }
+  .admin-main{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
+  .aurora{
+    filter:blur(56px) saturate(140%);
+    opacity:calc(var(--auroraOp) * .8);
+  }
+  .aurora span{animation-duration:44s}
+}
 </style>
 </head>
 <body>
@@ -1284,7 +1343,7 @@ document.getElementById('loginError').innerHTML='该账号不是管理员。请�
 return;
 }
 currentAdminUser=u;
-this.showAdmin();
+await this.showAdmin();
 }catch(e){this.showLogin();document.getElementById('loginError').textContent='会话校验失败：'+(e.message||'网络异常')+'，请重试';}
 },
 showLogin:function(){
@@ -1329,18 +1388,18 @@ b.disabled=false;b.textContent='✦ 进入控制台';return;
 }
 currentAdminUser=u;
 document.getElementById('loginPass').value='';
-this.showAdmin();
+await this.showAdmin();
 DB.addLog('登录','管理员 '+e+' 登录后台');
 toast('欢迎回来，'+e);
 }catch(err){er.textContent='登录异常：'+(err.message||'未知错误');}
 finally{b.disabled=false;b.textContent='✦ 进入控制台';}
 },
-showAdmin:function(){
+showAdmin:async function(){
 document.body.classList.remove('nav-open');
 document.getElementById('loginPage').classList.remove('active');
 document.getElementById('adminApp').classList.add('active');
 if(currentAdminUser)document.getElementById('adminEmail').textContent=currentAdminUser.email||'-';
-this.preload();
+try{ await this.preload(); }catch(e){}
 this.refreshSubBadge();
 this.refreshRedeemBadge();
 this.renderTab('dashboard');
@@ -1359,14 +1418,16 @@ if(b){if(p>0){b.textContent=p;b.classList.remove('hidden');}else b.classList.add
 },
 preload:function(){
 var self=this;
-DB.soft().then(function(d){self._all=d;self._fil=d.slice();});
-DB.cats().then(function(d){self._cats=d;});
-DB.tut().then(function(d){self._tuts=d;});
-DB.q().then(function(d){self._qs=d;});
-DB.an().then(function(d){self._ans=d;});
-DB.cm().then(function(d){self._cms=d;});
-DB.sub().then(function(d){self._subs=d;});
-DB.pf().then(function(d){self._pfs=d;});
+return Promise.all([
+DB.soft().then(function(d){self._all=d||[];self._fil=(d||[]).slice();}),
+DB.cats().then(function(d){self._cats=d||[];}),
+DB.tut().then(function(d){self._tuts=d||[];}),
+DB.q().then(function(d){self._qs=d||[];}),
+DB.an().then(function(d){self._ans=d||[];}),
+DB.cm().then(function(d){self._cms=d||[];}),
+DB.sub().then(function(d){self._subs=d||[];}),
+DB.pf().then(function(d){self._pfs=d||[];})
+]);
 },
 renderTab:function(t){
 this._tab=t;
