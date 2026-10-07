@@ -702,6 +702,7 @@ body{
 <div class="nav-item" data-tab="categories"><span class="icon">⌗</span><span>分类管理</span></div>
 <div class="nav-item" data-tab="add"><span class="icon">⊕</span><span>上传软件</span></div>
 <div class="nav-item" data-tab="users"><span class="icon">👤</span><span>用户管理</span></div>
+<div class="nav-item" data-tab="sub-accounts" id="navSubAccounts"><span class="icon">🛡</span><span>子账号</span></div>
 <div class="nav-item" data-tab="messages"><span class="icon">✉</span><span>站内信</span></div>
 <div class="nav-item" data-tab="mall"><span class="icon">🎁</span><span>积分商城</span></div>
 <div class="nav-item" data-tab="redeems"><span class="icon">📦</span><span>兑换订单</span><span class="nav-badge hidden" id="redeemBadge">0</span></div>
@@ -817,6 +818,39 @@ var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 var supabaseClient=(typeof supabase!=='undefined')?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 var quill=null,currentAdminUser=null;
+var isSubAccount=false,subPermissions=[];
+var RESERVED_TABS=['users','settings','sub-accounts'];
+var ALL_TABS=[
+{id:'dashboard',label:'仪表盘',icon:'◈'},
+{id:'software',label:'软件管理',icon:'⊞'},
+{id:'submissions',label:'提交审核',icon:'📥'},
+{id:'tutorials',label:'教程管理',icon:'📖'},
+{id:'drafts',label:'草稿箱',icon:'📝'},
+{id:'comments',label:'评论管理',icon:'💬'},
+{id:'qa',label:'问答管理',icon:'❓'},
+{id:'categories',label:'分类管理',icon:'⌗'},
+{id:'add',label:'上传软件',icon:'⊕'},
+{id:'messages',label:'站内信',icon:'✉'},
+{id:'mall',label:'积分商城',icon:'🎁'},
+{id:'redeems',label:'兑换订单',icon:'📦'}
+];
+function applyTabVisibility(){
+var navItems=document.querySelectorAll('.admin-sidebar .nav-item[data-tab]');
+navItems.forEach(function(el){
+var tab=el.dataset.tab;
+if(isSubAccount){
+if(RESERVED_TABS.indexOf(tab)!==-1){el.style.display='none';return;}
+if(subPermissions.indexOf(tab)===-1){el.style.display='none';return;}
+}
+el.style.display='';
+});
+}
+function checkSubAccount(userId){
+return supabaseClient.from('sub_accounts').select('*,profiles!sub_accounts_sub_user_id_fkey(email,username)').eq('sub_user_id',userId).eq('is_active',true).maybeSingle().then(function(r){
+if(r.error||!r.data)return null;
+return r.data;
+});
+}
 
 var _RLS_SQL='CREATE POLICY "admin_insert_notifications" ON public.notifications FOR INSERT TO authenticated WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));\n\nCREATE POLICY "user_read_own_notifications" ON public.notifications FOR SELECT TO authenticated USING (user_id = auth.uid() OR EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));\n\nCREATE POLICY "user_update_own_notifications" ON public.notifications FOR UPDATE TO authenticated USING (user_id = auth.uid());\n\nCREATE POLICY "admin_delete_notifications" ON public.notifications FOR DELETE TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));';
 
@@ -1016,8 +1050,12 @@ if(!r1.data||r1.data.length===0)throw new Error('插入失败或权限不足');
 var newId=r1.data[0].id;
 var r2=await this._t(supabaseClient.from('software_submissions').update({status:'approved'}).eq('id',id).select('id'));
 if(r2.error||!r2.data||r2.data.length===0){
-try{await this._t(supabaseClient.from('software').delete().eq('id',newId));}catch(e){}
-throw new Error(r2.error?r2.error.message:'更新提交状态失败，已回滚');
+var rollbackErr=null;
+try{await this._t(supabaseClient.from('software').delete().eq('id',newId));}catch(e){rollbackErr=e;}
+var msg=r2.error?r2.error.message:'更新提交状态失败';
+if(rollbackErr)msg+='；回滚也失败: '+rollbackErr.message+'（软件已插入但提交状态未更新，请手动处理）';
+else msg+='，已回滚';
+throw new Error(msg);
 }
 this.invalidate();
 },
@@ -1118,11 +1156,17 @@ this._rd=null;return r.data[0];
 },
 async refundPoints(userId,amount){
 if(!supabaseClient)throw new Error('未初始化');
-var cur=await this._t(supabaseClient.from('user_points').select('points').eq('user_id',userId).maybeSingle());
+var cur=await this._t(supabaseClient.from('user_points').select('points,updated_at').eq('user_id',userId).maybeSingle());
 var old=(cur.data&&cur.data.points)||0;
-var r=await this._t(supabaseClient.from('user_points').upsert({user_id:userId,points:old+amount,updated_at:new Date().toISOString()},{onConflict:'user_id'}));
+var newPoints=old+amount;
+var r=await this._t(supabaseClient.from('user_points').upsert({user_id:userId,points:newPoints,updated_at:new Date().toISOString()},{onConflict:'user_id'}));
 if(r.error)throw r.error;
-return old+amount;
+var verify=await this._t(supabaseClient.from('user_points').select('points').eq('user_id',userId).maybeSingle());
+var final=(verify.data&&verify.data.points);
+if(final!==undefined&&final!==newPoints){
+throw new Error('积分并发冲突，请重试（当前值: '+final+'，预期: '+newPoints+'）');
+}
+return newPoints;
 },
 async delRedeem(id){
 if(!supabaseClient)throw new Error('未初始化');
@@ -1133,7 +1177,46 @@ this._rd=null;
 },
 getLogs:function(){try{return JSON.parse(localStorage.getItem('lezhe_logs'))||[];}catch(e){return [];}},
 addLog:function(a,d){var l=this.getLogs();l.unshift({id:Date.now().toString(36),time:new Date().toISOString(),action:a,detail:d,user:currentAdminUser?currentAdminUser.email:'admin'});if(l.length>200)l=l.slice(0,200);localStorage.setItem('lezhe_logs',JSON.stringify(l));},
-clearLogs:function(){localStorage.setItem('lezhe_logs','[]');}
+clearLogs:function(){localStorage.setItem('lezhe_logs','[]');},
+async loadSubAccounts(){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('sub_accounts').select('*,profiles!sub_accounts_sub_user_id_fkey(email,username)').order('created_at',{ascending:false}));
+if(r.error)throw r.error;
+return r.data||[];
+},
+async findUserByEmail(email){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('profiles').select('id,email,username').ilike('email',email).limit(1));
+if(r.error)throw r.error;
+return (r.data&&r.data.length>0)?r.data[0]:null;
+},
+async createSubAccount(ownerId,subUserId,permissions){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('sub_accounts').insert([{owner_id:ownerId,sub_user_id:subUserId,permissions:permissions||[],is_active:true}]).select());
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('创建失败');
+return r.data[0];
+},
+async updateSubPermissions(id,permissions){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('sub_accounts').update({permissions:permissions,updated_at:new Date().toISOString()}).eq('id',id).select());
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('更新失败');
+return r.data[0];
+},
+async toggleSubAccount(id,active){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('sub_accounts').update({is_active:active,updated_at:new Date().toISOString()}).eq('id',id).select());
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('操作失败');
+return r.data[0];
+},
+async deleteSubAccount(id){
+if(!supabaseClient)throw new Error('未初始化');
+var r=await this._t(supabaseClient.from('sub_accounts').delete().eq('id',id).select('id'));
+if(r.error)throw r.error;
+if(!r.data||r.data.length===0)throw new Error('删除失败');
+}
 };
 var App={
 _tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,_editSource:null,_pubDraftId:null,_msgHistoryList:[],_mallItems:[],_redeems:[],_mallKw:'',_mallCatF:'all',_redeemF:'all',_mallEditId:null,_focusSearch:null,_focusPos:null,_seq:0,
@@ -1155,7 +1238,7 @@ if(loginEmail)loginEmail.addEventListener('keyup',function(e){if(e.key==='Enter'
 document.getElementById('adminLogout').addEventListener('click',async function(){
 var failed=false;
 try{if(supabaseClient)await supabaseClient.auth.signOut();}catch(e){failed=true;}
-currentAdminUser=null;
+currentAdminUser=null;isSubAccount=false;subPermissions=[];
 App.showLogin();
 toast(failed?'退出请求失败，已在本地登出':'已退出',failed?'warning':'success');
 });
@@ -1337,9 +1420,17 @@ return;
 p={data:ins.data};
 }
 if(!p.data||p.data.is_admin!==true){
+var sa=await checkSubAccount(u.id);
+if(!sa){
 await supabaseClient.auth.signOut();
 this.showLogin();
-document.getElementById('loginError').innerHTML='该账号不是管理员。请在 Supabase 执行：<br><code>update profiles set is_admin=true where id=\''+escapeHTML(u.id)+'\';</code>';
+document.getElementById('loginError').textContent='该账号没有后台访问权限。请联系管理员开通。';
+return;
+}
+isSubAccount=true;
+subPermissions=sa.permissions||[];
+currentAdminUser=u;
+await this.showAdmin();
 return;
 }
 currentAdminUser=u;
@@ -1382,8 +1473,19 @@ b.disabled=false;b.textContent='✦ 进入控制台';return;
 p2={data:ins.data};
 }
 if(!p2.data||p2.data.is_admin!==true){
+var sa=await checkSubAccount(u.id);
+if(!sa){
 await supabaseClient.auth.signOut();
-er.innerHTML='该账号不是管理员。请在 Supabase 执行：<br><code>update profiles set is_admin=true where id=\''+escapeHTML(u.id)+'\';</code>';
+er.textContent='该账号没有后台访问权限。请联系管理员开通。';
+b.disabled=false;b.textContent='✦ 进入控制台';return;
+}
+isSubAccount=true;
+subPermissions=sa.permissions||[];
+currentAdminUser=u;
+document.getElementById('loginPass').value='';
+await this.showAdmin();
+DB.addLog('登录','子账号 '+e+' 登录后台');
+toast('欢迎回来，'+e+'（子账号）');
 b.disabled=false;b.textContent='✦ 进入控制台';return;
 }
 currentAdminUser=u;
@@ -1399,6 +1501,8 @@ document.body.classList.remove('nav-open');
 document.getElementById('loginPage').classList.remove('active');
 document.getElementById('adminApp').classList.add('active');
 if(currentAdminUser)document.getElementById('adminEmail').textContent=currentAdminUser.email||'-';
+applyTabVisibility();
+DB.invalidate();
 try{ await this.preload(); }catch(e){}
 this.refreshSubBadge();
 this.refreshRedeemBadge();
@@ -1455,6 +1559,7 @@ if(t==='mall'){this.renderMall(m);return;}
 if(t==='redeems'){this.renderRedeems(m);return;}
 if(t==='settings'){this.renderSettings(m);return;}
 if(t==='qa'){this.renderQA(m);return;}
+if(t==='sub-accounts'){this.renderSubAccounts(m);return;}
 },
 renderMessages:function(c){
 var self=this;
@@ -3042,6 +3147,147 @@ h+='</div>';
 c.innerHTML=h;
 var cb=c.querySelector('#clearLogsBtn');
 if(cb)cb.addEventListener('click',async function(){if(!(await uiConfirm('确定清空所有操作日志吗？',{title:'清空日志',icon:'🗑',danger:true,okText:'清空'})))return;DB.clearLogs();toast('日志已清空');App.renderSettings(c);});
+},
+renderSubAccounts:async function(c){
+if(isSubAccount){c.innerHTML='<div class="empty-state"><div class="icon">🚫</div><h3>无权访问</h3><p>子账号无法管理子账号</p></div>';return;}
+var self=this;
+c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载子账号...</div>';
+try{
+var list=await DB.loadSubAccounts();
+var h='<h2 class="page-title">🛡 子账号管理</h2><p class="page-sub">创建子账号并分配可访问的功能模块，子账号使用自己的邮箱密码登录</p>';
+h+='<div class="toolbar"><button class="btn btn-sm btn-primary" id="addSubBtn">+ 添加子账号</button><span class="selected-info">共 '+list.length+' 个子账号</span></div>';
+if(list.length===0){
+h+='<div class="empty-state"><div class="icon">🛡</div><h3>暂无子账号</h3><p>点击「添加子账号」创建第一个子账号</p></div>';
+}else{
+h+='<div class="table-wrap"><table><thead><tr><th>邮箱</th><th>昵称</th><th>权限模块</th><th>状态</th><th>创建时间</th><th style="width:240px;">操作</th></tr></thead><tbody>';
+for(var i=0;i<list.length;i++){
+var sa=list[i];
+var pf=sa.profiles||{};
+var perms=sa.permissions||[];
+var permLabels=perms.map(function(p){var t=ALL_TABS.find(function(x){return x.id===p;});return t?t.label:p;});
+h+='<tr><td data-label="邮箱" style="font-size:.8rem;word-break:break-all;">'+escapeHTML(pf.email||sa.sub_user_id||'-')+'</td>';
+h+='<td data-label="昵称">'+escapeHTML(pf.username||'-')+'</td>';
+h+='<td data-label="权限"><div style="display:flex;flex-wrap:wrap;gap:4px;">';
+if(perms.length===0)h+='<span style="color:var(--dim);font-size:.75rem;">无权限</span>';
+else for(var j=0;j<permLabels.length;j++)h+='<span class="badge badge-cyan" style="font-size:.6rem;">'+escapeHTML(permLabels[j])+'</span>';
+h+='</div></td>';
+h+='<td data-label="状态">'+(sa.is_active?'<span class="badge badge-green">启用</span>':'<span class="badge badge-red">禁用</span>')+'</td>';
+h+='<td data-label="创建" style="font-size:.72rem;">'+(sa.created_at?formatDate(sa.created_at):'-')+'</td>';
+h+='<td data-label="操作"><div class="actions">';
+h+='<button class="btn btn-xs btn-outline sub-edit-btn" data-id="'+escapeAttr(sa.id)+'" data-perms="'+escapeAttr(JSON.stringify(perms))+'">编辑权限</button> ';
+h+='<button class="btn btn-xs '+(sa.is_active?'btn-outline':'btn-primary')+' sub-toggle-btn" data-id="'+escapeAttr(sa.id)+'" data-active="'+(sa.is_active?'1':'0')+'">'+(sa.is_active?'禁用':'启用')+'</button> ';
+h+='<button class="btn btn-xs btn-danger sub-del-btn" data-id="'+escapeAttr(sa.id)+'">删除</button>';
+h+='</div></td></tr>';
+}
+h+='</tbody></table></div>';
+}
+c.innerHTML=h;
+var addBtn=c.querySelector('#addSubBtn');
+if(addBtn)addBtn.addEventListener('click',function(){self._showAddSubDialog(c);});
+c.querySelectorAll('.sub-edit-btn').forEach(function(btn){
+btn.addEventListener('click',function(){
+var id=btn.dataset.id;var perms=JSON.parse(btn.dataset.perms||'[]');
+self._showEditPermDialog(id,perms,c);
+});
+});
+c.querySelectorAll('.sub-toggle-btn').forEach(function(btn){
+btn.addEventListener('click',async function(){
+var id=btn.dataset.id;var active=btn.dataset.active==='1';
+var label=active?'禁用':'启用';
+if(!(await uiConfirm('确定'+label+'该子账号？',{title:label+'子账号',icon:'🛡'})))return;
+btn.disabled=true;btn.textContent='处理中...';
+try{
+await DB.toggleSubAccount(id,!active);
+toast('已'+label);
+DB.addLog('子账号管理',label+'子账号 '+id);
+self.renderSubAccounts(c);
+}catch(e){toast('操作失败: '+(e.message||''),'error');btn.disabled=false;btn.textContent=label;}
+});
+});
+c.querySelectorAll('.sub-del-btn').forEach(function(btn){
+btn.addEventListener('click',async function(){
+var id=btn.dataset.id;
+if(!(await uiConfirm('确定删除该子账号？此操作不可撤销。',{title:'删除子账号',icon:'🗑',danger:true,okText:'删除'})))return;
+btn.disabled=true;btn.textContent='...';
+try{
+await DB.deleteSubAccount(id);
+toast('已删除');
+DB.addLog('子账号管理','删除子账号 '+id);
+self.renderSubAccounts(c);
+}catch(e){toast('删除失败: '+(e.message||''),'error');btn.disabled=false;btn.textContent='删除';}
+});
+});
+}catch(e){
+c.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>'+escapeHTML(e.message||'网络异常')+'</p><p style="color:var(--dim);font-size:.8rem;margin-top:8px;">请确认已在 Supabase 执行 sub_accounts.sql 创建数据表</p><button class="btn btn-sm btn-primary" onclick="App.renderTab(\'sub-accounts\')">重试</button></div>';
+}
+},
+_showAddSubDialog:function(c){
+var self=this;
+uiDialog({title:'添加子账号',input:true,placeholder:'输入子账号邮箱地址',okText:'下一步'}).then(async function(email){
+if(!email||!email.trim())return;
+email=email.trim();
+try{
+var user=await DB.findUserByEmail(email);
+if(!user){toast('未找到该邮箱对应的用户，该用户需先注册账号','error');return;}
+if(user.id===currentAdminUser.id){toast('不能将自已设为子账号','warning');return;}
+var permHtml='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:12px 0;">';
+for(var i=0;i<ALL_TABS.length;i++){
+var t=ALL_TABS[i];
+permHtml+='<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 8px;border-radius:6px;border:1px solid var(--bd);font-size:.82rem;"><input type="checkbox" class="sub-perm-cb" value="'+escapeAttr(t.id)+'" /> '+escapeHTML(t.icon+' '+t.label)+'</label>';
+}
+permHtml+='</div>';
+var ov=document.createElement('div');
+ov.className='modal-overlay';
+ov.innerHTML='<div class="modal-box"><div class="modal-header"><h3>设置权限 — '+escapeHTML(email)+'</h3><span class="close-btn sub-perm-close">✕</span></div><div class="modal-body">'+permHtml+'<div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-xs btn-outline" id="permSelectAll">全选</button><button class="btn btn-xs btn-outline" id="permSelectNone">清空</button></div></div><div class="modal-footer"><button class="btn btn-sm btn-outline sub-perm-close">取消</button><button class="btn btn-sm btn-primary" id="permConfirmBtn">确认创建</button></div></div>';
+document.body.appendChild(ov);
+ov.querySelector('.sub-perm-close').addEventListener('click',function(){ov.remove();});
+ov.querySelector('#permSelectAll').addEventListener('click',function(){ov.querySelectorAll('.sub-perm-cb').forEach(function(cb){cb.checked=true;});});
+ov.querySelector('#permSelectNone').addEventListener('click',function(){ov.querySelectorAll('.sub-perm-cb').forEach(function(cb){cb.checked=false;});});
+ov.querySelector('#permConfirmBtn').addEventListener('click',async function(){
+var perms=[];
+ov.querySelectorAll('.sub-perm-cb:checked').forEach(function(cb){perms.push(cb.value);});
+var btn=ov.querySelector('#permConfirmBtn');
+btn.disabled=true;btn.textContent='创建中...';
+try{
+await DB.createSubAccount(currentAdminUser.id,user.id,perms);
+toast('子账号已创建');
+DB.addLog('子账号管理','创建子账号 '+email+'，权限: '+perms.join(','));
+ov.remove();
+self.renderSubAccounts(c);
+}catch(e){toast('创建失败: '+(e.message||'可能已存在'),'error');btn.disabled=false;btn.textContent='确认创建';}
+});
+}catch(e){toast('查找用户失败: '+(e.message||''),'error');}
+});
+},
+_showEditPermDialog:function(id,currentPerms,c){
+var self=this;
+var permHtml='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:12px 0;">';
+for(var i=0;i<ALL_TABS.length;i++){
+var t=ALL_TABS[i];
+var checked=currentPerms.indexOf(t.id)!==-1?' checked':'';
+permHtml+='<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 8px;border-radius:6px;border:1px solid var(--bd);font-size:.82rem;"><input type="checkbox" class="sub-perm-cb" value="'+escapeAttr(t.id)+'"'+checked+' /> '+escapeHTML(t.icon+' '+t.label)+'</label>';
+}
+permHtml+='</div>';
+var ov=document.createElement('div');
+ov.className='modal-overlay';
+ov.innerHTML='<div class="modal-box"><div class="modal-header"><h3>编辑权限</h3><span class="close-btn sub-perm-close">✕</span></div><div class="modal-body">'+permHtml+'<div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-xs btn-outline" id="permSelectAll">全选</button><button class="btn btn-xs btn-outline" id="permSelectNone">清空</button></div></div><div class="modal-footer"><button class="btn btn-sm btn-outline sub-perm-close">取消</button><button class="btn btn-sm btn-primary" id="permSaveBtn">保存</button></div></div>';
+document.body.appendChild(ov);
+ov.querySelector('.sub-perm-close').addEventListener('click',function(){ov.remove();});
+ov.querySelector('#permSelectAll').addEventListener('click',function(){ov.querySelectorAll('.sub-perm-cb').forEach(function(cb){cb.checked=true;});});
+ov.querySelector('#permSelectNone').addEventListener('click',function(){ov.querySelectorAll('.sub-perm-cb').forEach(function(cb){cb.checked=false;});});
+ov.querySelector('#permSaveBtn').addEventListener('click',async function(){
+var perms=[];
+ov.querySelectorAll('.sub-perm-cb:checked').forEach(function(cb){perms.push(cb.value);});
+var btn=ov.querySelector('#permSaveBtn');
+btn.disabled=true;btn.textContent='保存中...';
+try{
+await DB.updateSubPermissions(id,perms);
+toast('权限已更新');
+DB.addLog('子账号管理','更新子账号权限 '+id+'，权限: '+perms.join(','));
+ov.remove();
+self.renderSubAccounts(c);
+}catch(e){toast('保存失败: '+(e.message||''),'error');btn.disabled=false;btn.textContent='保存';}
+});
 }
 };
 document.addEventListener('DOMContentLoaded',function(){App.init();});
@@ -3076,5 +3322,6 @@ if(tt)tt.addEventListener('click',function(){setTimeout(syncThemeColor,0);});
 });
 })();
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
