@@ -3149,11 +3149,13 @@ var cb=c.querySelector('#clearLogsBtn');
 if(cb)cb.addEventListener('click',async function(){if(!(await uiConfirm('确定清空所有操作日志吗？',{title:'清空日志',icon:'🗑',danger:true,okText:'清空'})))return;DB.clearLogs();toast('日志已清空');App.renderSettings(c);});
 },
 renderSubAccounts:async function(c){
-if(isSubAccount){c.innerHTML='<div class="empty-state"><div class="icon">🚫</div><h3>无权访问</h3><p>子账号无法管理子账号</p></div>';return;}
+if(isSubAccount){c.innerHTML='<div class="empty-state"><div class="icon"></div><h3>无权访问</h3><p>子账号无法管理子账号</p></div>';return;}
 var self=this;
+var seq=this._seq;
 c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载子账号...</div>';
 try{
 var list=await DB.loadSubAccounts();
+if(seq!==this._seq)return;
 var h='<h2 class="page-title">🛡 子账号管理</h2><p class="page-sub">创建子账号并分配可访问的功能模块，子账号使用自己的邮箱密码登录</p>';
 h+='<div class="toolbar"><button class="btn btn-sm btn-primary" id="addSubBtn">+ 添加子账号</button><span class="selected-info">共 '+list.length+' 个子账号</span></div>';
 if(list.length===0){
@@ -3240,12 +3242,14 @@ var ov=document.createElement('div');
 ov.className='modal-overlay';
 ov.innerHTML='<div class="modal-box"><div class="modal-header"><h3>设置权限 — '+escapeHTML(email)+'</h3><span class="close-btn sub-perm-close">✕</span></div><div class="modal-body">'+permHtml+'<div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-xs btn-outline" id="permSelectAll">全选</button><button class="btn btn-xs btn-outline" id="permSelectNone">清空</button></div></div><div class="modal-footer"><button class="btn btn-sm btn-outline sub-perm-close">取消</button><button class="btn btn-sm btn-primary" id="permConfirmBtn">确认创建</button></div></div>';
 document.body.appendChild(ov);
+ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
 ov.querySelector('.sub-perm-close').addEventListener('click',function(){ov.remove();});
 ov.querySelector('#permSelectAll').addEventListener('click',function(){ov.querySelectorAll('.sub-perm-cb').forEach(function(cb){cb.checked=true;});});
 ov.querySelector('#permSelectNone').addEventListener('click',function(){ov.querySelectorAll('.sub-perm-cb').forEach(function(cb){cb.checked=false;});});
 ov.querySelector('#permConfirmBtn').addEventListener('click',async function(){
 var perms=[];
 ov.querySelectorAll('.sub-perm-cb:checked').forEach(function(cb){perms.push(cb.value);});
+if(perms.length===0){toast('请至少选择一个权限模块','warning');return;}
 var btn=ov.querySelector('#permConfirmBtn');
 btn.disabled=true;btn.textContent='创建中...';
 try{
@@ -3272,12 +3276,14 @@ var ov=document.createElement('div');
 ov.className='modal-overlay';
 ov.innerHTML='<div class="modal-box"><div class="modal-header"><h3>编辑权限</h3><span class="close-btn sub-perm-close">✕</span></div><div class="modal-body">'+permHtml+'<div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-xs btn-outline" id="permSelectAll">全选</button><button class="btn btn-xs btn-outline" id="permSelectNone">清空</button></div></div><div class="modal-footer"><button class="btn btn-sm btn-outline sub-perm-close">取消</button><button class="btn btn-sm btn-primary" id="permSaveBtn">保存</button></div></div>';
 document.body.appendChild(ov);
+ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
 ov.querySelector('.sub-perm-close').addEventListener('click',function(){ov.remove();});
 ov.querySelector('#permSelectAll').addEventListener('click',function(){ov.querySelectorAll('.sub-perm-cb').forEach(function(cb){cb.checked=true;});});
 ov.querySelector('#permSelectNone').addEventListener('click',function(){ov.querySelectorAll('.sub-perm-cb').forEach(function(cb){cb.checked=false;});});
 ov.querySelector('#permSaveBtn').addEventListener('click',async function(){
 var perms=[];
 ov.querySelectorAll('.sub-perm-cb:checked').forEach(function(cb){perms.push(cb.value);});
+if(perms.length===0){toast('请至少保留一个权限模块','warning');return;}
 var btn=ov.querySelector('#permSaveBtn');
 btn.disabled=true;btn.textContent='保存中...';
 try{
