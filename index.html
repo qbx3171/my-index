@@ -19,13 +19,13 @@
 <meta name="twitter:card" content="summary" />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="preconnect" href="https://qqcxtfayjxyvswblmdpw.supabase.co" crossorigin />
-<link rel="dns-prefetch" href="https://unpkg.com" />
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
 <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'" />
 <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css"></noscript>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://lezhesoft.cn/#website","url":"https://lezhesoft.cn/","name":"乐哲软件","alternateName":"LeZheSoft","description":"提供设计工具、开发工具、办公软件、媒体工具等全品类实用软件下载与安装教程。","inLanguage":"zh-CN","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://lezhesoft.cn/?search={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"Organization","@id":"https://lezhesoft.cn/#organization","name":"乐哲软件","url":"https://lezhesoft.cn/","email":"LeZheSoft@outlook.com"}]}
 </script>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.3/dist/index.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
@@ -977,7 +977,7 @@ body.ls-locked{overflow:hidden !important}
 </div>
 <footer class="footer">
 <div class="brand">◆ 乐哲软件</div>
-<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection#c985ac93a1ac9aa6afbd89a6bcbda5a6a6a2e7aaa6a4"><span class="__cf_email__" data-cfemail="074b625d6f6254686173476872736b68686c2964686a">[email&#160;protected]</span></a></p>
+<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a></p>
 <div class="links">
 <span>友情链接：</span>
 <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> |
@@ -1102,7 +1102,7 @@ body.ls-locked{overflow:hidden !important}
 <div class="form-actions"><button class="btn btn-outline" id="fbCancel">取消</button><button class="btn btn-primary" id="fbSubmit">提交</button></div>
 </div>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 var supabaseClient=null;
@@ -1680,12 +1680,16 @@ if(soft){App.goHome();setTimeout(function(){Detail.open(soft);},200);}
 var Detail={
 _keyHandler:null,
 _currentSoft:null,
+_viewedThisSession:{},
 open:function(soft){
 if(window.scrollY>0)App._scrollPos=window.scrollY;
 addViewHistory(soft.id);
 markSoftSeen(soft.id);
+if(!this._viewedThisSession[soft.id]){
+this._viewedThisSession[soft.id]=true;
 soft.views=(soft.views||0)+1;
 DB.updateSoftware(soft).catch(function(e){});
+}
 var overlay=document.getElementById('detailOverlay');
 var iconEl=document.getElementById('detailIcon');
 if(soft.icon_url&&soft.icon_url.trim()){
@@ -2410,7 +2414,7 @@ if(isAuto)redeemRow.delivered_at=new Date().toISOString();
 var insRes=await supabaseClient.from('redeems').insert([redeemRow]).select().single();
 if(insRes.error){
 if(stock!==-1){
-try{await supabaseClient.from('mall_items').update({stock:stock}).eq('id',itemId);}catch(e){}
+try{var rollback=await supabaseClient.from('mall_items').update({stock:stock}).eq('id',itemId);if(rollback.error)console.error('库存回滚失败',rollback.error);}catch(e){console.error('库存回滚异常',e);}
 }
 toast('兑换失败：'+insRes.error.message,'error');
 return;
@@ -2524,6 +2528,7 @@ ov.onclick=function(e){if(e.target===ov)close();};
 };
 var Notif={
 _readKey:'lezhe_notif_read',_readIds:[],_rtChannel:null,_lastLoadTs:0,
+addReadId:function(id){var sid=String(id);if(this._readIds.indexOf(sid)===-1){this._readIds.push(sid);if(this._readIds.length>200)this._readIds=this._readIds.slice(-200);}},
 load:function(){
 var _now=Date.now();
 if(_now-this._lastLoadTs<300)return;
@@ -2576,7 +2581,7 @@ var remain=document.querySelectorAll('#notifList .notif-item.unread').length;
 Notif.updateBadge(remain);
 });
 }else{
-if(Notif._readIds.indexOf(String(rawId))===-1)Notif._readIds.push(String(rawId));
+Notif.addReadId(rawId);
 try{localStorage.setItem(Notif._readKey,JSON.stringify(Notif._readIds));}catch(e){}
 Notif.updateBadge();
 }
@@ -2627,7 +2632,7 @@ markAllRead:function(){
 document.querySelectorAll('#notifList .notif-item').forEach(function(el){
 var rawId=el.dataset.rawid;
 if(el.dataset.type!=='notif'){
-if(Notif._readIds.indexOf(String(rawId))===-1)Notif._readIds.push(String(rawId));
+Notif.addReadId(rawId);
 }
 el.classList.remove('unread');
 });
@@ -2761,7 +2766,8 @@ var grid=document.getElementById('collectionGrid');
 if(!sec||!grid||!list.length)return;
 sec.classList.remove('hidden');
 grid.innerHTML=list.map(function(c){
-var bg=c.cover?'background-image:url('+escapeAttr(c.cover)+');':'background:linear-gradient(135deg,#0077ff,#6c5ce7);';
+var bg='background:linear-gradient(135deg,#0077ff,#6c5ce7);';
+if(c.cover&&isImageUrl(c.cover)){var safeUrl=c.cover.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\)/g,'\\)');bg='background-image:url("'+safeUrl+'");';}
 return '<div class="collection-card" data-id="'+escapeAttr(c.id)+'" style="'+bg+'"><div class="cc-info"><div class="cc-title">'+escapeHTML(c.title)+'</div><div class="cc-sub">'+escapeHTML(c.subtitle||'')+'</div></div></div>';
 }).join('');
 grid.querySelectorAll('.collection-card').forEach(function(el){
@@ -3909,7 +3915,6 @@ setTimeout(finishLoading,2500);
 })();
 </script>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
