@@ -18,17 +18,53 @@
 <meta property="og:url" content="https://lezhesoft.cn/" />
 <meta name="twitter:card" content="summary" />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="preconnect" href="https://unpkg.com" crossorigin />
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
 <link rel="preconnect" href="https://qqcxtfayjxyvswblmdpw.supabase.co" crossorigin />
 <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
-<link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'" />
-<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css"></noscript>
+<link rel="dns-prefetch" href="https://unpkg.com" />
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+<script>
+(function(){
+var CDNS={
+supabase:['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2','https://unpkg.com/@supabase/supabase-js@2','https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.3/supabase.min.js'],
+pinyin:['https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.3/dist/index.min.js','https://unpkg.com/pinyin-pro@3.19.3/dist/index.min.js'],
+purify:['https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js','https://unpkg.com/dompurify@3.0.6/dist/purify.min.js','https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js'],
+qrcode:['https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js','https://unpkg.com/qrcode-generator@1.4.4/qrcode.js']
+};
+function loadScript(urls,idx,cb){
+if(idx>=urls.length){console.warn('[CDN] All sources failed for script');if(cb)cb(false);return;}
+var s=document.createElement('script');s.src=urls[idx];s.async=true;
+s.onload=function(){if(cb)cb(true);};
+s.onerror=function(){console.warn('[CDN] Failed: '+urls[idx]+', trying next...');s.remove();loadScript(urls,idx+1,cb);};
+document.head.appendChild(s);
+}
+function loadFontCSS(urls,idx){
+if(idx>=urls.length){console.warn('[CDN] Font Awesome: all sources failed');return;}
+var l=document.createElement('link');l.rel='stylesheet';l.href=urls[idx];
+l.onerror=function(){console.warn('[CDN] Font CSS failed: '+urls[idx]);l.remove();loadFontCSS(urls,idx+1);};
+document.head.appendChild(l);
+}
+var faUrls=['https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css','https://unpkg.com/@fortawesome/fontawesome-free@6.5.0/css/all.min.css','https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css'];
+loadFontCSS(faUrls,0);
+loadScript(CDNS.supabase,0,function(ok){if(ok)window.dispatchEvent(new Event('supabase:loaded'));});
+loadScript(CDNS.pinyin,0);
+loadScript(CDNS.purify,0);
+loadScript(CDNS.qrcode,0);
+window._cdnLoadStatus={supabase:false,pinyin:false,purify:false,qrcode:false};
+var _checkInt=setInterval(function(){
+window._cdnLoadStatus.supabase=typeof supabase!=='undefined'&&!!supabase.createClient;
+window._cdnLoadStatus.pinyin=typeof pinyin!=='undefined'||typeof window.pinyinPro!=='undefined';
+window._cdnLoadStatus.purify=typeof DOMPurify!=='undefined'||typeof window.DOMPurify!=='undefined';
+window._cdnLoadStatus.qrcode=typeof qrcode==='function';
+if(window._cdnLoadStatus.supabase){clearInterval(_checkInt);window.dispatchEvent(new Event('supabase:ready'));}
+},200);
+setTimeout(function(){clearInterval(_checkInt);},15000);
+})();
+</script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://lezhesoft.cn/#website","url":"https://lezhesoft.cn/","name":"乐哲软件","alternateName":"LeZheSoft","description":"提供设计工具、开发工具、办公软件、媒体工具等全品类实用软件下载与安装教程。","inLanguage":"zh-CN","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://lezhesoft.cn/?search={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"Organization","@id":"https://lezhesoft.cn/#organization","name":"乐哲软件","url":"https://lezhesoft.cn/","email":"LeZheSoft@outlook.com"}]}
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.3/dist/index.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <style>
 :root{--bg-primary:#f6f8fc;--bg-secondary:#eef2f9;--bg-card:rgba(255,255,255,.78);--bg-card-solid:#ffffff;--border-glow:rgba(15,26,46,.08);--border-glow-strong:rgba(15,26,46,.16);--text-primary:#0f1a2e;--text-secondary:#4a5a72;--text-dim:#94a3b8;--accent-cyan:#0077ff;--accent-purple:#6c5ce7;--accent-gradient:linear-gradient(135deg,#0077ff,#6c5ce7);--shadow-card:0 4px 16px rgba(15,26,46,.06),0 2px 6px rgba(15,26,46,.04);--shadow-card-hover:0 12px 32px rgba(15,26,46,.10);--shadow-sm:0 1px 2px rgba(15,26,46,.05),0 1px 3px rgba(15,26,46,.04);--radius-lg:20px;--radius-md:14px;--radius-sm:10px;--transition:.22s cubic-bezier(.2,0,0,1);--font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;--max-width:1200px;--header-height:64px;--danger:#e74c3c;--success:#22a05e;--warning:#f39c12;--sidebar-width:280px;--sidebar-trigger-width:32px}
 [data-theme="dark"]{--bg-primary:#0d1424;--bg-secondary:#131c30;--bg-card:rgba(19,28,48,.82);--bg-card-solid:#131c30;--border-glow:rgba(255,255,255,.07);--border-glow-strong:rgba(255,255,255,.14);--text-primary:#e8eef8;--text-secondary:#a8b5c9;--text-dim:#6b7a91;--shadow-card:0 4px 16px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.25);--shadow-card-hover:0 12px 32px rgba(0,0,0,.5);--shadow-sm:0 1px 2px rgba(0,0,0,.3)}
@@ -1102,7 +1138,7 @@ body.ls-locked{overflow:hidden !important}
 <div class="form-actions"><button class="btn btn-outline" id="fbCancel">取消</button><button class="btn btn-primary" id="fbSubmit">提交</button></div>
 </div>
 </div>
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 var supabaseClient=null;
@@ -1110,15 +1146,47 @@ var isAdmin=false;
 var currentUser=null;
 var userProfile=null;
 var _urlParamsHandled=false;
+var _supabaseInitRetries=0;
+var _supabaseInitMaxRetries=30;
 function initSupabase(){
 if(supabaseClient)return true;
 if(typeof supabase!=='undefined'&&supabase&&supabase.createClient){
-try{supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);return true;}
+try{supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);console.log('[Supabase] 初始化成功');return true;}
 catch(e){console.error('Supabase 初始化失败',e);return false;}
 }
 return false;
 }
-initSupabase();
+function tryInitSupabaseWithRetry(){
+if(supabaseClient)return;
+if(initSupabase())return;
+_supabaseInitRetries++;
+if(_supabaseInitRetries<_supabaseInitMaxRetries){
+setTimeout(tryInitSupabaseWithRetry,500);
+}else{
+console.warn('[Supabase] 库加载超时，尝试备用方案...');
+tryLoadSupabaseFallback();
+}
+}
+function tryLoadSupabaseFallback(){
+if(supabaseClient)return;
+var fallbackUrls=[
+'https://unpkg.com/@supabase/supabase-js@2',
+'https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.3/supabase.min.js'
+];
+var idx=0;
+function tryNext(){
+if(idx>=fallbackUrls.length||supabaseClient)return;
+var s=document.createElement('script');s.src=fallbackUrls[idx];
+s.onload=function(){
+if(initSupabase()){console.log('[Supabase] 备用CDN加载成功');window.dispatchEvent(new Event('supabase:ready'));}
+else{idx++;tryNext();}
+};
+s.onerror=function(){idx++;tryNext();};
+document.head.appendChild(s);
+}
+tryNext();
+}
+tryInitSupabaseWithRetry();
 var THEME_VALUES=['light','dark','glass','auto'];
 var THEME_LABELS={light:'白天',dark:'黑夜',glass:'玻璃',auto:'自动'};
 var RESET_COOLDOWN_MS=300000;
@@ -1184,23 +1252,44 @@ var CACHE_KEY='lezhe_software_cache';
 var cache={software:[],categories:[],loaded:false,lastFetch:0};
 function safeParse(str,fallback){try{var v=JSON.parse(str);return(v===null||v===undefined)?fallback:v;}catch(e){return fallback;}}
 function safeArray(v){return Array.isArray(v)?v:[];}
-function checkSupabase(){initSupabase();if(!supabaseClient){toast('服务未加载，请刷新页面重试','error');return false;}return true;}
+function checkSupabase(silent){initSupabase();if(!supabaseClient){if(!silent)toast('服务未加载，请刷新页面重试','error');return false;}return true;}
 function isToday(d){if(!d)return false;var t=new Date(d),n=new Date();return t.getFullYear()===n.getFullYear()&&t.getMonth()===n.getMonth()&&t.getDate()===n.getDate();}
 function timeAgo(d){if(!d)return '刚刚';var n=new Date(),diff=Math.max(0,n-new Date(d)),m=Math.floor(diff/60000);if(m<1)return '刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';var days=Math.floor(h/24);if(days<7)return days+'天前';return new Date(d).toLocaleDateString('zh-CN');}
 function saveCacheToStorage(){try{localStorage.setItem(CACHE_KEY,JSON.stringify({software:cache.software,categories:cache.categories,timestamp:Date.now()}));}catch(e){}}
 function getCachedData(){if(cache.loaded&&cache.software.length>0)return{software:cache.software,categories:cache.categories};var s=localStorage.getItem(CACHE_KEY);if(s){try{var d=JSON.parse(s);if(d&&Array.isArray(d.software)&&Array.isArray(d.categories)){cache.software=d.software;cache.categories=d.categories;cache.loaded=true;cache.lastFetch=d.timestamp||0;return{software:cache.software,categories:cache.categories};}}catch(e){}}return null;}
 var DB={
+_loadRetryCount:0,
+_loadMaxRetries:5,
+async waitForSupabase(){
+var maxWait=20;
+for(var i=0;i<maxWait;i++){
+if(supabaseClient)return true;
+initSupabase();
+if(supabaseClient)return true;
+await new Promise(function(r){setTimeout(r,500);});
+}
+return !!supabaseClient;
+},
 async loadAll(force){
 force=force||false;
-initSupabase();
-if(!supabaseClient){console.warn('Supabase 未加载');return{software:[],categories:['设计工具','开发工具','办公软件','媒体工具','实用工具']};}
+if(!supabaseClient){
+var ready=await this.waitForSupabase();
+if(!ready){
+console.warn('[DB] Supabase 加载超时，使用缓存或默认数据');
+if(cache.loaded&&cache.software.length>0)return{software:cache.software,categories:cache.categories};
+return{software:[],categories:['设计工具','开发工具','办公软件','媒体工具','实用工具']};
+}
+}
 if(cache.loaded&&!force&&(Date.now()-cache.lastFetch<600000))return{software:cache.software,categories:cache.categories};
+var lastErr=null;
+for(var attempt=0;attempt<=this._loadMaxRetries;attempt++){
 try{
 var[softRes,catRes]=await Promise.all([supabaseClient.from('software').select('*').order('created_at',{ascending:false}),supabaseClient.from('categories').select('name').order('name')]);
 if(softRes.error)throw softRes.error;
 if(catRes.error)throw catRes.error;
 cache.software=Array.isArray(softRes.data)?softRes.data:[];
 cache.categories=(catRes.data&&catRes.data.length)?catRes.data.map(function(item){return item.name;}):['设计工具','开发工具','办公软件','媒体工具','实用工具'];
+this._loadRetryCount=0;
 cache.software.forEach(function(s){
 s.screenshots=safeArray(s.screenshots);
 if(!s.changelog)s.changelog='';
@@ -1219,10 +1308,19 @@ cache.lastFetch=Date.now();
 saveCacheToStorage();
 return{software:cache.software,categories:cache.categories};
 }catch(e){
-console.error('加载数据失败:',e);
-if(cache.loaded)return{software:cache.software,categories:cache.categories};
-return{software:[],categories:['设计工具','开发工具','办公软件','媒体工具','实用工具']};
+lastErr=e;
+console.error('[DB] 加载失败 (尝试 '+(attempt+1)+'/'+(this._loadMaxRetries+1)+'):',e);
+if(attempt<this._loadMaxRetries){
+await new Promise(function(r){setTimeout(r,1000*(attempt+1));});
+continue;
 }
+}
+}
+console.error('[DB] 所有重试均失败:',lastErr);
+if(cache.loaded&&cache.software.length>0)return{software:cache.software,categories:cache.categories};
+var cached=getCachedData();
+if(cached)return cached;
+return{software:[],categories:['设计工具','开发工具','办公软件','媒体工具','实用工具']};
 },
 getSoftware:function(){return cache.software;},
 getCategories:function(){return cache.categories;},
@@ -3916,5 +4014,6 @@ setTimeout(finishLoading,2500);
 </script>
 <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
