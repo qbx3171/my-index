@@ -887,6 +887,27 @@ body{background-attachment:scroll !important}
 @keyframes lsDot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
 #loadingScreen.ls-done .ls-inner{animation:lsInnerOut .5s ease forwards}
 @keyframes lsInnerOut{to{opacity:0;transform:scale(.94) translateY(-8px)}}
+.rich-editor-wrapper{border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);overflow:hidden;}
+.rich-toolbar{display:flex;gap:4px;padding:8px 12px;background:var(--bg-secondary);border-bottom:1px solid var(--border-glow);flex-wrap:wrap;}
+.rich-toolbar button{padding:6px 10px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--text-primary);cursor:pointer;font-size:0.85rem;transition:all .15s;}
+.rich-toolbar button:hover{background:rgba(0,119,255,0.1);border-color:var(--accent-cyan);}
+.rich-toolbar button:active{transform:scale(0.95);}
+.rich-editor{min-height:120px;padding:12px 16px;color:var(--text-primary);font-size:0.95rem;line-height:1.6;outline:none;white-space:pre-wrap;word-break:break-word;}
+.rich-editor:focus{border-color:transparent;}
+.rich-editor:empty:before{content:attr(data-placeholder);color:var(--text-dim);pointer-events:none;}
+.rich-editor b,.rich-editor strong{font-weight:700;}
+.rich-editor i,.rich-editor em{font-style:italic;}
+.rich-editor u{text-decoration:underline;}
+.rich-editor ul,.rich-editor ol{margin:8px 0;padding-left:24px;}
+.rich-editor li{margin:4px 0;}
+.rich-editor code{background:rgba(0,119,255,0.08);padding:2px 6px;border-radius:4px;font-family:'Courier New',monospace;font-size:0.9em;}
+.rich-editor pre{background:#1e293b;color:#e2e8f0;padding:12px;border-radius:8px;overflow-x:auto;margin:8px 0;font-size:0.85rem;}
+.rich-editor a{color:var(--accent-cyan);text-decoration:underline;}
+.rich-editor img{max-width:100%;height:auto;border-radius:8px;margin:8px 0;display:block;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+.rich-editor blockquote{border-left:4px solid var(--accent-cyan);padding:8px 16px;margin:8px 0;background:rgba(0,119,255,0.05);border-radius:0 8px 8px 0;color:var(--text-secondary);}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600;margin-left:6px;vertical-align:middle;}
+.badge-pinned{background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;}
+.badge-featured{background:linear-gradient(135deg,#f39c12,#e74c3c);color:#fff;}
 body.ls-locked{overflow:hidden !important}
 </style>
 </head>
@@ -975,6 +996,24 @@ body.ls-locked{overflow:hidden !important}
 <section id="pageQA" class="hidden page-section">
 <div class="container" style="max-width:var(--max-width);padding:0 16px;">
 <div class="section-header"><h2><i class="fas fa-question-circle"></i> 社区问答</h2><button class="btn btn-primary" id="newQuestionBtn"><i class="fas fa-plus"></i> 提问</button></div>
+<div class="qa-category-tabs" id="qaCategoryTabs" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+<button class="btn btn-sm btn-outline qa-tab active" data-cat="all">全部</button>
+<button class="btn btn-sm btn-outline qa-tab" data-cat="设计">设计</button>
+<button class="btn btn-sm btn-outline qa-tab" data-cat="开发">开发</button>
+<button class="btn btn-sm btn-outline qa-tab" data-cat="办公">办公</button>
+<button class="btn btn-sm btn-outline qa-tab" data-cat="媒体">媒体</button>
+<button class="btn btn-sm btn-outline qa-tab" data-cat="实用">实用</button>
+</div>
+<div class="forum-welcome-card" style="background:linear-gradient(135deg,rgba(0,119,255,0.08),rgba(108,92,231,0.08));border-radius:16px;padding:20px 24px;margin-bottom:20px;border:1px solid var(--border-glow);">
+<h3 style="margin:0 0 12px;font-size:1.1rem;"><i class="fas fa-lightbulb" style="color:var(--warning);"></i>  如何让你的问题被快速解决？乐哲社区「高质量提问指南」</h3>
+<ul style="margin:0;padding-left:20px;color:var(--text-secondary);font-size:0.9rem;line-height:1.8;">
+<li><strong>标题清晰：</strong>用一句话概括问题，例如"Photoshop 2026 启动时提示'授权失败'"而不是"求助"</li>
+<li><strong>描述详细：</strong>说明系统环境、问题表现、已尝试的方法，最好附上截图</li>
+<li><strong>分类准确：</strong>选择正确的分类（设计/开发/办公/媒体），方便专业人士看到</li>
+<li><strong>善用格式：</strong>使用代码块展示错误信息，用列表整理步骤，让回答者更容易理解</li>
+</ul>
+<p style="margin:12px 0 0;font-size:0.85rem;color:var(--text-dim);"><i class="fas fa-heart" style="color:#e74c3c;"></i> 不要害怕问题太简单，每一个大神都是从"小白"走过来的。我们鼓励分享、鼓励互助，更鼓励每一个大胆的提问！</p>
+</div>
 <div id="questionList" class="card-list"></div>
 <div id="questionDetailContainer" class="hidden" style="margin-top:20px;"></div>
 </div>
@@ -1006,7 +1045,7 @@ body.ls-locked{overflow:hidden !important}
 </section>
 <section id="pageProfile" class="hidden page-section">
 <div class="container" style="max-width:var(--max-width);padding:0 16px;">
-<div class="section-header"><h2><i class="fas fa-user-circle"></i> 个人中心</h2><button class="btn btn-outline" id="profileLogoutBtn" style="color:var(--danger);"><i class="fas fa-sign-out-alt"></i> 退出登录</button></div>
+<div class="section-header"><h2><i class="fas fa-user-circle"></i> 个人中心</h2><div style="display:flex;gap:8px;"><button class="btn btn-outline" onclick="openSensitiveWordsManager()" title="敏感词管理"><i class="fas fa-shield-alt"></i></button><button class="btn btn-outline" id="profileLogoutBtn" style="color:var(--danger);"><i class="fas fa-sign-out-alt"></i> 退出登录</button></div></div>
 <div id="profileContent" style="min-height:200px;"></div>
 </div>
 </section>
@@ -1042,8 +1081,8 @@ body.ls-locked{overflow:hidden !important}
 <nav class="mobile-bottom-nav" id="mobileBottomNav"><a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a><a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a><a href="#" data-page="checkin"><i class="fas fa-calendar-check"></i><span>签到</span></a><a href="#" data-page="ranking"><i class="fas fa-trophy"></i><span>排行</span></a><a href="#" data-page="mall"><i class="fas fa-gift"></i><span>商城</span></a><a href="#" data-page="profile" style="display:none;"><i class="fas fa-user"></i><span>我的</span></a></nav>
 <div class="share-float" id="shareFloat"><a href="#" onclick="shareOn('wechat');return false;" title="分享到微信"><i class="fab fa-weixin"></i></a><a href="#" onclick="shareOn('weibo');return false;" title="分享到微博"><i class="fab fa-weibo"></i></a><a href="#" onclick="shareOn('twitter');return false;" title="分享到Twitter"><i class="fab fa-twitter"></i></a><a href="#" onclick="copyLink();return false;" title="复制链接"><i class="fas fa-link"></i></a><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" title="回到顶部"><i class="fas fa-arrow-up"></i></a></div>
 <div class="modal-overlay" id="tutorialDetailModal"><div class="modal-box" style="padding:0;max-width:900px;"><button class="close-btn" id="tutorialDetailClose" style="position:sticky;top:12px;right:12px;z-index:10;float:right;background:rgba(0,0,0,0.5);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:none;cursor:pointer;margin:8px 8px 0 0;">&times;</button><div style="padding:0 24px 8px;border-bottom:1px solid var(--border-glow);"><h3 id="tutorialDetailTitle" style="margin:8px 0 4px;font-size:1.5rem;font-weight:700;">教程标题</h3><div class="meta" style="font-size:.8rem;color:var(--text-dim);display:flex;gap:12px;flex-wrap:wrap;padding-bottom:8px;" id="tutorialDetailMeta"></div></div><div id="tutorialDetailVideos" style="padding:16px 24px 0;"></div><div id="tutorialDetailContent"></div><div id="tutorialComments"><h4><i class="far fa-comment-dots"></i> 评论</h4><div id="commentList"></div><div class="comment-input-area"><input type="text" id="commentAuthor" placeholder="昵称（可选）" style="flex:0.4;min-width:80px;"><input type="text" id="commentContent" placeholder="写评论..." style="flex:1;min-width:120px;"><button class="btn btn-primary" id="commentSubmitBtn">发表</button></div></div><div class="form-actions" style="padding:8px 24px 20px;border-top:1px solid var(--border-glow);"><button class="btn btn-outline" id="tutorialDetailCloseBtn">关闭</button></div></div></div>
-<div class="modal-overlay" id="questionModal"><div class="modal-box"><button class="close-btn" id="questionModalClose">&times;</button><h3>提出你的问题</h3><div class="form-group"><label>问题标题</label><input type="text" id="qTitle" placeholder="简明扼要的问题" /></div><div class="form-group"><label>详细描述</label><textarea id="qBody" rows="5" placeholder="问题背景、期望的答案等..."></textarea></div><div class="form-group"><label>分类</label><select id="qCategory"><option value="设计">设计</option><option value="开发">开发</option><option value="办公">办公</option><option value="媒体">媒体</option><option value="实用">实用</option></select></div><div class="form-actions"><button class="btn btn-outline" id="qCancel">取消</button><button class="btn btn-primary" id="qSubmit">提交问题</button></div></div></div>
-<div class="modal-overlay" id="answerModal"><div class="modal-box"><button class="close-btn" id="answerModalClose">&times;</button><h3>你的回答</h3><div class="form-group"><label>回答内容</label><textarea id="aBody" rows="5" placeholder="写你的回答..."></textarea></div><div class="form-actions"><button class="btn btn-outline" id="aCancel">取消</button><button class="btn btn-primary" id="aSubmit">提交回答</button></div></div></div>
+<div class="modal-overlay" id="questionModal"><div class="modal-box" style="max-width:700px;"><button class="close-btn" id="questionModalClose">&times;</button><h3><i class="fas fa-question-circle"></i> 提出你的问题</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">🎉 欢迎来到乐哲社区！无论遇到软件安装报错、找不到激活工具，还是对设计/开发流程有疑问，这里都是你最好的避风港。不要害怕问题太简单，每一个大神都是从"小白"走过来的。</p><div class="form-group"><label>问题标题 *</label><input type="text" id="qTitle" placeholder="简明扼要地描述你的问题，例如：Photoshop 2026 启动时提示'授权失败'" /></div><div class="form-group"><label>详细描述 *</label><div class="rich-editor-wrapper"><div class="rich-toolbar"><button type="button" data-action="bold" title="粗体"><i class="fas fa-bold"></i></button><button type="button" data-action="italic" title="斜体"><i class="fas fa-italic"></i></button><button type="button" data-action="underline" title="下划线"><i class="fas fa-underline"></i></button><button type="button" data-action="insertUnorderedList" title="无序列表"><i class="fas fa-list-ul"></i></button><button type="button" data-action="insertOrderedList" title="有序列表"><i class="fas fa-list-ol"></i></button><button type="button" data-action="createLink" title="插入链接"><i class="fas fa-link"></i></button><button type="button" data-action="insertCode" title="代码块"><i class="fas fa-code"></i></button><button type="button" data-action="insertImage" title="上传图片"><i class="fas fa-image"></i></button><input type="file" id="qImageUpload" accept="image/*" style="display:none;" /></div><div class="rich-editor" contenteditable="true" id="qBody" data-placeholder="请详细描述：&#10;1. 你的系统环境（Windows/Mac/Android版本）&#10;2. 问题的具体表现&#10;3. 已尝试的解决方法&#10;4. 截图或错误信息（点击🖼️按钮上传）"></div></div></div><div class="form-group"><label>分类 *</label><select id="qCategory"><option value="">-- 选择分类 --</option><option value="设计">🎨 设计工具</option><option value="开发">💻 开发工具</option><option value="办公"> 办公软件</option><option value="媒体">🎬 媒体工具</option><option value="实用">🔧 实用工具</option><option value="其他"> 其他问题</option></select></div><div class="form-group"><label><i class="fas fa-paperclip"></i> 附件（可选）</label><div class="attachment-upload-area" style="border:2px dashed var(--border-glow);border-radius:12px;padding:16px;text-align:center;background:var(--bg-secondary);cursor:pointer;transition:all .2s;" id="qAttachmentArea"><i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:var(--accent-cyan);margin-bottom:8px;"></i><p style="margin:0;font-size:0.85rem;color:var(--text-secondary);">点击或拖拽文件到此处上传<br/><span style="font-size:0.75rem;color:var(--text-dim);">支持图片、文档等，单个文件不超过10MB</span></p><input type="file" id="qFileUpload" multiple style="display:none;" /></div><div id="qAttachmentList" style="margin-top:8px;"></div></div><div class="form-actions"><button class="btn btn-outline" id="qCancel">取消</button><button class="btn btn-primary" id="qSubmit"><i class="fas fa-paper-plane"></i> 提交问题</button></div></div></div>
+<div class="modal-overlay" id="answerModal"><div class="modal-box" style="max-width:700px;"><button class="close-btn" id="answerModalClose">&times;</button><h3><i class="fas fa-reply"></i> 你的回答</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;">🤝 感谢你的热心帮助！请尽量详细地解答问题，包括步骤说明和截图。</p><div class="form-group"><label>回答内容 *</label><div class="rich-editor-wrapper"><div class="rich-toolbar"><button type="button" data-action="bold" title="粗体"><i class="fas fa-bold"></i></button><button type="button" data-action="italic" title="斜体"><i class="fas fa-italic"></i></button><button type="button" data-action="underline" title="下划线"><i class="fas fa-underline"></i></button><button type="button" data-action="insertUnorderedList" title="无序列表"><i class="fas fa-list-ul"></i></button><button type="button" data-action="insertOrderedList" title="有序列表"><i class="fas fa-list-ol"></i></button><button type="button" data-action="createLink" title="插入链接"><i class="fas fa-link"></i></button><button type="button" data-action="insertCode" title="代码块"><i class="fas fa-code"></i></button><button type="button" data-action="insertImage" title="上传图片"><i class="fas fa-image"></i></button><input type="file" id="aImageUpload" accept="image/*" style="display:none;" /></div><div class="rich-editor" contenteditable="true" id="aBody" data-placeholder="写你的回答...&#10;可以包含：&#10;- 详细的解决步骤&#10;- 相关截图（点击🖼️按钮上传）&#10;- 参考链接或文档"></div></div></div><div class="form-group"><label><i class="fas fa-paperclip"></i> 附件（可选）</label><div class="attachment-upload-area" style="border:2px dashed var(--border-glow);border-radius:12px;padding:16px;text-align:center;background:var(--bg-secondary);cursor:pointer;transition:all .2s;" id="aAttachmentArea"><i class="fas fa-cloud-upload-alt" style="font-size:2rem;color:var(--accent-cyan);margin-bottom:8px;"></i><p style="margin:0;font-size:0.85rem;color:var(--text-secondary);">点击或拖拽文件到此处上传<br/><span style="font-size:0.75rem;color:var(--text-dim);">支持图片、文档等，单个文件不超过10MB</span></p><input type="file" id="aFileUpload" multiple style="display:none;" /></div><div id="aAttachmentList" style="margin-top:8px;"></div></div><div class="form-actions"><button class="btn btn-outline" id="aCancel">取消</button><button class="btn btn-primary" id="aSubmit"><i class="fas fa-paper-plane"></i> 提交回答</button></div></div></div>
 <div class="modal-overlay" id="submitSoftwareModal"><div class="modal-box"><button class="close-btn" id="submitSoftwareModalClose">&times;</button><h3><i class="fas fa-rocket"></i> 开发者入驻 · 提交软件</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:12px;">提交后我们将审核，通过后立即上架。</p><div class="form-group"><label>软件名称 *</label><input type="text" id="subName" placeholder="例如：Photoshop 2026" /></div><div class="form-group"><label>分类 *</label><select id="subCategory"><option value="设计工具">设计工具</option><option value="开发工具">开发工具</option><option value="办公软件">办公软件</option><option value="媒体工具">媒体工具</option><option value="实用工具">实用工具</option></select></div><div class="form-group"><label>版本</label><input type="text" id="subVersion" placeholder="1.0" /></div><div class="form-group"><label>描述</label><textarea id="subDesc" rows="3" placeholder="软件简介..."></textarea></div><div class="form-group"><label>平台 (多个用逗号分隔)</label><input type="text" id="subPlatforms" placeholder="mac,windows,android" /></div><div class="form-group"><label>下载链接</label><input type="url" id="subDownloadUrl" placeholder="https://example.com/download" /></div><div class="form-group"><label>图标 URL</label><input type="url" id="subIconUrl" placeholder="https://example.com/icon.png" /></div><div class="form-group"><label>您的联系方式</label><input type="text" id="subContact" placeholder="用于审核沟通" /></div><div class="form-actions"><button class="btn btn-outline" id="subCancel">取消</button><button class="btn btn-primary" id="subSubmit">提交审核</button></div></div></div>
 <div class="modal-overlay" id="loginModal"><div class="modal-box" style="max-width:420px;padding:0;overflow:hidden;border-radius:20px;"><div style="background:var(--accent-gradient);padding:28px 32px 20px;color:#fff;"><button class="close-btn" id="loginModalClose" style="float:right;color:rgba(255,255,255,0.7);font-size:1.6rem;background:none;border:none;cursor:pointer;">&times;</button><div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;"><div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;">🔐</div><div><h3 style="font-size:1.4rem;font-weight:700;margin:0;color:#fff;">欢迎回来</h3><p style="font-size:0.8rem;opacity:0.8;margin:0;">登录您的乐哲账号</p></div></div></div><div style="padding:24px 32px 32px;background:var(--bg-card-solid);"><div class="form-group" style="margin-bottom:16px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">📧 邮箱地址</label><input type="email" id="loginEmail" placeholder="your@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" /></div><div class="form-group" style="margin-bottom:4px;position:relative;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔑 密码</label><input type="password" id="loginPassword" placeholder="请输入密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;padding-right:44px;" /><button type="button" id="toggleLoginPwd" style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;">👁️</button></div><div style="text-align:right;margin-bottom:16px;"><a href="#" id="forgotPasswordLink" style="font-size:0.75rem;color:var(--accent-cyan);font-weight:500;">忘记密码？</a></div><div id="loginError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div><button class="btn btn-primary" id="loginBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="loginBtnText">登 录</span><span id="loginSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button><p style="text-align:center;margin-top:16px;font-size:0.85rem;color:var(--text-dim);">还没有账号？<a href="#" id="switchToRegister" style="color:var(--accent-cyan);font-weight:600;text-decoration:none;">立即注册 →</a></p></div></div></div>
 <div class="modal-overlay" id="registerModal"><div class="modal-box" style="max-width:420px;padding:0;overflow:hidden;border-radius:20px;"><div style="background:var(--accent-gradient);padding:28px 32px 20px;color:#fff;"><button class="close-btn" id="registerModalClose" style="float:right;color:rgba(255,255,255,0.7);font-size:1.6rem;background:none;border:none;cursor:pointer;">&times;</button><div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;"><div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;">🚀</div><div><h3 style="font-size:1.4rem;font-weight:700;margin:0;color:#fff;">创建账号</h3><p style="font-size:0.8rem;opacity:0.8;margin:0;">加入乐哲，探索更多工具</p></div></div></div><div style="padding:24px 32px 32px;background:var(--bg-card-solid);"><div class="form-group" style="margin-bottom:12px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">📧 邮箱地址</label><input type="email" id="registerEmail" placeholder="your@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" /></div><div class="form-group" style="margin-bottom:12px;position:relative;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔑 密码 <span style="font-weight:400;color:var(--text-dim);font-size:0.7rem;">（至少8位，含大小写和数字）</span></label><input type="password" id="registerPassword" placeholder="设置密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;padding-right:44px;" /><button type="button" id="toggleRegPwd" style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;">👁️</button></div><div class="form-group" style="margin-bottom:12px;position:relative;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">✔️ 确认密码</label><input type="password" id="registerPasswordConfirm" placeholder="再次输入密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;padding-right:44px;" /><button type="button" id="toggleRegPwdConfirm" style="position:absolute;right:12px;bottom:10px;background:none;border:none;color:var(--text-dim);font-size:1rem;cursor:pointer;">👁️</button></div><div class="form-group" style="margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><input type="checkbox" id="agreeTerms" style="width:18px;height:18px;flex-shrink:0;accent-color:var(--accent-cyan);cursor:pointer;appearance:auto;-webkit-appearance:checkbox;" /><label for="agreeTerms" style="font-size:0.8rem;color:var(--text-secondary);cursor:pointer;">我已阅读并同意 <a href="#" id="showUserAgreement" style="color:var(--accent-cyan);text-decoration:underline;">《用户协议》</a> 和 <a href="#" id="showPrivacyPolicy" style="color:var(--accent-cyan);text-decoration:underline;">《隐私政策》</a></label></div><div id="registerError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div><button class="btn btn-primary" id="registerBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="registerBtnText">注 册</span><span id="registerSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button><p style="text-align:center;margin-top:16px;font-size:0.85rem;color:var(--text-dim);">已有账号？<a href="#" id="switchToLogin" style="color:var(--accent-cyan);font-weight:600;text-decoration:none;">去登录 →</a></p></div></div></div>
@@ -1052,6 +1091,7 @@ body.ls-locked{overflow:hidden !important}
 <div class="modal-overlay" id="editProfileModal"><div class="modal-box" style="max-width:420px;padding:24px 28px;border-radius:20px;"><button class="close-btn" id="editProfileModalClose" style="float:right;font-size:1.4rem;color:var(--text-dim);background:none;border:none;cursor:pointer;">&times;</button><h3 style="font-size:1.2rem;margin-bottom:8px;"><i class="fas fa-user-edit"></i> 编辑资料</h3><div class="form-group" style="margin-bottom:12px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">昵称</label><input type="text" id="editUsername" placeholder="输入昵称" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" /></div><div class="form-group" style="margin-bottom:12px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">头像链接 (URL)</label><input type="url" id="editAvatar" placeholder="https://example.com/avatar.jpg" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" /></div><div class="form-group" style="margin-bottom:16px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">个人简介</label><textarea id="editBio" rows="3" placeholder="介绍你自己..." style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;resize:vertical;"></textarea></div><div id="editProfileError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div><div class="form-actions"><button class="btn btn-outline" id="editProfileCancel">取消</button><button class="btn btn-primary" id="editProfileSave">保存</button></div></div></div>
 <div class="modal-overlay" id="resetPasswordSetModal"><div class="modal-box" style="max-width:400px;padding:24px 28px;border-radius:20px;"><button class="close-btn" id="resetPasswordSetModalClose" style="float:right;font-size:1.4rem;color:var(--text-dim);background:none;border:none;cursor:pointer;">&times;</button><h3 style="font-size:1.2rem;margin-bottom:8px;"><i class="fas fa-key"></i> 重置密码</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:12px;">请输入您收到的验证码，并设置新密码。</p><div class="reset-hint reset-hint-warn"><div class="hint-title"><i class="fas fa-exclamation-triangle"></i> 找不到验证码？</div><div>① 请在邮箱的 <b>垃圾邮件 / 广告邮件 / 订阅邮件</b> 文件夹中查找</div><div>② 发件人为 noreply 开头的地址，请勿误删</div><div>③ 验证码为 6 位数字，5 分钟内有效</div></div><div class="form-group" style="margin-bottom:12px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">📧 邮箱地址</label><input type="email" id="resetPasswordEmail" placeholder="your@email.com" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" /></div><div class="form-group" style="margin-bottom:12px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔢 验证码</label><input type="text" id="resetPasswordOtp" placeholder="请输入邮件中的验证码" maxlength="10" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;letter-spacing:4px;text-align:center;" /><div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;gap:8px;min-height:20px;"><button type="button" id="resendResetOtpBtn" style="background:none;border:none;color:var(--accent-cyan);font-size:0.78rem;cursor:pointer;font-weight:600;padding:2px 6px;border-radius:6px;">没收到？重新获取验证码</button><span id="resendCountdown" style="font-size:0.78rem;color:var(--text-dim);display:none;">重新获取(<span id="resendSeconds">300</span>s)</span></div></div><div class="form-group" style="margin-bottom:12px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">🔑 新密码 <span style="font-weight:400;color:var(--text-dim);font-size:0.7rem;">（至少8位，含大小写和数字）</span></label><input type="password" id="resetPasswordNew" placeholder="新密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" /></div><div class="form-group" style="margin-bottom:16px;"><label style="display:block;font-weight:600;font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">✔️ 确认新密码</label><input type="password" id="resetPasswordConfirm" placeholder="再次输入新密码" style="width:100%;padding:12px 16px;border:2px solid var(--border-glow);border-radius:12px;background:var(--bg-primary);color:var(--text-primary);font-size:0.95rem;" /></div><div id="resetPwError" style="background:#fee;color:#c0392b;padding:10px 14px;border-radius:10px;font-size:0.85rem;display:none;margin-bottom:12px;border-left:4px solid #e74c3c;"></div><button class="btn btn-primary" id="resetPasswordSetBtn" style="width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;background:var(--accent-gradient);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span id="resetPwBtnText">确认修改</span><span id="resetPwSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span></button></div></div>
 <div class="modal-overlay" id="agreementModal"><div class="modal-box" style="max-width:600px;"><div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 id="agreementModalTitle">用户协议</h3><span class="close-btn" id="agreementModalClose">✕</span></div><div class="modal-body" id="agreementModalBody" style="max-height:60vh;overflow-y:auto;line-height:1.8;font-size:0.9rem;white-space:pre-wrap;"></div><div class="modal-footer" style="margin-top:18px;display:flex;gap:10px;justify-content:flex-end;"><button class="btn btn-outline btn-sm" id="agreementModalCloseBtn">关闭</button></div></div></div>
+<div class="modal-overlay" id="sensitiveWordsModal"><div class="modal-box" style="max-width:700px;"><button class="close-btn" id="sensitiveWordsModalClose">&times;</button><h3><i class="fas fa-shield-alt"></i> 敏感词管理</h3><p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:12px;">当前共有 <strong id="sensitiveWordCount">0</strong> 个禁用词</p><div style="display:flex;gap:8px;margin-bottom:12px;"><input type="text" id="newSensitiveWord" placeholder="输入要添加的敏感词" style="flex:1;padding:8px 12px;border:2px solid var(--border-glow);border-radius:8px;background:var(--bg-primary);color:var(--text-primary);" /><button class="btn btn-primary btn-sm" id="addSensitiveWordBtn">添加</button></div><div id="sensitiveWordsList" style="max-height:400px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:6px;"></div><div class="form-actions" style="margin-top:16px;"><button class="btn btn-outline" id="sensitiveWordsClose">关闭</button></div></div></div>
 <div class="modal-overlay" id="donateModal">
 <div class="modal-box donate-card-modern">
 <button class="close-btn donate-close-btn" onclick="closeDonateModal()">&times;</button>
@@ -1250,6 +1290,56 @@ if(document.documentElement.getAttribute('data-theme')!==actual)document.documen
 },300000);
 var CACHE_KEY='lezhe_software_cache';
 var cache={software:[],categories:[],loaded:false,lastFetch:0};
+// 敏感词过滤系统
+var _sensitiveWords=['暴力','色情','赌博','毒品','诈骗','传销','恐怖','反动','谣言','诽谤','侮辱','歧视','广告','推广','加微信','加QQ','联系方式'];
+var _sensitiveWordsLoaded=false;
+function loadSensitiveWords(){
+if(_sensitiveWordsLoaded)return;
+try{
+var cached=localStorage.getItem('lezhe_sensitive_words');
+if(cached){
+var data=JSON.parse(cached);
+if(data.words&&Array.isArray(data.words)&&data.expire>Date.now()){
+_sensitiveWords=data.words;
+_sensitiveWordsLoaded=true;
+return;
+}
+}
+}catch(e){console.warn('[敏感词] 加载失败',e);}
+}
+function saveSensitiveWords(){
+try{
+localStorage.setItem('lezhe_sensitive_words',JSON.stringify({words:_sensitiveWords,expire:Date.now()+7*24*3600*1000}));
+}catch(e){console.warn('[敏感词] 保存失败',e);}
+}
+function filterSensitiveWords(text){
+loadSensitiveWords();
+if(!text)return text;
+var filtered=text;
+var mask='**';
+_sensitiveWords.forEach(function(word){
+var regex=new RegExp(word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+filtered=filtered.replace(regex,function(match){
+return match.split('').map(function(){return mask;}).join('');
+});
+});
+return filtered;
+}
+function containsSensitiveWords(text){
+loadSensitiveWords();
+if(!text)return false;
+return _sensitiveWords.some(function(word){
+return text.toLowerCase().indexOf(word.toLowerCase())!==-1;
+});
+}
+function addSensitiveWord(word){
+loadSensitiveWords();
+if(_sensitiveWords.indexOf(word)===-1){
+_sensitiveWords.push(word);
+saveSensitiveWords();
+}
+}
+function escapeHTML(str){if(str===null||str===undefined)return '';var d=document.createElement('div');d.textContent=String(str);return d.innerHTML;}
 function safeParse(str,fallback){try{var v=JSON.parse(str);return(v===null||v===undefined)?fallback:v;}catch(e){return fallback;}}
 function safeArray(v){return Array.isArray(v)?v:[];}
 function checkSupabase(silent){initSupabase();if(!supabaseClient){if(!silent)toast('服务未加载，请刷新页面重试','error');return false;}return true;}
@@ -1788,6 +1878,8 @@ this._viewedThisSession[soft.id]=true;
 soft.views=(soft.views||0)+1;
 DB.updateSoftware(soft).catch(function(e){});
 }
+this._currentSoft=soft;
+this._updateSEO(soft);
 var overlay=document.getElementById('detailOverlay');
 var iconEl=document.getElementById('detailIcon');
 if(soft.icon_url&&soft.icon_url.trim()){
@@ -1878,6 +1970,49 @@ document.body.style.overflow='hidden';
 this._currentSoft=soft;
 },
 openById:function(id){var soft=cache.software.find(function(s){return s.id===id;});if(soft){this.open(soft);}else{toast('未找到该软件','warning');}},
+_updateSEO:function(soft){
+try{
+var title=soft.name+' - '+soft.category+' | 乐哲软件';
+document.title=title;
+var descMeta=document.querySelector('meta[name="description"]');
+if(descMeta)descMeta.setAttribute('content',soft.description||soft.detail||'下载'+soft.name+'，最新版本'+soft.version+'，支持'+(soft.platforms?soft.platforms.join('/'):'' ));
+var ogTitle=document.querySelector('meta[property="og:title"]');
+if(ogTitle)ogTitle.setAttribute('content',title);
+var ogDesc=document.querySelector('meta[property="og:description"]');
+if(ogDesc)ogDesc.setAttribute('content',soft.description||soft.detail||'');
+var ogUrl=document.querySelector('meta[property="og:url"]');
+if(ogUrl)ogUrl.setAttribute('content',window.location.origin+window.location.pathname+'#software/'+soft.id);
+var canonicalLink=document.querySelector('link[rel="canonical"]');
+if(canonicalLink)canonicalLink.setAttribute('href',window.location.origin+window.location.pathname+'#software/'+soft.id);
+this._updateSchema(soft);
+}catch(e){console.warn('[SEO] 更新失败',e);}
+},
+_updateSchema:function(soft){
+try{
+var oldScript=document.getElementById('software-schema');
+if(oldScript)oldScript.remove();
+var schema={
+'@context':'https://schema.org',
+'@type':'SoftwareApplication',
+'name':soft.name,
+'description':soft.description||soft.detail||'',
+'url':window.location.origin+window.location.pathname+'#software/'+soft.id,
+'applicationCategory':soft.category,
+'operatingSystem':(soft.platforms||[]).join(','),
+'softwareVersion':soft.version||'1.0',
+'fileSize':soft.size||'',
+'downloadUrl':soft.download_url||'',
+'image':(soft.screenshots&&soft.screenshots.length)?soft.screenshots[0]:(soft.icon_url||''),
+'author':{'@type':'Organization','name':'乐哲软件'},
+'offers':{'@type':'Offer','price':'0','priceCurrency':'CNY'}
+};
+var script=document.createElement('script');
+script.type='application/ld+json';
+script.id='software-schema';
+script.textContent=JSON.stringify(schema);
+document.head.appendChild(script);
+}catch(e){console.warn('[Schema] 更新失败',e);}
+},
 close:function(){
 document.getElementById('detailOverlay').classList.remove('open');
 if(!document.querySelector('.modal-overlay.open'))document.body.style.overflow='';
@@ -2074,15 +2209,22 @@ if(card){var likeCount=card.querySelector('.like-count');if(likeCount)likeCount.
 }).catch(function(err){container.innerHTML='<div class="empty-state"><div class="icon">📖</div><h3>加载教程失败</h3><p>请检查网络或稍后重试</p></div>';});
 }
 var _questionsClickHandler=null;
-function renderQuestions(){
+function renderQuestions(category){
 var container=document.getElementById('questionList');
 if(!container)return;
 if(!checkSupabase()){container.innerHTML='<div class="empty-state"><div class="icon">❓</div><h3>服务未加载</h3><p>请刷新页面重试</p></div>';return;}
-supabaseClient.from('questions').select('*').order('created_at',{ascending:false}).then(function(res){
+var query=supabaseClient.from('questions').select('*');
+if(category){query=query.eq('category',category);}
+query.order('created_at',{ascending:false}).then(function(res){
 if(res.error){container.innerHTML='<div class="empty-state"><div class="icon">❓</div><h3>加载问答失败</h3><p>'+escapeHTML(res.error.message||'未知错误')+'</p></div>';return;}
 var data=res.data||[];
-if(data.length===0){container.innerHTML='<div class="empty-state"><div class="icon">❓</div><h3>暂无问题</h3><p>成为第一个提问者吧！</p></div>';return;}
-container.innerHTML=data.map(function(q){return '<div class="card-item" data-id="'+escapeAttr(q.id)+'"><div class="title">'+escapeHTML(q.title)+'</div><div class="meta"><span>'+escapeHTML(q.category)+'</span><span>'+timeAgo(q.created_at)+'</span><span>💬 '+(q.answers_count||0)+'</span></div><div class="summary">'+escapeHTML((q.body||'').slice(0,100))+'...</div><div class="footer"><span class="q-votes-'+escapeAttr(q.id)+'">👍 '+(q.votes||0)+'</span><div class="actions"><button class="vote-q" data-id="'+escapeAttr(q.id)+'"><i class="fas fa-thumbs-up"></i></button><button class="view-q" data-id="'+escapeAttr(q.id)+'">查看详情</button></div></div></div>';}).join('');
+if(data.length===0){container.innerHTML='<div class="empty-state"><div class="icon">❓</div><h3>'+(category?'暂无'+category+'类问题':'暂无问题')+'</h3><p>'+(category?'切换分类或':'成为第一个')+'提问者吧！</p></div>';return;}
+container.innerHTML=data.map(function(q){
+var badges='';
+if(q.is_pinned)badges+='<span class="badge badge-pinned"><i class="fas fa-thumbtack"></i> 置顶</span>';
+if(q.is_featured)badges+='<span class="badge badge-featured"><i class="fas fa-star"></i> 精华</span>';
+return '<div class="card-item" data-id="'+escapeAttr(q.id)+'"><div class="title">'+escapeHTML(q.title)+' '+badges+'</div><div class="meta"><span>'+escapeHTML(q.category)+'</span><span>'+timeAgo(q.created_at)+'</span><span>💬 '+(q.answers_count||0)+'</span><span>👁️ '+(q.views||0)+'</span></div><div class="summary">'+escapeHTML((q.body||'').slice(0,100))+'...</div><div class="footer"><span class="q-votes-'+escapeAttr(q.id)+'">👍 '+(q.votes||0)+'</span><div class="actions"><button class="vote-q" data-id="'+escapeAttr(q.id)+'"><i class="fas fa-thumbs-up"></i></button><button class="view-q" data-id="'+escapeAttr(q.id)+'">查看详情</button></div></div></div>';
+}).join('');
 if(_questionsClickHandler){container.removeEventListener('click',_questionsClickHandler);}
 _questionsClickHandler=function(e){
 var target=e.target.closest('button');
@@ -2117,12 +2259,22 @@ var container=document.getElementById('questionDetailContainer');
 var list=document.getElementById('questionList');
 list.classList.add('hidden');
 container.classList.remove('hidden');
+// 增加浏览量
+supabaseClient.from('questions').select('views').eq('id',qid).single().then(function(res){
+if(!res.error){
+var views=(res.data?res.data.views:0)+1;
+supabaseClient.from('questions').update({views:views}).eq('id',qid).then(function(){});
+}
+});
 supabaseClient.from('questions').select('*').eq('id',qid).single().then(function(res){
 if(res.error){toast('加载问题失败','error');return;}
 var q=res.data;
+var badges='';
+if(q.is_pinned)badges+='<span class="badge badge-pinned"><i class="fas fa-thumbtack"></i> 置顶</span>';
+if(q.is_featured)badges+='<span class="badge badge-featured"><i class="fas fa-star"></i> 精华</span>';
 var html='<div class="question-detail">'+
-'<div class="q-title">'+escapeHTML(q.title)+'</div>'+
-'<div class="q-meta"><span>'+escapeHTML(q.category)+'</span> · <span>'+timeAgo(q.created_at)+'</span> · <span>👍 '+(q.votes||0)+'</span></div>'+
+'<div class="q-title">'+escapeHTML(q.title)+' '+badges+'</div>'+
+'<div class="q-meta"><span>'+escapeHTML(q.category)+'</span> · <span>'+timeAgo(q.created_at)+'</span> · <span>👍 '+(q.votes||0)+'</span> · <span>👁️ '+(q.views||0)+'</span></div>'+
 '<div class="q-body">'+escapeHTML(q.body||'')+'</div>'+
 '<div style="margin-top:12px;">'+
 '<button class="btn btn-sm btn-outline" id="backToQuestions">← 返回问题列表</button>'+
@@ -2175,8 +2327,16 @@ container.addEventListener('click',_answersClickHandler);
 var currentPage=1,PAGE_SIZE=6,currentFilteredList=[];
 function handleUrlParams(){
 if(_urlParamsHandled)return false;
+var hash=window.location.hash||'';
 var p=new URLSearchParams(window.location.search);
 var sc=p.get('soft'),ct=p.get('cat'),kw=p.get('search'),pg=p.get('page');
+if(hash&&hash.startsWith('#software/')){
+var softId=hash.replace('#software/','');
+var s0=cache.software.find(function(x){return x.id===softId;});
+_urlParamsHandled=true;
+if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0);},200);return true;}
+return false;
+}
 if(sc){var s0=cache.software.find(function(x){return x.id===sc;});_urlParamsHandled=true;if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0);},200);return true;}return false;}
 if(pg==='checkin'){_urlParamsHandled=true;App.goCheckin(true);return true;}
 if(pg==='ranking'){_urlParamsHandled=true;App.goRanking(true);return true;}
@@ -2188,8 +2348,14 @@ if(kw){_urlParamsHandled=true;App.doSearch(kw,true);return true;}
 return false;
 }
 function handlePopState(){
+var hash=window.location.hash||'';
 var p=new URLSearchParams(window.location.search);
 var sc=p.get('soft'),ct=p.get('cat'),kw=p.get('search'),pg=p.get('page');
+if(hash&&hash.startsWith('#software/')){
+var softId=hash.replace('#software/','');
+var s0=cache.software.find(function(x){return x.id===softId;});
+if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0);},200);return;}
+}
 if(sc){var s0=cache.software.find(function(x){return x.id===sc;});if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0);},200);return;}}
 if(pg==='checkin'){App.goCheckin(true);return;}
 if(pg==='ranking'){App.goRanking(true);return;}
@@ -3009,17 +3175,215 @@ if(wechatContact2){wechatContact2.addEventListener('click',function(){copyTextTo
 document.getElementById('newQuestionBtn').addEventListener('click',function(){if(!requireAuth())return;document.getElementById('questionModal').classList.add('open');});
 document.getElementById('questionModalClose').addEventListener('click',function(){document.getElementById('questionModal').classList.remove('open');});
 document.getElementById('qCancel').addEventListener('click',function(){document.getElementById('questionModal').classList.remove('open');});
+// Rich text editor toolbar handlers
+function initRichToolbar(modalId){
+var modal=document.getElementById(modalId);
+if(!modal||modal.dataset.richInit)return;
+modal.dataset.richInit='1';
+var editors=modal.querySelectorAll('.rich-editor');
+editors.forEach(function(editor){
+var wrapper=editor.closest('.rich-editor-wrapper');
+if(!wrapper)return;
+var toolbar=wrapper.querySelector('.rich-toolbar');
+if(!toolbar)return;
+// 查找对应的文件上传input
+var imageUploadInput=modal.querySelector('input[type="file"][id*="ImageUpload"]');
+toolbar.addEventListener('click',function(e){
+var btn=e.target.closest('button[data-action]');
+if(!btn)return;
+e.preventDefault();
+var action=btn.dataset.action;
+editor.focus();
+if(action==='createLink'){
+var url=prompt('请输入链接地址:','https://');
+if(url){document.execCommand('createLink',false,url);}
+}else if(action==='insertCode'){
+var selection=window.getSelection();
+if(selection.rangeCount>0){
+var range=selection.getRangeAt(0);
+var codeText=selection.toString()||'code here';
+var codeEl=document.createElement('code');
+codeEl.textContent=codeText;
+range.deleteContents();
+range.insertNode(codeEl);
+selection.removeAllRanges();
+var newRange=document.createRange();
+newRange.selectNodeContents(codeEl);
+selection.addRange(newRange);
+}
+}else if(action==='insertImage'&&imageUploadInput){
+// 触发文件选择
+imageUploadInput.click();
+// 监听文件选择
+imageUploadInput.onchange=function(evt){
+var file=evt.target.files[0];
+if(!file)return;
+// 验证文件类型
+if(!file.type.startsWith('image/')){toast('请选择图片文件','warning');return;}
+// 验证文件大小（限制5MB）
+if(file.size>5*1024*1024){toast('图片大小不能超过5MB','warning');return;}
+// 读取并插入图片
+var reader=new FileReader();
+reader.onload=function(e){
+var imgSrc=e.target.result;
+// 压缩图片（如果太大）
+compressImage(imgSrc,function(compressedSrc){
+var img='<img src="'+compressedSrc+'" style="max-width:100%;height:auto;border-radius:8px;margin:8px 0;" alt="用户上传的图片" />';
+document.execCommand('insertHTML',false,img);
+});
+};
+reader.readAsDataURL(file);
+// 清空input，允许重复选择同一文件
+imageUploadInput.value='';
+};
+}
+else{
+document.execCommand(action,false,null);
+}
+});
+});
+}
+// 图片压缩函数
+function compressImage(src,callback,maxWidth=800,quality=0.8){
+var img=new Image();
+img.onload=function(){
+var canvas=document.createElement('canvas');
+var ctx=canvas.getContext('2d');
+var width=img.width;
+var height=img.height;
+if(width>maxWidth){height=Math.round(height*maxWidth/width);width=maxWidth;}
+canvas.width=width;
+canvas.height=height;
+ctx.drawImage(img,0,0,width,height);
+callback(canvas.toDataURL('image/jpeg',quality));
+};
+img.src=src;
+}
+initRichToolbar('questionModal');
+initRichToolbar('answerModal');
+// 敏感词管理功能
+function renderSensitiveWordsList(){
+var list=document.getElementById('sensitiveWordsList');
+if(!list)return;
+document.getElementById('sensitiveWordCount').textContent=_sensitiveWords.length;
+list.innerHTML=_sensitiveWords.map(function(word){
+return '<span class="badge" style="background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;padding:4px 10px;" title="点击删除" data-word="'+escapeAttr(word)+'">'+escapeHTML(word)+' ✕</span>';
+}).join('');
+list.addEventListener('click',function(e){
+var badge=e.target.closest('[data-word]');
+if(!badge)return;
+var word=badge.dataset.word;
+if(confirm('确定要删除敏感词 "'+word+'" 吗？')){
+_sensitiveWords=_sensitiveWords.filter(function(w){return w!==word;});
+saveSensitiveWords();
+renderSensitiveWordsList();
+toast('已删除','success');
+}
+});
+}
+document.getElementById('addSensitiveWordBtn').addEventListener('click',function(){
+var input=document.getElementById('newSensitiveWord');
+var word=input.value.trim();
+if(!word){toast('请输入敏感词','warning');return;}
+addSensitiveWord(word);
+input.value='';
+renderSensitiveWordsList();
+toast('已添加','success');
+});
+document.getElementById('sensitiveWordsModalClose').addEventListener('click',function(){document.getElementById('sensitiveWordsModal').classList.remove('open');});
+document.getElementById('sensitiveWordsClose').addEventListener('click',function(){document.getElementById('sensitiveWordsModal').classList.remove('open');});
+// 在个人中心添加入口（需要时调用）
+function openSensitiveWordsManager(){
+loadSensitiveWords();
+renderSensitiveWordsList();
+document.getElementById('sensitiveWordsModal').classList.add('open');
+}
+// 附件上传功能
+var _qAttachments=[];
+var _aAttachments=[];
+function initAttachmentUpload(prefix){
+var area=document.getElementById(prefix+'AttachmentArea');
+var input=document.getElementById(prefix+'FileUpload');
+var listEl=document.getElementById(prefix+'AttachmentList');
+if(!area||!input)return;
+// 点击触发文件选择
+area.addEventListener('click',function(){input.click();});
+// 拖拽上传
+area.addEventListener('dragover',function(e){e.preventDefault();area.style.borderColor='var(--accent-cyan)';area.style.background='rgba(0,119,255,0.05)';});
+area.addEventListener('dragleave',function(e){e.preventDefault();area.style.borderColor='var(--border-glow)';area.style.background='var(--bg-secondary)';});
+area.addEventListener('drop',function(e){
+e.preventDefault();
+area.style.borderColor='var(--border-glow)';
+area.style.background='var(--bg-secondary)';
+var files=e.dataTransfer.files;
+handleFiles(files,prefix);
+});
+// 文件选择处理
+input.addEventListener('change',function(e){
+handleFiles(e.target.files,prefix);
+input.value=''; // 清空以允许重复选择
+});
+function handleFiles(files,prefix){
+var attachments=prefix==='q'?_qAttachments:_aAttachments;
+Array.from(files).forEach(function(file){
+// 验证文件大小（10MB）
+if(file.size>10*1024*1024){toast('文件 '+file.name+' 超过10MB限制','warning');return;}
+// 读取文件为DataURL
+var reader=new FileReader();
+reader.onload=function(e){
+attachments.push({name:file.name,size:file.size,type:file.type,data:e.target.result});
+renderAttachmentList(prefix);
+};
+reader.readAsDataURL(file);
+});
+}
+function renderAttachmentList(prefix){
+var attachments=prefix==='q'?_qAttachments:_aAttachments;
+var listEl=document.getElementById(prefix+'AttachmentList');
+if(!listEl)return;
+if(attachments.length===0){listEl.innerHTML='';return;}
+listEl.innerHTML=attachments.map(function(att,idx){
+var sizeStr=att.size<1024?att.size+'B':att.size<1024*1024?(att.size/1024).toFixed(1)+'KB':(att.size/1024/1024).toFixed(1)+'MB';
+return '<div class="attachment-item" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-secondary);border-radius:8px;margin-bottom:6px;font-size:0.85rem;"><i class="fas fa-file" style="color:var(--accent-cyan);"></i><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHTML(att.name)+'</span><span style="color:var(--text-dim);font-size:0.75rem;">'+sizeStr+'</span><button type="button" data-idx="'+idx+'" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:0.9rem;" title="删除"><i class="fas fa-times"></i></button></div>';
+}).join('');
+// 绑定删除按钮
+listEl.querySelectorAll('button[data-idx]').forEach(function(btn){
+btn.addEventListener('click',function(){
+var idx=parseInt(this.dataset.idx);
+attachments.splice(idx,1);
+renderAttachmentList(prefix);
+});
+});
+}
+}
+initAttachmentUpload('q');
+initAttachmentUpload('a');
 document.getElementById('qSubmit').addEventListener('click',function(){
 if(!requireAuth())return;
 if(!checkSupabase())return;
 var title=document.getElementById('qTitle').value.trim();
-var body=document.getElementById('qBody').value.trim();
+var body=(document.getElementById('qBody').innerText||'').trim();
 var category=document.getElementById('qCategory').value;
 if(!title||!body){toast('标题和描述不能为空','warning');return;}
-supabaseClient.from('questions').insert([{title:title,body:body,category:category,answers_count:0,votes:0}]).then(function(res){
+// 敏感词检测
+if(containsSensitiveWords(title)||containsSensitiveWords(body)){
+toast('内容包含禁用词汇，请修改后重试','warning');
+console.warn('[论坛] 检测到敏感词:',{title:containsSensitiveWords(title),body:containsSensitiveWords(body)});
+return;
+}
+// 过滤敏感词
+title=filterSensitiveWords(title);
+body=filterSensitiveWords(body);
+// 准备附件数据
+var attachmentsData=_qAttachments.map(function(att){return{name:att.name,size:att.size,type:att.type};});
+supabaseClient.from('questions').insert([{title:title,body:body,category:category,answers_count:0,votes:0,attachments:attachmentsData}]).then(function(res){
 if(res.error){toast('提问失败: '+res.error.message,'error');return;}
 toast('问题提交成功！','success');
 document.getElementById('questionModal').classList.remove('open');
+document.getElementById('qTitle').value='';
+document.getElementById('qBody').innerHTML='';
+_qAttachments=[]; // 清空附件
+renderAttachmentList('q');
 renderQuestions();
 });
 });
@@ -3029,12 +3393,25 @@ document.getElementById('aSubmit').addEventListener('click',function(){
 if(!requireAuth())return;
 if(!checkSupabase())return;
 var qid=this.dataset.qid;
-var body=document.getElementById('aBody').value.trim();
+var body=(document.getElementById('aBody').innerText||'').trim();
 if(!body){toast('请填写回答内容','warning');return;}
-supabaseClient.from('answers').insert([{question_id:qid,body:body,votes:0}]).then(function(res){
+// 敏感词检测
+if(containsSensitiveWords(body)){
+toast('内容包含禁用词汇，请修改后重试','warning');
+console.warn('[论坛] 回答检测到敏感词');
+return;
+}
+// 过滤敏感词
+body=filterSensitiveWords(body);
+// 准备附件数据
+var attachmentsData=_aAttachments.map(function(att){return{name:att.name,size:att.size,type:att.type};});
+supabaseClient.from('answers').insert([{question_id:qid,body:body,votes:0,attachments:attachmentsData}]).then(function(res){
 if(res.error){toast('回答失败: '+res.error.message,'error');return;}
 toast('回答成功！','success');
 document.getElementById('answerModal').classList.remove('open');
+document.getElementById('aBody').innerHTML='';
+_aAttachments=[]; // 清空附件
+renderAttachmentList('a');
 loadAnswers(qid);
 supabaseClient.from('questions').select('answers_count').eq('id',qid).single().then(function(res2){
 if(!res2.error){
@@ -3141,6 +3518,19 @@ document.getElementById('navLinks').classList.remove('open');
 document.querySelectorAll('#mobileBottomNav a').forEach(function(a){a.classList.remove('active');});
 var mbQA=document.querySelector('#mobileBottomNav a[data-page="qa"]');if(mbQA)mbQA.classList.add('active');
 if(isMobile()&&isOpen)closeSidebar();
+// Add category tab handlers
+var tabsContainer=document.getElementById('qaCategoryTabs');
+if(tabsContainer&&!tabsContainer.dataset.handlerAttached){
+tabsContainer.dataset.handlerAttached='1';
+tabsContainer.addEventListener('click',function(e){
+var tab=e.target.closest('.qa-tab');
+if(!tab)return;
+tabsContainer.querySelectorAll('.qa-tab').forEach(function(t){t.classList.remove('active');});
+tab.classList.add('active');
+var cat=tab.dataset.cat;
+renderQuestions(cat==='all'?null:cat);
+});
+}
 renderQuestions();
 },
 goCheckin:function(isPop){
