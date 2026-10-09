@@ -9,6 +9,7 @@
 <meta name="author" content="乐哲软件" />
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
 <meta name="theme-color" content="#0077ff" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230077ff'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='40' font-family='Arial,sans-serif' font-weight='700' fill='white'%3E%E4%B9%90%3C/text%3E%3C/svg%3E" />
 <link rel="canonical" href="https://lezhesoft.cn/" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="乐哲软件" />
@@ -40,6 +41,7 @@
 </script>
 <script>/* supabase-js is loaded via inline blob: the webpack UMD package requires document.currentScript.src to compute publicPath, and pure inline execution throws Automatic publicPath is not supported */
 (function(){
+if(location.protocol==='file:')return;
 try{
 var el=document.getElementById('lezheSupabaseBundle');
 var blob=new Blob([el.textContent],{type:'text/javascript'});
@@ -79,11 +81,14 @@ l.onload=function(){if(done)return;done=true;clearTimeout(timer);remember('fa',u
 l.onerror=function(){if(done)return;done=true;clearTimeout(timer);console.warn('[CDN] Font CSS failed: '+urls[idx]);l.remove();loadFontCSS(urls,idx+1);};
 document.head.appendChild(l);
 }
+var isFilePreview=location.protocol==='file:';
+if(!isFilePreview){
 loadFontCSS(orderUrls('fa',FA_URLS),0);
 loadScript('pinyin',orderUrls('pinyin',CDNS.pinyin),0);
 loadScript('qrcode',orderUrls('qrcode',CDNS.qrcode),0);
-window._cdnLoadStatus={supabase:true,pinyin:false,purify:true,qrcode:false};
-var _readyFired=false;
+}
+window._cdnLoadStatus={supabase:!isFilePreview,pinyin:false,purify:true,qrcode:false};
+var _readyFired=isFilePreview;
 var _checkInt=setInterval(function(){
 window._cdnLoadStatus.pinyin=typeof window.pinyinPro!=='undefined';
 window._cdnLoadStatus.qrcode=typeof qrcode==='function';
@@ -1083,7 +1088,7 @@ body.ls-locked{overflow:hidden !important}
 </div>
 <footer class="footer">
 <div class="brand">◆ 乐哲软件</div>
-<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="/cdn-cgi/l/email-protection#efa38ab5878abc80899baf809a9b83808084c18c8082"><span class="__cf_email__" data-cfemail="fab69fa0929fa9959c8eba958f8e96959591d4999597">[email&#160;protected]</span></a></p>
+<p>&copy; 2026 乐哲软件 &middot; 侵权请联系 <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a></p>
 <div class="links">
 <span>友情链接：</span>
 <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> |
@@ -1209,15 +1214,10 @@ body.ls-locked{overflow:hidden !important}
 <div class="form-actions"><button class="btn btn-outline" id="fbCancel">取消</button><button class="btn btn-primary" id="fbSubmit">提交</button></div>
 </div>
 </div>
-<script>/* Cloudflare 邮箱混淆本地解码：替代外部 /cdn-cgi 脚本，避免 file:// 或边缘脚本不可达时报资源错误 */
-(function(){
-function dec(hex){var r=parseInt(hex.substr(0,2),16),s='';for(var i=2;i+1<hex.length;i+=2){s+=String.fromCharCode(parseInt(hex.substr(i,2),16)^r);}return s;}
-try{
-document.querySelectorAll('.__cf_email__').forEach(function(el){var m=el.getAttribute('data-cfemail');if(m){el.textContent=dec(m);el.removeAttribute('data-cfemail');}});
-document.querySelectorAll('a[href^="/cdn-cgi/l/email-protection#"]').forEach(function(a){var h=a.getAttribute('href').split('#')[1];if(h){a.href='mailto:'+dec(h);}});
-}catch(e){}
-})();
-</script><script>
+<script>
+var IS_LOCAL_HOST=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+var IS_FILE_PREVIEW=location.protocol==='file:';
+var IS_LOCAL_PREVIEW=IS_FILE_PREVIEW||IS_LOCAL_HOST;
 var SUPABASE_URL='https://qqcxtfayjxyvswblmdpw.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
 var supabaseClient=null;
@@ -1228,6 +1228,7 @@ var _urlParamsHandled=false;
 var _supabaseInitRetries=0;
 var _supabaseInitMaxRetries=30;
 function initSupabase(){
+if(IS_LOCAL_PREVIEW)return false;
 if(supabaseClient)return true;
 if(typeof supabase!=='undefined'&&supabase&&supabase.createClient){
 try{supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);try{if(supabaseClient.realtime){supabaseClient.realtime.reconnectAfterMs=function(t){return t>2?1e9:([1000,3000,5000][t-1]||5000);};if(supabaseClient.realtime.onError){supabaseClient.realtime.onError(function(){rtNoteFail();});}}}catch(e2){}console.log('[Supabase] 初始化成功');return true;}
@@ -1236,6 +1237,7 @@ catch(e){console.error('Supabase 初始化失败',e);return false;}
 return false;
 }
 function tryInitSupabaseWithRetry(){
+if(IS_LOCAL_PREVIEW)return;
 if(supabaseClient)return;
 if(initSupabase())return;
 _supabaseInitRetries++;
@@ -1378,10 +1380,12 @@ _sensitiveWords.push(word);
 saveSensitiveWords();
 }
 }
-function escapeHTML(str){if(str===null||str===undefined)return '';var d=document.createElement('div');d.textContent=String(str);return d.innerHTML;}
 function safeParse(str,fallback){try{var v=JSON.parse(str);return(v===null||v===undefined)?fallback:v;}catch(e){return fallback;}}
 function safeArray(v){return Array.isArray(v)?v:[];}
-function checkSupabase(silent){initSupabase();if(!supabaseClient){if(!silent)toast('服务未加载，请刷新页面重试','error');return false;}return true;}
+function checkSupabase(silent){
+if(IS_LOCAL_PREVIEW){if(!silent)toast('本地预览模式未连接云端服务；部署到正式域名后启用完整功能','warning');return false;}
+initSupabase();if(!supabaseClient){if(!silent)toast('服务未加载，请刷新页面重试','error');return false;}return true;
+}
 function isToday(d){if(!d)return false;var t=new Date(d),n=new Date();return t.getFullYear()===n.getFullYear()&&t.getMonth()===n.getMonth()&&t.getDate()===n.getDate();}
 function timeAgo(d){if(!d)return '刚刚';var n=new Date(),diff=Math.max(0,n-new Date(d)),m=Math.floor(diff/60000);if(m<1)return '刚刚';if(m<60)return m+'分钟前';var h=Math.floor(m/60);if(h<24)return h+'小时前';var days=Math.floor(h/24);if(days<7)return days+'天前';return new Date(d).toLocaleDateString('zh-CN');}
 function saveCacheToStorage(){
@@ -1407,6 +1411,14 @@ return !!supabaseClient;
 },
 async loadAll(force){
 force=force||false;
+if(IS_LOCAL_PREVIEW){
+var localCached=getCachedData();
+window._lezheLoadFailed=false;
+if(localCached)return localCached;
+cache.categories=['设计工具','开发工具','办公软件','媒体工具','实用工具'];
+cache.software=[];cache.loaded=true;cache.lastFetch=Date.now();
+return{software:cache.software,categories:cache.categories};
+}
 if(!supabaseClient){
 var ready=await this.waitForSupabase();
 if(!ready){
@@ -1498,6 +1510,10 @@ setTimeout(function(){if(el.parentNode){el.style.animation='toastOut 0.4s ease f
 }
 function escapeHTML(str){if(str===null||str===undefined)return '';var d=document.createElement('div');d.textContent=String(str);return d.innerHTML;}
 function escapeAttr(str){if(str===null||str===undefined)return '';return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function isSafeHttpUrl(v){
+if(!v||typeof v!=='string')return false;
+try{var u=new URL(v,window.location.href);return u.protocol==='http:'||u.protocol==='https:';}catch(e){return false;}
+}
 function isImageUrl(v){
 if(!v||typeof v!=='string')return false;
 var s=v.trim();
@@ -1964,7 +1980,7 @@ var screenshots=(soft.screenshots||[]).filter(function(url){return url&&url.trim
 if(screenshots.length>0){
 scr.classList.remove('hidden');
 scr.innerHTML=screenshots.map(function(url){return '<img src="'+escapeAttr(url)+'" alt="截图" width="90" height="60" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" data-url="'+escapeAttr(url)+'">';}).join('');
-scr.querySelectorAll('img').forEach(function(img){img.addEventListener('click',function(){window.open(this.dataset.url,'_blank');});});
+scr.querySelectorAll('img').forEach(function(img){img.addEventListener('click',function(){if(isSafeHttpUrl(this.dataset.url))window.open(this.dataset.url,'_blank','noopener,noreferrer');});});
 }else{scr.classList.add('hidden');scr.innerHTML='';}
 var clog=document.getElementById('detailChangelog');
 if(soft.changelog&&soft.changelog.trim().length>0){clog.classList.remove('hidden');clog.textContent=soft.changelog;}
@@ -1999,14 +2015,12 @@ dlBtn.innerHTML='<i class="fas fa-download"></i> 下载';
 dlBtn.disabled=false;
 dlBtn.onclick=function(){
 if(!requireAuth())return;
-if(soft.download_url&&soft.download_url.trim()){
-window.open(soft.download_url,'_blank');
+if(soft.download_url&&isSafeHttpUrl(soft.download_url.trim())){
+window.open(soft.download_url,'_blank','noopener,noreferrer');
 soft.downloads=(soft.downloads||0)+1;
 DB.updateSoftware(soft).catch(function(e){});
 toast('开始下载 '+soft.name,'success');
 }else{
-soft.downloads=(soft.downloads||0)+1;
-DB.updateSoftware(soft).catch(function(e){});
 toast('暂无下载链接','warning');
 }
 };
@@ -2338,7 +2352,7 @@ if(q.is_featured)badges+='<span class="badge badge-featured"><i class="fas fa-st
 var html='<div class="question-detail">'+
 '<div class="q-title">'+escapeHTML(q.title)+' '+badges+'</div>'+
 '<div class="q-meta"><span>'+escapeHTML(q.category)+'</span> · <span>'+timeAgo(q.created_at)+'</span> · <span>👍 '+(q.votes||0)+'</span> · <span>👁️ '+(q.views||0)+'</span></div>'+
-'<div class="q-body">'+escapeHTML(q.body||'')+'</div>'+
+'<div class="q-body">'+sanitizeHTML(q.body||'')+'</div>'+
 '<div style="margin-top:12px;">'+
 '<button class="btn btn-sm btn-outline" id="backToQuestions">← 返回问题列表</button>'+
 '<button class="btn btn-sm btn-primary" id="answerBtn" style="margin-left:10px;">写回答</button>'+
@@ -2363,7 +2377,7 @@ supabaseClient.from('answers').select('*').eq('question_id',qid).order('created_
 if(res.error){container.innerHTML='<p style="color:var(--text-dim);">暂无回答，快来抢沙发！</p>';return;}
 var data=res.data||[];
 if(data.length===0){container.innerHTML='<p style="color:var(--text-dim);">还没有回答，快来抢沙发！</p>';return;}
-container.innerHTML=data.map(function(a){return '<div class="answer-item"><div class="a-meta"><span>匿名用户</span><span>'+timeAgo(a.created_at)+'</span></div><div class="a-body">'+escapeHTML(a.body)+'</div><div class="a-actions"><button class="vote-a" data-id="'+escapeAttr(a.id)+'"><i class="fas fa-thumbs-up"></i> <span class="a-votes-'+escapeAttr(a.id)+'">'+(a.votes||0)+'</span></button></div></div>';}).join('');
+container.innerHTML=data.map(function(a){return '<div class="answer-item"><div class="a-meta"><span>匿名用户</span><span>'+timeAgo(a.created_at)+'</span></div><div class="a-body">'+sanitizeHTML(a.body||'')+'</div><div class="a-actions"><button class="vote-a" data-id="'+escapeAttr(a.id)+'"><i class="fas fa-thumbs-up"></i> <span class="a-votes-'+escapeAttr(a.id)+'">'+(a.votes||0)+'</span></button></div></div>';}).join('');
 if(_answersClickHandler){container.removeEventListener('click',_answersClickHandler);}
 _answersClickHandler=function(e){
 var target=e.target.closest('button');
@@ -3359,14 +3373,31 @@ toast('已添加','success');
 document.getElementById('sensitiveWordsModalClose').addEventListener('click',function(){document.getElementById('sensitiveWordsModal').classList.remove('open');});
 document.getElementById('sensitiveWordsClose').addEventListener('click',function(){document.getElementById('sensitiveWordsModal').classList.remove('open');});
 // 在个人中心添加入口（需要时调用）
-function openSensitiveWordsManager(){
+window.openSensitiveWordsManager=function(){
 loadSensitiveWords();
 renderSensitiveWordsList();
 document.getElementById('sensitiveWordsModal').classList.add('open');
-}
+};
 // 附件上传功能
 var _qAttachments=[];
 var _aAttachments=[];
+function renderAttachmentList(prefix){
+var attachments=prefix==='q'?_qAttachments:_aAttachments;
+var listEl=document.getElementById(prefix+'AttachmentList');
+if(!listEl)return;
+if(attachments.length===0){listEl.innerHTML='';return;}
+listEl.innerHTML=attachments.map(function(att,idx){
+var sizeStr=att.size<1024?att.size+'B':att.size<1024*1024?(att.size/1024).toFixed(1)+'KB':(att.size/1024/1024).toFixed(1)+'MB';
+return '<div class="attachment-item" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-secondary);border-radius:8px;margin-bottom:6px;font-size:0.85rem;"><i class="fas fa-file" style="color:var(--accent-cyan);"></i><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHTML(att.name)+'</span><span style="color:var(--text-dim);font-size:0.75rem;">'+sizeStr+'</span><button type="button" data-idx="'+idx+'" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:0.9rem;" title="删除"><i class="fas fa-times"></i></button></div>';
+}).join('');
+listEl.querySelectorAll('button[data-idx]').forEach(function(btn){
+btn.addEventListener('click',function(){
+var idx=parseInt(this.dataset.idx,10);
+attachments.splice(idx,1);
+renderAttachmentList(prefix);
+});
+});
+}
 function initAttachmentUpload(prefix){
 var area=document.getElementById(prefix+'AttachmentArea');
 var input=document.getElementById(prefix+'FileUpload');
@@ -3403,24 +3434,6 @@ renderAttachmentList(prefix);
 reader.readAsDataURL(file);
 });
 }
-function renderAttachmentList(prefix){
-var attachments=prefix==='q'?_qAttachments:_aAttachments;
-var listEl=document.getElementById(prefix+'AttachmentList');
-if(!listEl)return;
-if(attachments.length===0){listEl.innerHTML='';return;}
-listEl.innerHTML=attachments.map(function(att,idx){
-var sizeStr=att.size<1024?att.size+'B':att.size<1024*1024?(att.size/1024).toFixed(1)+'KB':(att.size/1024/1024).toFixed(1)+'MB';
-return '<div class="attachment-item" style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-secondary);border-radius:8px;margin-bottom:6px;font-size:0.85rem;"><i class="fas fa-file" style="color:var(--accent-cyan);"></i><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHTML(att.name)+'</span><span style="color:var(--text-dim);font-size:0.75rem;">'+sizeStr+'</span><button type="button" data-idx="'+idx+'" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:0.9rem;" title="删除"><i class="fas fa-times"></i></button></div>';
-}).join('');
-// 绑定删除按钮
-listEl.querySelectorAll('button[data-idx]').forEach(function(btn){
-btn.addEventListener('click',function(){
-var idx=parseInt(this.dataset.idx);
-attachments.splice(idx,1);
-renderAttachmentList(prefix);
-});
-});
-}
 }
 initAttachmentUpload('q');
 initAttachmentUpload('a');
@@ -3428,18 +3441,19 @@ document.getElementById('qSubmit').addEventListener('click',function(){
 if(!requireAuth())return;
 if(!checkSupabase())return;
 var title=document.getElementById('qTitle').value.trim();
-var body=(document.getElementById('qBody').innerText||'').trim();
+var editor=document.getElementById('qBody');
+var bodyText=(editor.innerText||'').trim();
+var body=sanitizeHTML(editor.innerHTML||'');
 var category=document.getElementById('qCategory').value;
-if(!title||!body){toast('标题和描述不能为空','warning');return;}
-// 敏感词检测
-if(containsSensitiveWords(title)||containsSensitiveWords(body)){
+if(!title||!bodyText||!category){toast('标题、描述和分类不能为空','warning');return;}
+// 敏感词检测以纯文本为准，避免 HTML 标记干扰。
+if(containsSensitiveWords(title)||containsSensitiveWords(bodyText)){ 
 toast('内容包含禁用词汇，请修改后重试','warning');
-console.warn('[论坛] 检测到敏感词:',{title:containsSensitiveWords(title),body:containsSensitiveWords(body)});
+console.warn('[论坛] 检测到敏感词:',{title:containsSensitiveWords(title),body:containsSensitiveWords(bodyText)});
 return;
 }
-// 过滤敏感词
+// 前端仅做提示与基础过滤；服务端仍需执行内容审核。
 title=filterSensitiveWords(title);
-body=filterSensitiveWords(body);
 // 准备附件数据
 var attachmentsData=_qAttachments.map(function(att){return{name:att.name,size:att.size,type:att.type};});
 supabaseClient.from('questions').insert([{title:title,body:body,category:category,answers_count:0,votes:0,attachments:attachmentsData}]).then(function(res){
@@ -3459,16 +3473,17 @@ document.getElementById('aSubmit').addEventListener('click',function(){
 if(!requireAuth())return;
 if(!checkSupabase())return;
 var qid=this.dataset.qid;
-var body=(document.getElementById('aBody').innerText||'').trim();
-if(!body){toast('请填写回答内容','warning');return;}
-// 敏感词检测
-if(containsSensitiveWords(body)){
+var answerEditor=document.getElementById('aBody');
+var bodyText=(answerEditor.innerText||'').trim();
+var body=sanitizeHTML(answerEditor.innerHTML||'');
+if(!bodyText){toast('请填写回答内容','warning');return;}
+// 敏感词检测以纯文本为准。
+if(containsSensitiveWords(bodyText)){ 
 toast('内容包含禁用词汇，请修改后重试','warning');
 console.warn('[论坛] 回答检测到敏感词');
 return;
 }
-// 过滤敏感词
-body=filterSensitiveWords(body);
+// 保留经 DOMPurify 清洗后的富文本格式。
 // 准备附件数据
 var attachmentsData=_aAttachments.map(function(att){return{name:att.name,size:att.size,type:att.type};});
 supabaseClient.from('answers').insert([{question_id:qid,body:body,votes:0,attachments:attachmentsData}]).then(function(res){
@@ -4362,7 +4377,7 @@ try{localStorage.setItem('lezhe_rt_dead',String(Date.now()+6*3600*1000));}catch(
 if(supabaseClient&&supabaseClient.realtime&&supabaseClient.realtime.disconnect){try{supabaseClient.realtime.disconnect();}catch(e){}}
 console.warn('[realtime] 实时连接不可用，已停用实时功能（不影响正常浏览）');
 }
-if(location.protocol==='file:'){window._lezheRtDisabled=true;}
+if(IS_LOCAL_PREVIEW){window._lezheRtDisabled=true;}
 function initPresence(){
 if(window._lezheRtDisabled||rtIsDead())return;
 if(!supabaseClient||typeof supabase==='undefined'||!supabaseClient.channel)return;
