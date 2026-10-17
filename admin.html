@@ -2274,7 +2274,7 @@ self._editId=null;
 await DB.soft(true).then(function(dd){self._all=dd;self._fil=dd.slice();});
 self.renderTab('add');
 }else{
-var ns={name:d.name,category:d.category,version:d.version,icon:d.icon,icon_url:d.icon_url,download_url:d.download_url,platforms:d.platforms,size:d.size,description:d.description,detail:d.detail,recommend:d.recommend,date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString(),views:0,downloads:0};
+var ns={name:d.name,category:d.category,version:d.version,icon:d.icon,icon_url:d.icon_url,download_url:d.download_url,platforms:d.platforms,size:d.size,description:d.description,detail:d.detail,recommend:d.recommend,screenshots:App._softShots||[],date:new Date().toISOString().slice(0,10),created_at:new Date().toISOString(),views:0,downloads:0};
 var r=await DB.addSoft(ns);
 if(r){
 DB.addLog('添加软件','软件: '+d.name);
