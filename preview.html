@@ -432,35 +432,31 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 [data-theme="glass"] .share-float a:hover{background:var(--accent-gradient);border-color:transparent;color:#fff;box-shadow:0 10px 32px rgba(94,184,255,.5),inset 0 1px 0 rgba(255,255,255,.55)}
 .detail-overlay{position:fixed;inset:0;z-index:200;background:rgba(6,15,32,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:var(--transition)}
 .detail-overlay.open{opacity:1;visibility:visible}
-.detail-modal{max-width:680px;width:100%;max-height:92vh;display:flex;flex-direction:column;background:#fff;border-radius:0;transform:translateY(0);transition:var(--transition);overflow:hidden;padding:0;box-shadow:none}
-.detail-overlay.open .detail-modal{transform:translateY(0)}
-.detail-overlay{background:rgba(0,0,0,.3);backdrop-filter:blur(2px)}
-.detail-modal .modal-body{flex:1 1 auto;overflow-y:auto;padding:20px 24px 16px;position:relative;background:#fff}
-.detail-modal .modal-actions{flex-shrink:0;padding:10px 24px 16px;border-top:1px solid #f0f0f0;background:#fff;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.detail-modal .modal-actions .btn{flex:1;min-width:80px}
-.detail-modal .close-btn{position:absolute;top:10px;right:12px;font-size:1.1rem;color:#999;line-height:1;width:28px;height:28px;border-radius:50%;background:#f5f5f5;z-index:5;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center}
-.detail-modal .close-btn:hover{background:#eee;color:#666}
-.detail-breadcrumb{font-size:.72rem;color:#999;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:1000;overflow-y:auto;display:none}
+.detail-overlay.open{display:block}
+.detail-page{max-width:680px;margin:0 auto;padding:20px 24px 80px;min-height:100vh;background:#fff}
+.detail-back{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:#666;background:#f5f5f5;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;margin-bottom:20px}
+.detail-back:hover{background:#eee;color:#333}
+.detail-breadcrumb{font-size:.75rem;color:#999;margin-bottom:16px;display:flex;align-items:center;gap:6px}
 .detail-breadcrumb a{color:#999;text-decoration:none}
 .detail-breadcrumb .sep{opacity:.5}
 .detail-breadcrumb .current{color:#666}
-.detail-modal h2{font-size:1.4rem;font-weight:700;margin:0 0 14px;color:#222;line-height:1.4}
-.detail-author-row{display:flex;align-items:center;gap:10px;margin:0 0 18px;padding-bottom:14px}
-.detail-author-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ff9a9e,#fad0c4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;flex-shrink:0;overflow:hidden}
+.detail-page h2{font-size:1.5rem;font-weight:700;margin:0 0 16px;color:#222;line-height:1.4}
+.detail-author-row{display:flex;align-items:center;gap:12px;margin:0 0 20px;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.detail-author-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ff9a9e,#fad0c4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;font-weight:700;flex-shrink:0;overflow:hidden;position:relative}
+.detail-author-avatar .verified-badge{position:absolute;bottom:-2px;right:-2px;width:16px;height:16px;background:#ffc107;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;border:2px solid #fff}
 .detail-author-info{flex:1;min-width:0}
-.detail-author-name{font-size:.82rem;font-weight:600;color:#333;display:flex;align-items:center;gap:4px}
+.detail-author-name{font-size:.85rem;font-weight:600;color:#333;display:flex;align-items:center;gap:4px}
 .detail-author-name .verified{color:#ffc107;font-size:.7rem}
-.detail-author-meta{font-size:.7rem;color:#999;margin-top:3px;display:flex;gap:10px;align-items:center}
-.detail-modal .detail-meta{display:none}
-.detail-modal .detail-desc{font-size:.9rem;line-height:1.8;color:#333;margin:0 0 16px;white-space:pre-wrap}
-.detail-modal .detail-body-text{font-size:.9rem;line-height:1.8;color:#555;margin:0 0 16px;white-space:pre-wrap}
-.detail-screenshots{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.detail-screenshots img{width:90px;height:60px;object-fit:cover;border-radius:var(--radius-sm);cursor:pointer;border:2px solid transparent;transition:var(--transition);aspect-ratio:3/2}
-.detail-screenshots img:hover{border-color:var(--accent-cyan);transform:scale(1.05)}
-.detail-changelog,.detail-requirements{margin:8px 0;font-size:.75rem;background:var(--bg-secondary);padding:10px 14px;border-radius:var(--radius-sm);border-left:3px solid var(--accent-purple);color:var(--text-secondary);white-space:pre-wrap;max-height:90px;overflow-y:auto}
-[data-theme="glass"] .detail-modal{background:linear-gradient(180deg,rgba(24,34,54,.92) 0%,rgba(16,24,42,.96) 100%);border:1px solid rgba(255,255,255,.16);box-shadow:0 32px 80px rgba(0,10,30,.6),inset 0 1px 0 rgba(255,255,255,.12)}
-[data-theme="glass"] .detail-modal .modal-actions{background:transparent;border-top:1px solid rgba(255,255,255,.10)}
-[data-theme="glass"] .detail-modal .detail-desc,[data-theme="glass"] .detail-changelog,[data-theme="glass"] .detail-requirements{background:rgba(0,10,30,.35);border-left-color:rgba(94,184,255,.65)}
+.detail-author-meta{font-size:.72rem;color:#999;margin-top:3px;display:flex;gap:12px;align-items:center}
+.detail-page .detail-desc{font-size:.92rem;line-height:1.9;color:#333;margin:0 0 20px;white-space:pre-wrap}
+.detail-page .detail-body-text{font-size:.92rem;line-height:1.9;color:#555;margin:0 0 20px;white-space:pre-wrap}
+.detail-screenshots{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.detail-screenshots img{width:100px;height:66px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:var(--transition);aspect-ratio:3/2}
+.detail-screenshots img:hover{border-color:#0077ff;transform:scale(1.05)}
+.detail-changelog,.detail-requirements{margin:10px 0;font-size:.78rem;background:#f9f9f9;padding:12px 16px;border-radius:8px;color:#666;white-space:pre-wrap}
+.detail-action-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #f0f0f0;padding:12px 0;margin-top:24px;display:flex;gap:8px;align-items:center}
+.detail-action-bar .btn{flex:1;min-width:80px}
 .related-software{margin-top:14px;border-top:1px solid var(--border-glow);padding-top:12px}
 .related-software h4{font-size:.85rem;font-weight:600;margin-bottom:10px;color:var(--text-primary);display:flex;align-items:center;gap:6px}
 .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
@@ -477,7 +473,7 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .related-card .platforms .plat.android{color:#22a05e;background:rgba(61,220,132,.10)}
 .detail-fav-btn{font-size:1.1rem;padding:3px 8px;background:none;border:none;color:var(--text-dim);cursor:pointer;border-radius:4px}
 .detail-fav-btn.active{color:var(--danger)}
-@media (max-width:640px){.detail-overlay{padding:0;align-items:flex-end}.detail-modal{max-height:92vh;border-radius:0;max-width:100%}.detail-overlay.open .detail-modal{transform:translateY(0)}.detail-modal .modal-body{padding:16px 16px 10px}.detail-modal h2{font-size:1.15rem;margin-bottom:12px}.detail-modal .detail-desc{font-size:.82rem;padding:0;background:transparent;border:none}.detail-screenshots img{width:58px;height:40px}.related-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:5px}.related-card .icon-wrap{width:28px;height:28px;font-size:14px}.related-card .name{font-size:.6rem}.detail-modal .modal-actions{padding:10px 16px 16px;flex-direction:column;gap:5px}.detail-modal .modal-actions .btn{flex:1 1 100%;min-width:unset;padding:9px 10px;font-size:.8rem;border-radius:50px}.detail-author-row{margin:0 0 14px;padding-bottom:12px}.detail-author-avatar{width:34px;height:34px}}
+@media (max-width:640px){.detail-page{padding:16px 16px 100px}.detail-page h2{font-size:1.2rem;margin-bottom:12px}.detail-page .detail-desc{font-size:.85rem;padding:0}.detail-screenshots img{width:70px;height:46px}.related-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:5px}.related-card .icon-wrap{width:28px;height:28px;font-size:14px}.related-card .name{font-size:.6rem}.detail-action-bar{padding:10px 0 16px;gap:6px}.detail-action-bar .btn{flex:1;padding:9px 8px;font-size:.8rem;border-radius:50px}.detail-author-row{margin:0 0 16px;padding:10px 0}.detail-author-avatar{width:38px;height:38px}}
 .page-section{padding:20px 0}
 .page-section .section-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px}
 .page-section .section-header h2{font-size:1.6rem;font-weight:700;margin:0}
@@ -1125,7 +1121,7 @@ body.ls-locked{overflow:hidden !important}
 </div>
 <div class="notif-panel" id="notifPanel"><div class="notif-header"><span><i class="fas fa-bell"></i> 通知</span><span class="notif-mark-all" id="notifMarkAllRead">全部已读</span></div><div class="notif-list" id="notifList"></div></div>
 <div class="compare-bar hidden" id="compareBar"><span class="compare-count" id="compareCount">已选 0</span><div class="compare-thumbs" id="compareThumbs"></div><button class="btn btn-sm btn-primary" id="compareGoBtn">对比</button><button class="btn btn-sm btn-outline" id="compareClearBtn">清空</button></div>
-<div class="detail-overlay" id="detailOverlay"><div class="detail-modal" id="detailModal"><div class="modal-body" id="modalBody"><button class="close-btn" id="detailClose">✕</button><div class="detail-breadcrumb"><a href="#" id="detailBreadHome">🏠 首页</a><span class="sep">/</span><span id="detailBreadCat">软件库</span></div><h2 id="detailName">软件名称</h2><div class="detail-author-row"><div class="detail-author-avatar">乐</div><div class="detail-author-info"><div class="detail-author-name">乐哲软件 <span class="verified">✓</span></div><div class="detail-author-meta"><span id="detailAuthorCat">📂 软件库</span><span id="detailAuthorViews">👁 0</span><span id="detailAuthorDate">📅 近日</span></div></div></div><div class="detail-meta" id="detailMeta"></div><div class="detail-screenshots hidden" id="detailScreenshots"></div><div class="detail-changelog hidden" id="detailChangelog"></div><div class="detail-requirements hidden" id="detailRequirements"></div><div class="detail-desc" id="detailDesc"></div><div class="related-software hidden" id="relatedSoftware"><h4>📎 相关推荐</h4><div class="related-grid" id="relatedGrid"></div></div></div><div class="modal-actions"><button class="btn btn-primary" id="detailDownload"><i class="fas fa-download"></i> 下载</button><button class="btn btn-outline btn-fav" id="detailFavBtn"><i class="far fa-heart"></i> 收藏</button><button class="btn btn-outline" id="detailShareBtn"><i class="fas fa-share-alt"></i> 分享</button><button class="btn btn-outline" id="detailCloseBtn">关闭</button></div></div></div>
+<div class="detail-overlay" id="detailOverlay"><div class="detail-page"><button class="detail-back" id="detailClose"><i class="fas fa-arrow-left"></i> 返回</button><div class="detail-breadcrumb"><a href="#" id="detailBreadHome">🏠 首页</a><span class="sep">/</span><span id="detailBreadCat">软件库</span></div><h2 id="detailName">软件名称</h2><div class="detail-author-row"><div class="detail-author-avatar">乐<span class="verified-badge">✓</span></div><div class="detail-author-info"><div class="detail-author-name">乐哲软件 <span class="verified">✓</span></div><div class="detail-author-meta"><span id="detailAuthorCat">📂 软件库</span><span id="detailAuthorViews">👁 0</span><span id="detailAuthorDate">📅 近日</span></div></div></div><div class="detail-meta hidden" id="detailMeta"></div><div class="detail-screenshots hidden" id="detailScreenshots"></div><div class="detail-changelog hidden" id="detailChangelog"></div><div class="detail-requirements hidden" id="detailRequirements"></div><div class="detail-desc" id="detailDesc"></div><div class="related-software hidden" id="relatedSoftware"><h4>📎 相关推荐</h4><div class="related-grid" id="relatedGrid"></div></div><div class="detail-action-bar"><button class="btn btn-primary" id="detailDownload"><i class="fas fa-download"></i> 下载</button><button class="btn btn-outline btn-fav" id="detailFavBtn"><i class="far fa-heart"></i> 收藏</button><button class="btn btn-outline" id="detailShareBtn"><i class="fas fa-share-alt"></i> 分享</button></div></div></div>
 <nav class="mobile-bottom-nav" id="mobileBottomNav"><a href="#" data-page="home" class="active"><i class="fas fa-home"></i><span>首页</span></a><a href="#" data-page="list"><i class="fas fa-th-list"></i><span>软件库</span></a><a href="#" data-page="checkin"><i class="fas fa-calendar-check"></i><span>签到</span></a><a href="#" data-page="ranking"><i class="fas fa-trophy"></i><span>排行</span></a><a href="#" data-page="mall"><i class="fas fa-gift"></i><span>商城</span></a><a href="#" data-page="profile" style="display:none;"><i class="fas fa-user"></i><span>我的</span></a></nav>
 <div class="share-float" id="shareFloat"><a href="#" onclick="shareOn('wechat');return false;" title="分享到微信"><i class="fab fa-weixin"></i></a><a href="#" onclick="shareOn('weibo');return false;" title="分享到微博"><i class="fab fa-weibo"></i></a><a href="#" onclick="shareOn('twitter');return false;" title="分享到Twitter"><i class="fab fa-twitter"></i></a><a href="#" onclick="copyLink();return false;" title="复制链接"><i class="fas fa-link"></i></a><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" title="回到顶部"><i class="fas fa-arrow-up"></i></a></div>
 <div class="modal-overlay" id="tutorialDetailModal"><div class="modal-box" style="padding:0;max-width:900px;"><button class="close-btn" id="tutorialDetailClose" style="position:sticky;top:12px;right:12px;z-index:10;float:right;background:rgba(0,0,0,0.5);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:none;cursor:pointer;margin:8px 8px 0 0;">&times;</button><div style="padding:0 24px 8px;border-bottom:1px solid var(--border-glow);"><h3 id="tutorialDetailTitle" style="margin:8px 0 4px;font-size:1.5rem;font-weight:700;">教程标题</h3><div class="meta" style="font-size:.8rem;color:var(--text-dim);display:flex;gap:12px;flex-wrap:wrap;padding-bottom:8px;" id="tutorialDetailMeta"></div></div><div id="tutorialDetailVideos" style="padding:16px 24px 0;"></div><div id="tutorialDetailContent"></div><div id="tutorialComments"><h4><i class="far fa-comment-dots"></i> 评论</h4><div id="commentList"></div><div class="comment-input-area"><input type="text" id="commentAuthor" placeholder="昵称（可选）" style="flex:0.4;min-width:80px;"><input type="text" id="commentContent" placeholder="写评论..." style="flex:1;min-width:120px;"><button class="btn btn-primary" id="commentSubmitBtn">发表</button></div></div><div class="form-actions" style="padding:8px 24px 20px;border-top:1px solid var(--border-glow);"><button class="btn btn-outline" id="tutorialDetailCloseBtn">关闭</button></div></div></div>
@@ -2046,7 +2042,8 @@ var cardFav=document.querySelector('.software-card[data-id="'+soft.id+'"] .favor
 if(cardFav){if(nowFav)cardFav.classList.add('active');else cardFav.classList.remove('active');}
 };
 document.getElementById('detailShareBtn').onclick=function(){Share.open(soft);};
-document.getElementById('detailFeedbackBtn').onclick=function(){
+var fbBtn=document.getElementById('detailFeedbackBtn');
+if(fbBtn)fbBtn.onclick=function(){
 document.getElementById('feedbackTarget').textContent='针对：'+soft.name;
 document.getElementById('feedbackModal').dataset.softId=soft.id;
 document.getElementById('feedbackModal').classList.add('open');
@@ -2110,8 +2107,6 @@ requestAnimationFrame(function(){window.scrollTo({top:y,behavior:'instant'});});
 }
 };
 document.getElementById('detailClose').addEventListener('click',function(){Detail.close();});
-document.getElementById('detailCloseBtn').addEventListener('click',function(){Detail.close();});
-document.getElementById('detailOverlay').addEventListener('click',function(e){if(e.target===e.currentTarget)Detail.close();});
 document.addEventListener('click',function(e){
 if(e.target.closest('.favorite-btn')||e.target.closest('.compare-check')||e.target.closest('.detail-trigger'))return;
 var card=e.target.closest('.software-card');
