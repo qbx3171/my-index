@@ -1545,8 +1545,8 @@ el.querySelector('.toast-close').addEventListener('click',function(e){e.stopProp
 el.addEventListener('click',function(e){if(e.target.classList.contains('toast-close'))return;var self=this;self.style.animation='toastOut 0.3s ease forwards';setTimeout(function(){if(self.parentNode)self.parentNode.removeChild(self);},400);});
 setTimeout(function(){if(el.parentNode){el.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},500);}},3500);
 }
-function escapeHTML(str){if(str===null||str===undefined)return '';var d=document.createElement('div');d.textContent=String(str);return d.innerHTML;}
-function escapeAttr(str){if(str===null||str===undefined)return '';return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escapeHTML(str){if(str===null||str===undefined)return '';var d=document.createElement('div');d.textContent=sanitizeUnicode(String(str));return d.innerHTML;}
+function escapeAttr(str){if(str===null||str===undefined)return '';return sanitizeUnicode(String(str)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 // 修复通知乱码：清洗字符串中的损坏字符（孤立代理对=半个emoji、替换字符、控制字符），
 // 防止服务端数据在存储/传输环节编码损坏后在页面显示为乱码/◆
 function sanitizeUnicode(s){
@@ -1612,7 +1612,7 @@ var kw=escapeHTML(keyword);
 var safe=kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 try{return escaped.replace(new RegExp(safe,'gi'),function(m){return '<mark>'+m+'</mark>';});}catch(e){return escaped;}
 }
-function sanitizeHTML(html){if(!html)return '';if(typeof DOMPurify!=='undefined'&&DOMPurify.sanitize){try{return DOMPurify.sanitize(html,{FORBID_TAGS:['script','style','object','embed','form'],ADD_TAGS:['iframe'],ADD_ATTR:['allowfullscreen','frameborder','allow'],ALLOWED_URI_REGEXP:/^(?:(?:https?):\/\/(?:www\.)?(?:youtube\.com|youtu\.be|bilibili\.com|player\.bilibili\.com)\/|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i});}catch(e){console.warn('DOMPurify 失败',e);return escapeHTML(html);}}return escapeHTML(html);}
+function sanitizeHTML(html){if(!html)return '';html=sanitizeUnicode(html);if(typeof DOMPurify!=='undefined'&&DOMPurify.sanitize){try{return sanitizeUnicode(DOMPurify.sanitize(html,{FORBID_TAGS:['script','style','object','embed','form'],ADD_TAGS:['iframe'],ADD_ATTR:['allowfullscreen','frameborder','allow'],ALLOWED_URI_REGEXP:/^(?:(?:https?):\/\/(?:www\.)?(?:youtube\.com|youtu\.be|bilibili\.com|player\.bilibili\.com)\/|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i}));}catch(e){console.warn('DOMPurify 失败',e);return escapeHTML(html);}}return escapeHTML(html);}
 function getIconEmoji(cat){var map={'设计工具':'✎','开发工具':'⚙','办公软件':'📋','媒体工具':'🎬','实用工具':'🔧'};return map[cat]||'📦';}
 function renderIcon(soft){var fallback=soft.icon||'📦';if(soft.icon_url&&soft.icon_url.trim()){return '<img src="'+escapeAttr(soft.icon_url)+'" alt="'+escapeAttr(soft.name)+'" width="48" height="48" loading="lazy" decoding="async" data-fallback="'+escapeAttr(fallback)+'" onerror="this.style.display=\'none\';this.parentElement.textContent=this.dataset.fallback;">';}return escapeHTML(fallback);}
 function renderPlatformBadges(soft){var html='';var p=soft.platforms||[];if(p.includes('mac'))html+='<span class="badge badge-mac"><i class="fab fa-apple"></i> Mac</span>';if(p.includes('windows'))html+='<span class="badge badge-windows"><i class="fab fa-windows"></i> Windows</span>';if(p.includes('android'))html+='<span class="badge badge-android"><i class="fab fa-android"></i> Android</span>';return html;}
@@ -2127,7 +2127,7 @@ this._currentSoft=soft;
 openById:function(id){var soft=cache.software.find(function(s){return s.id===id;});if(soft){this.open(soft);}else{toast('未找到该软件','warning');}},
 _updateSEO:function(soft){
 try{
-var title=soft.name+' - '+soft.category+' | 乐哲软件';
+var title=sanitizeUnicode(soft.name)+' - '+sanitizeUnicode(soft.category)+' | 乐哲软件';
 document.title=title;
 var descMeta=document.querySelector('meta[name="description"]');
 if(descMeta)descMeta.setAttribute('content',sanitizeUnicode(soft.description||soft.detail||'下载'+soft.name+'，最新版本'+soft.version+'，支持'+(soft.platforms?soft.platforms.join('/'):'' )));
@@ -2317,7 +2317,7 @@ var id=this.dataset.id;
 if(!id||!Array.isArray(data))return;
 var tut=data.find(function(t){return t.id===id;});
 if(!tut)return;
-document.getElementById('tutorialDetailTitle').textContent=tut.title;
+document.getElementById('tutorialDetailTitle').textContent=sanitizeUnicode(tut.title);
 document.getElementById('tutorialDetailMeta').innerHTML='<span>'+escapeHTML(tut.category)+'</span><span>·</span><span><i class="far fa-clock"></i> '+timeAgo(tut.created_at)+'</span><span>·</span><span><i class="far fa-heart"></i> '+(tut.likes||0)+'</span>';
 document.getElementById('tutorialDetailContent').innerHTML=sanitizeHTML(tut.content||'');
 var videos2=[];
@@ -3313,9 +3313,9 @@ var unlocked=this.getUnlocked();
 container.innerHTML='<div class="achievement-grid">'+ACHIEVEMENTS.map(function(a){
 var on=unlocked.indexOf(a.id)>-1;
 return '<div class="achievement-item '+(on?'unlocked':'locked')+'">'+
-'<div class="ach-icon">'+a.icon+'</div>'+
-'<div class="ach-name">'+a.name+'</div>'+
-'<div class="ach-desc">'+a.desc+'</div></div>';
+'<div class="ach-icon">'+escapeHTML(a.icon)+'</div>'+
+'<div class="ach-name">'+escapeHTML(a.name)+'</div>'+
+'<div class="ach-desc">'+escapeHTML(a.desc)+'</div></div>';
 }).join('')+'</div>';
 }
 };
@@ -4086,8 +4086,8 @@ var _bb=document.getElementById('bellBadge');if(_bb)_bb.classList.add('hidden');
 }
 function setLoginLoading(loading){var btn=document.getElementById('loginBtn');var text=document.getElementById('loginBtnText');var spinner=document.getElementById('loginSpinner');if(!btn)return;btn.disabled=loading;if(loading){text.textContent='登录中...';spinner.style.display='inline';}else{text.textContent='登 录';spinner.style.display='none';}}
 function setRegisterLoading(loading){var btn=document.getElementById('registerBtn');var text=document.getElementById('registerBtnText');var spinner=document.getElementById('registerSpinner');if(!btn)return;btn.disabled=loading;if(loading){text.textContent='注册中...';spinner.style.display='inline';}else{text.textContent='注 册';spinner.style.display='none';}}
-function showLoginError(msg){var el=document.getElementById('loginError');if(el){el.textContent=msg;el.style.display='block';}}
-function showRegisterError(msg){var el=document.getElementById('registerError');if(el){el.textContent=msg;el.style.display='block';}}
+function showLoginError(msg){var el=document.getElementById('loginError');if(el){el.textContent=sanitizeUnicode(msg);el.style.display='block';}}
+function showRegisterError(msg){var el=document.getElementById('registerError');if(el){el.textContent=sanitizeUnicode(msg);el.style.display='block';}}
 function hideLoginError(){var el=document.getElementById('loginError');if(el)el.style.display='none';}
 function hideRegisterError(){var el=document.getElementById('registerError');if(el)el.style.display='none';}
 function validateEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);}
@@ -4096,15 +4096,15 @@ function friendlyError(err){if(!err)return '操作失败，请稍后重试';var 
 function passwordScore(pw){if(!pw)return 0;var s=0;if(pw.length>=8)s++;if(pw.length>=12)s++;if(/[a-z]/.test(pw)&&/[A-Z]/.test(pw))s++;if(/\d/.test(pw))s++;if(/[^a-zA-Z0-9]/.test(pw))s++;return s;}
 function renderStrengthBar(inputId,barId,labelId){var input=document.getElementById(inputId);if(!input)return;input.addEventListener('input',function(){var pw=this.value;var bar=document.getElementById(barId);var label=document.getElementById(labelId);if(!bar||!label)return;var score=passwordScore(pw);var labels=['','弱','一般','较强','强','强'];var colors=['','#e74c3c','#f39c12','#3498db','#2ecc71','#2ecc71'];if(!pw){bar.style.display='none';label.textContent='';return;}bar.style.display='flex';var segments=bar.querySelectorAll('.strength-seg');for(var i=0;i<segments.length;i++){segments[i].style.background=i<score?colors[score]:'var(--border-glow)';}label.textContent=labels[score]||'';label.style.color=colors[score]||'';});}
 function setResetLoading(loading){var btn=document.getElementById('resetPasswordBtn');var text=document.getElementById('resetBtnText');var spinner=document.getElementById('resetSpinner');if(!btn)return;btn.disabled=loading;if(loading){text.textContent='发送中...';spinner.style.display='inline';}else{text.textContent='发送重置邮件';spinner.style.display='none';}}
-function showResetError(msg){var el=document.getElementById('resetError');if(el){el.textContent=msg;el.style.display='block';}}
+function showResetError(msg){var el=document.getElementById('resetError');if(el){el.textContent=sanitizeUnicode(msg);el.style.display='block';}}
 function hideResetError(){var el=document.getElementById('resetError');if(el)el.style.display='none';}
 function showResetSuccess(msg){var el=document.getElementById('resetSuccess');if(el){el.textContent=msg;el.style.display='block';}}
 function hideResetSuccess(){var el=document.getElementById('resetSuccess');if(el)el.style.display='none';}
 function setChangePwLoading(loading){var btn=document.getElementById('changePasswordBtn');var text=document.getElementById('changePwBtnText');var spinner=document.getElementById('changePwSpinner');if(!btn)return;btn.disabled=loading;if(loading){text.textContent='修改中...';spinner.style.display='inline';}else{text.textContent='修改密码';spinner.style.display='none';}}
-function showChangePwError(msg){var el=document.getElementById('changePwError');if(el){el.textContent=msg;el.style.display='block';}}
+function showChangePwError(msg){var el=document.getElementById('changePwError');if(el){el.textContent=sanitizeUnicode(msg);el.style.display='block';}}
 function hideChangePwError(){var el=document.getElementById('changePwError');if(el)el.style.display='none';}
 function setResetPwLoading(loading){var btn=document.getElementById('resetPasswordSetBtn');var text=document.getElementById('resetPwBtnText');var spinner=document.getElementById('resetPwSpinner');if(!btn)return;btn.disabled=loading;if(loading){text.textContent='修改中...';spinner.style.display='inline';}else{text.textContent='确认修改';spinner.style.display='none';}}
-function showResetPwError(msg){var el=document.getElementById('resetPwError');if(el){el.textContent=msg;el.style.display='block';}}
+function showResetPwError(msg){var el=document.getElementById('resetPwError');if(el){el.textContent=sanitizeUnicode(msg);el.style.display='block';}}
 function hideResetPwError(){var el=document.getElementById('resetPwError');if(el)el.style.display='none';}
 var resendCountdownTimer=null;
 function startResendCountdown(seconds){var btn=document.getElementById('resendResetOtpBtn');var cd=document.getElementById('resendCountdown');var secEl=document.getElementById('resendSeconds');if(!btn||!cd||!secEl)return;if(resendCountdownTimer){clearInterval(resendCountdownTimer);resendCountdownTimer=null;}seconds=typeof seconds==='number'?seconds:300;if(seconds<=0){btn.style.display='inline';cd.style.display='none';btn.disabled=false;return;}var remaining=seconds;btn.style.display='none';cd.style.display='inline';secEl.textContent=remaining;resendCountdownTimer=setInterval(function(){remaining--;if(remaining<=0){clearInterval(resendCountdownTimer);resendCountdownTimer=null;btn.style.display='inline';cd.style.display='none';btn.disabled=false;}else{secEl.textContent=remaining;}},1000);}
@@ -4661,4 +4661,3 @@ setTimeout(finishLoading,2500);
 if(location.protocol==='http:'||location.protocol==='https:'){var _bs=document.createElement('script');_bs.async=true;_bs.src='https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';document.head.appendChild(_bs);}
 </script>
 </body></html>
-<!-- （注：内容由AI生成） -->
