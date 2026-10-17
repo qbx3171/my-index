@@ -4530,6 +4530,24 @@ fbClose();
 });
 setTimeout(function(){Achievement.check();},1500);
 setTimeout(initPresence,800);
+// 鑷姩杞鏂拌蒋浠?- 姣?0绉掓鏌ヤ竴娆r
+(function(){
+  var _lastCount=DB.getSoftware().length;
+  setInterval(async function(){
+    try{
+      await DB.loadData(true);
+      var _newCount=DB.getSoftware().length;
+      if(_newCount!==_lastCount){
+        _lastCount=_newCount;
+        var _tc=document.getElementById('todayStackContainer');
+        if(_tc&&!document.querySelector('.detail-overlay.open')){
+          Render.renderTodayNew(_tc);
+          toast('鍙戠幇鏂拌蒋浠朵笂鏋讹紒','success');
+        }
+      }
+    }catch(e){}
+  },30000);
+})();
 });
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadUser);}else{loadUser();}
 setupAuthListener();
