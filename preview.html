@@ -430,7 +430,10 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 @media (max-width:480px){.share-float{bottom:70px;right:6px;gap:4px}.share-float a{width:28px;height:28px;font-size:.7rem}}
 [data-theme="glass"] .share-float a{background:linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 100%);border:1px solid rgba(255,255,255,.28);color:#d8e2f5;box-shadow:0 6px 22px rgba(0,10,30,.45),inset 0 1px 0 rgba(255,255,255,.4)}
 [data-theme="glass"] .share-float a:hover{background:var(--accent-gradient);border-color:transparent;color:#fff;box-shadow:0 10px 32px rgba(94,184,255,.5),inset 0 1px 0 rgba(255,255,255,.55)}
-.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;overflow-y:auto;display:none;transition:opacity .3s;background:var(--bg-primary);--mx:50%;--my:50%}
+.detail-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;overflow-y:auto;overflow-x:hidden;display:none;transition:opacity .3s;background:var(--bg-primary);--mx:50%;--my:50%;scrollbar-width:thin;scrollbar-color:rgba(0,119,255,.2) transparent}
+.detail-overlay::-webkit-scrollbar{width:5px}
+.detail-overlay::-webkit-scrollbar-track{background:transparent}
+.detail-overlay::-webkit-scrollbar-thumb{background:rgba(0,119,255,.2);border-radius:3px}
 .detail-overlay.open{display:block}
 .detail-page{max-width:720px;margin:0 auto;padding:0 0 100px;min-height:100vh;position:relative}
 .detail-overlay::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(600px circle at var(--mx) var(--my),rgba(0,119,255,.08),transparent 60%);pointer-events:none;z-index:1}
@@ -2022,11 +2025,14 @@ var descText=soft.detail||soft.description||'';
 if(descText.trim().length>0){descEl.textContent=descText;descEl.style.display='block';}
 else{descEl.textContent='';descEl.style.display='none';}
 var scr=document.getElementById('detailScreenshots');
-var screenshots=(soft.screenshots||[]).filter(function(url){return url&&url.trim().length>0;});
+var rawShots=soft.screenshots;
+if(typeof rawShots==='string'){try{rawShots=JSON.parse(rawShots);}catch(e){rawShots=[];}}
+if(!Array.isArray(rawShots))rawShots=[];
+var screenshots=rawShots.filter(function(url){return url&&typeof url==='string'&&url.trim().length>0;});
 if(screenshots.length>0){
 scr.classList.remove('hidden');
 document.getElementById('detailShotTitle').style.display='flex';
-scr.innerHTML=screenshots.map(function(url){return '<img src="'+escapeAttr(url)+'" alt="截图" width="90" height="60" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" data-url="'+escapeAttr(url)+'">';}).join('');
+scr.innerHTML=screenshots.map(function(url){return '<img src="'+escapeAttr(url)+'" alt="软件截图" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" data-url="'+escapeAttr(url)+'">';}).join('');
 scr.querySelectorAll('img').forEach(function(img){img.addEventListener('click',function(){if(isSafeHttpUrl(this.dataset.url))window.open(this.dataset.url,'_blank','noopener,noreferrer');});});
 }else{scr.classList.add('hidden');document.getElementById('detailShotTitle').style.display='none';scr.innerHTML='';}
 var clog=document.getElementById('detailChangelog');
@@ -2092,6 +2098,7 @@ document.getElementById('feedbackModal').classList.add('open');
 };
 overlay.classList.add('open');
 document.body.style.overflow='hidden';
+document.documentElement.style.overflow='hidden';
 this._currentSoft=soft;
 },
 openById:function(id){var soft=cache.software.find(function(s){return s.id===id;});if(soft){this.open(soft);}else{toast('未找到该软件','warning');}},
@@ -2140,7 +2147,7 @@ document.head.appendChild(script);
 },
 close:function(){
 document.getElementById('detailOverlay').classList.remove('open');
-if(!document.querySelector('.modal-overlay.open'))document.body.style.overflow='';
+if(!document.querySelector('.modal-overlay.open')){document.body.style.overflow='';document.documentElement.style.overflow='';}
 Detail._currentSoft=null;
 if(App._scrollPos>0){
 var y=App._scrollPos;
@@ -2169,7 +2176,7 @@ var np=document.getElementById('notifPanel');
 if(np&&np.classList.contains('open')){np.classList.remove('open');anyClosed=true;}
 var nd=document.getElementById('notifDetailOverlay');
 if(nd){nd.classList.remove('open');setTimeout(function(){if(nd.parentNode)nd.parentNode.removeChild(nd);},320);anyClosed=true;}
-if(anyClosed)document.body.style.overflow='';
+if(anyClosed){document.body.style.overflow='';document.documentElement.style.overflow='';}
 }
 if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){
 e.preventDefault();
