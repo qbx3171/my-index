@@ -444,9 +444,9 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .detail-breadcrumb .sep{opacity:.5}
 .detail-breadcrumb .current{color:#888}
 .detail-page h2{font-size:1.55rem;font-weight:700;margin:12px 24px 0;color:#1a1a1a;line-height:1.4;letter-spacing:-.02em}
-.detail-cover{width:100%;height:200px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);margin:20px 0 0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.detail-cover{width:calc(100% - 48px);height:220px;margin:20px 24px 0;border-radius:14px;overflow:hidden;position:relative;background:#f5f5f5}
 .detail-cover img{width:100%;height:100%;object-fit:cover}
-.detail-cover-icon{font-size:64px;color:#fff;opacity:.9}
+.detail-cover-icon{font-size:48px;color:#ccc}
 .detail-author-row{display:flex;align-items:center;gap:12px;margin:20px 24px 0;padding:16px 0;border-bottom:1px solid #f0f0f0}
 .detail-author-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;font-weight:700;flex-shrink:0;box-shadow:0 2px 8px rgba(102,126,234,.3)}
 .detail-author-info{flex:1;min-width:0}
@@ -1988,14 +1988,15 @@ this._updateSEO(soft);
 var overlay=document.getElementById('detailOverlay');
 document.getElementById('detailBreadCat').textContent=soft.category||'软件库';
 document.getElementById('detailName').textContent=soft.name||'未命名';
-// Cover image
+// Cover image - use first screenshot
 var coverEl=document.getElementById('detailCover');
 var coverIconEl=document.getElementById('detailCoverIcon');
-if(soft.icon_url&&soft.icon_url.trim()){
-coverEl.innerHTML='<img src="'+escapeAttr(soft.icon_url)+'" alt="'+escapeAttr(soft.name)+'" onerror="this.style.display=\'none\';document.getElementById(\'detailCoverIcon\').style.display=\'flex\'">';
-coverIconEl.style.display='none';
+var allScreenshots=(soft.screenshots||[]).filter(function(url){return url&&url.trim().length>0;});
+if(allScreenshots.length>0){
+coverEl.innerHTML='<img src="'+escapeAttr(allScreenshots[0])+'" alt="'+escapeAttr(soft.name)+'" onerror="this.parentElement.style.display=\'none\'">';
+coverEl.style.display='block';
 }else{
-coverEl.innerHTML='<div class="detail-cover-icon" id="detailCoverIcon">'+(soft.icon||'📦')+'</div>';
+coverEl.style.display='none';
 }
 // Author meta row
 document.getElementById('detailAuthorCat').textContent='📂 '+(soft.category||'软件库');
@@ -2034,7 +2035,7 @@ var descText=soft.detail||soft.description||'';
 if(descText.trim().length>0){descEl.textContent=descText;descEl.style.display='block';}
 else{descEl.textContent='';descEl.style.display='none';}
 var scr=document.getElementById('detailScreenshots');
-var screenshots=(soft.screenshots||[]).filter(function(url){return url&&url.trim().length>0;});
+var screenshots=allScreenshots.slice(1);
 if(screenshots.length>0){
 scr.classList.remove('hidden');
 scr.innerHTML=screenshots.map(function(url){return '<img src="'+escapeAttr(url)+'" alt="截图" width="90" height="60" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" data-url="'+escapeAttr(url)+'">';}).join('');
