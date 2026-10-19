@@ -3222,10 +3222,16 @@ var url=window.location.origin+window.location.pathname+'?soft='+soft.id;
 this._url=url;
 document.getElementById('shareTitle').textContent=sanitizeUnicode(soft.name);
 var c=document.getElementById('shareQr');
+var render=function(){
 if(typeof qrcode==='function'){
-try{var qr=qrcode(0,'M');qr.addData(url);qr.make();c.innerHTML=qr.createImgTag(6,8);}
+try{var qr=qrcode(0,'M');qr.addData(url);qr.make();c.innerHTML=qr.createImgTag(6,8);return true;}
 catch(e){c.innerHTML='<div style="padding:20px;color:#999;">二维码生成失败</div>';}
 }else c.innerHTML='<div style="padding:20px;color:#999;">二维码加载中...</div>';
+return false;
+};
+if(!render()&&typeof loadScript==='function'&&typeof CDNS!=='undefined'&&CDNS.qrcode){
+loadScript('qrcode',orderUrls('qrcode',CDNS.qrcode),0,function(ok){if(ok)render();});
+}
 document.getElementById('shareModal').classList.add('open');
 },
 close:function(){document.getElementById('shareModal').classList.remove('open');}
@@ -4598,7 +4604,7 @@ contact:document.getElementById('fbContact').value.trim()||null,
 user_id:currentUser?currentUser.id:null
 }]);
 this.disabled=false;
-if(r.error){toast('提交失败：'+r.error.message,'error');return;}
+if(r.error){var _fbErrMsg=(r.error.message||'');if(/feedback|relation/i.test(_fbErrMsg)&&/does not exist|not exist|undefined_table/i.test(_fbErrMsg)){toast('反馈功能暂未开放，请稍后再试','warning');}else{toast('提交失败：'+_fbErrMsg,'error');}return;}
 toast('反馈已提交，感谢！','success');
 document.getElementById('fbContent').value='';
 fbClose();

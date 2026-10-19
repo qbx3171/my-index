@@ -235,6 +235,8 @@ body.nav-open .sidebar-backdrop{opacity:1;pointer-events:auto}
 .table-wrap td .actions .view-btn:hover{background:var(--pu);color:#fff;border-color:transparent}
 .table-wrap td .actions .reply-btn{background:rgba(15,169,104,.1);color:var(--gr);border-color:rgba(15,169,104,.14)}
 .table-wrap td .actions .reply-btn:hover{background:var(--gr);color:#fff;border-color:transparent}
+.table-wrap td .actions .status-btn{background:rgba(15,169,104,.1);color:var(--gr);border-color:rgba(15,169,104,.14)}
+.table-wrap td .actions .status-btn:hover{background:var(--gr);color:#fff;border-color:transparent}
 .table-wrap td .actions .approve-btn{background:rgba(15,169,104,.1);color:var(--gr);border-color:rgba(15,169,104,.14)}
 .table-wrap td .actions .approve-btn:hover{background:var(--gr);color:#fff;border-color:transparent}
 .table-wrap td .actions .reject-btn{background:rgba(239,68,68,.1);color:var(--rd);border-color:rgba(239,68,68,.14)}
@@ -651,6 +653,7 @@ body{height:100vh;height:100dvh;}
 <div class="nav-item" data-tab="tutorials"><span class="icon">📖</span><span>教程管理</span></div>
 <div class="nav-item" data-tab="drafts"><span class="icon">📝</span><span>草稿箱</span></div>
 <div class="nav-item" data-tab="comments"><span class="icon">💬</span><span>评论管理</span></div>
+<div class="nav-item" data-tab="feedback"><span class="icon">📮</span><span>反馈管理</span><span class="nav-badge hidden" id="feedbackBadge">0</span></div>
 <div class="nav-item" data-tab="qa"><span class="icon">❓</span><span>问答管理</span></div>
 <div class="nav-item" data-tab="categories"><span class="icon">⌗</span><span>分类管理</span></div>
 <div class="nav-item" data-tab="add"><span class="icon">⊕</span><span>上传软件</span></div>
@@ -852,6 +855,7 @@ var ALL_TABS=[
 {id:'tutorials',label:'教程管理',icon:'📖'},
 {id:'drafts',label:'草稿箱',icon:'📝'},
 {id:'comments',label:'评论管理',icon:'💬'},
+{id:'feedback',label:'反馈管理',icon:'📮'},
 {id:'qa',label:'问答管理',icon:'❓'},
 {id:'categories',label:'分类管理',icon:'⌗'},
 {id:'add',label:'上传软件',icon:'⊕'},
@@ -877,6 +881,7 @@ return r.data;
 });
 }
 var _RLS_SQL='CREATE POLICY "admin_insert_notifications" ON public.notifications FOR INSERT TO authenticated WITH CHECK (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));\n\nCREATE POLICY "user_read_own_notifications" ON public.notifications FOR SELECT TO authenticated USING (user_id = auth.uid() OR EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));\n\nCREATE POLICY "user_update_own_notifications" ON public.notifications FOR UPDATE TO authenticated USING (user_id = auth.uid());\n\nCREATE POLICY "admin_delete_notifications" ON public.notifications FOR DELETE TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));';
+var _FEEDBACK_SQL='CREATE TABLE IF NOT EXISTS public.feedback (\n  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),\n  software_id text,\n  type text DEFAULT \'other\',\n  content text NOT NULL,\n  contact text,\n  user_id uuid,\n  status text DEFAULT \'pending\',\n  created_at timestamptz DEFAULT now()\n);\n\nALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;\n\nDROP POLICY IF EXISTS "feedback_insert_public" ON public.feedback;\nCREATE POLICY "feedback_insert_public" ON public.feedback FOR INSERT TO anon, authenticated WITH CHECK (true);\nDROP POLICY IF EXISTS "feedback_admin_read" ON public.feedback;\nCREATE POLICY "feedback_admin_read" ON public.feedback FOR SELECT TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));\nDROP POLICY IF EXISTS "feedback_admin_update" ON public.feedback;\nCREATE POLICY "feedback_admin_update" ON public.feedback FOR UPDATE TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));\nDROP POLICY IF EXISTS "feedback_admin_delete" ON public.feedback;\nCREATE POLICY "feedback_admin_delete" ON public.feedback FOR DELETE TO authenticated USING (EXISTS (SELECT 1 FROM public.profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));';
 function toast(m,t){t=t||'success';var c=document.getElementById('toastContainer');var e=document.createElement('div');e.className='toast '+t;var i={success:'◆',error:'✕',warning:'⚠'};e.innerHTML='<span class="icon">'+(i[t]||'◆')+'</span> '+escapeHTML(m);c.appendChild(e);setTimeout(function(){e.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){e.remove();},500);},2800);}
 function escapeHTML(s){if(s===null||s===undefined)return '';var d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
 function escapeAttr(s){if(s===null||s===undefined)return '';return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1042,9 +1047,9 @@ if(quill.root.tagName==='TEXTAREA')quill.root.value=html||'';
 else quill.root.innerHTML=html||'';
 }
 var DB={
-_sw:null,_swT:0,_ca:null,_caT:0,_tu:null,_tuT:0,_qu:null,_quT:0,_an:null,_anT:0,_cm:null,_cmT:0,_sb:null,_sbT:0,_pf:null,_pfT:0,_ml:null,_mlT:0,_rd:null,_rdT:0,_mlErr:null,_ttl:120000,
+_sw:null,_swT:0,_ca:null,_caT:0,_tu:null,_tuT:0,_qu:null,_quT:0,_an:null,_anT:0,_cm:null,_cmT:0,_fb:null,_fbT:0,_sb:null,_sbT:0,_pf:null,_pfT:0,_ml:null,_mlT:0,_rd:null,_rdT:0,_mlErr:null,_ttl:120000,
 _t:function(p,ms){ms=ms||10000;return new Promise(function(res,rej){var t=setTimeout(function(){rej(new Error('请求超时'));},ms);p.then(function(v){clearTimeout(t);res(v);},function(e){clearTimeout(t);rej(e);});});},
-invalidate:function(){this._sw=null;this._ca=null;this._tu=null;this._qu=null;this._an=null;this._cm=null;this._sb=null;this._pf=null;this._ml=null;this._rd=null;this._mlErr=null;},
+invalidate:function(){this._sw=null;this._ca=null;this._tu=null;this._qu=null;this._an=null;this._cm=null;this._fb=null;this._sb=null;this._pf=null;this._ml=null;this._rd=null;this._mlErr=null;},
 async soft(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sw&&n-this._swT<this._ttl)return this._sw;try{var r=await this._t(supabaseClient.from('software').select('*').order('created_at',{ascending:false}));if(r.error)return this._sw||[];this._sw=r.data||[];this._swT=n;return this._sw;}catch(e){return this._sw||[];}},
 async cats(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._ca&&n-this._caT<this._ttl)return this._ca;try{var r=await this._t(supabaseClient.from('categories').select('*').order('name'));if(r.error)return [];this._ca=r.data||[];this._caT=n;return this._ca;}catch(e){return [];}},
 async addSoft(s){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').insert(s).select());if(r.error)return null;this.invalidate();return r.data?r.data[0]:null;}catch(e){return null;}},
@@ -1064,6 +1069,9 @@ async updQCount(id,c){if(!supabaseClient)return;try{await this._t(supabaseClient
 async cm(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._cm&&n-this._cmT<this._ttl)return this._cm;try{var r=await this._t(supabaseClient.from('tutorial_comments').select('*').order('created_at',{ascending:false}));if(r.error)return this._cm||[];this._cm=r.data||[];this._cmT=n;return this._cm;}catch(e){return this._cm||[];}},
 async addCm(c){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('tutorial_comments').insert(c).select());if(r.error)return null;this._cm=null;return r.data?r.data[0]:null;}catch(e){return null;}},
 async delCm(id){if(!supabaseClient)return {success:false,error:'未初始化'};try{var r=await this._t(supabaseClient.from('tutorial_comments').delete().eq('id',id).select('id'));if(r.error)return {success:false,error:r.error.message};if(!r.data||r.data.length===0)return {success:false,error:'删除失败或权限不足'};this._cm=null;return {success:true};}catch(e){return {success:false,error:e.message||'网络异常'};}},
+async fb(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._fb&&n-this._fbT<this._ttl)return this._fb;try{var r=await this._t(supabaseClient.from('feedback').select('*').order('created_at',{ascending:false}));if(r.error){this._fbErr=r.error;return this._fb||[];}this._fbErr=null;this._fb=r.data||[];this._fbT=n;return this._fb;}catch(e){return this._fb||[];}},
+async delFb(id){if(!supabaseClient)return {success:false,error:'未初始化'};try{var r=await this._t(supabaseClient.from('feedback').delete().eq('id',id).select('id'));if(r.error)return {success:false,error:r.error.message};if(!r.data||r.data.length===0)return {success:false,error:'删除失败或权限不足'};this._fb=null;return {success:true};}catch(e){return {success:false,error:e.message||'网络异常'};}},
+async updFbStatus(id,status){if(!supabaseClient)return {success:false,error:'未初始化'};try{var r=await this._t(supabaseClient.from('feedback').update({status:status}).eq('id',id).select('id'));if(r.error)return {success:false,error:r.error.message};this._fb=null;return {success:true};}catch(e){return {success:false,error:e.message||'网络异常'};}},
 async sub(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sb&&n-this._sbT<this._ttl)return this._sb;try{var r=await this._t(supabaseClient.from('software_submissions').select('*').order('created_at',{ascending:false}));if(r.error)return this._sb||[];this._sb=r.data||[];this._sbT=n;return this._sb;}catch(e){return this._sb||[];}},
 async approve(id,s){
 if(!supabaseClient)throw new Error('未初始化');
@@ -1267,7 +1275,7 @@ if(!r.data||r.data.length===0)throw new Error('删除失败');
 }
 };
 var App={
-_tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,_editSource:null,_pubDraftId:null,_msgHistoryList:[],_mallItems:[],_redeems:[],_mallKw:'',_mallCatF:'all',_redeemF:'all',_mallEditId:null,_focusSearch:null,_focusPos:null,_seq:0,
+_tab:'dashboard',_editId:null,_all:[],_fil:[],_ps:10,_page:1,_selByTab:{software:[],tutorials:[],qa:[],comments:[],submissions:[],users:[]},_kw:'',_catF:'all',_timer:null,_tCache:{},_sortF:null,_sortO:null,_cats:[],_tuts:[],_qs:[],_ans:[],_cms:[],_fbs:[],_fbKw:'',_fbStatusChecked:false,_fbHasStatus:false,_subs:[],_pfs:[],_tutEditId:null,_tutKw:'',_qaKw:'',_qaF:'all',_qaSortF:null,_qaSortO:null,_vl:[],_il:[],_draftKw:'',_isDraftPub:false,_autoSave:null,_cmKw:'',_cmTutF:'all',_cmSortF:'created_at',_cmSortO:'desc',_replyId:null,_replyTut:null,_replyAuthor:'',_pfKw:'',_subF:'pending',_isSubmitting:false,_editSource:null,_pubDraftId:null,_msgHistoryList:[],_mallItems:[],_redeems:[],_mallKw:'',_mallCatF:'all',_redeemF:'all',_mallEditId:null,_focusSearch:null,_focusPos:null,_seq:0,
 sel:function(){return this._selByTab[this._tab]||[];},
 setSel:function(ids){this._selByTab[this._tab]=ids;},
 _restoreFocus:function(c,id){if(this._focusSearch!==id)return;this._focusSearch=null;var n=c.querySelector('#'+id);if(!n)return;var p=this._focusPos;this._focusPos=null;n.focus();try{if(p==null||p>n.value.length)p=n.value.length;n.setSelectionRange(p,p);}catch(e){}},
@@ -1559,6 +1567,7 @@ DB.invalidate();
 try{ await this.preload(); }catch(e){}
 this.refreshSubBadge();
 this.refreshRedeemBadge();
+this.refreshFeedbackBadge();
 this.renderTab('dashboard');
 },
 refreshSubBadge:async function(){
@@ -1571,6 +1580,19 @@ refreshRedeemBadge:async function(){
 var list=await DB.redeems(true);
 var p=list.filter(function(x){return (x.status||'pending')==='pending'&&x.delivery_type!=='auto';}).length;
 var b=document.getElementById('redeemBadge');
+if(b){if(p>0){b.textContent=p;b.classList.remove('hidden');}else b.classList.add('hidden');}
+},
+_probeFeedbackStatus:function(){
+if(this._fbStatusChecked)return Promise.resolve(this._fbHasStatus);
+this._fbStatusChecked=true;
+var self=this;
+try{return supabaseClient.from('feedback').select('status').limit(1).then(function(r){self._fbHasStatus=!r.error;return self._fbHasStatus;}).catch(function(){self._fbHasStatus=false;return false;});}catch(e){this._fbHasStatus=false;return Promise.resolve(false);}
+},
+refreshFeedbackBadge:async function(){
+var list=await DB.fb(true);
+var has=await this._probeFeedbackStatus();
+var p=has?list.filter(function(x){var s=x.status||'pending';return s==='pending'||s==='new'||s==='open';}).length:list.length;
+var b=document.getElementById('feedbackBadge');
 if(b){if(p>0){b.textContent=p;b.classList.remove('hidden');}else b.classList.add('hidden');}
 },
 preload:function(){
@@ -1603,6 +1625,7 @@ if(t==='submissions'){this.renderSubs(m);return;}
 if(t==='tutorials'){this.renderTuts(m);return;}
 if(t==='drafts'){this.renderDrafts(m);return;}
 if(t==='comments'){this.renderComments(m);return;}
+if(t==='feedback'){this.renderFeedback(m);return;}
 if(t==='dashboard'){this.renderDash(m);return;}
 if(t==='categories'){this.renderCats(m);return;}
 if(t==='add'){this.renderAddForm(m);return;}
@@ -2566,6 +2589,105 @@ if(r2){toast('✅ 回复成功');DB.addLog('回复评论','评论 ID: '+self._re
 else toast('❌ 回复失败','error');
 });
 },
+renderFeedback:async function(c){
+if(this._tab!=='feedback')return;
+c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载反馈...</div>';
+var self=this;
+var seq=this._seq;
+var data=await DB.fb(true);
+var softs=await DB.soft(true);
+var users=await DB.pf(true);
+if(seq!==this._seq)return;
+this._fbs=data;
+var has=await this._probeFeedbackStatus();
+if(seq!==this._seq)return;
+var fil=this._getFilteredFeedback();
+var total=fil.length;
+var ps=this._ps;
+var tp=Math.ceil(total/ps)||1;
+if(this._page>tp)this._page=tp;
+if(this._page<1)this._page=1;
+var st=(this._page-1)*ps;
+var en=Math.min(st+ps,total);
+var pi=fil.slice(st,en);
+var softMap={};(softs||[]).forEach(function(s){softMap[s.id]=s.name;});
+var userMap={};(users||[]).forEach(function(u){userMap[u.id]=u.email||u.username||'';});
+var typeLabels={broken:'链接失效',wrong:'描述有误',suggest:'功能建议',other:'其他'};
+var statusLabels={pending:'待处理',new:'待处理',open:'待处理',done:'已处理',handled:'已处理',resolved:'已处理'};
+var sqlEsc=escapeHTML(_FEEDBACK_SQL);
+var missing=!!DB._fbErr&&/relation "public\.feedback" does not exist|relation "feedback" does not exist/i.test(DB._fbErr.message||'');
+var h='<h2 class="page-title">📮 反馈管理</h2><p class="page-sub">共 '+total+' 条用户反馈（来自前台软件详情页的「反馈」按钮）</p><div class="toolbar">';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="fbSearch" placeholder="搜索反馈内容 / 联系方式 / 类型..." value="'+escapeAttr(this._fbKw)+'" /></div>';
+h+='<div class="btn-group"><button class="btn btn-sm btn-outline" id="fbRefresh">⟳ 刷新</button><span class="selected-info">共 '+total+' 条</span></div></div>';
+if(missing){
+h+='<div class="rls-hint"><div class="title">⚠️ 未找到 feedback 数据表</div><div>前台提交反馈需要 <b>feedback</b> 表。请在 <b>Supabase 控制台 → SQL Editor</b> 中执行以下 SQL 创建表与权限，然后刷新本页面：</div><pre>'+sqlEsc+'</pre></div>';
+}
+h+='<div class="table-wrap comment-table-wrap"><table><thead><tr><th>软件</th><th>用户</th><th>类型</th><th>反馈内容</th><th>联系方式</th><th>时间</th>'+(has?'<th>状态</th>':'')+'<th style="width:200px;">操作</th></tr></thead><tbody>';
+if(pi.length===0)h+='<tr class="empty-row"><td colspan="'+(has?8:7)+'">暂无反馈</td></tr>';
+else{
+for(var i=0;i<pi.length;i++){
+var x=pi[i];
+var sname=softMap[x.software_id]||'—';
+var uname=userMap[x.user_id]||'游客';
+var tl=typeLabels[x.type]||x.type||'其他';
+var sl=statusLabels[x.status]||(x.status?x.status:'待处理');
+var stc=(sl==='已处理')?'category-tag office':'category-tag media';
+h+='<tr data-id="'+escapeAttr(x.id)+'">';
+h+='<td data-label="软件" style="font-size:.75rem;">'+escapeHTML(sname)+'</td>';
+h+='<td data-label="用户" style="font-size:.75rem;">'+escapeHTML(uname)+'</td>';
+h+='<td data-label="类型"><span class="category-tag">'+escapeHTML(tl)+'</span></td>';
+h+='<td data-label="反馈内容" class="comment-content-cell" title="'+escapeAttr(x.content||'')+'">'+escapeHTML(x.content||'')+'</td>';
+h+='<td data-label="联系方式" style="font-size:.75rem;">'+escapeHTML(x.contact||'—')+'</td>';
+h+='<td data-label="时间" style="font-size:.7rem;">'+timeAgo(x.created_at)+'</td>';
+if(has)h+='<td data-label="状态"><span class="'+stc+'">'+escapeHTML(sl)+'</span></td>';
+h+='<td data-label="操作"><div class="actions">';
+h+='<button class="view-btn" data-id="'+escapeAttr(x.id)+'">📄 详情</button>';
+if(has)h+='<button class="status-btn" data-id="'+escapeAttr(x.id)+'" data-status="'+escapeAttr(x.status||'pending')+'">'+(sl==='已处理'?'↩ 标记待处理':'✅ 标记已处理')+'</button>';
+h+='<button class="del-btn" data-id="'+escapeAttr(x.id)+'">🗑 删除</button>';
+h+='</div></td></tr>';
+}
+}
+h+='</tbody></table></div>';
+h+='<div class="pagination"><div class="info">共 '+total+' 条，第 '+(total?st+1:0)+'-'+en+' 条</div><div class="pages">';
+h+='<button class="fb-page-btn" data-page="prev" '+(this._page<=1?'disabled':'')+'>‹</button>';
+var sp=Math.max(1,this._page-3);
+var ep=Math.min(tp,sp+6);
+if(ep-sp<6)sp=Math.max(1,ep-6);
+for(var p=sp;p<=ep;p++)h+='<button class="fb-page-btn '+(p===this._page?'active':'')+'" data-page="'+p+'">'+p+'</button>';
+h+='<button class="fb-page-btn" data-page="next" '+(this._page>=tp?'disabled':'')+'>›</button>';
+h+='</div></div>';
+c.innerHTML=h;this._restoreFocus(c,'fbSearch');
+var si=c.querySelector('#fbSearch');
+self._bindSearch(si,function(v){self._fbKw=v;self._focusSearch='fbSearch';self._page=1;self.renderFeedback(c);});
+var rb=c.querySelector('#fbRefresh');
+if(rb)rb.addEventListener('click',function(){DB.fb(true).then(function(d){self._fbs=d;self.renderFeedback(c);self.refreshFeedbackBadge();toast('已刷新');});});
+c.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;var x=self._fbs.find(function(f){return f.id===id;});if(x)self.showFeedbackDetail(x,softMap,userMap,has);});});
+c.querySelectorAll('.status-btn').forEach(function(b){b.addEventListener('click',async function(){var btn=this;var id=btn.dataset.id;var cur=btn.dataset.status;var next=(cur==='done'||cur==='handled'||cur==='resolved')?'pending':'done';if(!(await uiConfirm('确定将这条反馈标记为「'+(next==='done'?'已处理':'待处理')+'」吗？',{title:'更新状态',icon:'📮'})))return;btn.disabled=true;btn.textContent='处理中...';DB.updFbStatus(id,next).then(function(r){if(r.success){DB.addLog('更新反馈状态','反馈 ID: '+shortId(id));toast('✅ 已更新');self.renderFeedback(c);self.refreshFeedbackBadge();}else{toast('❌ '+(r.error||'更新失败'),'error');btn.disabled=false;btn.textContent='状态';}});});});
+c.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',async function(){var btn=this;var id=btn.dataset.id;if(!(await uiConfirm('确定要删除这条反馈吗？',{title:'删除反馈',icon:'🗑',danger:true,okText:'删除'})))return;btn.disabled=true;btn.textContent='处理中...';DB.delFb(id).then(function(r){if(r.success){DB.addLog('删除反馈','反馈 ID: '+shortId(id));toast('✅ 已删除');self._fbs=self._fbs.filter(function(x){return x.id!==id;});self.renderFeedback(c);self.refreshFeedbackBadge();}else{toast('❌ '+(r.error||'删除失败'),'error');btn.disabled=false;btn.textContent='🗑 删除';}});});});
+c.querySelectorAll('.fb-page-btn').forEach(function(b){b.addEventListener('click',function(){var p=this.dataset.page;var t=Math.ceil(self._getFilteredFeedback().length/self._ps)||1;if(p==='prev'){if(self._page>1)self._page--;}else if(p==='next'){if(self._page<t)self._page++;}else self._page=parseInt(p);self.renderFeedback(c);});});
+},
+_getFilteredFeedback:function(){
+var data=this._fbs||[];
+var kw=(this._fbKw||'').toLowerCase().trim();
+if(!kw)return data.slice();
+return data.filter(function(x){var c=(x.content||'').toLowerCase();var ct=(x.contact||'').toLowerCase();var ty=(x.type||'').toLowerCase();return c.indexOf(kw)!==-1||ct.indexOf(kw)!==-1||ty.indexOf(kw)!==-1;});
+},
+showFeedbackDetail:function(x,softMap,userMap,has){
+var m=document.getElementById('detailModal');
+document.getElementById('detailTitle').textContent='📮 反馈详情';
+var body=document.getElementById('detailBody');
+var typeLabels={broken:'链接失效',wrong:'描述有误',suggest:'功能建议',other:'其他'};
+var statusLabels={pending:'待处理',new:'待处理',open:'待处理',done:'已处理',handled:'已处理',resolved:'已处理'};
+body.innerHTML='<div class="detail-row"><div class="label">软件</div><div class="value">'+escapeHTML((softMap&&softMap[x.software_id])||'—')+'</div></div>'+
+'<div class="detail-row"><div class="label">用户</div><div class="value">'+escapeHTML((userMap&&userMap[x.user_id])||'游客')+'</div></div>'+
+'<div class="detail-row"><div class="label">类型</div><div class="value">'+escapeHTML(typeLabels[x.type]||x.type||'其他')+'</div></div>'+
+'<div class="detail-row"><div class="label">联系方式</div><div class="value">'+escapeHTML(x.contact||'—')+'</div></div>'+
+'<div class="detail-row"><div class="label">内容</div><div class="value" style="line-height:1.8;white-space:pre-wrap;word-break:break-word;">'+escapeHTML(x.content||'')+'</div></div>'+
+'<div class="detail-row"><div class="label">时间</div><div class="value">'+(x.created_at?formatDate(x.created_at):'-')+'</div></div>'+
+(has?'<div class="detail-row"><div class="label">状态</div><div class="value">'+escapeHTML(statusLabels[x.status]||(x.status?x.status:'待处理'))+'</div></div>':'')+
+'<div class="detail-row"><div class="label">ID</div><div class="value" style="font-size:.75rem;color:var(--dim);">'+escapeHTML(x.id||'')+'</div></div>';
+m.classList.remove('hidden');
+},
 renderQA:function(c){
 if(this._tab!=='qa')return;
 var self=this;
@@ -3486,6 +3608,7 @@ if(tt)tt.addEventListener('click',function(){setTimeout(syncThemeColor,0);});
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
