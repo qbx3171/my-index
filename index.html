@@ -4596,15 +4596,10 @@ if(!checkSupabase())return;
 var content=document.getElementById('fbContent').value.trim();
 if(!content){toast('请填写反馈内容','warning');return;}
 this.disabled=true;
-var r=await supabaseClient.from('feedback').insert([{
-software_id:fbModal.dataset.softId||null,
-type:document.getElementById('fbType').value,
-content:content,
-contact:document.getElementById('fbContact').value.trim()||null,
-user_id:currentUser?currentUser.id:null
-}]);
+var _fbPayload={software_id:fbModal.dataset.softId||null,type:document.getElementById('fbType').value,content:content,contact:document.getElementById('fbContact').value.trim()||null,user_id:currentUser?currentUser.id:null};
+var r=await supabaseClient.from('feedback').insert([_fbPayload]);
 this.disabled=false;
-if(r.error){var _fbErrMsg=(r.error.message||'');if(/feedback|relation/i.test(_fbErrMsg)&&/does not exist|not exist|undefined_table/i.test(_fbErrMsg)){toast('反馈功能暂未开放，请稍后再试','warning');}else{toast('提交失败：'+_fbErrMsg,'error');}return;}
+if(r.error){var _fbErrMsg=(r.error.message||'');if(/feedback|relation/i.test(_fbErrMsg)&&/does not exist|not exist|undefined_table/i.test(_fbErrMsg)){toast('反馈功能暂未开放，请稍后再试','warning');return;}if(_fbPayload.software_id&&/invalid input syntax for type uuid/i.test(_fbErrMsg)){this.disabled=true;delete _fbPayload.software_id;var r2=await supabaseClient.from('feedback').insert([_fbPayload]);this.disabled=false;if(r2.error){toast('提交失败：'+(r2.error.message||'未知错误'),'error');}else{toast('反馈已提交，感谢！','success');document.getElementById('fbContent').value='';fbClose();}return;}toast('提交失败：'+_fbErrMsg,'error');return;}
 toast('反馈已提交，感谢！','success');
 document.getElementById('fbContent').value='';
 fbClose();
