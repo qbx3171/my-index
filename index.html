@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0267)https://p3-flow-sign.byteimg.com/tos-cn-i-ik7evvg4ik/rc/pc/super_tool/613ac3efdf9a47e189b80185dcace03d.html~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=2026101714555864025262BAB76FCA8838&rrcfp=935dee89&x-expires=1792826351&x-signature=R5TuJ2L5vFuu9BgnRpXuyjGUJao%3D -->
 <html lang="zh-CN" data-theme="light" data-theme-stored="light"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>乐哲软件官网 - 精选高效工具 | 设计开发办公媒体软件免费下载</title>
 <meta name="description" content="乐哲软件(lezhesoft.cn)是专业的软件资源下载平台，提供设计工具、开发工具、办公软件、媒体工具等全品类实用软件下载与安装教程。">
@@ -42,16 +40,19 @@
 <script>/* supabase-js is loaded via inline blob: the webpack UMD package requires document.currentScript.src to compute publicPath, and pure inline execution throws Automatic publicPath is not supported */
 (function(){
 if(location.protocol==='file:')return;
+var _h=location.hostname;
+if(!(/^(localhost|127\.0\.0\.1)$/.test(_h)||_h==='lezhesoft.cn'||/\.lezhesoft\.cn$/.test(_h)))return;
 try{
 var el=document.getElementById('lezheSupabaseBundle');
 var blob=new Blob([el.textContent],{type:'text/javascript'});
 var s=document.createElement('script');
 s.src=URL.createObjectURL(blob);
 s.onload=function(){try{URL.revokeObjectURL(s.src);}catch(e){}};
+s.onerror=function(){try{URL.revokeObjectURL(s.src);}catch(e){}};
 document.head.appendChild(s);
-}catch(e){console.warn('[CDN] supabase inline load failed',e);}
+}catch(e){}
 })();
-</script><script src="blob:https://p3-flow-sign.byteimg.com/6bdd2421-7229-4de7-b383-8321be4518f8"></script>
+</script>
 <script>
 (function(){
 var CDNS={
@@ -1253,6 +1254,7 @@ body.ls-locked{overflow:hidden !important}
 <script>
 var IS_LOCAL_HOST=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 var IS_FILE_PREVIEW=location.protocol==='file:';
+var IS_TRUSTED_HOST=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)||location.hostname==='lezhesoft.cn'||/\.lezhesoft\.cn$/.test(location.hostname);
 var IS_LOCAL_PREVIEW=IS_FILE_PREVIEW||IS_LOCAL_HOST;
 var SUPABASE_URL='https://lezhesoft-d0g80z4vb0ac03c39-1300972301.ap-shanghai.app.tcloudbase.com/supabase-proxy';
 var SUPABASE_ANON_KEY='sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW';
@@ -1280,7 +1282,6 @@ _supabaseInitRetries++;
 if(_supabaseInitRetries<_supabaseInitMaxRetries){
 setTimeout(tryInitSupabaseWithRetry,500);
 }else{
-console.warn('[Supabase] 库加载超时，尝试备用方案...');
 tryLoadSupabaseFallback();
 }
 }
@@ -3354,7 +3355,7 @@ Render.renderSkeleton(document.getElementById('recommendGrid'),6);
 Render.renderSkeleton(document.getElementById('latestGrid'),6);
 }
 if(cached){
-self.refreshAll();
+self.refreshAll(true);
 DB.loadAll(true).then(function(){self.refreshAll();_idle(function(){renderTutorials();renderQuestions();if(!handleUrlParams())App.goHome();});}).catch(function(){});
 }else{
 DB.loadAll().then(function(){self.refreshAll();_idle(function(){renderTutorials();renderQuestions();if(!handleUrlParams())App.goHome();});window.dispatchEvent(new Event('lezhe:ready'));}).catch(function(){window.dispatchEvent(new Event('lezhe:ready'));});
@@ -3879,12 +3880,13 @@ document.getElementById('searchSuggestions').classList.remove('open');
 document.getElementById('searchHistory').classList.remove('open');
 if(!isPop)window.history.pushState(null,'',window.location.pathname+'?search='+encodeURIComponent(keyword));
 },
-refreshHome:function(){
+refreshHome:function(_skipTodayNew){
 var self=this;
 var all=DB.getSoftware();
 Render.renderAnnouncements(document.getElementById('announcementContainer'));
 Render.renderCategories(document.getElementById('categoryList'),null,function(cat){self.goList(cat);});
-Render.renderTodayNew(document.getElementById('todayStackContainer'));
+if(_skipTodayNew){var _tc=document.getElementById('todayStackContainer');if(_tc)_tc.innerHTML='<div class="stack-empty"><span class="empty-icon">⏳</span><span class="empty-text">正在加载今日上新…</span></div>';}
+else Render.renderTodayNew(document.getElementById('todayStackContainer'));
 var _isMobileView=window.innerWidth<=768;
 var _homeLimit=_isMobileView?3:6;
 Render.renderCards(document.getElementById('recommendGrid'),all.filter(function(s){return s.recommend;}).slice(0,_homeLimit),true);
@@ -3947,8 +3949,8 @@ document.getElementById('jumpPageInput').max=totalPages;
 applyViewMode();
 },
 refreshListWithFilters:function(){this.refreshList(this.searchKeyword||null);},
-refreshAll:function(){
-if(this.currentPage==='home')this.refreshHome();
+refreshAll:function(_skipHomeFresh){
+if(this.currentPage==='home')this.refreshHome(_skipHomeFresh);
 else if(this.currentPage==='list')this.refreshListWithFilters();
 else if(this.currentPage==='tutorials')renderTutorials();
 else if(this.currentPage==='qa')renderQuestions();
@@ -4524,7 +4526,7 @@ try{localStorage.setItem('lezhe_rt_dead',String(Date.now()+6*3600*1000));}catch(
 if(supabaseClient&&supabaseClient.realtime&&supabaseClient.realtime.disconnect){try{supabaseClient.realtime.disconnect();}catch(e){}}
 console.warn('[realtime] 实时连接不可用，已停用实时功能（不影响正常浏览）');
 }
-if(IS_LOCAL_PREVIEW){window._lezheRtDisabled=true;}
+if(IS_LOCAL_PREVIEW||!IS_TRUSTED_HOST){window._lezheRtDisabled=true;}
 function initPresence(){
 if(window._lezheRtDisabled||rtIsDead())return;
 if(!supabaseClient||typeof supabase==='undefined'||!supabaseClient.channel)return;
@@ -4667,5 +4669,5 @@ setTimeout(finishLoading,2500);
 <script>/* Busuanzi counter: load only under http(s), to avoid invalid requests and skewed statistics under file:// */
 if(location.protocol==='http:'||location.protocol==='https:'){var _bs=document.createElement('script');_bs.async=true;_bs.src='https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';document.head.appendChild(_bs);}
 </script>
-</body></html>
-<!-- （注：内容由AI生成） -->
+</body>
+</html>
