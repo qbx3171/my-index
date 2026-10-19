@@ -3012,12 +3012,19 @@ var pNotif=currentUser
 : Promise.resolve({data:[]});
 Promise.all([pAnn,pNotif]).then(function(arr){
 var anns=(arr[0].data||[]).map(function(a){
-return {_id:'a_'+a.id,_rawId:a.id,_type:'ann',title:sanitizeUnicode(a.title),content:sanitizeUnicode(a.content),pinned:a.pinned,level:a.level,created_at:a.created_at,is_read:Notif._readIds.indexOf(String(a.id))>-1};
+var at=sanitizeUnicode(a.title||'').replace(/^【([^】]+)】/,'$1');
+var ac=sanitizeUnicode(a.content||'');
+var am=ac.match(/^【([^】]+)】([\s\S]*)$/);
+if(am){if(!at.trim())at=am[1];ac=am[2];}
+if(ac.indexOf('\n')===-1)ac=ac.replace(/[①②③④⑤⑥⑦⑧⑨⑩]/g,function(c){return '\n'+c;});
+return {_id:'a_'+a.id,_rawId:a.id,_type:'ann',title:at,content:ac,pinned:a.pinned,level:a.level,created_at:a.created_at,is_read:Notif._readIds.indexOf(String(a.id))>-1};
 });
 var notifs=(arr[1].data||[]).map(function(n){
 var tt=sanitizeUnicode(n.content||'');
 var m=tt.match(/^【([^】]+)】([\s\S]+)$/);
-return {_id:'n_'+n.id,_rawId:n.id,_type:'notif',title:m?m[1]:'系统通知',content:m?m[2]:tt,pinned:false,level:(n.type==='system'?'info':'info'),created_at:n.created_at,is_read:!!n.is_read};
+var nc=m?m[2]:tt;
+if(nc.indexOf('\n')===-1)nc=nc.replace(/[①②③④⑤⑥⑦⑧⑨⑩]/g,function(c){return '\n'+c;});
+return {_id:'n_'+n.id,_rawId:n.id,_type:'notif',title:m?m[1]:'系统通知',content:nc,pinned:false,level:(n.type==='system'?'info':'info'),created_at:n.created_at,is_read:!!n.is_read};
 });
 var list=anns.concat(notifs).sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
 Notif.render(list);
@@ -4661,3 +4668,4 @@ setTimeout(finishLoading,2500);
 if(location.protocol==='http:'||location.protocol==='https:'){var _bs=document.createElement('script');_bs.async=true;_bs.src='https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';document.head.appendChild(_bs);}
 </script>
 </body></html>
+<!-- （注：内容由AI生成） -->
