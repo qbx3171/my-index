@@ -95,8 +95,7 @@ if(_readyFired&&window._cdnLoadStatus.pinyin&&window._cdnLoadStatus.qrcode)clear
 },200);
 setTimeout(function(){clearInterval(_checkInt);},15000);
 })();
-</script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<script type="application/ld+json">
+</script><script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://lezhesoft.cn/#website","url":"https://lezhesoft.cn/","name":"乐哲软件","alternateName":"LeZheSoft","description":"提供设计工具、开发工具、办公软件、媒体工具等全品类实用软件下载与安装教程。","inLanguage":"zh-CN","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://lezhesoft.cn/?search={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"Organization","@id":"https://lezhesoft.cn/#organization","name":"乐哲软件","url":"https://lezhesoft.cn/","email":"LeZheSoft@outlook.com"}]}
 </script>
 <style>
@@ -1114,7 +1113,7 @@ body.ls-locked{overflow:hidden !important}
 </div>
 <footer class="footer">
 <div class="brand">◆ 乐哲软件</div>
-<p>© 2026 乐哲软件 · 侵权请联系 <a href="/cdn-cgi/l/email-protection#c589a09fada096aaa3b185aab0b1a9aaaaaeeba6aaa8"><span class="__cf_email__" data-cfemail="b3ffd6e9dbd6e0dcd5c7f3dcc6c7dfdcdcd89dd0dcde">[email&#160;protected]</span></a></p>
+<p>© 2026 乐哲软件 · 侵权请联系 <a href="mailto:LeZheSoft@outlook.com">LeZheSoft@outlook.com</a></p>
 <div class="links">
 <span>友情链接：</span>
 <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a> |
@@ -1248,7 +1247,7 @@ body.ls-locked{overflow:hidden !important}
 <div class="form-actions"><button class="btn btn-outline" id="fbCancel">取消</button><button class="btn btn-primary" id="fbSubmit">提交</button></div>
 </div>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 var IS_LOCAL_HOST=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 var IS_FILE_PREVIEW=location.protocol==='file:';
 var IS_LOCAL_PREVIEW=IS_FILE_PREVIEW||IS_LOCAL_HOST;
@@ -1542,7 +1541,7 @@ el.querySelector('.toast-close').addEventListener('click',function(e){e.stopProp
 el.addEventListener('click',function(e){if(e.target.classList.contains('toast-close'))return;var self=this;self.style.animation='toastOut 0.3s ease forwards';setTimeout(function(){if(self.parentNode)self.parentNode.removeChild(self);},400);});
 setTimeout(function(){if(el.parentNode){el.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},500);}},3500);
 }
-function escapeHTML(str){if(str===null||str===undefined)return '';var d=document.createElement('div');d.textContent=sanitizeUnicode(String(str));return d.innerHTML;}
+function escapeHTML(str){if(str===null||str===undefined)return '';return sanitizeUnicode(String(str)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escapeAttr(str){if(str===null||str===undefined)return '';return sanitizeUnicode(String(str)).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function sanitizeUnicode(s){
 if(!s)return '';
@@ -1696,8 +1695,8 @@ function getGroupStates(){try{var raw=localStorage.getItem('lezhe_group_states')
 function saveGroupStates(states){try{localStorage.setItem('lezhe_group_states',JSON.stringify(states));}catch(e){}}
 function toggleGroup(groupId){var states=getGroupStates();states[groupId]=!states[groupId];saveGroupStates(states);Render.renderCategories(document.getElementById('categoryList'),App.currentCategory==='all'?null:App.currentCategory,function(cat){App.goList(cat);});}
 function scrollToActiveItem(){var container=document.getElementById('categoryList');if(!container)return;var active=container.querySelector('.category-item-side.active, .category-item-all.active');if(active){requestAnimationFrame(function(){active.scrollIntoView({block:'nearest',behavior:'smooth'});});}}
-function markSoftSeen(id){try{localStorage.setItem('lezhe_seen_'+id,Date.now().toString());}catch(e){}}
-function isSoftUpdated(s){if(!s.updated_at)return false;var seen=0;try{seen=parseInt(localStorage.getItem('lezhe_seen_'+s.id)||'0',10);}catch(e){}return new Date(s.updated_at).getTime()>seen;}
+function markSoftSeen(id){try{var map=safeParse(localStorage.getItem('lezhe_seen_map'),{});map[id]=Date.now();var keys=Object.keys(map);if(keys.length>200){keys.sort(function(a,b){return map[a]-map[b];});keys.slice(0,keys.length-200).forEach(function(k){delete map[k];});}localStorage.setItem('lezhe_seen_map',JSON.stringify(map));}catch(e){}}
+function isSoftUpdated(s){if(!s.updated_at)return false;var map=safeParse(localStorage.getItem('lezhe_seen_map'),{});var seen=map[s.id]||0;return new Date(s.updated_at).getTime()>seen;}
 var Render={
 renderSkeleton:function(container,count){
 count=count||6;
@@ -1746,7 +1745,7 @@ else if(i===2)cardClass+=' card-next2';
 else if(i===3)cardClass+=' card-next3';
 else if(i===4)cardClass+=' card-next4';
 else cardClass+=' card-hidden';
-stackHTML+='<div class="'+cardClass+'" data-index="'+i+'" data-id="'+escapeAttr(s.id)+'"><span class="new-badge">✦ NEW</span><span class="card-index-badge">'+(i+1)+' / '+todayItems.length+'</span><div class="card-top-row"><div class="card-icon">'+iconHtml+'</div><div class="card-title"><div class="name">'+escapeHTML(displayName)+'</div><div class="meta"><span class="cat-tag">'+escapeHTML(cat)+'</span><span class="version">v'+escapeHTML(s.version||'1.0')+'</span><span class="size">'+escapeHTML(sizeText)+'</span></div></div></div><div class="card-desc">'+escapeHTML(descText)+'</div><div class="card-footer-row"><div class="badge-platforms">'+platHtml+'</div><div class="stats-info"><span><i class="far fa-eye"></i> '+views+'</span><span><i class="fas fa-download"></i> '+downloads+'</span></div><span class="time-ago"><i class="far fa-clock"></i> '+time+'</span></div></div>';
+stackHTML+='<div class="'+cardClass+'" data-index="'+i+'" data-id="'+escapeAttr(s.id)+'"><span class="new-badge">✦ NEW</span><span class="card-index-badge">'+(i+1)+' / '+todayItems.length+'</span><div class="card-top-row"><div class="card-icon">'+iconHtml+'</div><div class="card-title"><div class="name">'+escapeHTML(displayName)+'</div><div class="meta"><span class="cat-tag">'+escapeHTML(cat)+'</span><span class="version">v'+escapeHTML(s.version||'1.0')+'</span><span class="size">'+escapeHTML(sizeText)+'</span></div></div></div><div class="card-desc">'+escapeHTML(descText)+'</div><div class="card-footer-row"><div class="badge-platforms">'+platHtml+'</div><div class="stats-info"><span><i class="far fa-eye"></i> '+(parseInt(views,10)||0)+'</span><span><i class="fas fa-download"></i> '+(parseInt(downloads,10)||0)+'</span></div><span class="time-ago"><i class="far fa-clock"></i> '+time+'</span></div></div>';
 }
 stackHTML+='</div></div><div class="stack-controls" id="stackControls"><button class="ctrl-btn" id="stackPrev" aria-label="上一张"><span class="icon">‹</span></button><div class="stack-dots" id="stackDots"></div><span class="stack-counter" id="stackCounter">1 / '+todayItems.length+'</span><button class="ctrl-btn" id="stackNext" aria-label="下一张"><span class="icon">›</span></button></div>';
 container.innerHTML=stackHTML;
@@ -1936,7 +1935,7 @@ html+='<div class="software-card'+listMode+'" data-id="'+escapeAttr(s.id)+'" tab
 '<p class="card-desc">'+escapeHTML(desc)+'</p>'+
 '<div class="card-foot">'+
 '<div class="plat-list">'+renderPlatformBadges(s)+'</div>'+
-'<div class="stats"><span><i class="far fa-eye"></i>'+(s.views||0)+'</span><span><i class="fas fa-download"></i>'+(s.downloads||0)+'</span></div>'+
+'<div class="stats"><span><i class="far fa-eye"></i>'+(parseInt(s.views,10)||0)+'</span><span><i class="fas fa-download"></i>'+(parseInt(s.downloads,10)||0)+'</span></div>'+
 '</div>'+
 '</div>';
 }
@@ -2030,7 +2029,7 @@ infoHtml+='<div class="detail-info-item"><div class="detail-info-label">支持�
 infoHtml+='<div class="detail-info-item"><div class="detail-info-label">授权类型</div><div class="detail-info-value">'+(soft.is_vip_free?'VIP免费':'免费下载')+'</div></div>';
 infoGrid.innerHTML=infoHtml;
 var statsRow=document.getElementById('detailStatsRow');
-statsRow.innerHTML='<div class="detail-stat"><div class="detail-stat-num">'+(soft.downloads||0)+'</div><div class="detail-stat-label">下载量</div></div><div class="detail-stat"><div class="detail-stat-num">'+(soft.views||0)+'</div><div class="detail-stat-label">浏览量</div></div><div class="detail-stat"><div class="detail-stat-num">'+(soft.recommend?'推荐':'普通')+'</div><div class="detail-stat-label">推荐</div></div>';
+statsRow.innerHTML='<div class="detail-stat"><div class="detail-stat-num">'+(parseInt(soft.downloads,10)||0)+'</div><div class="detail-stat-label">下载量</div></div><div class="detail-stat"><div class="detail-stat-num">'+(parseInt(soft.views,10)||0)+'</div><div class="detail-stat-label">浏览量</div></div><div class="detail-stat"><div class="detail-stat-num">'+(soft.recommend?'推荐':'普通')+'</div><div class="detail-stat-label">推荐</div></div>';
 document.getElementById('detailMeta').innerHTML='';
 var descEl=document.getElementById('detailDesc');
 var descText=sanitizeUnicode(soft.detail||soft.description||'');
@@ -2182,6 +2181,18 @@ var soft=DB.getSoftware().find(function(s){return s.id===id;});
 if(soft){App._scrollPos=window.scrollY;Detail.open(soft);}
 });
 document.addEventListener('keydown',function(e){
+if(e.key!=='Enter'&&e.key!==' ')return;
+if(!e.target||!e.target.closest)return;
+var card=e.target.closest('.software-card');
+if(!card||e.target.closest('input,textarea,select,[contenteditable]'))return;
+if(e.target.closest('a,button'))return;
+e.preventDefault();
+var id=card.dataset.id;
+if(!id)return;
+var soft=DB.getSoftware().find(function(s){return s.id===id;});
+if(soft){App._scrollPos=window.scrollY;Detail.open(soft);}
+});
+document.addEventListener('keydown',function(e){
 if(e.key==='Escape'){
 var anyClosed=false;
 document.querySelectorAll('.modal-overlay.open').forEach(function(m){m.classList.remove('open');anyClosed=true;});
@@ -2247,6 +2258,8 @@ function submitComment(tutorialId,author,content){
 if(!requireAuth())return;
 if(!checkSupabase())return;
 if(!tutorialId||!content.trim()){toast('请填写评论内容','warning');return;}
+if(containsSensitiveWords(content)){toast('评论包含禁用词汇，请修改后重试','warning');return;}
+content=filterSensitiveWords(content);
 var btn=document.getElementById('commentSubmitBtn');
 btn.disabled=true;btn.textContent='提交中...';
 supabaseClient.from('tutorial_comments').insert([{tutorial_id:tutorialId,author:author.trim()||'匿名用户',content:content.trim()}]).then(function(res){
@@ -2376,8 +2389,6 @@ if(q.is_pinned)badges+='<span class="badge badge-pinned"><i class="fas fa-thumbt
 if(q.is_featured)badges+='<span class="badge badge-featured"><i class="fas fa-star"></i> 精华</span>';
 return '<div class="card-item" data-id="'+escapeAttr(q.id)+'"><div class="title">'+escapeHTML(q.title)+' '+badges+'</div><div class="meta"><span>'+escapeHTML(q.category)+'</span><span>'+timeAgo(q.created_at)+'</span><span>💬 '+(q.answers_count||0)+'</span><span>👁️ '+(q.views||0)+'</span></div><div class="summary">'+escapeHTML(htmlToText(q.body||'').slice(0,100))+'...</div><div class="footer"><span class="q-votes-'+escapeAttr(q.id)+'">👍 '+(q.votes||0)+'</span><div class="actions"><button class="vote-q" data-id="'+escapeAttr(q.id)+'"><i class="fas fa-thumbs-up"></i></button><button class="view-q" data-id="'+escapeAttr(q.id)+'">查看详情</button></div></div></div>';
 }).join('');
-window.__LEZHE_QA_FIX__='v3';
-console.log('[乐哲] 问答列表已渲染，共 '+data.length+' 篇');
 if(_questionsClickHandler){container.removeEventListener('click',_questionsClickHandler);}
 _questionsClickHandler=function(e){
 var target=e.target.closest('button');
@@ -2662,7 +2673,8 @@ var newStreak=(current.last_checkin===yesterdayStr)?(current.streak||0)+1:1;
 var earned=10;
 if(newStreak>=7)earned=30;else if(newStreak>=3)earned=20;
 var insRes=await supabaseClient.from('checkins').insert([{user_id:userId,checkin_date:todayStr,points_earned:earned,streak:newStreak}]);
-if(insRes.error&&insRes.error.code!=='23505')throw insRes.error;
+if(insRes.error&&insRes.error.code==='23505'){toast('今日已签到','warning');if(btn){btn.disabled=false;btn.innerHTML='<i class="fas fa-calendar-check"></i> 立即签到';}this.load();return;}
+if(insRes.error)throw insRes.error;
 var newPoints=(current.points||0)+earned;
 var upRes=await supabaseClient.from('user_points').upsert({user_id:userId,points:newPoints,streak:newStreak,last_checkin:todayStr,updated_at:new Date().toISOString()},{onConflict:'user_id'});
 if(upRes.error)throw upRes.error;
@@ -2773,7 +2785,9 @@ var c=document.getElementById('mallContent');
 if(!c)return;
 if(!checkSupabase())return;
 c.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim);">加载中...</div>';
+try{
 var itemsRes=await supabaseClient.from('mall_items').select('*').eq('active',true).order('sort',{ascending:true});
+if(itemsRes.error)throw itemsRes.error;
 var items=itemsRes.data||[];
 var myPoints=0;
 var myRedeemCount=0;
@@ -2796,7 +2810,7 @@ var imgLink='';
 if(it.icon_url&&typeof it.icon_url==='string'&&isImageUrl(it.icon_url.trim()))imgLink=it.icon_url.trim();
 else if(it.icon&&typeof it.icon==='string'&&isImageUrl(it.icon.trim()))imgLink=it.icon.trim();
 var iconHtml=imgLink
-? '<img src="'+escapeAttr(imgLink)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(it.icon||'🎁')+'\';">'
+? '<img src="'+escapeAttr(imgLink)+'" alt="" loading="lazy" data-fallback="'+escapeAttr(it.icon||'🎁')+'" onerror="this.style.display=\'none\';this.parentElement.textContent=this.dataset.fallback||\'🎁\';">'
 : escapeHTML(it.icon||'🎁');
 var stock=typeof it.stock==='number'?it.stock:-1;
 var stockTag='';
@@ -2821,10 +2835,15 @@ c.querySelectorAll('.buy-btn').forEach(function(b){
 if(b.disabled)return;
 b.addEventListener('click',function(){Mall.buy(this.dataset.id,parseInt(this.dataset.cost,10));});
 });
+}catch(e){
+console.error('商城加载失败',e);
+if(c)c.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><h3>商城加载失败</h3><p>'+escapeHTML(e.message||'网络异常，请稍后重试')+'</p><button class="btn btn-primary" style="margin-top:14px;" onclick="Mall.load()">重试</button></div>';
+}
 },
 buy:async function(itemId,cost){
 if(!requireAuth())return;
 if(!checkSupabase())return;
+try{
 var itemRes=await supabaseClient.from('mall_items').select('name,icon,icon_url,stock,delivery_type,auto_content').eq('id',itemId).maybeSingle();
 if(!itemRes.data){toast('商品不存在','error');return;}
 var item=itemRes.data;
@@ -2874,7 +2893,12 @@ try{var rollback=await supabaseClient.from('mall_items').update({stock:stock}).e
 toast('兑换失败：'+insRes.error.message,'error');
 return;
 }
-await supabaseClient.from('user_points').upsert({user_id:currentUser.id,points:points-cost,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+var upRes=await supabaseClient.from('user_points').upsert({user_id:currentUser.id,points:points-cost,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+if(upRes.error){
+try{if(stock!==-1){var rb=await supabaseClient.from('mall_items').update({stock:stock}).eq('id',itemId);if(rb.error)console.error('库存回滚失败',rb.error);}await supabaseClient.from('redeems').delete().eq('id',insRes.data.id);}catch(e){console.error('兑换回滚异常',e);}
+toast('扣积分失败：'+upRes.error.message,'error');
+return;
+}
 RedeemResult.show({
 isAuto:isAuto,
 itemName:item.name,
@@ -2883,6 +2907,10 @@ contact:contact,
 autoContent:item.auto_content||''
 });
 Mall.load();
+}catch(e){
+console.error('商城兑换异常',e);
+toast('兑换异常：'+(e.message||'请稍后重试'),'error');
+}
 },
 askContact:function(itemName,cost,points){
 return new Promise(function(resolve){
@@ -2909,7 +2937,9 @@ if(!c)return;
 if(!requireAuth())return;
 if(!checkSupabase())return;
 c.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-dim);">加载中...</div>';
+try{
 var res=await supabaseClient.from('redeems').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+if(res.error)throw res.error;
 var list=res.data||[];
 if(!list.length){
 c.innerHTML='<div class="empty-state"><div class="icon">📦</div><h3>还没有兑换记录</h3><p>去商城看看吧～</p><button class="btn btn-primary" style="margin-top:14px;" onclick="App.goMall()">前往商城</button></div>';
@@ -2934,7 +2964,7 @@ var imgLink='';
 if(r.item_icon_url&&typeof r.item_icon_url==='string'&&isImageUrl(r.item_icon_url.trim()))imgLink=r.item_icon_url.trim();
 else if(r.item_icon&&typeof r.item_icon==='string'&&isImageUrl(r.item_icon.trim()))imgLink=r.item_icon.trim();
 var iconHtml=imgLink
-? '<img src="'+escapeAttr(imgLink)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.textContent=\''+escapeAttr(r.item_icon||'🎁')+'\';">'
+? '<img src="'+escapeAttr(imgLink)+'" alt="" loading="lazy" data-fallback="'+escapeAttr(r.item_icon||'🎁')+'" onerror="this.style.display=\'none\';this.parentElement.textContent=this.dataset.fallback||\'🎁\';">'
 : escapeHTML(r.item_icon||'🎁');
 var status=r.status||'pending';
 var statusText=stMap[status]||'待发放';
@@ -2979,6 +3009,10 @@ copyTextToClipboard(text).then(function(ok){if(ok)toast('已复制','success');e
 ov.onclick=function(e){if(e.target===ov)close();};
 });
 });
+}catch(e){
+console.error('兑换记录加载失败',e);
+if(c)c.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>'+(e.message||'网络异常，请稍后重试')+'</p><button class="btn btn-primary" style="margin-top:14px;" onclick="MyRedeems.load()">重试</button></div>';
+}
 }
 };
 var Notif={
@@ -3005,6 +3039,9 @@ return {_id:'n_'+n.id,_rawId:n.id,_type:'notif',title:m?m[1]:'系统通知',cont
 });
 var list=anns.concat(notifs).sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
 Notif.render(list);
+}).catch(function(){
+var _nc=document.getElementById('notifList');
+if(_nc)_nc.innerHTML='<div class="notif-empty">通知加载失败，请稍后重试</div>';
 });
 },
 render:function(list){
@@ -3317,8 +3354,6 @@ searchKeyword:'',
 platformFilter:'all',
 _scrollPos:0,
 init:function(){
-window.__LEZHE_QA_FIX__='v3';
-console.log('[乐哲] 问答模块修复版 v3 已加载；footer 邮箱应为明文 LeZheSoft@outlook.com');
 var self=this;
 var savedSort=localStorage.getItem('lezhe_sort_by');
 if(savedSort&&['date','views','downloads'].includes(savedSort)){self.sortBy=savedSort;document.getElementById('sortSelect').value=savedSort;}
@@ -3358,10 +3393,10 @@ document.querySelectorAll('.nav-links a[data-page]').forEach(function(a){a.addEv
 document.querySelectorAll('#mobileBottomNav a').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var page=this.dataset.page;if(page==='home')self.goHome();else if(page==='list')self.goList();else if(page==='tutorials')self.goTutorials();else if(page==='qa')self.goQA();else if(page==='checkin')self.goCheckin();else if(page==='ranking')self.goRanking();else if(page==='mall')self.goMall();else if(page==='profile')self.goProfile();});});
 var searchInput=document.getElementById('searchInput'),searchBtn=document.getElementById('searchBtn');
 if(searchBtn){searchBtn.addEventListener('click',function(){closeSearchSuggestions();self.doSearch(searchInput.value.trim());});}
-if(searchInput){searchInput.addEventListener('keyup',function(e){if(e.key==='Enter'){closeSearchSuggestions();self.doSearch(this.value.trim());return;}showSuggestions(this.value.trim());});}
+if(searchInput){searchInput.addEventListener('input',function(e){if(e.isComposing)return;showSuggestions(this.value.trim());});searchInput.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.isComposing){closeSearchSuggestions();self.doSearch(this.value.trim());}});}
 var sidebarSearchInput=document.getElementById('sidebarSearchInput'),sidebarSearchBtn=document.getElementById('sidebarSearchBtn');
 if(sidebarSearchBtn){sidebarSearchBtn.addEventListener('click',function(){closeSearchSuggestions();self.doSearch(sidebarSearchInput.value.trim());});}
-if(sidebarSearchInput){sidebarSearchInput.addEventListener('keyup',function(e){if(e.key==='Enter'){closeSearchSuggestions();self.doSearch(this.value.trim());return;}});}
+if(sidebarSearchInput){sidebarSearchInput.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.isComposing){closeSearchSuggestions();self.doSearch(this.value.trim());}});}
 document.getElementById('logoHome').addEventListener('click',function(e){e.preventDefault();self.goHome();});
 document.getElementById('mobileToggle').addEventListener('click',function(){document.getElementById('navLinks').classList.toggle('open');});
 document.getElementById('prevPageBtn').addEventListener('click',function(){if(currentPage>1){currentPage--;self.renderListPage();}});
@@ -3472,6 +3507,11 @@ document.getElementById('sensitiveWordCount').textContent=_sensitiveWords.length
 list.innerHTML=_sensitiveWords.map(function(word){
 return '<span class="badge" style="background:var(--bg-secondary);color:var(--text-primary);cursor:pointer;padding:4px 10px;" title="点击删除" data-word="'+escapeAttr(word)+'">'+escapeHTML(word)+' ✕</span>';
 }).join('');
+}
+(function(){
+var list=document.getElementById('sensitiveWordsList');
+if(!list||list.dataset.delInit)return;
+list.dataset.delInit='1';
 list.addEventListener('click',function(e){
 var badge=e.target.closest('[data-word]');
 if(!badge)return;
@@ -3483,7 +3523,7 @@ renderSensitiveWordsList();
 toast('已删除','success');
 }
 });
-}
+})();
 document.getElementById('addSensitiveWordBtn').addEventListener('click',function(){
 var input=document.getElementById('newSensitiveWord');
 var word=input.value.trim();
@@ -3553,7 +3593,8 @@ reader.readAsDataURL(file);
 }
 initAttachmentUpload('q');
 initAttachmentUpload('a');
-document.getElementById('qSubmit').addEventListener('click',function(){
+document.getElementById('qSubmit').addEventListener('click',async function(){
+if(this.disabled)return;
 if(!requireAuth())return;
 if(!checkSupabase())return;
 var title=document.getElementById('qTitle').value.trim();
@@ -3562,14 +3603,15 @@ var bodyText=(editor.innerText||'').trim();
 var body=sanitizeHTML(editor.innerHTML||'');
 var category=document.getElementById('qCategory').value;
 if(!title||!bodyText||!category){toast('标题、描述和分类不能为空','warning');return;}
-if(containsSensitiveWords(title)||containsSensitiveWords(bodyText)){ 
+if(containsSensitiveWords(title)||containsSensitiveWords(bodyText)){
 toast('内容包含禁用词汇，请修改后重试','warning');
-console.warn('[论坛] 检测到敏感词:',{title:containsSensitiveWords(title),body:containsSensitiveWords(bodyText)});
 return;
 }
 title=filterSensitiveWords(title);
 var attachmentsData=_qAttachments.map(function(att){return{name:att.name,size:att.size,type:att.type};});
+this.disabled=true;this.textContent='提交中...';
 supabaseClient.from('questions').insert([{title:title,body:body,category:category,answers_count:0,votes:0,attachments:attachmentsData}]).then(function(res){
+qSubmitBtnRestore();
 if(res.error){toast('提问失败：'+friendlyError(res.error),'error');return;}
 toast('问题提交成功！','success');
 document.getElementById('questionModal').classList.remove('open');
@@ -3578,8 +3620,9 @@ document.getElementById('qBody').innerHTML='';
 _qAttachments=[];
 renderAttachmentList('q');
 renderQuestions();
+}).catch(function(){qSubmitBtnRestore();});
 });
-});
+function qSubmitBtnRestore(){var b=document.getElementById('qSubmit');if(b){b.disabled=false;b.innerHTML='<i class="fas fa-paper-plane"></i> 提交问题';}}
 document.getElementById('answerModalClose').addEventListener('click',function(){document.getElementById('answerModal').classList.remove('open');});
 document.getElementById('aCancel').addEventListener('click',function(){document.getElementById('answerModal').classList.remove('open');});
 document.getElementById('aSubmit').addEventListener('click',function(){
@@ -3590,9 +3633,8 @@ var answerEditor=document.getElementById('aBody');
 var bodyText=(answerEditor.innerText||'').trim();
 var body=sanitizeHTML(answerEditor.innerHTML||'');
 if(!bodyText){toast('请填写回答内容','warning');return;}
-if(containsSensitiveWords(bodyText)){ 
+if(containsSensitiveWords(bodyText)){
 toast('内容包含禁用词汇，请修改后重试','warning');
-console.warn('[论坛] 回答检测到敏感词');
 return;
 }
 var attachmentsData=_aAttachments.map(function(att){return{name:att.name,size:att.size,type:att.type};});
@@ -3616,6 +3658,7 @@ document.getElementById('openSubmitSoftwareBtn').addEventListener('click',functi
 document.getElementById('submitSoftwareModalClose').addEventListener('click',function(){document.getElementById('submitSoftwareModal').classList.remove('open');});
 document.getElementById('subCancel').addEventListener('click',function(){document.getElementById('submitSoftwareModal').classList.remove('open');});
 document.getElementById('subSubmit').addEventListener('click',function(){
+if(this.disabled)return;
 if(!requireAuth())return;
 if(!checkSupabase())return;
 var name=document.getElementById('subName').value.trim();
@@ -3627,7 +3670,9 @@ var downloadUrl=document.getElementById('subDownloadUrl').value.trim();
 var iconUrl=document.getElementById('subIconUrl').value.trim();
 var contact=document.getElementById('subContact').value.trim();
 if(!name||!downloadUrl){toast('软件名称和下载链接为必填','warning');return;}
+var subBtn=this;subBtn.disabled=true;subBtn.textContent='提交中...';
 supabaseClient.from('software_submissions').insert([{name:name,category:category,version:version,description:desc,platforms:platforms,download_url:downloadUrl,icon_url:iconUrl,contact:contact,status:'pending',user_id:currentUser.id}]).then(function(res){
+subBtn.disabled=false;subBtn.textContent='提交软件';
 if(res.error){toast('提交失败：'+friendlyError(res.error),'error');return;}
 toast('提交成功！等待审核','success');
 document.getElementById('submitSoftwareModal').classList.remove('open');
@@ -3937,7 +3982,7 @@ var url=encodeURIComponent(window.location.href);
 var title=encodeURIComponent('乐哲软件 · 精选高效工具');
 var shareMap={wechat:'https://api.addthis.com/oexchange/0.8/forward/wechat/offer?url='+url+'&title='+title,weibo:'https://service.weibo.com/share/share.php?url='+url+'&title='+title+'&pic=',twitter:'https://twitter.com/intent/tweet?text='+title+'&url='+url};
 if(platform==='wechat'){copyLinkText('乐哲软件 · 精选高效工具',window.location.href);toast('请复制链接后打开微信分享给好友','success');return;}
-window.open(shareMap[platform],'_blank','width=600,height=500');
+window.open(shareMap[platform],'_blank','width=600,height=500,noopener,noreferrer');
 }
 function copyLinkText(title,url){var text=title+'\n'+url;if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){toast('已复制标题与链接','success');});}else{var input=document.createElement('input');input.value=text;document.body.appendChild(input);input.select();document.execCommand('copy');document.body.removeChild(input);toast('已复制标题与链接','success');}}
 function copyLink(){copyLinkText('乐哲软件 · 精选高效工具',window.location.href);}
@@ -4579,7 +4624,9 @@ setTimeout(function(){Achievement.check();},1500);
 setTimeout(initPresence,800);
 (function(){
   var _lastCount=DB.getSoftware().length;
-  setInterval(async function(){
+  var _timer=null;
+  async function _poll(){
+    if(document.hidden)return;
     try{
       await DB.loadAll(true);
       var _newCount=DB.getSoftware().length;
@@ -4592,7 +4639,9 @@ setTimeout(initPresence,800);
         }
       }
     }catch(e){}
-  },30000);
+  }
+  _timer=setInterval(_poll,300000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)_poll();});
 })();
 });
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',loadUser);}else{loadUser();}
@@ -4631,7 +4680,6 @@ setTimeout(finishLoading,2500);
 <script>
 if(location.protocol==='http:'||location.protocol==='https:'){var _bs=document.createElement('script');_bs.async=true;_bs.src='https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';document.head.appendChild(_bs);}
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
