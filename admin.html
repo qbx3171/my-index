@@ -616,6 +616,59 @@ body{height:100vh;height:100dvh;}
   .aurora{filter:blur(56px) saturate(140%);opacity:calc(var(--auroraOp) * .8);}
   .aurora span{animation-duration:44s}
 }
+.lz-bot{position:fixed;left:12px;bottom:0;width:230px;height:480px;z-index:6;opacity:0;transition:opacity .6s ease;cursor:pointer;pointer-events:none}
+.lz-bot.on{opacity:1;pointer-events:auto}
+.lz-stage{position:relative;width:100%;height:100%;perspective:800px}
+.lz-rig{position:relative;width:100%;height:100%;transform-style:preserve-3d}
+.lz-glow{position:absolute;left:50%;top:38%;width:270px;height:300px;margin:-150px 0 0 -135px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.5),rgba(160,220,255,.18) 45%,transparent 70%);filter:blur(16px);pointer-events:none;z-index:0}
+.lz-fig{position:absolute;left:50%;bottom:16px;width:220px;height:310px;margin-left:-110px;user-select:none;pointer-events:none;z-index:2}
+.lz-svg{width:100%;height:100%;overflow:visible;display:block;filter:drop-shadow(0 10px 18px rgba(80,105,150,.26))}
+#lzAll{transform-origin:150px 418px}
+#lzHead{transform-origin:150px 208px}
+#lzArmL{transform-origin:110px 205px}
+#lzArmR{transform-origin:190px 205px}
+#lzEyes{transform-origin:150px 108px;transition:transform .1s ease}
+#lzHeart{opacity:0;transform-origin:150px 168px}
+.lz-fig.lz-breath .lz-svg{animation:lzBreath 3s ease-in-out infinite}
+.lz-fig.lz-wave #lzArmR{animation:lzWaveR .52s ease-in-out 3}
+.lz-fig.lz-wave #lzArmL{animation:lzWaveL .52s ease-in-out 3}
+.lz-fig.lz-nod #lzHead{animation:lzNod .6s ease-in-out 2}
+.lz-fig.lz-jump .lz-svg{animation:lzJump .95s cubic-bezier(.28,.8,.4,1)}
+.lz-fig.lz-spin .lz-svg{animation:lzSpin 1.15s cubic-bezier(.4,0,.3,1)}
+.lz-fig.lz-dance .lz-svg{animation:lzDance 1.5s ease-in-out}
+.lz-fig.lz-dance #lzArmL{animation:lzDanceArmL .375s ease-in-out 4}
+.lz-fig.lz-dance #lzArmR{animation:lzDanceArmR .375s ease-in-out 4}
+.lz-fig.lz-heart #lzHeart{animation:lzHeart 1.5s ease-out}
+.lz-fig.lz-heart #lzArmL{animation:lzHeartArmL 1.5s ease-in-out}
+.lz-fig.lz-heart #lzArmR{animation:lzHeartArmR 1.5s ease-in-out}
+@keyframes lzBreath{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-6px) scale(1.012,.988)}}
+@keyframes lzWaveR{0%,100%{transform:rotate(0)}50%{transform:rotate(-46deg)}}
+@keyframes lzWaveL{0%,100%{transform:rotate(0)}50%{transform:rotate(46deg)}}
+@keyframes lzNod{0%,100%{transform:rotate(0)}50%{transform:rotate(9deg)}}
+@keyframes lzJump{0%{transform:translateY(0) scale(1,1)}22%{transform:translateY(-52px) scale(.94,1.08)}46%{transform:translateY(0) scale(1.1,.9)}62%{transform:translateY(-18px) scale(1,1)}80%{transform:translateY(0) scale(1.05,.95)}100%{transform:translateY(0) scale(1,1)}}
+@keyframes lzSpin{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(360deg) scale(1.03)}100%{transform:rotateY(720deg) scale(1)}}
+@keyframes lzDance{0%,100%{transform:translateX(0) rotate(0)}15%{transform:translateX(-11px) rotate(-6deg)}30%{transform:translateX(0) rotate(0)}45%{transform:translateX(11px) rotate(6deg)}60%{transform:translateX(-9px) rotate(-5deg)}75%{transform:translateX(9px) rotate(5deg)}90%{transform:translateX(0) rotate(0)}}
+@keyframes lzDanceArmL{0%,100%{transform:rotate(0)}50%{transform:rotate(-62deg)}}
+@keyframes lzDanceArmR{0%,100%{transform:rotate(0)}50%{transform:rotate(62deg)}}
+@keyframes lzHeart{0%{opacity:0;transform:translateY(0) scale(.3)}25%{opacity:1;transform:translateY(-14px) scale(1.15)}70%{opacity:1;transform:translateY(-46px) scale(1)}100%{opacity:0;transform:translateY(-84px) scale(.85)}}
+@keyframes lzHeartArmL{0%,100%{transform:rotate(0)}35%,70%{transform:rotate(-36deg)}}
+@keyframes lzHeartArmR{0%,100%{transform:rotate(0)}35%,70%{transform:rotate(36deg)}}
+.lz-shadow{position:absolute;left:50%;bottom:6px;width:176px;height:22px;margin-left:-88px;border-radius:50%;background:radial-gradient(ellipse,rgba(70,95,140,.32),rgba(70,95,140,.1) 55%,transparent 75%);filter:blur(7px);pointer-events:none;z-index:1}
+.lz-dialog{position:absolute;left:206px;bottom:320px;transform:translateX(-6px) scale(.9);transform-origin:left bottom;min-width:186px;max-width:248px;font-size:.76rem;line-height:1.6;color:var(--tx);background:var(--cardS);border:1px solid var(--glassBd);box-shadow:var(--glassSh);padding:10px 14px;border-radius:16px;backdrop-filter:blur(16px);opacity:0;pointer-events:none;transition:opacity .28s ease,transform .28s cubic-bezier(.22,.61,.36,1);z-index:9}
+.lz-dialog::after{content:'';position:absolute;left:-5px;bottom:14px;width:11px;height:11px;background:var(--cardS);border-left:1px solid var(--glassBd);border-bottom:1px solid var(--glassBd);transform:rotate(45deg)}
+.lz-dialog.on{opacity:1;transform:translateX(0) scale(1)}
+.lz-dialog em{color:var(--cy);font-style:normal;font-weight:600}
+.lz-typing{display:inline-flex;gap:4px;align-items:center;padding:3px 0}
+.lz-typing i{width:5px;height:5px;border-radius:50%;background:var(--cy);animation:lzDot .9s ease-in-out infinite}
+.lz-typing i:nth-child(2){animation-delay:.15s}
+.lz-typing i:nth-child(3){animation-delay:.3s}
+@keyframes lzDot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.lz-chips{position:absolute;left:206px;bottom:120px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:10}
+.lz-chips.on{opacity:1;pointer-events:auto}
+.lz-chip{pointer-events:auto;font-size:.7rem;padding:5px 11px;border-radius:20px;background:var(--cardS);border:1px solid var(--glassBd);color:var(--tx2);cursor:pointer;backdrop-filter:blur(10px);transition:all .2s ease;white-space:nowrap;font-family:inherit;line-height:1.4}
+.lz-chip:hover{color:var(--cy);border-color:var(--cy);box-shadow:0 0 0 3px rgba(10,132,255,.12);transform:translateX(2px)}
+@media (max-width:720px){.lz-bot{width:170px;height:390px;left:4px;bottom:0}.lz-fig{width:158px;height:222px;margin-left:-79px}.lz-glow{width:200px;height:230px;margin:-115px 0 0 -100px}.lz-shadow{width:124px;height:16px;margin-left:-62px}.lz-dialog{min-width:158px;max-width:196px;font-size:.72rem;bottom:252px;left:158px}.lz-chip{font-size:.66rem;padding:4px 9px}.lz-chips{bottom:92px;left:158px}}
+
 </style>
 </head>
 <body>
@@ -624,6 +677,70 @@ body{height:100vh;height:100dvh;}
 
 <div class="login-page active" id="loginPage">
 <div class="bg-glow"></div><div class="bg-glow"></div>
+<div class="lz-bot" id="lzBot">
+<div class="lz-stage"><div class="lz-rig">
+<div class="lz-dialog" id="lzDialog"></div>
+<div class="lz-chips" id="lzChips"></div>
+<div class="lz-glow"></div>
+<div class="lz-shadow"></div>
+<div class="lz-fig lz-breath" id="lzFig">
+<svg class="lz-svg" viewBox="0 0 300 430" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="gH" cx="36%" cy="26%" r="90%"><stop offset="0%" stop-color="#ffffff"/><stop offset="45%" stop-color="#fbfcfe"/><stop offset="80%" stop-color="#e9eef6"/><stop offset="100%" stop-color="#c3cede"/></radialGradient>
+<radialGradient id="gB" cx="34%" cy="20%" r="95%"><stop offset="0%" stop-color="#ffffff"/><stop offset="40%" stop-color="#fbfcfe"/><stop offset="74%" stop-color="#ecf1f8"/><stop offset="92%" stop-color="#d4dde9"/><stop offset="100%" stop-color="#b4c1d4"/></radialGradient>
+<linearGradient id="gAL" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c0ccdd"/><stop offset="24%" stop-color="#eef2f8"/><stop offset="48%" stop-color="#ffffff"/><stop offset="78%" stop-color="#dde4ef"/><stop offset="100%" stop-color="#b6c2d5"/></linearGradient>
+<linearGradient id="gAR" x1="1" y1="0" x2="0" y2="0"><stop offset="0%" stop-color="#c0ccdd"/><stop offset="24%" stop-color="#eef2f8"/><stop offset="48%" stop-color="#ffffff"/><stop offset="78%" stop-color="#dde4ef"/><stop offset="100%" stop-color="#b6c2d5"/></linearGradient>
+<radialGradient id="gLeg" cx="38%" cy="24%" r="90%"><stop offset="0%" stop-color="#ffffff"/><stop offset="46%" stop-color="#f6f8fc"/><stop offset="82%" stop-color="#dfe6f0"/><stop offset="100%" stop-color="#bcc8da"/></radialGradient>
+<radialGradient id="gSpec" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#ffffff" stop-opacity=".98"/><stop offset="55%" stop-color="#ffffff" stop-opacity=".5"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+<radialGradient id="gAo" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#7c8da6" stop-opacity=".45"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+<filter id="fb" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="4"/></filter>
+<filter id="fb2" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="9"/></filter>
+</defs>
+<g id="lzAll">
+<ellipse cx="152" cy="392" rx="118" ry="46" fill="#8698b4" opacity=".2" filter="url(#fb2)"/>
+<g id="lzArmL"><g transform="rotate(-4 110 205)">
+<path d="M118 198c-38 7-63 37-74 77-5 18-8 31-6 43 2 14 14 22 28 18 14-4 20-14 22-30 4-38 14-76 30-108z" fill="url(#gAL)"/>
+<path d="M118 198c-38 7-63 37-74 77-5 18-8 31-6 43 2 14 14 22 28 18 14-4 20-14 22-30 4-38 14-76 30-108z" fill="none" stroke="#b6c2d5" stroke-width="1.4" opacity=".5"/>
+<ellipse cx="48" cy="314" rx="26" ry="27" fill="url(#gLeg)"/>
+<ellipse cx="48" cy="314" rx="26" ry="27" fill="none" stroke="#b6c2d5" stroke-width="1.4" opacity=".5"/>
+<ellipse cx="39" cy="302" rx="9" ry="12" fill="url(#gSpec)" opacity=".95" transform="rotate(-22 39 302)"/>
+</g></g>
+<g id="lzArmR"><g transform="rotate(4 190 205)">
+<path d="M182 198c38 7 63 37 74 77 5 18 8 31 6 43-2 14-14 22-28 18-14-4-20-14-22-30-4-38-14-76-30-108z" fill="url(#gAR)"/>
+<path d="M182 198c38 7 63 37 74 77 5 18 8 31 6 43-2 14-14 22-28 18-14-4-20-14-22-30-4-38-14-76-30-108z" fill="none" stroke="#b6c2d5" stroke-width="1.4" opacity=".5"/>
+<ellipse cx="252" cy="314" rx="26" ry="27" fill="url(#gLeg)"/>
+<ellipse cx="252" cy="314" rx="26" ry="27" fill="none" stroke="#b6c2d5" stroke-width="1.4" opacity=".5"/>
+<ellipse cx="243" cy="302" rx="9" ry="12" fill="url(#gSpec)" opacity=".95" transform="rotate(-22 243 302)"/>
+</g></g>
+<ellipse cx="150" cy="286" rx="104" ry="128" fill="url(#gB)"/>
+<ellipse cx="150" cy="286" rx="104" ry="128" fill="url(#gAo)" opacity=".4"/>
+<ellipse cx="108" cy="220" rx="34" ry="44" fill="url(#gSpec)" opacity=".9" transform="rotate(-18 108 220)"/>
+<ellipse cx="186" cy="356" rx="14" ry="26" fill="#ffffff" opacity=".35" filter="url(#fb)"/>
+<path d="M112 334c26 0 40 24 40 52s-12 44-38 44-40-18-40-46 12-50 38-50z" fill="url(#gLeg)"/>
+<path d="M112 334c26 0 40 24 40 52s-12 44-38 44-40-18-40-46 12-50 38-50z" fill="none" stroke="#b6c2d5" stroke-width="1.5" opacity=".6"/>
+<path d="M188 334c26 0 40 24 40 52s-12 44-38 44-40-18-40-46 12-50 38-50z" fill="url(#gLeg)"/>
+<path d="M188 334c26 0 40 24 40 52s-12 44-38 44-40-18-40-46 12-50 38-50z" fill="none" stroke="#b6c2d5" stroke-width="1.5" opacity=".6"/>
+<ellipse cx="100" cy="376" rx="10" ry="36" fill="url(#gSpec)" opacity=".9" transform="rotate(-6 100 376)"/>
+<ellipse cx="176" cy="376" rx="10" ry="36" fill="url(#gSpec)" opacity=".9" transform="rotate(-6 176 376)"/>
+<g id="lzHead">
+<circle cx="150" cy="106" r="56" fill="#8698b4" opacity=".18" filter="url(#fb2)" transform="translate(2,6)"/>
+<circle cx="150" cy="106" r="55" fill="url(#gH)"/>
+<circle cx="150" cy="106" r="55" fill="url(#gAo)" opacity=".28"/>
+<ellipse cx="126" cy="74" rx="22" ry="14" fill="url(#gSpec)" opacity=".95" transform="rotate(-24 126 74)"/>
+<g id="lzEyes">
+<circle cx="124" cy="108" r="12" fill="#141821"/>
+<circle cx="176" cy="108" r="12" fill="#141821"/>
+<rect x="133" y="103" width="34" height="10" rx="5" fill="#141821"/>
+<circle cx="120" cy="103" r="3.6" fill="#ffffff"/>
+<circle cx="172" cy="103" r="3.6" fill="#ffffff"/>
+</g>
+</g>
+<g id="lzHeart"><path d="M150 210c-6-11-24-10-24 3 0 9 12 17 24 25 12-8 24-16 24-25 0-13-18-14-24-3z" fill="#ff5c8a"/><path d="M144 216c-3-5-10-4-10 1 0 4 5 8 10 11" fill="#ffb3c9" opacity=".75"/></g>
+</g>
+</svg>
+</div>
+</div></div>
+</div>
 <div class="login-box">
 <div class="login-logo">✦ 乐哲软件</div>
 <div class="login-sub">管理控制台</div>
@@ -3610,5 +3727,193 @@ if(tt)tt.addEventListener('click',function(){setTimeout(syncThemeColor,0);});
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
+<script>
+(function(){
+var el=null,dialog=null,chipsBox=null;
+var running=false,idleTimer=null;
+var mode='idle',typing=false,speakToken=0;
+
+var GREETS=['你好呀，我是乐哲机器人 ✦','欢迎回到乐哲控制台','今天也要好好管理哦','我在这儿等着你登录呢'];
+var HINTS=[
+'别忘了填邮箱和密码哦～',
+'登录后就能管理软件和用户啦',
+'有问题随时点我聊天',
+'听说最近后台多了不少新功能',
+'需要帮忙的话，点那些小按钮就好'
+];
+var KNOWLEDGE=[
+{k:['登录','密码','进不去','登不上','邮箱'],a:'登录需要管理员邮箱和密码。如果提示 <em>邮箱或密码错误</em>，请确认大小写；连续失败先检查网络，或在网址后加 <em>?sb=代理地址</em> 试试。'},
+{k:['网络','连不上','加载失败','超时','代理'],a:'网络异常时可以在网址后追加 <em>?sb=你的代理地址</em> 走自定义代理。若提示 Supabase 组件加载失败，刷新页面即可。'},
+{k:['软件','上传','新增','添加'],a:'在左侧进入「软件管理」，点右上角新增即可。编辑支持图标、截图和平台标签，保存后前台自动同步。'},
+{k:['用户','账号','子账号','权限'],a:'「子账号管理」可以创建子账号并勾选它能访问的模块。管理员权限由 profiles 表的 is_admin 字段控制。'},
+{k:['积分','签到','商城','兑换'],a:'积分相关在「签到管理」和「积分商城」。兑换记录在「兑换管理」审核发放，自动发货商品会直接给内容。'},
+{k:['教程','文章','发布'],a:'「教程管理」支持图文教程，封面、标签、正文都能编辑，发布后出现在前台教程页。'},
+{k:['反馈','建议','bug','问题'],a:'用户反馈在「反馈管理」里查看、回复和标记状态，提到的 bug 我都会记下。'},
+{k:['数据','统计','报表','图表','看板'],a:'「数据看板」汇总软件数、用户数、下载量和浏览量，还有趋势图表，方便看整体情况。'},
+{k:['主题','暗色','黑色','颜色'],a:'后台支持明暗主题切换，右上角的 🌓 按钮就能换。'},
+{k:['你好','hi','hello','在吗','嗨','哈喽'],a:'你好呀！我是<em>乐哲机器人</em>，可以问我登录、软件管理、用户权限、积分商城这些事 ✦'},
+{k:['你叫什么','你是谁','名字','介绍'],a:'我叫<em>乐哲机器人</em>，是这个后台的小助手，我的眼睛会一直跟着你哦～'},
+{k:['谢谢','感谢','辛苦','厉害'],a:'不客气，能帮上忙就好 ✦'},
+{k:['再见','拜拜','走了','下班'],a:'拜拜～记得常回来看看，我一直在的。'}
+];
+var FALLBACK=[
+'这个问题我还没学会，你可以问问登录、软件管理、用户权限、积分商城这些～',
+'唔…我不太懂这个。试试问我「怎么添加软件」或「登录失败怎么办」？',
+'我先记下了，换个问法也许我能答上来 ✦'
+];
+
+function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+function showDialog(html){if(dialog){dialog.innerHTML=html;dialog.classList.add('on');}}
+function hideDialog(){if(dialog)dialog.classList.remove('on');}
+function showChips(on){
+if(!chipsBox)return;
+if(on){
+if(!chipsBox.innerHTML){
+['怎么添加软件','登录失败怎么办','积分商城怎么用','你叫什么名字'].forEach(function(t){
+var b=document.createElement('button');
+b.className='lz-chip';b.type='button';b.textContent=t;
+b.addEventListener('click',function(ev){ev.stopPropagation();ask(t);});
+chipsBox.appendChild(b);
+});
+}
+chipsBox.classList.add('on');
+}else{chipsBox.classList.remove('on');}
+}
+function typeThen(text,cb){
+if(!dialog)return;
+var i=0;
+typing=true;
+showDialog('<span class="lz-typing"><i></i><i></i><i></i></span>');
+var tk=++speakToken;
+var iv=setInterval(function(){
+if(tk!==speakToken){clearInterval(iv);return;}
+i+=2;
+dialog.innerHTML=text.slice(0,i);
+if(i>=text.length){
+clearInterval(iv);
+dialog.innerHTML=text;
+typing=false;
+if(cb)cb();
+}
+},14);
+}
+function say(text,opt){
+opt=opt||{};
+mode='talk';
+var tk=++speakToken;
+var delay=opt.delay===undefined?380:opt.delay;
+setTimeout(function(){
+if(tk!==speakToken)return;
+typeThen(text,function(){
+if(opt.chips!==false)showChips(true);
+if(opt.hold){
+clearTimeout(el._holdT);
+el._holdT=setTimeout(function(){
+if(mode==='talk'){mode='idle';hideDialog();showChips(false);}
+},opt.hold);
+}
+});
+},delay);
+}
+function ask(qq){
+qq=String(qq||'').trim();
+if(!qq)return;
+speakToken++;
+typing=false;
+mode='talk';
+showDialog('<span class="lz-typing"><i></i><i></i><i></i></span>');
+var low=qq.toLowerCase();
+var best=null,bestScore=0;
+KNOWLEDGE.forEach(function(item){
+var score=0;
+item.k.forEach(function(k){if(low.indexOf(k)>-1)score+=(k.length>1?3:1);});
+if(score>bestScore){bestScore=score;best=item;}
+});
+var ans=bestScore>0?best.a:FALLBACK[Math.floor(Math.random()*FALLBACK.length)];
+setTimeout(function(){typeThen(ans,function(){showChips(true);});},420);
+}
+function idleLoop(){
+if(!running)return;
+if(idleTimer)clearTimeout(idleTimer);
+idleTimer=setTimeout(function(){
+if(running&&mode==='idle'&&!typing){
+say(HINTS[Math.floor(Math.random()*HINTS.length)],{hold:5200,chips:true});
+}
+idleLoop();
+},19000);
+}
+function start(){
+if(!el||running)return;
+running=true;
+el.classList.remove('on');
+void el.offsetWidth;
+el.classList.add('on');
+mode='idle';
+var r=el.getBoundingClientRect();
+mouseX=r.left+r.width/2;mouseY=r.top;
+if(!el._bind){
+el._bind=1;
+el.addEventListener('click',function(){
+if(mode==='idle'){say(GREETS[Math.floor(Math.random()*GREETS.length)],{delay:120,hold:6000});}
+else{showChips(true);}
+});
+}
+// 每次打开先来一个随机动作（比常驻循环更早触发）
+lastAct=-1;
+setTimeout(function(){if(running)randomAct();},520);
+setTimeout(function(){
+if(!running)return;
+say(GREETS[0],{delay:700,hold:6500});
+},260);
+idleLoop();
+}
+function stop(){
+running=false;
+mode='idle';typing=false;speakToken++;
+if(el)el.classList.remove('on');
+if(dialog){dialog.classList.remove('on');dialog.innerHTML='';}
+if(chipsBox)chipsBox.classList.remove('on');
+clearTimeout(idleTimer);
+}
+function init(){
+el=document.getElementById('lzBot');
+if(!el)return;
+dialog=document.getElementById('lzDialog');
+chipsBox=document.getElementById('lzChips');
+var login=document.getElementById('loginPage');
+if(login&&login.classList.contains('active'))start();
+}
+var fig=null;
+function part(id){return el?el.querySelector('#'+id):null;}
+function blink(){
+var e=part('lzEyes');if(!e)return;
+e.style.transform='scaleY(0.1)';
+setTimeout(function(){e.style.transform='scaleY(1)';},140);
+setTimeout(function(){e.style.transform='scaleY(0.1)';},260);
+setTimeout(function(){e.style.transform='scaleY(1)';},400);
+}
+function oneShot(cls,ms){
+if(!el)return;
+el.classList.remove('lz-wave','lz-jump','lz-nod','lz-spin','lz-dance','lz-heart');
+void el.offsetWidth;
+el.classList.add(cls);
+clearTimeout(el._actT);
+el._actT=setTimeout(function(){el.classList.remove(cls);},ms);
+}
+var ACTS=[['lz-wave',1850],['lz-jump',1000],['lz-nod',1400],['lz-spin',1250],['lz-dance',1600],['lz-heart',1550]];
+var lastAct=-1;
+function randomAct(){
+if(!running||typing)return;
+var i=Math.floor(Math.random()*ACTS.length);
+if(i===lastAct)i=(i+1+Math.floor(Math.random()*(ACTS.length-1)))%ACTS.length;
+lastAct=i;
+oneShot(ACTS[i][0],ACTS[i][1]);
+}
+setInterval(function(){if(running)blink();},3800);
+setInterval(function(){if(running&&Math.random()<0.82)randomAct();},5200);
+window.LzBot={start:start,stop:stop,say:say,ask:ask};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 </body>
 </html>
