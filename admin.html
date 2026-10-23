@@ -616,58 +616,110 @@ body{height:100vh;height:100dvh;}
   .aurora{filter:blur(56px) saturate(140%);opacity:calc(var(--auroraOp) * .8);}
   .aurora span{animation-duration:44s}
 }
-.lz-bot{position:fixed;left:12px;bottom:0;width:230px;height:480px;z-index:6;opacity:0;transition:opacity .6s ease;cursor:pointer;pointer-events:none}
+/* ===== 小乐 · 桌面宠物 ===== */
+.lz-bot{position:fixed;left:10px;bottom:0;width:286px;height:392px;z-index:6;opacity:0;transition:opacity .6s ease;cursor:pointer;pointer-events:none;-webkit-user-select:none;user-select:none}
 .lz-bot.on{opacity:1;pointer-events:auto}
-.lz-stage{position:relative;width:100%;height:100%;perspective:800px}
-.lz-rig{position:relative;width:100%;height:100%;transform-style:preserve-3d}
-.lz-glow{position:absolute;left:50%;top:38%;width:270px;height:300px;margin:-150px 0 0 -135px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.5),rgba(160,220,255,.18) 45%,transparent 70%);filter:blur(16px);pointer-events:none;z-index:0}
-.lz-fig{position:absolute;left:50%;bottom:16px;width:220px;height:310px;margin-left:-110px;user-select:none;pointer-events:none;z-index:2}
-.lz-svg{width:100%;height:100%;overflow:visible;display:block;filter:drop-shadow(0 10px 18px rgba(80,105,150,.26))}
-#lzAll{transform-origin:150px 418px}
-#lzHead{transform-origin:150px 208px}
-#lzArmL{transform-origin:110px 205px}
-#lzArmR{transform-origin:190px 205px}
-#lzEyes{transform-origin:150px 108px;transition:transform .1s ease}
-#lzHeart{opacity:0;transform-origin:150px 168px}
-.lz-fig.lz-breath .lz-svg{animation:lzBreath 3s ease-in-out infinite}
-.lz-fig.lz-wave #lzArmR{animation:lzWaveR .52s ease-in-out 3}
-.lz-fig.lz-wave #lzArmL{animation:lzWaveL .52s ease-in-out 3}
-.lz-fig.lz-nod #lzHead{animation:lzNod .6s ease-in-out 2}
-.lz-fig.lz-jump .lz-svg{animation:lzJump .95s cubic-bezier(.28,.8,.4,1)}
-.lz-fig.lz-spin .lz-svg{animation:lzSpin 1.15s cubic-bezier(.4,0,.3,1)}
-.lz-fig.lz-dance .lz-svg{animation:lzDance 1.5s ease-in-out}
-.lz-fig.lz-dance #lzArmL{animation:lzDanceArmL .375s ease-in-out 4}
-.lz-fig.lz-dance #lzArmR{animation:lzDanceArmR .375s ease-in-out 4}
-.lz-fig.lz-heart #lzHeart{animation:lzHeart 1.5s ease-out}
-.lz-fig.lz-heart #lzArmL{animation:lzHeartArmL 1.5s ease-in-out}
-.lz-fig.lz-heart #lzArmR{animation:lzHeartArmR 1.5s ease-in-out}
-@keyframes lzBreath{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-6px) scale(1.012,.988)}}
-@keyframes lzWaveR{0%,100%{transform:rotate(0)}50%{transform:rotate(-46deg)}}
-@keyframes lzWaveL{0%,100%{transform:rotate(0)}50%{transform:rotate(46deg)}}
-@keyframes lzNod{0%,100%{transform:rotate(0)}50%{transform:rotate(9deg)}}
-@keyframes lzJump{0%{transform:translateY(0) scale(1,1)}22%{transform:translateY(-52px) scale(.94,1.08)}46%{transform:translateY(0) scale(1.1,.9)}62%{transform:translateY(-18px) scale(1,1)}80%{transform:translateY(0) scale(1.05,.95)}100%{transform:translateY(0) scale(1,1)}}
-@keyframes lzSpin{0%{transform:rotateY(0) scale(1)}50%{transform:rotateY(360deg) scale(1.03)}100%{transform:rotateY(720deg) scale(1)}}
-@keyframes lzDance{0%,100%{transform:translateX(0) rotate(0)}15%{transform:translateX(-11px) rotate(-6deg)}30%{transform:translateX(0) rotate(0)}45%{transform:translateX(11px) rotate(6deg)}60%{transform:translateX(-9px) rotate(-5deg)}75%{transform:translateX(9px) rotate(5deg)}90%{transform:translateX(0) rotate(0)}}
-@keyframes lzDanceArmL{0%,100%{transform:rotate(0)}50%{transform:rotate(-62deg)}}
-@keyframes lzDanceArmR{0%,100%{transform:rotate(0)}50%{transform:rotate(62deg)}}
-@keyframes lzHeart{0%{opacity:0;transform:translateY(0) scale(.3)}25%{opacity:1;transform:translateY(-14px) scale(1.15)}70%{opacity:1;transform:translateY(-46px) scale(1)}100%{opacity:0;transform:translateY(-84px) scale(.85)}}
-@keyframes lzHeartArmL{0%,100%{transform:rotate(0)}35%,70%{transform:rotate(-36deg)}}
-@keyframes lzHeartArmR{0%,100%{transform:rotate(0)}35%,70%{transform:rotate(36deg)}}
-.lz-shadow{position:absolute;left:50%;bottom:6px;width:176px;height:22px;margin-left:-88px;border-radius:50%;background:radial-gradient(ellipse,rgba(70,95,140,.32),rgba(70,95,140,.1) 55%,transparent 75%);filter:blur(7px);pointer-events:none;z-index:1}
-.lz-dialog{position:absolute;left:206px;bottom:320px;transform:translateX(-6px) scale(.9);transform-origin:left bottom;min-width:186px;max-width:248px;font-size:.76rem;line-height:1.6;color:var(--tx);background:var(--cardS);border:1px solid var(--glassBd);box-shadow:var(--glassSh);padding:10px 14px;border-radius:16px;backdrop-filter:blur(16px);opacity:0;pointer-events:none;transition:opacity .28s ease,transform .28s cubic-bezier(.22,.61,.36,1);z-index:9}
+.lz-stage{position:absolute;left:0;bottom:0;width:286px;height:336px;transform-origin:50% 96%;transition:transform .32s cubic-bezier(.22,.61,.36,1)}
+.lz-wrap{position:absolute;inset:0;animation:lxBob 3.6s ease-in-out infinite;transform-origin:50% 92%}
+.lz-shadow{position:absolute;left:50%;bottom:20px;width:168px;height:22px;margin-left:-84px;border-radius:50%;background:radial-gradient(ellipse at 50% 50%,rgba(46,74,128,.26),rgba(46,74,128,.1) 55%,rgba(46,74,128,0) 78%);filter:blur(3px);pointer-events:none;animation:lxShS 3.6s ease-in-out infinite}
+.lz-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 18px rgba(38,62,110,.18));pointer-events:none}
+.lz-svg *{transform-box:view-box}
+#lxArmL{transform-origin:50px 234px}
+#lxArmR{transform-origin:270px 234px}
+#lxEyes{transform-origin:160px 178px;transition:transform .12s ease-out}
+#lxBlinkL .lx-blink{transform-origin:132px 178px}
+#lxBlinkR .lx-blink{transform-origin:188px 178px}
+#lxMouth{transform-origin:160px 214px}
+#lxTuft{transform-origin:160px 84px;animation:lxTuftA 3.4s ease-in-out infinite}
+#lxHeart{opacity:0;transform:scale(.3);transform-origin:160px 250px;transition:opacity .3s ease,transform .5s cubic-bezier(.34,1.56,.64,1)}
+#lxItem{opacity:0;transform:scale(.4);transform-origin:274px 240px;transition:opacity .22s ease,transform .38s cubic-bezier(.34,1.56,.64,1)}
+.lx-blink{animation:lxBlinkA 5.4s ease-in-out infinite}
+@keyframes lxBob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-7px) scale(1.012,.988)}}
+@keyframes lxShS{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.9);opacity:.72}}
+@keyframes lxTuftA{0%,100%{transform:rotate(0)}40%{transform:rotate(5deg)}75%{transform:rotate(-4deg)}}
+@keyframes lxBlinkA{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.06)}}
+/* 睡觉 */
+.lz-bot.nap .lx-blink{animation:none;transform:scaleY(.06)}
+.lz-bot.nap .lz-wrap{animation:lxSleepB 3.4s ease-in-out infinite}
+@keyframes lxSleepB{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(2px) scale(1.02,.975)}}
+.lx-zzz{position:absolute;left:206px;top:46px;width:56px;height:66px;pointer-events:none;opacity:0;transition:opacity .4s ease;z-index:3}
+.lz-bot.nap .lx-zzz{opacity:1}
+.lx-zzz b{position:absolute;font-weight:800;color:#7b8fb5;font-size:15px;animation:lxZ 2.6s ease-in-out infinite}
+.lx-zzz b:nth-child(1){left:0;bottom:34px}
+.lx-zzz b:nth-child(2){left:15px;bottom:50px;font-size:11px;animation-delay:.55s}
+.lx-zzz b:nth-child(3){left:28px;bottom:62px;font-size:8px;animation-delay:1.1s}
+@keyframes lxZ{0%{opacity:0;transform:translate(0,6px) scale(.7)}35%{opacity:1}100%{opacity:0;transform:translate(8px,-14px) scale(1.1)}}
+/* 表情气泡 */
+.lz-emote{position:absolute;left:210px;bottom:300px;font-size:1.45rem;z-index:12;pointer-events:none;opacity:0;transform:translateY(8px) scale(.5);transition:all .34s cubic-bezier(.34,1.56,.64,1)}
+.lz-emote.on{opacity:1;transform:translateY(0) scale(1)}
+/* 悬停凑近 */
+.lz-bot.hover .lz-stage{transform:scale(1.035) translateY(-4px)}
+/* 动作：挥手 */
+.lz-bot.act-wave #lxArmR{animation:lxWave 2s ease-in-out}
+@keyframes lxWave{0%{transform:translate(0,0) rotate(0)}10%{transform:translate(7px,-34px) rotate(-20deg)}22%{transform:translate(9px,-37px) rotate(17deg)}34%{transform:translate(7px,-34px) rotate(-20deg)}46%{transform:translate(9px,-37px) rotate(17deg)}58%{transform:translate(7px,-34px) rotate(-20deg)}70%{transform:translate(9px,-37px) rotate(17deg)}82%{transform:translate(4px,-19px) rotate(-9deg)}100%{transform:translate(0,0) rotate(0)}}
+/* 跳跃 */
+.lz-bot.act-jump .lz-wrap{animation:lxJump 1.05s cubic-bezier(.3,.7,.4,1)}
+@keyframes lxJump{0%{transform:translateY(0) scale(1,1)}18%{transform:translateY(0) scale(1.06,.92)}45%{transform:translateY(-46px) scale(.95,1.06)}70%{transform:translateY(0) scale(1.08,.9)}85%{transform:translateY(-9px) scale(1,1)}100%{transform:translateY(0) scale(1,1)}}
+/* 点头 */
+.lz-bot.act-nod .lz-wrap{animation:lxNod 1.4s ease-in-out}
+@keyframes lxNod{0%,100%{transform:translateY(0) rotate(0)}16%{transform:translateY(6px) scale(1.03,.96)}32%{transform:translateY(-2px) rotate(0)}48%{transform:translateY(6px) scale(1.03,.96)}64%{transform:translateY(-2px)}80%{transform:translateY(5px) scale(1.02,.97)}}
+/* 跳舞 */
+.lz-bot.act-dance .lz-wrap{animation:lxDance 1.9s ease-in-out}
+.lz-bot.act-dance #lxArmL{animation:lxDanceL 1.9s ease-in-out}
+.lz-bot.act-dance #lxArmR{animation:lxDanceR 1.9s ease-in-out}
+@keyframes lxDance{0%,100%{transform:translateX(0) rotate(0)}15%{transform:translateX(-11px) rotate(-4.5deg)}32%{transform:translateX(0) rotate(0)}50%{transform:translateX(11px) rotate(4.5deg)}68%{transform:translateX(0) rotate(0)}84%{transform:translateX(-9px) rotate(-3.5deg)}}
+@keyframes lxDanceL{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(-7px,-11px) rotate(30deg)}60%{transform:translate(4px,7px) rotate(-19deg)}85%{transform:translate(-6px,-9px) rotate(26deg)}}
+@keyframes lxDanceR{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(7px,7px) rotate(-19deg)}60%{transform:translate(-4px,-11px) rotate(30deg)}85%{transform:translate(6px,-9px) rotate(-26deg)}}
+/* 比心 */
+.lz-bot.act-heart #lxArmL{animation:lxHoldL 1.9s ease-in-out}
+.lz-bot.act-heart #lxArmR{animation:lxHoldR 1.9s ease-in-out}
+@keyframes lxHoldL{0%,100%{transform:translate(0,0) rotate(0)}22%,72%{transform:translate(60px,16px) rotate(26deg)}}
+@keyframes lxHoldR{0%,100%{transform:translate(0,0) rotate(0)}22%,72%{transform:translate(-60px,16px) rotate(-26deg)}}
+.lz-bot.act-heart #lxHeart{opacity:1;transform:scale(1) translateY(-16px)}
+.lz-bot.act-heart #lxHeart .h-in{animation:lxBeat 1.1s ease-in-out infinite}
+@keyframes lxBeat{0%,100%{transform:scale(1)}30%{transform:scale(1.13)}60%{transform:scale(.97)}}
+/* 歪头 */
+.lz-bot.act-tilt .lz-wrap{animation:lxTilt 1.5s ease-in-out}
+@keyframes lxTilt{0%,100%{transform:rotate(0)}28%,72%{transform:rotate(-8.5deg) translateY(2px)}}
+/* 舔棒棒糖 */
+.lz-bot.act-treat #lxItem{opacity:1;animation:lxItemIn .4s cubic-bezier(.34,1.56,.64,1) both,lxLick .5s ease-in-out .4s infinite}
+@keyframes lxItemIn{0%{transform:translate(0,0) scale(.4)}100%{transform:translate(-84px,42px) scale(1)}}
+@keyframes lxLick{0%,100%{transform:translate(-84px,42px) rotate(0)}50%{transform:translate(-91px,50px) rotate(-8deg)}}
+.lz-bot.act-treat #lxArmR{animation:lxTreatR 2.6s ease-in-out both}
+@keyframes lxTreatR{0%,100%{transform:translate(0,0) rotate(0)}14%,86%{transform:translate(-70px,14px) rotate(-12deg)}}
+.lz-bot.act-treat #lxMouth{animation:lxLickM .5s ease-in-out infinite}
+@keyframes lxLickM{0%,100%{transform:scale(1,1)}50%{transform:scale(1.12,.42)}}
+.lz-bot.act-treat .lx-blink{animation:lxTreatE .5s ease-in-out infinite}
+@keyframes lxTreatE{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.45)}}
+/* 伸懒腰 */
+.lz-bot.act-stretch .lz-wrap{animation:lxStretch 1.7s ease-in-out}
+@keyframes lxStretch{0%,100%{transform:scale(1,1) translateY(0)}30%,66%{transform:scale(.93,1.09) translateY(-6px)}}
+.lz-bot.act-stretch #lxArmL{animation:lxStrL 1.7s ease-in-out}
+.lz-bot.act-stretch #lxArmR{animation:lxStrR 1.7s ease-in-out}
+@keyframes lxStrL{0%,100%{transform:translate(0,0) rotate(0)}30%,66%{transform:translate(-15px,-13px) rotate(-26deg)}}
+@keyframes lxStrR{0%,100%{transform:translate(0,0) rotate(0)}30%,66%{transform:translate(15px,-13px) rotate(26deg)}}
+/* 害羞 */
+.lz-bot.act-shy .lz-wrap{animation:lxShy 1.8s ease-in-out}
+@keyframes lxShy{0%,100%{transform:scale(1,1) translateY(0)}25%,72%{transform:scale(1.05,.94) translateY(5px) rotate(-2deg)}}
+.lz-bot.act-shy #lxArmL{animation:lxShyL 1.8s ease-in-out}
+.lz-bot.act-shy #lxArmR{animation:lxShyR 1.8s ease-in-out}
+@keyframes lxShyL{0%,100%{transform:translate(0,0) rotate(0)}25%,72%{transform:translate(30px,-46px) rotate(22deg)}}
+@keyframes lxShyR{0%,100%{transform:translate(0,0) rotate(0)}25%,72%{transform:translate(-30px,-46px) rotate(-22deg)}}
+/* 气泡与快捷问答 */
+.lz-dialog{position:absolute;left:196px;bottom:262px;transform:translateX(-6px) scale(.9);transform-origin:left bottom;min-width:186px;max-width:248px;font-size:.76rem;line-height:1.6;color:var(--tx);background:var(--cardS);border:1px solid var(--glassBd);box-shadow:var(--glassSh);padding:10px 14px;border-radius:16px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);opacity:0;pointer-events:none;transition:opacity .28s ease,transform .28s cubic-bezier(.22,.61,.36,1);z-index:9}
 .lz-dialog::after{content:'';position:absolute;left:-5px;bottom:14px;width:11px;height:11px;background:var(--cardS);border-left:1px solid var(--glassBd);border-bottom:1px solid var(--glassBd);transform:rotate(45deg)}
 .lz-dialog.on{opacity:1;transform:translateX(0) scale(1)}
 .lz-dialog em{color:var(--cy);font-style:normal;font-weight:600}
 .lz-typing{display:inline-flex;gap:4px;align-items:center;padding:3px 0}
-.lz-typing i{width:5px;height:5px;border-radius:50%;background:var(--cy);animation:lzDot .9s ease-in-out infinite}
+.lz-typing i{width:5px;height:5px;border-radius:50%;background:var(--cy);animation:lxDot .9s ease-in-out infinite}
 .lz-typing i:nth-child(2){animation-delay:.15s}
 .lz-typing i:nth-child(3){animation-delay:.3s}
-@keyframes lzDot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
-.lz-chips{position:absolute;left:206px;bottom:120px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:10}
+@keyframes lxDot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.lz-chips{position:absolute;left:196px;bottom:84px;display:flex;flex-direction:column;gap:6px;align-items:flex-start;opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:10}
 .lz-chips.on{opacity:1;pointer-events:auto}
-.lz-chip{pointer-events:auto;font-size:.7rem;padding:5px 11px;border-radius:20px;background:var(--cardS);border:1px solid var(--glassBd);color:var(--tx2);cursor:pointer;backdrop-filter:blur(10px);transition:all .2s ease;white-space:nowrap;font-family:inherit;line-height:1.4}
+.lz-chip{pointer-events:auto;font-size:.7rem;padding:5px 11px;border-radius:20px;background:var(--cardS);border:1px solid var(--glassBd);color:var(--tx2);cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:all .2s ease;white-space:nowrap;font-family:inherit;line-height:1.4}
 .lz-chip:hover{color:var(--cy);border-color:var(--cy);box-shadow:0 0 0 3px rgba(10,132,255,.12);transform:translateX(2px)}
-@media (max-width:720px){.lz-bot{width:170px;height:390px;left:4px;bottom:0}.lz-fig{width:158px;height:222px;margin-left:-79px}.lz-glow{width:200px;height:230px;margin:-115px 0 0 -100px}.lz-shadow{width:124px;height:16px;margin-left:-62px}.lz-dialog{min-width:158px;max-width:196px;font-size:.72rem;bottom:252px;left:158px}.lz-chip{font-size:.66rem;padding:4px 9px}.lz-chips{bottom:92px;left:158px}}
+@media (max-width:720px){.lz-bot{width:216px;height:302px;left:4px}.lz-stage{width:216px;height:254px}.lz-shadow{width:126px;height:16px;margin-left:-63px}.lz-dialog{min-width:150px;max-width:188px;font-size:.7rem;left:150px;bottom:210px}.lz-chips{left:150px;bottom:64px}.lz-emote{left:158px;bottom:238px;font-size:1.2rem}}
 
 </style>
 </head>
@@ -678,68 +730,219 @@ body{height:100vh;height:100dvh;}
 <div class="login-page active" id="loginPage">
 <div class="bg-glow"></div><div class="bg-glow"></div>
 <div class="lz-bot" id="lzBot">
-<div class="lz-stage"><div class="lz-rig">
 <div class="lz-dialog" id="lzDialog"></div>
 <div class="lz-chips" id="lzChips"></div>
-<div class="lz-glow"></div>
+<div class="lz-emote" id="lxEmote"></div>
+<div class="lz-stage" id="lxStage">
 <div class="lz-shadow"></div>
-<div class="lz-fig lz-breath" id="lzFig">
-<svg class="lz-svg" viewBox="0 0 300 430" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<radialGradient id="gH" cx="36%" cy="26%" r="90%"><stop offset="0%" stop-color="#ffffff"/><stop offset="45%" stop-color="#fbfcfe"/><stop offset="80%" stop-color="#e9eef6"/><stop offset="100%" stop-color="#c3cede"/></radialGradient>
-<radialGradient id="gB" cx="34%" cy="20%" r="95%"><stop offset="0%" stop-color="#ffffff"/><stop offset="40%" stop-color="#fbfcfe"/><stop offset="74%" stop-color="#ecf1f8"/><stop offset="92%" stop-color="#d4dde9"/><stop offset="100%" stop-color="#b4c1d4"/></radialGradient>
-<linearGradient id="gAL" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c0ccdd"/><stop offset="24%" stop-color="#eef2f8"/><stop offset="48%" stop-color="#ffffff"/><stop offset="78%" stop-color="#dde4ef"/><stop offset="100%" stop-color="#b6c2d5"/></linearGradient>
-<linearGradient id="gAR" x1="1" y1="0" x2="0" y2="0"><stop offset="0%" stop-color="#c0ccdd"/><stop offset="24%" stop-color="#eef2f8"/><stop offset="48%" stop-color="#ffffff"/><stop offset="78%" stop-color="#dde4ef"/><stop offset="100%" stop-color="#b6c2d5"/></linearGradient>
-<radialGradient id="gLeg" cx="38%" cy="24%" r="90%"><stop offset="0%" stop-color="#ffffff"/><stop offset="46%" stop-color="#f6f8fc"/><stop offset="82%" stop-color="#dfe6f0"/><stop offset="100%" stop-color="#bcc8da"/></radialGradient>
-<radialGradient id="gSpec" cx="50%" cy="45%" r="50%"><stop offset="0%" stop-color="#ffffff" stop-opacity=".98"/><stop offset="55%" stop-color="#ffffff" stop-opacity=".5"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
-<radialGradient id="gAo" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#7c8da6" stop-opacity=".45"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
-<filter id="fb" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="4"/></filter>
-<filter id="fb2" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="9"/></filter>
-</defs>
-<g id="lzAll">
-<ellipse cx="152" cy="392" rx="118" ry="46" fill="#8698b4" opacity=".2" filter="url(#fb2)"/>
-<g id="lzArmL"><g transform="rotate(-4 110 205)">
-<path d="M118 198c-38 7-63 37-74 77-5 18-8 31-6 43 2 14 14 22 28 18 14-4 20-14 22-30 4-38 14-76 30-108z" fill="url(#gAL)"/>
-<path d="M118 198c-38 7-63 37-74 77-5 18-8 31-6 43 2 14 14 22 28 18 14-4 20-14 22-30 4-38 14-76 30-108z" fill="none" stroke="#b6c2d5" stroke-width="1.4" opacity=".5"/>
-<ellipse cx="48" cy="314" rx="26" ry="27" fill="url(#gLeg)"/>
-<ellipse cx="48" cy="314" rx="26" ry="27" fill="none" stroke="#b6c2d5" stroke-width="1.4" opacity=".5"/>
-<ellipse cx="39" cy="302" rx="9" ry="12" fill="url(#gSpec)" opacity=".95" transform="rotate(-22 39 302)"/>
-</g></g>
-<g id="lzArmR"><g transform="rotate(4 190 205)">
-<path d="M182 198c38 7 63 37 74 77 5 18 8 31 6 43-2 14-14 22-28 18-14-4-20-14-22-30-4-38-14-76-30-108z" fill="url(#gAR)"/>
-<path d="M182 198c38 7 63 37 74 77 5 18 8 31 6 43-2 14-14 22-28 18-14-4-20-14-22-30-4-38-14-76-30-108z" fill="none" stroke="#b6c2d5" stroke-width="1.4" opacity=".5"/>
-<ellipse cx="252" cy="314" rx="26" ry="27" fill="url(#gLeg)"/>
-<ellipse cx="252" cy="314" rx="26" ry="27" fill="none" stroke="#b6c2d5" stroke-width="1.4" opacity=".5"/>
-<ellipse cx="243" cy="302" rx="9" ry="12" fill="url(#gSpec)" opacity=".95" transform="rotate(-22 243 302)"/>
-</g></g>
-<ellipse cx="150" cy="286" rx="104" ry="128" fill="url(#gB)"/>
-<ellipse cx="150" cy="286" rx="104" ry="128" fill="url(#gAo)" opacity=".4"/>
-<ellipse cx="108" cy="220" rx="34" ry="44" fill="url(#gSpec)" opacity=".9" transform="rotate(-18 108 220)"/>
-<ellipse cx="186" cy="356" rx="14" ry="26" fill="#ffffff" opacity=".35" filter="url(#fb)"/>
-<path d="M112 334c26 0 40 24 40 52s-12 44-38 44-40-18-40-46 12-50 38-50z" fill="url(#gLeg)"/>
-<path d="M112 334c26 0 40 24 40 52s-12 44-38 44-40-18-40-46 12-50 38-50z" fill="none" stroke="#b6c2d5" stroke-width="1.5" opacity=".6"/>
-<path d="M188 334c26 0 40 24 40 52s-12 44-38 44-40-18-40-46 12-50 38-50z" fill="url(#gLeg)"/>
-<path d="M188 334c26 0 40 24 40 52s-12 44-38 44-40-18-40-46 12-50 38-50z" fill="none" stroke="#b6c2d5" stroke-width="1.5" opacity=".6"/>
-<ellipse cx="100" cy="376" rx="10" ry="36" fill="url(#gSpec)" opacity=".9" transform="rotate(-6 100 376)"/>
-<ellipse cx="176" cy="376" rx="10" ry="36" fill="url(#gSpec)" opacity=".9" transform="rotate(-6 176 376)"/>
-<g id="lzHead">
-<circle cx="150" cy="106" r="56" fill="#8698b4" opacity=".18" filter="url(#fb2)" transform="translate(2,6)"/>
-<circle cx="150" cy="106" r="55" fill="url(#gH)"/>
-<circle cx="150" cy="106" r="55" fill="url(#gAo)" opacity=".28"/>
-<ellipse cx="126" cy="74" rx="22" ry="14" fill="url(#gSpec)" opacity=".95" transform="rotate(-24 126 74)"/>
-<g id="lzEyes">
-<circle cx="124" cy="108" r="12" fill="#141821"/>
-<circle cx="176" cy="108" r="12" fill="#141821"/>
-<rect x="133" y="103" width="34" height="10" rx="5" fill="#141821"/>
-<circle cx="120" cy="103" r="3.6" fill="#ffffff"/>
-<circle cx="172" cy="103" r="3.6" fill="#ffffff"/>
-</g>
-</g>
-<g id="lzHeart"><path d="M150 210c-6-11-24-10-24 3 0 9 12 17 24 25 12-8 24-16 24-25 0-13-18-14-24-3z" fill="#ff5c8a"/><path d="M144 216c-3-5-10-4-10 1 0 4 5 8 10 11" fill="#ffb3c9" opacity=".75"/></g>
-</g>
-</svg>
+<div class="lz-wrap">
+<svg class="lz-svg" id="lxSvg" viewBox="0 0 320 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- 身体：球面主光 -->
+          <radialGradient id="xgBody" cx="35%" cy="22%" r="82%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="34%" stop-color="#FEFFFF"/>
+            <stop offset="62%" stop-color="#F6F9FE"/>
+            <stop offset="84%" stop-color="#E6EDF9"/>
+            <stop offset="94%" stop-color="#D2DDEF"/>
+            <stop offset="100%" stop-color="#BCC9DF"/>
+          </radialGradient>
+          <!-- 身体：右下暖灰反光 -->
+          <radialGradient id="xgBodyRim" cx="78%" cy="82%" r="58%">
+            <stop offset="0%" stop-color="#A9BCDA" stop-opacity=".55"/>
+            <stop offset="62%" stop-color="#A9BCDA" stop-opacity=".12"/>
+            <stop offset="100%" stop-color="#A9BCDA" stop-opacity="0"/>
+          </radialGradient>
+          <!-- 底部承重暗部 -->
+          <radialGradient id="xgUnder" cx="50%" cy="72%" r="62%">
+            <stop offset="0%" stop-color="#8FA3C4" stop-opacity=".38"/>
+            <stop offset="65%" stop-color="#8FA3C4" stop-opacity=".10"/>
+            <stop offset="100%" stop-color="#8FA3C4" stop-opacity="0"/>
+          </radialGradient>
+          <!-- 肢体：比身体略暗（受光少） -->
+          <radialGradient id="xgLimb" cx="36%" cy="24%" r="86%">
+            <stop offset="0%" stop-color="#FDFEFF"/>
+            <stop offset="46%" stop-color="#F3F7FD"/>
+            <stop offset="80%" stop-color="#E1E9F6"/>
+            <stop offset="100%" stop-color="#C6D2E5"/>
+          </radialGradient>
+          <radialGradient id="xgFoot" cx="40%" cy="26%" r="90%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="48%" stop-color="#F0F5FC"/>
+            <stop offset="82%" stop-color="#DBE4F2"/>
+            <stop offset="100%" stop-color="#BFCBE0"/>
+          </radialGradient>
+          <!-- 镜面高光 -->
+          <radialGradient id="xgSpec" cx="50%" cy="46%" r="52%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".96"/>
+            <stop offset="48%" stop-color="#FFFFFF" stop-opacity=".46"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="xgSpecS" cx="50%" cy="46%" r="50%">
+            <stop offset="0%" stop-color="#FFFFFF" stop-opacity=".9"/>
+            <stop offset="60%" stop-color="#FFFFFF" stop-opacity=".3"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+          </radialGradient>
+          <!-- 肚皮：一块更亮的软垫 -->
+          <radialGradient id="xgBelly" cx="44%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="70%" stop-color="#FDFEFF"/>
+            <stop offset="100%" stop-color="#F4F8FE"/>
+          </radialGradient>
+          <!-- 呆毛 -->
+          <linearGradient id="xgTuft" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#D8E2F1"/>
+            <stop offset="100%" stop-color="#FFFFFF"/>
+          </linearGradient>
+          <!-- 眼睛 -->
+          <radialGradient id="xgEye" cx="38%" cy="30%" r="86%">
+            <stop offset="0%" stop-color="#4A5470"/>
+            <stop offset="42%" stop-color="#2B3346"/>
+            <stop offset="100%" stop-color="#171C28"/>
+          </radialGradient>
+          <radialGradient id="xgBlush" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FF9DBB" stop-opacity=".72"/>
+            <stop offset="58%" stop-color="#FF9DBB" stop-opacity=".3"/>
+            <stop offset="100%" stop-color="#FF9DBB" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="xgHeart" cx="34%" cy="28%" r="82%">
+            <stop offset="0%" stop-color="#FF9AB8"/>
+            <stop offset="55%" stop-color="#FF5C8A"/>
+            <stop offset="100%" stop-color="#E42E63"/>
+          </radialGradient>
+          <!-- 棒棒糖斜条纹 -->
+          <linearGradient id="xgLolli" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FF8FB8"/>
+            <stop offset="12.5%" stop-color="#FF8FB8"/>
+            <stop offset="12.5%" stop-color="#FFFFFF"/>
+            <stop offset="25%" stop-color="#FFFFFF"/>
+            <stop offset="25%" stop-color="#FF8FB8"/>
+            <stop offset="37.5%" stop-color="#FF8FB8"/>
+            <stop offset="37.5%" stop-color="#FFFFFF"/>
+            <stop offset="50%" stop-color="#FFFFFF"/>
+            <stop offset="50%" stop-color="#FF8FB8"/>
+            <stop offset="62.5%" stop-color="#FF8FB8"/>
+            <stop offset="62.5%" stop-color="#FFFFFF"/>
+            <stop offset="75%" stop-color="#FFFFFF"/>
+            <stop offset="75%" stop-color="#FF8FB8"/>
+            <stop offset="87.5%" stop-color="#FF8FB8"/>
+            <stop offset="87.5%" stop-color="#FFFFFF"/>
+            <stop offset="100%" stop-color="#FFFFFF"/>
+          </linearGradient>
+          <clipPath id="xclipLolli"><circle cx="276" cy="180" r="23"/></clipPath>
+          <filter id="xfBlur8" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="8"/></filter>
+          <filter id="xfBlur4" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter>
+          <filter id="xfBlur14" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="14"/></filter>
+          <!-- 身体裁剪：所有贴表面元素都不越界 -->
+          <clipPath id="xclipBody"><ellipse cx="160" cy="196" rx="108" ry="118"/></clipPath>
+        </defs>
+
+        <!-- ============ 脚（在身体后面） ============ -->
+        <g id="lxFeet">
+          <ellipse cx="118" cy="302" rx="35" ry="23" fill="url(#xgFoot)"/>
+          <ellipse cx="118" cy="302" rx="35" ry="23" fill="none" stroke="#C3CFE2" stroke-width="1.4" opacity=".55"/>
+          <ellipse cx="107" cy="294" rx="11" ry="7" fill="url(#xgSpecS)" opacity=".9" transform="rotate(-12 107 294)"/>
+          <ellipse cx="202" cy="302" rx="35" ry="23" fill="url(#xgFoot)"/>
+          <ellipse cx="202" cy="302" rx="35" ry="23" fill="none" stroke="#C3CFE2" stroke-width="1.4" opacity=".55"/>
+          <ellipse cx="191" cy="294" rx="11" ry="7" fill="url(#xgSpecS)" opacity=".9" transform="rotate(-12 191 294)"/>
+        </g>
+
+        <!-- ============ 身体 ============ -->
+        <g id="lxTorso">
+          <ellipse cx="160" cy="196" rx="108" ry="118" fill="url(#xgBody)"/>
+          <ellipse cx="160" cy="196" rx="108" ry="118" fill="url(#xgBodyRim)" opacity=".9"/>
+          <ellipse cx="160" cy="196" rx="108" ry="118" fill="url(#xgUnder)" opacity=".85"/>
+          <ellipse cx="160" cy="196" rx="108" ry="118" fill="none" stroke="#C3CFE2" stroke-width="1.5" opacity=".55"/>
+          <!-- 右下边缘反光 -->
+          <path d="M212 288a108 118 0 0 1-96-6" fill="none" stroke="#FFFFFF" stroke-width="3" opacity=".5" filter="url(#xfBlur4)"/>
+          <!-- 顶部大高光 -->
+          <ellipse cx="116" cy="126" rx="42" ry="27" fill="url(#xgSpec)" transform="rotate(-26 116 126)"/>
+          <ellipse cx="196" cy="112" rx="16" ry="9" fill="url(#xgSpecS)" opacity=".78" transform="rotate(-16 196 112)"/>
+          <!-- 肚皮软垫 -->
+          <g clip-path="url(#xclipBody)">
+            <ellipse cx="160" cy="212" rx="70" ry="78" fill="url(#xgBelly)" opacity=".95"/>
+            <ellipse cx="160" cy="212" rx="70" ry="78" fill="none" stroke="#FFFFFF" stroke-width="2" opacity=".7"/>
+            <path d="M146 268q14 10 28 0" fill="none" stroke="#CBD7E8" stroke-width="2.6" stroke-linecap="round" opacity=".7"/>
+          </g>
+        </g>
+
+        <!-- ============ 手臂（在身体前面，与轮廓相接） ============ -->
+        <g id="lxArmL">
+          <ellipse cx="66" cy="244" rx="19" ry="26" fill="#8FA3C4" opacity=".3" filter="url(#xfBlur8)"/>
+          <ellipse cx="50" cy="234" rx="27" ry="30" fill="url(#xgLimb)" transform="rotate(-14 50 234)"/>
+          <ellipse cx="50" cy="234" rx="27" ry="30" fill="none" stroke="#C3CFE2" stroke-width="1.4" opacity=".55" transform="rotate(-14 50 234)"/>
+          <ellipse cx="40" cy="222" rx="8.5" ry="11" fill="url(#xgSpecS)" opacity=".92" transform="rotate(-18 40 222)"/>
+          <ellipse cx="50" cy="256" rx="10" ry="5.8" fill="#FFB8CC" opacity=".34" transform="rotate(-14 50 256)"/>
+        </g>
+        <g id="lxArmR">
+          <ellipse cx="254" cy="244" rx="19" ry="26" fill="#8FA3C4" opacity=".3" filter="url(#xfBlur8)"/>
+          <ellipse cx="270" cy="234" rx="27" ry="30" fill="url(#xgLimb)" transform="rotate(14 270 234)"/>
+          <ellipse cx="270" cy="234" rx="27" ry="30" fill="none" stroke="#C3CFE2" stroke-width="1.4" opacity=".55" transform="rotate(14 270 234)"/>
+          <ellipse cx="260" cy="222" rx="8.5" ry="11" fill="url(#xgSpecS)" opacity=".92" transform="rotate(18 260 222)"/>
+          <ellipse cx="270" cy="256" rx="10" ry="5.8" fill="#FFB8CC" opacity=".34" transform="rotate(14 270 256)"/>
+        </g>
+
+        <!-- ============ 脸 ============ -->
+        <g id="lxFace">
+          <!-- 眼睛：外层负责跟随鼠标位移 -->
+          <g id="lxEyes">
+            <g id="lxBlinkL"><g class="lp-blink">
+              <ellipse cx="132" cy="178" rx="15" ry="19" fill="url(#xgEye)"/>
+              <ellipse cx="132" cy="178" rx="15" ry="19" fill="none" stroke="#0F1420" stroke-width="1" opacity=".35"/>
+              <circle cx="126.4" cy="170.4" r="5.4" fill="#FFFFFF"/>
+              <circle cx="136.6" cy="185.6" r="2.6" fill="#FFFFFF" opacity=".68"/>
+              <ellipse cx="132" cy="192" rx="8" ry="3.2" fill="#7FD3FF" opacity=".28"/>
+            </g></g>
+            <g id="lxBlinkR"><g class="lp-blink">
+              <ellipse cx="188" cy="178" rx="15" ry="19" fill="url(#xgEye)"/>
+              <ellipse cx="188" cy="178" rx="15" ry="19" fill="none" stroke="#0F1420" stroke-width="1" opacity=".35"/>
+              <circle cx="182.4" cy="170.4" r="5.4" fill="#FFFFFF"/>
+              <circle cx="192.6" cy="185.6" r="2.6" fill="#FFFFFF" opacity=".68"/>
+              <ellipse cx="188" cy="192" rx="8" ry="3.2" fill="#7FD3FF" opacity=".28"/>
+            </g></g>
+          </g>
+          <!-- 腮红 -->
+          <ellipse cx="102" cy="206" rx="17" ry="10" fill="url(#xgBlush)"/>
+          <ellipse cx="218" cy="206" rx="17" ry="10" fill="url(#xgBlush)"/>
+          <!-- 小鼻子 + 嘴 -->
+          <path d="M155.4 200.6q4.6-3.4 9.2 0-2 5.4-4.6 5.4t-4.6-5.4z" fill="#3A4152" opacity=".9"/>
+          <path id="lxMouth" d="M153 212q7 6.4 14 0" fill="none" stroke="#3A4152" stroke-width="2.8" stroke-linecap="round" opacity=".85"/>
+        </g>
+
+        <!-- ============ 呆毛 ============ -->
+        <g id="lxTuft">
+          <path d="M160 90c-4-18 4-30 14-38 3 13-2 25-8 33" fill="none" stroke="url(#xgTuft)" stroke-width="7" stroke-linecap="round"/>
+          <path d="M160 90c-4-18 4-30 14-38" fill="none" stroke="#C3CFE2" stroke-width="7" stroke-linecap="round" opacity=".35"/>
+          <circle cx="174" cy="50" r="7" fill="#FFFFFF"/>
+          <circle cx="174" cy="50" r="7" fill="none" stroke="#C3CFE2" stroke-width="1.3" opacity=".6"/>
+          <circle cx="171.6" cy="47.4" r="2.2" fill="#FFFFFF"/>
+        </g>
+
+        <!-- ============ 棒棒糖（点击才出现；画在身体上、手下面） ============ -->
+        <g id="lxItem">
+          <path d="M276 198L272 248" stroke="#F0E6DA" stroke-width="7.5" stroke-linecap="round"/>
+          <path d="M276 198L272 248" stroke="#D9C9B6" stroke-width="1.5" stroke-linecap="round" opacity=".55"/>
+          <circle cx="276" cy="180" r="23" fill="#FFF0F6"/>
+          <g clip-path="url(#xclipLolli)">
+            <rect x="246" y="150" width="60" height="60" fill="url(#xgLolli)" transform="rotate(-32 276 180)"/>
+            <ellipse cx="266" cy="167" rx="11" ry="7" fill="#FFFFFF" opacity=".78" transform="rotate(-28 266 167)"/>
+            <ellipse cx="286" cy="196" rx="9" ry="5" fill="#FFFFFF" opacity=".35" transform="rotate(-28 286 196)"/>
+          </g>
+          <circle cx="276" cy="180" r="23" fill="none" stroke="#E79FBE" stroke-width="1.5" opacity=".55"/>
+        </g>
+
+        <!-- ============ 比心 ============ -->
+        <g id="lxHeart">
+          <g class="h-in">
+            <path d="M160 236c-8-16-34-15-34 4 0 13 17 25 34 37 17-12 34-24 34-37 0-19-26-20-34-4z" fill="url(#xgHeart)"/>
+            <path d="M148 244c-4-7-14-6-14 2 0 5 7 11 14 15" fill="#FFFFFF" opacity=".42"/>
+            <path d="M160 236c-8-16-34-15-34 4 0 13 17 25 34 37 17-12 34-24 34-37 0-19-26-20-34-4z" fill="none" stroke="#C21F4E" stroke-width="1.4" opacity=".35"/>
+          </g>
+        </g>
+      </svg>
 </div>
-</div></div>
+<div class="lx-zzz"><b>z</b><b>z</b><b>z</b></div>
+</div>
 </div>
 <div class="login-box">
 <div class="login-logo">✦ 乐哲软件</div>
@@ -3729,18 +3932,17 @@ if(tt)tt.addEventListener('click',function(){setTimeout(syncThemeColor,0);});
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 <script>
 (function(){
-var el=null,dialog=null,chipsBox=null;
-var running=false,idleTimer=null;
-var mode='idle',typing=false,speakToken=0;
+'use strict';
+var el=null,dialog=null,chipsBox=null,emoteEl=null,eyes=null,stage=null;
+var running=false,mode='idle',speakToken=0,typeTimer=null,sayTimer=null;
+var actTimer=null,actEndT=0,lastAct='';
+var idleTimer=null,emoteTimer=null,rafPending=false;
+var clickCount=0,clickTimer=null,blushHue=0;
+var mouseTX=0,mouseTY=0,lastMoveReset=0;
 
-var GREETS=['你好呀，我是乐哲机器人 ✦','欢迎回到乐哲控制台','今天也要好好管理哦','我在这儿等着你登录呢'];
-var HINTS=[
-'别忘了填邮箱和密码哦～',
-'登录后就能管理软件和用户啦',
-'有问题随时点我聊天',
-'听说最近后台多了不少新功能',
-'需要帮忙的话，点那些小按钮就好'
-];
+var GREETS=['嗨～我是<em>小乐</em>，以后就住在这个角落啦 ✦','欢迎回到控制台，我是小乐','今天也要开开心心的呀 ✦','戳我一下，我给你变个动作'];
+var HINTS=['别忘了填邮箱和密码哦～','登录后就能管理软件和用户啦','有问题随时点我聊天','戳我一下，我舔口棒棒糖给你看 🍭','需要帮忙的话，点那些小按钮就好'];
+var CHIPS=['怎么添加软件','登录失败怎么办','积分商城怎么用','你叫什么名字'];
 var KNOWLEDGE=[
 {k:['登录','密码','进不去','登不上','邮箱'],a:'登录需要管理员邮箱和密码。如果提示 <em>邮箱或密码错误</em>，请确认大小写；连续失败先检查网络，或在网址后加 <em>?sb=代理地址</em> 试试。'},
 {k:['网络','连不上','加载失败','超时','代理'],a:'网络异常时可以在网址后追加 <em>?sb=你的代理地址</em> 走自定义代理。若提示 Supabase 组件加载失败，刷新页面即可。'},
@@ -3751,25 +3953,56 @@ var KNOWLEDGE=[
 {k:['反馈','建议','bug','问题'],a:'用户反馈在「反馈管理」里查看、回复和标记状态，提到的 bug 我都会记下。'},
 {k:['数据','统计','报表','图表','看板'],a:'「数据看板」汇总软件数、用户数、下载量和浏览量，还有趋势图表，方便看整体情况。'},
 {k:['主题','暗色','黑色','颜色'],a:'后台支持明暗主题切换，右上角的 🌓 按钮就能换。'},
-{k:['你好','hi','hello','在吗','嗨','哈喽'],a:'你好呀！我是<em>乐哲机器人</em>，可以问我登录、软件管理、用户权限、积分商城这些事 ✦'},
-{k:['你叫什么','你是谁','名字','介绍'],a:'我叫<em>乐哲机器人</em>，是这个后台的小助手，我的眼睛会一直跟着你哦～'},
+{k:['你好','hi','hello','在吗','嗨','哈喽'],a:'你好呀！我是<em>小乐</em>，可以问我登录、软件管理、用户权限、积分商城这些事 ✦'},
+{k:['你叫什么','你是谁','名字','介绍'],a:'我叫<em>小乐</em>，是这个后台的小向导，会自己玩、自己动，戳我一下我就换个动作～'},
+{k:['棒棒糖','糖','零食','吃'],a:'说到甜的！戳我一下我就掏出棒棒糖舔一口 🍭'},
+{k:['动作','表演','来一个','跳舞','跳一个'],a:'好呀，看我表演！'},
 {k:['谢谢','感谢','辛苦','厉害'],a:'不客气，能帮上忙就好 ✦'},
-{k:['再见','拜拜','走了','下班'],a:'拜拜～记得常回来看看，我一直在的。'}
+{k:['再见','拜拜','走了','下班'],a:'拜拜～我会一直在这儿等你回来'}
 ];
 var FALLBACK=[
 '这个问题我还没学会，你可以问问登录、软件管理、用户权限、积分商城这些～',
 '唔…我不太懂这个。试试问我「怎么添加软件」或「登录失败怎么办」？',
 '我先记下了，换个问法也许我能答上来 ✦'
 ];
+var BLUSH_SETS=['#FF9DBB','#FFB08A','#D5A8FF','#9DC8FF','#FF8A9E'];
+var ACTS=[
+{n:'wave',d:2050},{n:'jump',d:1100},{n:'nod',d:1450},
+{n:'dance',d:1950},{n:'heart',d:1950},{n:'tilt',d:1550},{n:'treat',d:2600},
+{n:'stretch',d:1750},{n:'shy',d:1850}
+];
+var ACT_CLASSES=ACTS.map(function(a){return 'act-'+a.n;});
 
-function clamp(v,a,b){return v<a?a:(v>b?b:v);}
-function showDialog(html){if(dialog){dialog.innerHTML=html;dialog.classList.add('on');}}
+function part(id){return el?el.querySelector('#'+id):null;}
+function clearAct(){
+if(!el)return;
+ACT_CLASSES.forEach(function(c){el.classList.remove(c);});
+}
+function runAct(name,dur){
+if(!el)return;
+clearAct();
+void el.offsetWidth;
+el.classList.add('act-'+name);
+actEndT=Date.now()+(dur||1200);
+lastAct=name;
+if(actTimer)clearTimeout(actTimer);
+actTimer=setTimeout(function(){clearAct();actEndT=0;},dur||1200);
+}
+function randomAct(force){
+if(!running)return null;
+if(!force&&Date.now()<actEndT-120)return null;
+if(force&&lastAct!=='treat'){runAct('treat',2600);return 'treat';}
+var pool=ACTS.filter(function(a){return a.n!==lastAct;});
+var pick=pool[Math.floor(Math.random()*pool.length)];
+runAct(pick.n,pick.d);
+return pick.n;
+}
 function hideDialog(){if(dialog)dialog.classList.remove('on');}
 function showChips(on){
 if(!chipsBox)return;
 if(on){
 if(!chipsBox.innerHTML){
-['怎么添加软件','登录失败怎么办','积分商城怎么用','你叫什么名字'].forEach(function(t){
+CHIPS.forEach(function(t){
 var b=document.createElement('button');
 b.className='lz-chip';b.type='button';b.textContent=t;
 b.addEventListener('click',function(ev){ev.stopPropagation();ask(t);});
@@ -3779,49 +4012,45 @@ chipsBox.appendChild(b);
 chipsBox.classList.add('on');
 }else{chipsBox.classList.remove('on');}
 }
-function typeThen(text,cb){
-if(!dialog)return;
-var i=0;
-typing=true;
-showDialog('<span class="lz-typing"><i></i><i></i><i></i></span>');
-var tk=++speakToken;
-var iv=setInterval(function(){
-if(tk!==speakToken){clearInterval(iv);return;}
-i+=2;
-dialog.innerHTML=text.slice(0,i);
-if(i>=text.length){
-clearInterval(iv);
-dialog.innerHTML=text;
-typing=false;
-if(cb)cb();
-}
-},14);
-}
-function say(text,opt){
+function say(html,opt){
 opt=opt||{};
-mode='talk';
 var tk=++speakToken;
-var delay=opt.delay===undefined?380:opt.delay;
+mode='talk';
+if(typeTimer)clearInterval(typeTimer);
+if(sayTimer)clearTimeout(sayTimer);
+hideDialog();
+if(!dialog)return;
+dialog.classList.add('on');
+dialog.innerHTML='<span class="lz-typing"><i></i><i></i><i></i></span>';
+var delay=opt.delay===undefined?360:opt.delay;
 setTimeout(function(){
 if(tk!==speakToken)return;
-typeThen(text,function(){
-if(opt.chips!==false)showChips(true);
-if(opt.hold){
-clearTimeout(el._holdT);
-el._holdT=setTimeout(function(){
-if(mode==='talk'){mode='idle';hideDialog();showChips(false);}
-},opt.hold);
+var hasTag=html.indexOf('<')>-1;
+if(hasTag){dialog.innerHTML=html;}
+else{
+var i=0;
+typeTimer=setInterval(function(){
+if(tk!==speakToken){clearInterval(typeTimer);return;}
+i+=2;
+dialog.innerHTML=html.slice(0,i);
+if(i>=html.length)clearInterval(typeTimer);
+},26);
 }
-});
+if(opt.chips!==false)showChips(true);
+var hold=opt.hold||Math.max(4600,html.length*165);
+sayTimer=setTimeout(function(){
+if(tk!==speakToken)return;
+hideDialog();showChips(false);mode='idle';resetIdle();
+},hold);
 },delay);
 }
 function ask(qq){
 qq=String(qq||'').trim();
 if(!qq)return;
 speakToken++;
-typing=false;
 mode='talk';
-showDialog('<span class="lz-typing"><i></i><i></i><i></i></span>');
+hideDialog();
+if(dialog){dialog.classList.add('on');dialog.innerHTML='<span class="lz-typing"><i></i><i></i><i></i></span>';}
 var low=qq.toLowerCase();
 var best=null,bestScore=0;
 KNOWLEDGE.forEach(function(item){
@@ -3830,17 +4059,56 @@ item.k.forEach(function(k){if(low.indexOf(k)>-1)score+=(k.length>1?3:1);});
 if(score>bestScore){bestScore=score;best=item;}
 });
 var ans=bestScore>0?best.a:FALLBACK[Math.floor(Math.random()*FALLBACK.length)];
-setTimeout(function(){typeThen(ans,function(){showChips(true);});},420);
+var tk=speakToken;
+setTimeout(function(){
+if(tk!==speakToken||!dialog)return;
+dialog.innerHTML=ans;
+showChips(true);
+if(/动作|表演|跳舞|糖/.test(qq))randomAct(true);
+},420);
 }
-function idleLoop(){
-if(!running)return;
+function emote(ch){
+if(!emoteEl)return;
+if(emoteTimer)clearTimeout(emoteTimer);
+emoteEl.textContent=ch||['😊','✨','🎵','💫','🌸','🍡','⭐','😋'][Math.floor(Math.random()*8)];
+emoteEl.classList.add('on');
+emoteTimer=setTimeout(function(){emoteEl.classList.remove('on');},1600);
+}
+function resetIdle(){
 if(idleTimer)clearTimeout(idleTimer);
+if(el)el.classList.remove('nap');
 idleTimer=setTimeout(function(){
-if(running&&mode==='idle'&&!typing){
-say(HINTS[Math.floor(Math.random()*HINTS.length)],{hold:5200,chips:true});
+if(!running||mode==='talk'){resetIdle();return;}
+if(el)el.classList.add('nap');
+emote('💤');
+setTimeout(function(){
+if(el&&el.classList.contains('nap')&&Math.random()<0.5){
+say(['Zzz…','呼…呼…','（做梦吃棒棒糖）'][Math.floor(Math.random()*3)],{hold:3200,chips:false});
 }
-idleLoop();
-},19000);
+},2600);
+},16000);
+}
+function updateGaze(){
+if(rafPending||!eyes)return;
+rafPending=true;
+requestAnimationFrame(function(){
+rafPending=false;
+if(!eyes||!el)return;
+var r=el.getBoundingClientRect();
+var cx=r.left+r.width*0.5,cy=r.top+r.height*0.5;
+var dx=mouseTX-cx,dy=mouseTY-cy;
+var dist=Math.sqrt(dx*dx+dy*dy)||1;
+var max=4.2,k=Math.min(1,dist/320);
+eyes.style.transform='translate('+((dx/dist)*max*k).toFixed(2)+'px,'+((dy/dist)*max*k*0.8).toFixed(2)+'px)';
+var lean=Math.max(-3,Math.min(3,dx/220));
+if(stage)stage.style.transform=(el.classList.contains('hover')?'scale(1.035) translateY(-4px) ':'')+'rotate('+(lean*0.6).toFixed(2)+'deg)';
+});
+}
+function onMove(e){
+mouseTX=e.clientX;mouseTY=e.clientY;
+if(el&&el.classList.contains('nap')){el.classList.remove('nap');resetIdle();}
+else if(Date.now()-lastMoveReset>4000){lastMoveReset=Date.now();resetIdle();}
+updateGaze();
 }
 function start(){
 if(!el||running)return;
@@ -3849,71 +4117,84 @@ el.classList.remove('on');
 void el.offsetWidth;
 el.classList.add('on');
 mode='idle';
-var r=el.getBoundingClientRect();
-mouseX=r.left+r.width/2;mouseY=r.top;
-if(!el._bind){
-el._bind=1;
-el.addEventListener('click',function(){
-if(mode==='idle'){say(GREETS[Math.floor(Math.random()*GREETS.length)],{delay:120,hold:6000});}
-else{showChips(true);}
-});
-}
-// 每次打开先来一个随机动作（比常驻循环更早触发）
-lastAct=-1;
-setTimeout(function(){if(running)randomAct();},520);
-setTimeout(function(){
-if(!running)return;
-say(GREETS[0],{delay:700,hold:6500});
-},260);
-idleLoop();
+resetIdle();
+setTimeout(function(){randomAct();},520);
+setTimeout(function(){if(running)say(GREETS[0],{hold:6500,chips:true});},260);
 }
 function stop(){
 running=false;
-mode='idle';typing=false;speakToken++;
-if(el)el.classList.remove('on');
+mode='idle';speakToken++;
+clearAct();
+if(el){el.classList.remove('on','nap','hover');el.style.display='';}
 if(dialog){dialog.classList.remove('on');dialog.innerHTML='';}
 if(chipsBox)chipsBox.classList.remove('on');
+if(emoteEl)emoteEl.classList.remove('on');
 clearTimeout(idleTimer);
+if(typeTimer)clearInterval(typeTimer);
+if(sayTimer)clearTimeout(sayTimer);
+if(actTimer)clearTimeout(actTimer);
+actEndT=0;
+}
+function bindEvents(){
+if(!el)return;
+el.addEventListener('click',function(e){
+if(e.target.closest&&e.target.closest('.lz-chips'))return;
+if(e.target.closest&&e.target.closest('.lz-dialog'))return;
+if(el.classList.contains('nap')){el.classList.remove('nap');resetIdle();}
+clickCount++;
+if(clickTimer)clearTimeout(clickTimer);
+clickTimer=setTimeout(function(){clickCount=0;},340);
+if(clickCount>=2){
+clickCount=0;
+runAct('heart',1950);
+emote('💖');
+say('最喜欢你啦 💖',{hold:3000,chips:false});
+return;
+}
+var a=randomAct(true);
+if(mode==='idle'&&a){
+var line;
+if(a==='treat')line='给你看我的棒棒糖～舔一口 🍭';
+else if(a==='dance')line='看我的舞蹈！';
+else if(a==='heart')line='比心给你 💗';
+else if(a==='shy')line='诶…别一直看我啦';
+else line=GREETS[Math.floor(Math.random()*GREETS.length)];
+say(line,{hold:4400,chips:true});
+}
+if(Math.random()<0.34)emote();
+});
+el.addEventListener('contextmenu',function(e){
+e.preventDefault();
+blushHue=(blushHue+1)%BLUSH_SETS.length;
+var stops=el.querySelectorAll('#xgBlush stop');
+if(stops.length){
+var c=BLUSH_SETS[blushHue];
+stops.forEach(function(st){st.setAttribute('stop-color',c);});
+}
+emote('😊');
+say('换了块新腮红，好看吗？',{hold:2600,chips:false});
+});
+el.addEventListener('mouseenter',function(){el.classList.add('hover');updateGaze();});
+el.addEventListener('mouseleave',function(){el.classList.remove('hover');updateGaze();});
+document.addEventListener('mousemove',onMove,{passive:true});
 }
 function init(){
 el=document.getElementById('lzBot');
 if(!el)return;
 dialog=document.getElementById('lzDialog');
 chipsBox=document.getElementById('lzChips');
+emoteEl=document.getElementById('lxEmote');
+stage=el.querySelector('.lz-stage');
+eyes=part('lxEyes');
+bindEvents();
 var login=document.getElementById('loginPage');
 if(login&&login.classList.contains('active'))start();
 }
-var fig=null;
-function part(id){return el?el.querySelector('#'+id):null;}
-function blink(){
-var e=part('lzEyes');if(!e)return;
-e.style.transform='scaleY(0.1)';
-setTimeout(function(){e.style.transform='scaleY(1)';},140);
-setTimeout(function(){e.style.transform='scaleY(0.1)';},260);
-setTimeout(function(){e.style.transform='scaleY(1)';},400);
-}
-function oneShot(cls,ms){
-if(!el)return;
-el.classList.remove('lz-wave','lz-jump','lz-nod','lz-spin','lz-dance','lz-heart');
-void el.offsetWidth;
-el.classList.add(cls);
-clearTimeout(el._actT);
-el._actT=setTimeout(function(){el.classList.remove(cls);},ms);
-}
-var ACTS=[['lz-wave',1850],['lz-jump',1000],['lz-nod',1400],['lz-spin',1250],['lz-dance',1600],['lz-heart',1550]];
-var lastAct=-1;
-function randomAct(){
-if(!running||typing)return;
-var i=Math.floor(Math.random()*ACTS.length);
-if(i===lastAct)i=(i+1+Math.floor(Math.random()*(ACTS.length-1)))%ACTS.length;
-lastAct=i;
-oneShot(ACTS[i][0],ACTS[i][1]);
-}
-setInterval(function(){if(running)blink();},3800);
-setInterval(function(){if(running&&Math.random()<0.82)randomAct();},5200);
 window.LzBot={start:start,stop:stop,say:say,ask:ask};
+window.XiaoLe=window.LzBot;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
