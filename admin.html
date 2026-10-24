@@ -1290,6 +1290,10 @@ function saveDrafts(d){localStorage.setItem('lezhe_tutorial_drafts',JSON.stringi
 function deleteDraft(id){saveDrafts(getDrafts().filter(function(d){return d.id!==id;}));}
 function getDraft(id){return getDrafts().find(function(d){return d.id===id;})||null;}
 function saveDraft(d){var a=getDrafts();var i=a.findIndex(function(x){return x.id===d.id;});if(i!==-1)a[i]=d;else a.push(d);saveDrafts(a);}
+function isBadMediaUrl(u){u=(u||'').trim();if(!u)return false;return /["'\s]/.test(u)||/%22/i.test(u)||/srcset/i.test(u)||/\.js(\?|#|$)/i.test(u);}
+function cleanMediaUrl(u){u=(u||'').trim();return isBadMediaUrl(u)?'':u;}
+(function(){try{var ds=getDrafts(),ch=false;for(var i=0;i<ds.length;i++){var d=ds[i];var c2=cleanMediaUrl(d.cover);var v2=null,i2=null;try{var tv=typeof d.videos==='string'?JSON.parse(d.videos):(d.videos||[]);if(Array.isArray(tv))v2=tv.filter(function(u){return !isBadMediaUrl(u);});}catch(e){}try{var ti=typeof d.images==='string'?JSON.parse(d.images):(d.images||[]);if(Array.isArray(ti))i2=ti.filter(function(u){return !isBadMediaUrl(u);});}catch(e){}if(c2!==(d.cover||'')||(v2&&JSON.stringify(v2)!==(d.videos||''))||(i2&&JSON.stringify(i2)!==(d.images||''))){if(v2)d.videos=JSON.stringify(v2);if(i2)d.images=JSON.stringify(i2);d.cover=c2;ds[i]=d;ch=true;}}
+if(ch)saveDrafts(ds);}catch(e){}})();
 function detectVideoPlatform(u){u=u.toLowerCase();if(u.includes('youtube.com')||u.includes('youtu.be'))return 'youtube';if(u.includes('bilibili.com')||u.includes('b23.tv'))return 'bilibili';if(u.includes('douyin.com')||u.includes('iesdouyin.com')||u.includes('v.douyin.com'))return 'douyin';if(u.includes('kuaishou.com'))return 'kuaishou';if(u.includes('v.qq.com'))return 'tencent';if(u.includes('youku.com'))return 'youku';if(u.includes('xiaohongshu.com'))return 'xiaohongshu';return 'unknown';}
 function isPlatformEmbeddable(p){return ['douyin','kuaishou','xiaohongshu'].indexOf(p)===-1;}
 function getBilibiliCover(url){return new Promise(function(resolve){var m=url.match(/b23\.tv\/([a-zA-Z0-9]+)/)||url.match(/bilibili\.com\/video\/([a-zA-Z0-9]+)/);if(!m){resolve(null);return;}fetch('https://api.bilibili.com/x/web-interface/view?bvid='+m[1],{signal:AbortSignal.timeout(5000)}).then(function(r){return r.json();}).then(function(d){resolve(d&&d.data&&d.data.pic?d.data.pic:null);}).catch(function(){resolve(null);});});}
@@ -3136,8 +3140,9 @@ var catL=t.category||'未分类';
 var v=[],im=[];
 try{if(t.videos)v=typeof t.videos==='string'?JSON.parse(t.videos):t.videos;if(t.images)im=typeof t.images==='string'?JSON.parse(t.images):t.images;}catch(e){}
 var cov='';
-if(t.cover)cov='<img src="'+escapeAttr(t.cover)+'" alt="" onerror="this.style.display=\'none\'" />';
-else if(im&&im.length>0)cov='<img src="'+escapeAttr(im[0])+'" alt="" onerror="this.style.display=\'none\'" />';
+var covSrc=cleanMediaUrl(t.cover);
+if(!covSrc&&im&&im.length>0){for(var ci=0;ci<im.length;ci++){covSrc=cleanMediaUrl(im[ci]);if(covSrc)break;}}
+if(covSrc)cov='<img src="'+escapeAttr(covSrc)+'" alt="" onerror="this.style.display=\'none\'" />';
 else cov='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--dim);">📖</div>';
 var hv=v&&v.length>0;
 h+='<div class="tutorial-card" data-id="'+escapeAttr(t.id)+'">';
@@ -3219,9 +3224,9 @@ content=(content||'').trim();
 if(!title&&!content)return;
 var sum=document.getElementById('tutEditSummary').value.trim();
 var cat=document.getElementById('tutEditCategory').value;
-var cov=document.getElementById('tutEditCover').value.trim();
-var vs=this._vl.slice();
-var is=this._il.slice();
+var cov=cleanMediaUrl(document.getElementById('tutEditCover').value);
+var vs=this._vl.filter(function(u){return !isBadMediaUrl(u);});
+var is=this._il.filter(function(u){return !isBadMediaUrl(u);});
 var did=(this._editSource==='draft'&&this._pubDraftId)?this._pubDraftId:(this._tutEditId||Date.now().toString(36)+Math.random().toString(36).slice(2,6));
 var d={id:did,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
 try{
@@ -3297,7 +3302,8 @@ var p=detectVideoPlatform(u);
 return '<div class="media-item"><span class="thumb" style="background:rgba(13,124,255,.1);display:flex;align-items:center;justify-content:center;font-size:14px;">▶</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;">'+escapeHTML(u)+'</span><span class="platform-badge">'+escapeHTML(p)+'</span><span class="remove-media" data-type="v" data-idx="'+i+'">✕</span></div>';
 }).join('');
 ic.innerHTML=this._il.map(function(u,i){
-return '<div class="media-item"><span class="thumb"><img src="'+escapeAttr(u)+'" alt="" onerror="this.parentElement.textContent=\'🖼\'" /></span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;">'+escapeHTML(u)+'</span><span class="remove-media" data-type="i" data-idx="'+i+'">✕</span></div>';
+var cu=cleanMediaUrl(u);
+return '<div class="media-item"><span class="thumb">'+(cu?'<img src="'+escapeAttr(cu)+'" alt="" onerror="this.parentElement.textContent=\'🖼\'" />':'🖼')+'</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;">'+escapeHTML(u)+'</span><span class="remove-media" data-type="i" data-idx="'+i+'">✕</span></div>';
 }).join('');
 vc.querySelectorAll('.remove-media').forEach(function(el){el.addEventListener('click',function(){var i=parseInt(this.dataset.idx);self._vl.splice(i,1);self._renderMedia();self._autoSaveDraft();});});
 ic.querySelectorAll('.remove-media').forEach(function(el){el.addEventListener('click',function(){var i=parseInt(this.dataset.idx);self._il.splice(i,1);self._renderMedia();self._autoSaveDraft();});});
@@ -3311,11 +3317,11 @@ var sum=document.getElementById('tutEditSummary').value.trim();
 var cat=document.getElementById('tutEditCategory').value;
 var content=getQuillHTML();
 content=(content||'').trim();
-var cov=document.getElementById('tutEditCover').value.trim();
+var cov=cleanMediaUrl(document.getElementById('tutEditCover').value);
 if(!title||!content){toast('标题和内容不能为空','warning');return;}
 this._submitting=true;document.getElementById('tutSubmitBtn').disabled=true;document.getElementById('tutSubmitBtn').textContent='发布中...';
-var vs=this._vl.slice();
-var is=this._il.slice();
+var vs=this._vl.filter(function(u){return !isBadMediaUrl(u);});
+var is=this._il.filter(function(u){return !isBadMediaUrl(u);});
 var editId=this._tutEditId;
 var editSource=this._editSource||'new';
 var pubDraftId=this._pubDraftId;
@@ -3328,8 +3334,10 @@ else{did=Date.now().toString(36)+Math.random().toString(36).slice(2,6);self._tut
 var dup=getDrafts().find(function(x){return x.id!==did&&x.title===title&&x.content===content;});
 if(dup)did=dup.id;
 var d={id:did,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
-try{saveDraft(d);toast('💾 已自动保存到草稿箱'+(msg?' ('+msg+')':''),'warning');}catch(e){toast('❌ 草稿保存失败','error');}
+try{saveDraft(d);toast('💾 发布失败，内容已自动保存到草稿箱','warning');}catch(e){toast('❌ 草稿保存失败','error');}
 self._submitting=false;document.getElementById('tutSubmitBtn').disabled=false;
+if(msg){try{console.error('[教程发布诊断]',msg);}catch(e){}
+uiConfirm('发布失败，内容已保存到草稿箱，可稍后重新发布。\n\n失败详情：\n'+msg+'\n\n（详情已同步输出到浏览器控制台 F12 → 控制台）',{title:'教程发布失败',icon:'⚠️',okText:'知道了',cancelText:'关闭'});}
 document.getElementById('tutEditModal').classList.add('hidden');
 self._stopAuto();
 self._vl=[];self._il=[];
@@ -3355,11 +3363,12 @@ return;
 }
 if(editSource==='published'&&editId){
 var isNetErr=function(m){return /fetch|network|timeout|timed|超时/i.test(m||'');};
+var fmtErr=function(e){if(!e)return '未知错误';var c=e.code||'';var m=e.message||e.msg||'';var x=[e.details,e.hint].filter(Boolean).join('；');return (c?('['+c+'] '):'')+m+(x?(' ｜ '+x):'');};
 var doUpdate=function(attempt){
 supabaseClient.from('tutorials').update(data).eq('id',editId).select().then(function(r){
 if(r.error){
-var m=r.error.message||'';
-if(attempt<3&&isNetErr(m)){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doUpdate(attempt+1);},1500);return;}
+var m=fmtErr(r.error);
+if(attempt<3&&isNetErr(r.error&&(r.error.message||r.error.msg))){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doUpdate(attempt+1);},1500);return;}
 saveToDrafts(m);return;}
 if(!r.data||r.data.length===0){saveToDrafts('更新失败或权限不足');return;}
 var drafts=getDrafts();
@@ -3376,11 +3385,14 @@ return;
 }
 var insertData=Object.assign({likes:0},data);
 var isNetErr=function(m){return /fetch|network|timeout|timed|超时/i.test(m||'');};
+var fmtErr=function(e){if(!e)return '未知错误';var c=e.code||'';var m=e.message||e.msg||'';var x=[e.details,e.hint].filter(Boolean).join('；');return (c?('['+c+'] '):'')+m+(x?(' ｜ '+x):'');};
 var doInsert=function(attempt){
 supabaseClient.from('tutorials').insert([insertData]).select().then(function(r){
 if(r.error){
-var m=r.error.message||'';
-if(attempt<3&&isNetErr(m)){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doInsert(attempt+1);},1500);return;}
+var m=fmtErr(r.error);
+var col=((r.error&&(r.error.message||r.error.msg))||'').match(/Could not find the '([^']+)' column/);
+if(col&&Object.prototype.hasOwnProperty.call(insertData,col[1])){delete insertData[col[1]];toast('⚠️ 数据表缺少字段 '+col[1]+'，已自动跳过并重试','warning');setTimeout(function(){doInsert(attempt);},300);return;}
+if(attempt<3&&isNetErr(r.error&&(r.error.message||r.error.msg))){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doInsert(attempt+1);},1500);return;}
 saveToDrafts(m);return;}
 if(!r.data||r.data.length===0){saveToDrafts('插入失败或权限不足');return;}
 toast('🎉 发布成功');
