@@ -3304,6 +3304,7 @@ ic.querySelectorAll('.remove-media').forEach(function(el){el.addEventListener('c
 },
 _submitTut:function(){
 var self=this;
+if(this._submitting)return;
 if(!supabaseClient){toast('❌ 客户端未初始化','error');return;}
 var title=document.getElementById('tutEditTitle').value.trim();
 var sum=document.getElementById('tutEditSummary').value.trim();
@@ -3312,6 +3313,7 @@ var content=getQuillHTML();
 content=(content||'').trim();
 var cov=document.getElementById('tutEditCover').value.trim();
 if(!title||!content){toast('标题和内容不能为空','warning');return;}
+this._submitting=true;document.getElementById('tutSubmitBtn').disabled=true;document.getElementById('tutSubmitBtn').textContent='发布中...';
 var vs=this._vl.slice();
 var is=this._il.slice();
 var editId=this._tutEditId;
@@ -3320,9 +3322,14 @@ var pubDraftId=this._pubDraftId;
 var data={title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:'')};
 var saveToDrafts=function(msg){
 var did;
-if(pubDraftId){did=pubDraftId;}else{did=Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+if(pubDraftId){did=pubDraftId;}
+else if(self._tutEditId){did=self._tutEditId;}
+else{did=Date.now().toString(36)+Math.random().toString(36).slice(2,6);self._tutEditId=did;}
+var dup=getDrafts().find(function(x){return x.id!==did&&x.title===title&&x.content===content;});
+if(dup)did=dup.id;
 var d={id:did,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
 try{saveDraft(d);toast('💾 已自动保存到草稿箱'+(msg?' ('+msg+')':''),'warning');}catch(e){toast('❌ 草稿保存失败','error');}
+self._submitting=false;document.getElementById('tutSubmitBtn').disabled=false;
 document.getElementById('tutEditModal').classList.add('hidden');
 self._stopAuto();
 self._vl=[];self._il=[];
@@ -3338,27 +3345,43 @@ self._editSource=null;
 self._pubDraftId=null;
 self._tutEditId=null;
 self._isDraftPub=false;
+self._submitting=false;
+document.getElementById('tutSubmitBtn').disabled=false;
 };
 if(editSource==='draft'){
 var d={id:pubDraftId||editId,title:title,summary:sum,category:cat,content:content,videos:JSON.stringify(vs),images:JSON.stringify(is),cover:cov||(is.length>0?is[0]:''),updated_at:new Date().toISOString()};
-try{saveDraft(d);toast('✅ 草稿已更新');closeAndReset();self.renderTab(self._tab);}catch(e){toast('❌ 草稿更新失败','error');}
+try{saveDraft(d);toast('✅ 草稿已更新');closeAndReset();self.renderTab(self._tab);}catch(e){toast('❌ 草稿更新失败','error');self._submitting=false;document.getElementById('tutSubmitBtn').disabled=false;}
 return;
 }
 if(editSource==='published'&&editId){
+var isNetErr=function(m){return /fetch|network|timeout|timed|超时/i.test(m||'');};
+var doUpdate=function(attempt){
 supabaseClient.from('tutorials').update(data).eq('id',editId).select().then(function(r){
-if(r.error){saveToDrafts(r.error.message);return;}
+if(r.error){
+var m=r.error.message||'';
+if(attempt<3&&isNetErr(m)){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doUpdate(attempt+1);},1500);return;}
+saveToDrafts(m);return;}
 if(!r.data||r.data.length===0){saveToDrafts('更新失败或权限不足');return;}
 var drafts=getDrafts();
 if(drafts.some(function(d){return d.id===editId;}))deleteDraft(editId);
 toast('✅ 更新成功');
 closeAndReset();
 self.renderTab(self._tab);
-}).catch(function(e){saveToDrafts(e.message);});
+}).catch(function(e){
+if(attempt<3){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doUpdate(attempt+1);},1500);return;}
+saveToDrafts(e.message);});
+};
+doUpdate(1);
 return;
 }
 var insertData=Object.assign({likes:0},data);
+var isNetErr=function(m){return /fetch|network|timeout|timed|超时/i.test(m||'');};
+var doInsert=function(attempt){
 supabaseClient.from('tutorials').insert([insertData]).select().then(function(r){
-if(r.error){saveToDrafts(r.error.message);return;}
+if(r.error){
+var m=r.error.message||'';
+if(attempt<3&&isNetErr(m)){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doInsert(attempt+1);},1500);return;}
+saveToDrafts(m);return;}
 if(!r.data||r.data.length===0){saveToDrafts('插入失败或权限不足');return;}
 toast('🎉 发布成功');
 if(editSource==='draftPub'&&pubDraftId){deleteDraft(pubDraftId);}
@@ -3370,7 +3393,11 @@ if(allDrafts[di].title===title&&allDrafts[di].content===content){deleteDraft(all
 DB.sendNotificationToAll('【新教程发布】'+title+'，快来看看吧！').catch(function(){});
 closeAndReset();
 self.renderTab(self._tab);
-}).catch(function(e){saveToDrafts(e.message);});
+}).catch(function(e){
+if(attempt<3){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doInsert(attempt+1);},1500);return;}
+saveToDrafts(e.message);});
+};
+doInsert(1);
 },
 renderMall:async function(c){
 if(this._tab!=='mall')return;
