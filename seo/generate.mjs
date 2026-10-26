@@ -68,7 +68,8 @@ const cats = [...new Set(softs.map((s) => s.category).filter(Boolean))];
 let cCount = 0;
 for (const c of cats) {
   const { html } = renderCategoryPage(c, softs.filter((s) => s.category === c));
-  await writeFile(join(ROOT, "cat", `${encodeURIComponent(c)}.html`), html, "utf8");
+  // 文件名用中文原名：URL 请求时浏览器自动编码，GitHub Pages 解码后能命中真实文件
+  await writeFile(join(ROOT, "cat", `${c}.html`), html, "utf8");
   cCount++;
 }
 console.log(`分类页：${cCount}`);
