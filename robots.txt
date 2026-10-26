@@ -3,4 +3,5 @@ Allow: /
 
 User-agent: *
 Disallow: /admin/
+Disallow: /admin.html
 Sitemap: https://www.lezhesoft.cn/sitemap.xml
