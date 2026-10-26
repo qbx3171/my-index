@@ -18,8 +18,33 @@ export const esc = (s) =>
     .replace(/"/g, "&quot;");
 
 const softUrl = (id) => `${SITE}/soft/${encodeURIComponent(id)}.html`;
-const catUrl = (c) => `${SITE}/cat/${encodeURIComponent(c)}.html`;
 const tutUrl = (id) => `${SITE}/tutorial/${encodeURIComponent(id)}.html`;
+
+// 分类 ASCII slug：彻底规避 GitHub Pages / git / API 对非 ASCII 文件名的编码问题
+const CAT_SLUGS = {
+  "Adobe系列": "adobe",
+  "三维设计": "sanwei-sheji",
+  "办公软件": "bangong-ruanjian",
+  "压缩工具": "yasuo-gongju",
+  "图像处理": "tuxiang-chuli",
+  "图像设计": "tuxiang-sheji",
+  "媒体工具": "meiti-gongju",
+  "安卓软件": "anzhuo-ruanjian",
+  "实用工具": "shiyong-gongju",
+  "开发工具": "kaifa-gongju",
+  "插件管理": "chajian-guanli",
+  "模型制作": "moxing-zhizuo",
+  "系统镜像": "xitong-jingxiang",
+  "虚拟机模拟器": "xuniji-moniqi",
+  "驱动管理": "qudong-guanli",
+};
+const catHash = (s) => {
+  let h = 0;
+  for (const ch of String(s)) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+  return h.toString(36);
+};
+export const catSlug = (c) => CAT_SLUGS[c] || `cat-${catHash(c)}`;
+const catUrl = (c) => `${SITE}/cat/${catSlug(c)}.html`;
 
 const head = (title, desc, canonical, extra = "") => `<!DOCTYPE html>
 <html lang="zh-CN">
