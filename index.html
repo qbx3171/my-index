@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <meta name="theme-color" content="#0077ff">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230077ff'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='40' font-family='Arial,sans-serif' font-weight='700' fill='white'%3E%E4%B9%90%3C/text%3E%3C/svg%3E">
-<link rel="canonical" href="https://lezhesoft.cn/">
+<link rel="canonical" href="https://www.lezhesoft.cn/">
 <script>
 /* 深度链接 canonical 同步：?soft= / ?cat= 页面指向自身，避免被搜索引擎当作首页重复页丢弃 */
 (function(){
@@ -17,8 +17,8 @@ if(location.protocol==='file:'||location.hostname!=='lezhesoft.cn')return;
 var p=new URLSearchParams(location.search);
 var soft=p.get('soft'),cat=p.get('cat');
 var u=null;
-if(soft)u='https://lezhesoft.cn/?soft='+encodeURIComponent(soft);
-else if(cat)u='https://lezhesoft.cn/?cat='+encodeURIComponent(cat);
+if(soft)u='https://www.lezhesoft.cn/soft/'+encodeURIComponent(soft)+'.html';
+else if(cat)u='https://www.lezhesoft.cn/cat/'+encodeURIComponent(cat)+'.html';
 if(!u)return;
 var l=document.querySelector('link[rel="canonical"]');if(l)l.setAttribute('href',u);
 var o=document.querySelector('meta[property="og:url"]');if(o)o.setAttribute('content',u);
@@ -30,7 +30,7 @@ var o=document.querySelector('meta[property="og:url"]');if(o)o.setAttribute('con
 <meta property="og:locale" content="zh_CN">
 <meta property="og:title" content="乐哲软件官网 - 精选高效工具">
 <meta property="og:description" content="提供设计工具、开发工具、办公软件、媒体工具等全品类实用软件下载与安装教程。">
-<meta property="og:url" content="https://lezhesoft.cn/">
+<meta property="og:url" content="https://www.lezhesoft.cn/">
 <meta property="og:image" content="https://lezhesoft.cn/og-cover.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -1237,7 +1237,7 @@ body.ls-locked{overflow:hidden !important}
 <a href="https://www.oschina.net/" target="_blank" rel="noopener">开源中国</a> |
 <a href="https://www.csdn.net/" target="_blank" rel="noopener">CSDN</a> |
 <a href="https://www.zhihu.com/" target="_blank" rel="noopener">知乎</a> |
-<a href="#" onclick="openDonateModal();return false;">赞助打赏</a>
+<a href="#" onclick="openDonateModal();return false;">赞助打赏</a> | <a href="/sitemap.html">网站地图</a>
 </div>
 <div class="links" style="margin-top:8px;">
 <span>快速导航：</span>
@@ -2252,7 +2252,7 @@ window.history.pushState({soft:soft.id},'',window.location.pathname+'?'+_p.toStr
 openById:function(id){var soft=cache.software.find(function(s){return s.id===id;});if(soft){this.open(soft);}else{toast('未找到该软件','warning');}},
 _updateSEO:function(soft){
 try{
-var _canon=window.location.origin+window.location.pathname+'?soft='+encodeURIComponent(soft.id);
+var _canon='https://www.lezhesoft.cn/soft/'+encodeURIComponent(soft.id)+'.html';
 var title=sanitizeUnicode(soft.name)+' 下载 - '+sanitizeUnicode(soft.category)+' | 乐哲软件';
 document.title=title;
 var descMeta=document.querySelector('meta[name="description"]');
@@ -2279,7 +2279,7 @@ var schema={
 '@type':'SoftwareApplication',
 'name':soft.name,
 'description':soft.description||soft.detail||'',
-'url':window.location.origin+window.location.pathname+'?soft='+encodeURIComponent(soft.id),
+'url':'https://www.lezhesoft.cn/soft/'+encodeURIComponent(soft.id)+'.html',
 'applicationCategory':soft.category,
 'operatingSystem':(soft.platforms||[]).join(','),
 'softwareVersion':soft.version||'1.0',
@@ -2297,8 +2297,8 @@ if(_dl>0||_rv>0){schema.interactionStatistic=[{'@type':'InteractionCounter','int
 schema.publisher={'@type':'Organization','name':'乐哲软件','url':window.location.origin};
 var _crumb={'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':[
 {'@type':'ListItem','position':1,'name':'首页','item':window.location.origin+'/'},
-{'@type':'ListItem','position':2,'name':soft.category||'全部软件','item':window.location.origin+'/?cat='+encodeURIComponent(soft.category||'')},
-{'@type':'ListItem','position':3,'name':soft.name,'item':window.location.origin+window.location.pathname+'?soft='+encodeURIComponent(soft.id)}
+{'@type':'ListItem','position':2,'name':soft.category||'全部软件','item':'https://www.lezhesoft.cn/cat/'+encodeURIComponent(soft.category||'')+'.html'},
+{'@type':'ListItem','position':3,'name':soft.name,'item':'https://www.lezhesoft.cn/soft/'+encodeURIComponent(soft.id)+'.html'}
 ]};
 var oldCrumb=document.getElementById('soft-breadcrumb-schema');
 if(oldCrumb)oldCrumb.remove();
@@ -3408,7 +3408,7 @@ var Share={
 _soft:null,_url:'',
 open:function(soft){
 this._soft=soft;
-var url=window.location.origin+window.location.pathname+'?soft='+soft.id;
+var url='https://www.lezhesoft.cn/soft/'+soft.id+'.html';
 this._url=url;
 document.getElementById('shareTitle').textContent=sanitizeUnicode(soft.name);
 var c=document.getElementById('shareQr');
