@@ -2114,8 +2114,9 @@ if(soft){App.goHome();setTimeout(function(){Detail.open(soft);},200);}
 var Detail={
 _keyHandler:null,
 _currentSoft:null,
+_pushed:false,
 _viewedThisSession:{},
-open:function(soft){
+open:function(soft,noHist){
 if(window.scrollY>0)App._scrollPos=window.scrollY;
 addViewHistory(soft.id);
 markSoftSeen(soft.id);
@@ -2195,7 +2196,7 @@ return '<div class="related-card" data-id="'+escapeAttr(rs.id)+'"><div class="ic
 relatedGrid.querySelectorAll('.related-card').forEach(function(el){
 el.addEventListener('click',function(){
 var id=this.dataset.id;
-Detail.close();
+Detail.close(true);
 setTimeout(function(){Detail.openById(id);},200);
 });
 });
@@ -2239,12 +2240,13 @@ document.documentElement.style.overflow='hidden';
 if(window._detailStartParticles)window._detailStartParticles();
 this._currentSoft=soft;
 try{
-if(!soft._noHistory){
+if(!soft._noHistory&&!noHist){
 var _p=new URLSearchParams(window.location.search);
 var _cur=_p.get('soft');
 if(_cur!==soft.id){
 _p.set('soft',soft.id);
 window.history.pushState({soft:soft.id},'',window.location.pathname+'?'+_p.toString());
+Detail._pushed=true;
 }
 }
 }catch(e){}
@@ -2314,13 +2316,17 @@ script.textContent=JSON.stringify(schema);
 document.head.appendChild(script);
 }catch(e){console.warn('[Schema] 更新失败',e);}
 },
-close:function(){
+close:function(noHist){
 document.getElementById('detailOverlay').classList.remove('open');
 if(window._detailStopParticles)window._detailStopParticles();
 if(!document.querySelector('.modal-overlay.open')){document.body.style.overflow='';document.documentElement.style.overflow='';}
 var _closing=Detail._currentSoft;
 Detail._currentSoft=null;
-if(_closing&&!_closing._noHistory){
+if(!noHist&&_closing&&!_closing._noHistory&&Detail._pushed){
+Detail._pushed=false;
+try{window.history.back();}catch(e){}
+}else if(_closing&&!_closing._noHistory){
+Detail._pushed=false;
 try{
 var _p=new URLSearchParams(window.location.search);
 if(_p.get('soft')){
@@ -2329,7 +2335,7 @@ var _qs=_p.toString();
 window.history.replaceState(null,'',window.location.pathname+(_qs?'?'+_qs:''));
 }
 }catch(e){}
-}
+}else{Detail._pushed=false;}
 if(App._scrollPos>0){
 var y=App._scrollPos;
 requestAnimationFrame(function(){window.scrollTo({top:y,behavior:'instant'});});
@@ -2722,12 +2728,15 @@ function handlePopState(){
 var hash=window.location.hash||'';
 var p=new URLSearchParams(window.location.search);
 var sc=p.get('soft'),ct=p.get('cat'),kw=p.get('search'),pg=p.get('page');
-if(hash&&hash.startsWith('#software/')){
-var softId=hash.replace('#software/','');
+var _ov=document.getElementById('detailOverlay');
+var _detailOpen=_ov&&_ov.classList.contains('open');
+var _wantDetail=!!(sc||(hash&&hash.startsWith('#software/')));
+if(_detailOpen&&!_wantDetail){Detail.close(true);}
+if(_wantDetail){
+var softId=sc?sc:hash.replace('#software/','');
 var s0=cache.software.find(function(x){return x.id===softId;});
-if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0);},200);return;}
+if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0,true);},200);return;}
 }
-if(sc){var s0=cache.software.find(function(x){return x.id===sc;});if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0);},200);return;}}
 if(pg==='checkin'){App.goCheckin(true);return;}
 if(pg==='ranking'){App.goRanking(true);return;}
 if(pg==='profile'){App.goProfile(true);return;}
