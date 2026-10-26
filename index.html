@@ -2736,6 +2736,7 @@ if(_wantDetail){
 var softId=sc?sc:hash.replace('#software/','');
 var s0=cache.software.find(function(x){return x.id===softId;});
 if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0,true);},200);return;}
+if(_detailOpen){Detail.close(true);}
 }
 if(pg==='checkin'){App.goCheckin(true);return;}
 if(pg==='ranking'){App.goRanking(true);return;}
