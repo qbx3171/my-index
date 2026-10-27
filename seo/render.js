@@ -329,7 +329,7 @@ export function renderSitemapHtml(softs = [], tutorials = []) {
   }
   const html = head(
     "网站地图 - 全部软件与教程 | 乐哲软件",
-    `乐哲软件网站地图，收录全部 ${softs.length} 款软件详情页、${cats.length} 个分类聚合页与 ${tutorials.length} 篇教程的完整链接索引，方便搜索引擎抓取全站内容，也便于用户快速导航找到所需软件的下载页与安装教程。`,
+    `乐哲软件网站地图，收录全部 ${softs.length} 款软件详情页、${cats.length} 个分类聚合页与 ${tutorials.length} 篇图文教程的完整链接索引，方便搜索引擎抓取全站内容，也便于用户快速导航找到所需软件的下载页与安装教程，列表每日更新。`,
     `${SITE}/sitemap.html`
   ) + `
 <main>
