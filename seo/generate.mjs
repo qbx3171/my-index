@@ -29,16 +29,93 @@ if (!keyMatch || !urlMatch) {
 const SUPABASE_URL = urlMatch[1];
 const KEY = keyMatch[1];
 
-async function sb(query) {
+// —— 抗传输抖动抓取 ——
+// CloudBase 代理偶发把多字节汉字截断，解码后被替换成 U+FFFD（每次请求坏的位置随机，
+// 已实测同一查询 4 次返回的乱码位置/数量均不同；数据库本身是干净的）。
+// 策略：同一查询请求多次，按记录 id 逐字段合并，优先取无乱码（或乱码更少）的版本。
+const FFD = "\uFFFD";
+const ffdCount = (s) => {
+  let n = 0, i = -1;
+  while ((i = s.indexOf(FFD, i + 1)) !== -1) n++;
+  return n;
+};
+
+async function fetchOnce(query) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${query}`, {
     headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
   });
   if (!res.ok) throw new Error(`supabase ${res.status}: ${query.slice(0, 60)}`);
-  return res.json();
+  return JSON.parse(Buffer.from(await res.arrayBuffer()).toString("utf8"));
 }
 
-const softs = await sb("software?select=*&limit=1000");
-const tutorials = await sb("tutorials?select=*&limit=500");
+async function sb(query, copies = 5) {
+  const parsed = [];
+  let lastErr;
+  for (let i = 0; i < copies; i++) {
+    try {
+      parsed.push(await fetchOnce(query));
+    } catch (e) {
+      lastErr = e;
+    }
+    if (i < copies - 1) await new Promise((r) => setTimeout(r, 300));
+  }
+  if (!parsed.length) throw lastErr ?? new Error("supabase 请求全部失败");
+  const first = parsed[0];
+  if (!Array.isArray(first)) return first;
+
+  const merged = new Map();
+  for (const arr of parsed) {
+    for (const row of arr) {
+      const key = row.id ?? JSON.stringify(row);
+      if (!merged.has(key)) {
+        merged.set(key, { ...row });
+        continue;
+      }
+      const acc = merged.get(key);
+      for (const [k, v] of Object.entries(row)) {
+        if (typeof v === "string" && v.includes(FFD)) {
+          const cur = acc[k];
+          // 当前副本更干净则保留不动；两边都脏才取乱码更少的
+          if (!(typeof cur === "string" && cur.includes(FFD))) continue;
+          if (ffdCount(v) < ffdCount(cur)) acc[k] = v;
+        } else {
+          acc[k] = v;
+        }
+      }
+    }
+  }
+  const rows = [...merged.values()];
+  const bad = [];
+  for (const row of rows)
+    for (const [k, v] of Object.entries(row))
+      if (typeof v === "string" && v.includes(FFD)) bad.push(`${row.id ?? "?"}/${k}`);
+  if (bad.length) console.warn(`⚠ 合并 ${copies} 份后仍有乱码字段（源数据损坏或抖动异常）: ${bad.join(", ")}`);
+  return rows;
+}
+
+// —— 源数据定点修复 ——
+// 个别记录在数据源里早期就丢字（git 历史无更早版本可考证），按上下文修复。
+const TEXT_FIXUPS = [
+  {
+    id: "d05e874d28573342261a189c", // Windows 11
+    field: "description",
+    from: /更顺\uFFFD+的交互/,
+    to: "更顺畅的交互",
+  },
+];
+function applyFixups(rows) {
+  for (const row of rows) {
+    for (const fx of TEXT_FIXUPS) {
+      if (fx.id && row.id !== fx.id) continue;
+      const v = row[fx.field];
+      if (typeof v === "string" && fx.from.test(v)) row[fx.field] = v.replace(fx.from, fx.to);
+    }
+  }
+  return rows;
+}
+
+const softs = applyFixups(await sb("software?select=*&limit=1000"));
+const tutorials = applyFixups(await sb("tutorials?select=*&limit=500"));
 console.log(`数据：software=${softs.length}，tutorials=${tutorials.length}`);
 
 // 清理旧产物，避免删除的软件留下死页
