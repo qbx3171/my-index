@@ -14,6 +14,7 @@ import {
   renderSitemapXml,
   renderSitemapHtml,
   catSlug,
+  platformLabel,
 } from "./render.js";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -85,11 +86,37 @@ async function sb(query, copies = 5) {
     }
   }
   const rows = [...merged.values()];
+  // 治愈环节：合并后仍有乱码的记录，改用按 id 的单条小响应重拉
+  // （响应越小越不容易被代理截断），最多重试 5 轮
+  const table = query.split("?")[0];
+  for (let round = 0; round < 5; round++) {
+    const badIds = rows
+      .filter((r) => Object.values(r).some((v) => typeof v === "string" && v.includes(FFD)))
+      .map((r) => r.id)
+      .filter(Boolean);
+    if (!badIds.length) return rows;
+    for (const id of badIds) {
+      try {
+        const fresh = await fetchOnce(`${table}?select=*&id=eq.${encodeURIComponent(id)}`);
+        const row = Array.isArray(fresh) ? fresh[0] : fresh;
+        const acc = rows.find((r) => r.id === id);
+        if (!row || !acc) continue;
+        for (const [k, v] of Object.entries(row)) {
+          if (typeof v !== "string") continue;
+          if (!v.includes(FFD)) acc[k] = v;
+          else if (typeof acc[k] === "string" && acc[k].includes(FFD) && ffdCount(v) < ffdCount(acc[k])) acc[k] = v;
+        }
+      } catch {
+        /* 单条重拉失败不致命，下一轮再试 */
+      }
+    }
+    await new Promise((r) => setTimeout(r, 400));
+  }
   const bad = [];
   for (const row of rows)
     for (const [k, v] of Object.entries(row))
       if (typeof v === "string" && v.includes(FFD)) bad.push(`${row.id ?? "?"}/${k}`);
-  if (bad.length) console.warn(`⚠ 合并 ${copies} 份后仍有乱码字段（源数据损坏或抖动异常）: ${bad.join(", ")}`);
+  if (bad.length) console.warn(`⚠ 治愈 ${5} 轮后仍有乱码字段（源数据可能真的损坏）: ${bad.join(", ")}`);
   return rows;
 }
 
@@ -125,10 +152,34 @@ for (const dir of ["soft", "cat", "tutorial"]) {
 }
 
 let count = 0;
-for (const s of softs) {
+// 标题/描述去重：同名的记录（通常是 Windows/Mac 两个平台各一条，或有克隆记录），
+// 标题与描述里追加平台后缀，避免「许多页面具有相同标题/描述」
+const nameCounts = new Map();
+for (const s of softs) nameCounts.set(s.name ?? "", (nameCounts.get(s.name ?? "") || 0) + 1);
+const rendered = softs.map((s) => {
   const related = softs.filter((x) => x.category === s.category && x.id !== s.id).slice(0, 8);
-  const { html } = renderSoftPage(s, related);
-  await writeFile(join(ROOT, "soft", `${encodeURIComponent(s.id)}.html`), html, "utf8");
+  const dup = (nameCounts.get(s.name ?? "") || 0) > 1;
+  return { s, related, ...renderSoftPage(s, related, dup ? { dupPlatform: platformLabel(s) || s.id } : {}) };
+});
+// 描述碰撞兜底：名字有细微差别的克隆记录（同名不同版本）描述可能雷同，
+// 对最终 meta description 相同的页面强制追加「版本+平台」尾注后重渲染
+const descGroups = new Map();
+for (const b of rendered) {
+  const m = b.html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "";
+  if (!descGroups.has(m)) descGroups.set(m, []);
+  descGroups.get(m).push(b);
+}
+for (const group of descGroups.values()) {
+  if (group.length < 2) continue;
+  for (const b of group) {
+    const re = renderSoftPage(b.s, b.related, { forceDescTail: true });
+    b.html = re.html;
+    b.title = re.title;
+  }
+  console.log(`检测到 ${group.length} 个页面描述雷同，已强制区分: ${group.map((b) => b.s.name).join(" / ")}`);
+}
+for (const b of rendered) {
+  await writeFile(join(ROOT, "soft", `${encodeURIComponent(b.s.id)}.html`), b.html, "utf8");
   count++;
 }
 console.log(`软件详情页：${count}`);

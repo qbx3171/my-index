@@ -46,6 +46,25 @@ const catHash = (s) => {
 export const catSlug = (c) => CAT_SLUGS[c] || `cat-${catHash(c)}`;
 const catUrl = (c) => `${SITE}/cat/${catSlug(c)}.html`;
 
+// —— SEO 文案辅助 ——
+const stripHtml = (s) =>
+  String(s ?? "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+
+// meta description 目标长度：过短会被 Bing 判为「too short」
+const MIN_DESC = 100;
+
+export const platformLabel = (s) => {
+  const p = Array.isArray(s?.platforms) ? s.platforms.join(",") : String(s?.platforms ?? "");
+  if (/win/i.test(p)) return "Windows";
+  if (/mac|os ?x|darwin|apple/i.test(p)) return "Mac";
+  return p ? p.slice(0, 20) : "";
+};
+
 const head = (title, desc, canonical, extra = "") => `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -108,7 +127,7 @@ const jsonLd = (obj) =>
 
 /* ---------------- 软件详情页 ---------------- */
 
-export function renderSoftPage(soft, related = []) {
+export function renderSoftPage(soft, related = [], opts = {}) {
   const id = pick(soft, ["id"]);
   const name = pick(soft, ["name"], id);
   const category = pick(soft, ["category"], "软件库");
@@ -120,11 +139,39 @@ export function renderSoftPage(soft, related = []) {
   const date = pick(soft, ["date", "created_at"], "");
   const price = Number(soft.price) || 0;
   const canonical = softUrl(id);
-  const title = `${name}下载${version ? ` v${version}` : ""} - ${category} | 乐哲软件`;
+
+  // 标题：同名同版本的多平台记录（Windows/Mac 各一条）用平台后缀区分，避免重复标题
+  const dupPlatform = opts.dupPlatform || null;
+  const title = `${name}下载${version ? ` v${version}` : ""}${dupPlatform ? `（${dupPlatform}版）` : ""} - ${category} | 乐哲软件`;
+
+  // 描述：过短则用 detail 正文补足；同名/碰撞记录强制追加尾注并预留尾部空间，
+  // 保证截断到 158 字后各页描述仍然唯一
+  let base = description.trim();
+  let tail = "";
+  if (opts.forceDescTail) {
+    tail = `本页为${dupPlatform || platformLabel(soft) || "当前"}平台 v${version || "当前"} 版本下载页，其他版本请查看同分类列表。`;
+  } else if (dupPlatform) {
+    tail = `本页面为${dupPlatform}平台版本，其他平台版本请查看同分类列表。`;
+  }
+  if (base.length > 120) base = base.slice(0, 120);
+  let descFull = base;
+  if (descFull.length < MIN_DESC) {
+    const detailText = stripHtml(soft.detail);
+    if (detailText) descFull += `软件详情：${detailText}`;
+  }
+  if (descFull.length < MIN_DESC) {
+    descFull += `${name}${version ? ` v${version}` : ""}已由乐哲软件完整收录，提供高速免费下载通道，页面附版本号、更新日期、文件大小与平台兼容性等参数信息，安装或使用中遇到问题可查阅站内图文教程，下载前请确认系统环境满足软件运行要求。`;
+  }
+  if (tail) {
+    const room = 158 - tail.length;
+    if (descFull.length > room) descFull = descFull.slice(0, room).replace(/[，、；\s]+$/, "");
+    descFull += tail;
+  }
+  const metaDesc = descFull.slice(0, 158);
 
   const html = head(
     title,
-    description.slice(0, 160),
+    metaDesc,
     canonical,
     (iconUrl ? `<meta property="og:image" content="${esc(iconUrl)}">` : "") +
       jsonLd({
@@ -134,7 +181,7 @@ export function renderSoftPage(soft, related = []) {
         operatingSystem: platforms || "Windows, macOS",
         applicationCategory: category,
         softwareVersion: version || undefined,
-        description,
+        description: metaDesc,
         image: iconUrl || undefined,
         dateModified: date || undefined,
         offers: { "@type": "Offer", price: String(price), priceCurrency: "CNY" },
@@ -178,9 +225,11 @@ ${foot()}`;
 export function renderCategoryPage(category, rows = []) {
   const canonical = catUrl(category);
   const title = `${category}软件下载大全_共${rows.length}款 - 乐哲软件`;
+  const topNames = rows.slice(0, 6).map((r) => pick(r, ["name"])).filter(Boolean);
+  const desc = `乐哲软件${category}分类页，共收录${rows.length}款${category}软件，涵盖${topNames.join("、")}等常用工具，每款软件均标注最新版本号、更新日期与平台兼容性，全部提供高速免费下载与详细安装教程，列表持续更新，帮助你快速找到合适的${category}软件。`;
   const html = head(
     title,
-    `乐哲软件${category}分类，收录${rows.length}款精选${category}软件，提供免费下载与安装教程。`,
+    desc.slice(0, 158),
     canonical
   ) + `
 <main>
@@ -215,9 +264,20 @@ export function renderTutorialPage(t, related = []) {
   const canonical = tutUrl(id);
   const title = `${title0}_乐哲软件教程`;
 
+  // 描述：summary 过短时补足，避免被 Bing 判为 too short
+  let descFull = summary.trim();
+  if (descFull.length < MIN_DESC) {
+    const contentText = stripHtml(content);
+    if (contentText) descFull += `教程正文节选：${contentText}`;
+  }
+  if (descFull.length < MIN_DESC) {
+    descFull += `本教程由乐哲软件整理发布，通过图文分步演示完整操作流程，新手也能快速跟随完成配置，教程涉及的相关软件均可在站内对应分类免费下载使用。`;
+  }
+  const metaDesc = descFull.slice(0, 158);
+
   const html = head(
     title,
-    summary.slice(0, 160),
+    metaDesc,
     canonical,
     (cover ? `<meta property="og:image" content="${esc(cover)}">` : "") +
       jsonLd({
@@ -269,7 +329,7 @@ export function renderSitemapHtml(softs = [], tutorials = []) {
   }
   const html = head(
     "网站地图 - 全部软件与教程 | 乐哲软件",
-    `乐哲软件网站地图，收录全部 ${softs.length} 款软件与 ${tutorials.length} 篇教程的完整链接索引。`,
+    `乐哲软件网站地图，收录全部 ${softs.length} 款软件详情页、${cats.length} 个分类聚合页与 ${tutorials.length} 篇教程的完整链接索引，方便搜索引擎抓取全站内容，也便于用户快速导航找到所需软件的下载页与安装教程。`,
     `${SITE}/sitemap.html`
   ) + `
 <main>
