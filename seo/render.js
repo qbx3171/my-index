@@ -58,6 +58,15 @@ const stripHtml = (s) =>
 // meta description 目标长度：过短会被 Bing 判为「too short」
 const MIN_DESC = 100;
 
+// 按标点边界裁剪，避免描述断在半句/词中间（如「…屏幕检测、电池信」）
+const clip = (s, max) => {
+  if (s.length <= max) return s;
+  const head = s.slice(0, max);
+  const m = head.match(/^[\s\S]*[，。；：！？、,.;:!?]/);
+  if (m && m[0].length >= Math.floor(max * 0.6)) return m[0].replace(/[，。；：、,.;:!?\s]+$/, "");
+  return head.replace(/[，。；：、,.;:!?\s]+$/, "");
+};
+
 export const platformLabel = (s) => {
   const p = Array.isArray(s?.platforms) ? s.platforms.join(",") : String(s?.platforms ?? "");
   if (/win/i.test(p)) return "Windows";
@@ -153,7 +162,6 @@ export function renderSoftPage(soft, related = [], opts = {}) {
   } else if (dupPlatform) {
     tail = `本页面为${dupPlatform}平台版本，其他平台版本请查看同分类列表。`;
   }
-  if (base.length > 120) base = base.slice(0, 120);
   let descFull = base;
   if (descFull.length < MIN_DESC) {
     const detailText = stripHtml(soft.detail);
@@ -164,10 +172,9 @@ export function renderSoftPage(soft, related = [], opts = {}) {
   }
   if (tail) {
     const room = 158 - tail.length;
-    if (descFull.length > room) descFull = descFull.slice(0, room).replace(/[，、；\s]+$/, "");
-    descFull += tail;
+    descFull = clip(descFull, room) + tail;
   }
-  const metaDesc = descFull.slice(0, 158);
+  const metaDesc = clip(descFull, 158);
 
   const html = head(
     title,
