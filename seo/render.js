@@ -108,7 +108,7 @@ h1{font-size:24px;margin:8px 0}
 <body>
 <header><a href="${SITE}/">乐哲软件</a></header>`;
 
-const foot = () => `<footer>© 乐哲软件 lezhesoft.cn · <a href="${SITE}/sitemap.html">网站地图</a> · <a href="${SITE}/copyright.html">版权声明</a></footer>
+const foot = () => `<footer><a href="${SITE}/">乐哲软件官网</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="${SITE}/sitemap.html">网站地图</a> · <a href="${SITE}/copyright.html">版权声明</a></footer>
 </body></html>`;
 
 const crumb = (items) =>
