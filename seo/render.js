@@ -376,6 +376,7 @@ export function renderTutorialPage(t, related = []) {
 ${crumb([{ name: "首页", url: `${SITE}/` }, { name: `${category}教程` }])}
 <h1>${esc(title0)}</h1>
 <div class="meta">${createdAt ? `<span>发布：${esc(String(createdAt).slice(0, 10))}</span>` : ""}<span>分类：${esc(category)}</span></div>
+${cover ? `<img src="${esc(cover)}" alt="${esc(title0)}封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">` : ""}
 <article>${content}</article>
 ${relatedBlock("相关教程", related)}
 </main>

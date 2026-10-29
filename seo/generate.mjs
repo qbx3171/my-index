@@ -16,6 +16,7 @@ import {
   catSlug,
   platformLabel,
 } from "./render.js";
+import { ensureCovers } from "./cover.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -167,6 +168,10 @@ for (const dir of ["soft", "cat", "tutorial"]) {
   await rm(join(ROOT, dir), { recursive: true, force: true });
   await mkdir(join(ROOT, dir), { recursive: true });
 }
+
+// 教程封面：必须在目录清理之后生成（清理会连 tutorial/cover/ 一起删掉）
+const newCovers = await ensureCovers(tutorials);
+if (newCovers.length) console.log(`新增教程封面：${newCovers.length} 张`);
 
 let count = 0;
 // 标题/描述去重：同名的记录（通常是 Windows/Mac 两个平台各一条，或有克隆记录），
