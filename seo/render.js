@@ -119,8 +119,25 @@ h1{font-size:24px;margin:8px 0}
 <body>
 <header><a href="${SITE}/">乐哲软件</a></header>`;
 
-const foot = () => `<footer><a href="${SITE}/">乐哲软件官网</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="${SITE}/sitemap.html">网站地图</a> · <a href="${SITE}/copyright.html">版权声明</a></footer>
+// 品牌锚文本轮换：按页面 URL 的稳定 hash 分配，覆盖「官网词 / 精确品牌词 / 域名」三种变体，
+// 避免 177 个页面页脚清一色同一个锚文本（机械感强，且只覆盖单一变体）
+const BRAND_ANCHORS = ["乐哲软件官网", "乐哲软件", "乐哲软件官网", "lezhesoft.cn"];
+let footSeq = 0;
+export const resetFootSeq = () => {
+  footSeq = 0;
+};
+const foot = (seed) => {
+  let n;
+  if (seed) {
+    n = 0;
+    for (const ch of String(seed)) n = (n * 31 + ch.codePointAt(0)) % 100003;
+  } else {
+    n = footSeq++;
+  }
+  const anchor = BRAND_ANCHORS[n % BRAND_ANCHORS.length];
+  return `<footer><a href="${SITE}/">${esc(anchor)}</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="${SITE}/sitemap.html">网站地图</a> · <a href="${SITE}/copyright.html">版权声明</a></footer>
 </body></html>`;
+};
 
 const crumb = (items) =>
   `<nav class="crumb">${items
@@ -248,7 +265,7 @@ ${downloadUrl ? `<a class="btn" href="${esc(downloadUrl)}" rel="nofollow">立即
 <p>${esc(name)}由乐哲软件收录整理。下载前请阅读软件许可协议；安装中如遇缺少运行库、报错代码等问题，请参考站内相关教程。</p>
 ${relatedBlock("同分类软件", related)}
 </main>
-${foot()}`;
+${foot(canonical)}`;
   return { html, title };
 }
 
@@ -328,7 +345,7 @@ ${rows
   .join("")}
 </ul>
 </main>
-${foot()}`;
+${foot(canonical)}`;
   return { html, title };
 }
 
@@ -380,7 +397,7 @@ ${cover ? `<img src="${esc(cover)}" alt="${esc(title0)}封面图" width="1200" h
 <article>${content}</article>
 ${relatedBlock("相关教程", related)}
 </main>
-${foot()}`;
+${foot(canonical)}`;
   return { html, title };
 }
 
@@ -432,6 +449,6 @@ ${tutorials.length
       .join("")}</p>`
   : ""}
 </main>
-${foot()}`;
+${foot("sitemap")}`;
   return { html, title: "网站地图 - 全部软件与教程 | 乐哲软件" };
 }
