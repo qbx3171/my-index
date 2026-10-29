@@ -1,8 +1,12 @@
 User-agent: Baiduspider
 Allow: /
+Disallow: /admin/
+Disallow: /admin.html
+Disallow: /cdn-cgi/
 
 User-agent: *
 Disallow: /admin/
 Disallow: /admin.html
 Disallow: /cdn-cgi/
+
 Sitemap: https://www.lezhesoft.cn/sitemap.xml
