@@ -298,3 +298,24 @@ await writeFile(join(ROOT, "sitemap.xml"), renderSitemapXml(softs, tutorials), "
 const sm = renderSitemapHtml(softs, tutorials);
 await writeFile(join(ROOT, "sitemap.html"), sm.html, "utf8");
 console.log(`sitemap.xml + sitemap.html 完成（共 ${softs.length + tutorials.length + cats.length + 1} 个 URL）`);
+
+// 末尾自检：扫描全部产物，含 U+FFFD 即以 exit 2 退出（传输乱码随机出现，
+// 重跑一次大概率拿到干净副本；每日流程应在 exit 2 时自动重跑，最多 3 次）
+const { readdirSync, statSync } = await import("node:fs");
+const badFiles = [];
+const scanDir = (dir) => {
+  for (const f of readdirSync(dir)) {
+    const p = join(dir, f);
+    if (statSync(p).isDirectory()) scanDir(p);
+    else if (f.endsWith(".html") && (await readFile(p, "utf8")).includes(FFD)) badFiles.push(p);
+  }
+};
+for (const dir of ["soft", "cat", "tutorial"]) scanDir(join(ROOT, dir));
+for (const f of readdirSync(ROOT)) {
+  if (f.endsWith(".html") && (await readFile(join(ROOT, f), "utf8")).includes(FFD)) badFiles.push(f);
+}
+if (badFiles.length) {
+  console.error(`⚠ 产物仍含 ${badFiles.length} 个乱码文件：${badFiles.join(", ")}——请重跑本脚本（exit 2）`);
+  process.exit(2);
+}
+console.log("产物自检通过：无乱码");
