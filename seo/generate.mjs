@@ -206,4 +206,4 @@ console.log(`分类页：${cCount}`);
 await writeFile(join(ROOT, "sitemap.xml"), renderSitemapXml(softs, tutorials), "utf8");
 const sm = renderSitemapHtml(softs, tutorials);
 await writeFile(join(ROOT, "sitemap.html"), sm.html, "utf8");
-console.log(`sitemap.xml + sitemap.html 完成（共 ${softs.length + tutorials.length + cats.length + 2} 个 URL）`);
+console.log(`sitemap.xml + sitemap.html 完成（共 ${softs.length + tutorials.length + cats.length + 1} 个 URL）`);

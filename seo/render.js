@@ -74,14 +74,14 @@ export const platformLabel = (s) => {
   return p ? p.slice(0, 20) : "";
 };
 
-const head = (title, desc, canonical, extra = "") => `<!DOCTYPE html>
+const head = (title, desc, canonical, extra = "", robots = "index,follow,max-image-preview:large") => `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="robots" content="${robots}">
 <link rel="canonical" href="${esc(canonical)}">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="乐哲软件">
@@ -316,7 +316,6 @@ export function renderSitemapXml(softs = [], tutorials = []) {
   const today = new Date().toISOString().slice(0, 10);
   const entries = [
     `  <url><loc>${SITE}/</loc><lastmod>${today}</lastmod></url>`,
-    `  <url><loc>${SITE}/sitemap.html</loc></url>`,
     ...cats.map((c) => `  <url><loc>${catUrl(c)}</loc></url>`),
     ...softs.map((s) => `  <url><loc>${softUrl(pick(s, ["id"]))}</loc></url>`),
     ...tutorials.map((t) => `  <url><loc>${tutUrl(pick(t, ["id"]))}</loc></url>`),
@@ -337,7 +336,9 @@ export function renderSitemapHtml(softs = [], tutorials = []) {
   const html = head(
     "网站地图 - 全部软件与教程 | 乐哲软件",
     `乐哲软件网站地图，收录全部 ${softs.length} 款软件详情页、${cats.length} 个分类聚合页与 ${tutorials.length} 篇图文教程的完整链接索引，方便搜索引擎抓取全站内容，也便于用户快速导航找到所需软件的下载页与安装教程，列表每日更新。`,
-    `${SITE}/sitemap.html`
+    `${SITE}/sitemap.html`,
+    "",
+    "noindex,follow"
   ) + `
 <main>
 <h1>网站地图</h1>
