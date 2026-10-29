@@ -116,9 +116,10 @@ export async function ensureCovers(tutorials) {
   const made = [];
   let browser = null;
   for (const t of tutorials) {
-    if (t.cover && /^https?:/.test(t.cover)) continue; // 已有外链封面
     const id = t.id;
     if (!id) continue;
+    const localUrl = `${SITE}/tutorial/cover/${id}.png`;
+    if (t.cover === localUrl) continue; // 已是本地生成封面
     const outPng = join(OUT_DIR, `${id}.png`);
     if (!existsSync(outPng)) {
       browser = browser ?? findBrowser();
@@ -141,7 +142,7 @@ export async function ensureCovers(tutorials) {
       }
       made.push(id);
     }
-    if (!t.cover) t.cover = `${SITE}/tutorial/cover/${id}.png`;
+    t.cover = localUrl;
   }
   return made;
 }
