@@ -203,6 +203,75 @@ for (const c of cats) {
 }
 console.log(`分类页：${cCount}`);
 
+// —— 首页侧栏分类导航静态化 ——
+// 目的是让爬虫在 index.html 原始 HTML 里就能拿到 15 条 /cat/ 真实链接（原先只有无 href 的 <div>）。
+// 用与前端完全相同的 class 结构输出，JS 初始化时 renderCategories() 会整体覆盖 #categoryList，
+// 所以用户看到的界面、点击行为都不变，不存在隐藏文本或两套内容的问题。
+const NAV_GROUPS = [
+  { id: "creative", name: "创意设计", icon: "🎨", cats: ["设计工具", "媒体工具"] },
+  { id: "dev", name: "开发编程", icon: "💻", cats: ["开发工具"] },
+  { id: "office", name: "办公效率", icon: "📋", cats: ["办公软件", "实用工具"] },
+];
+const NAV_ICONS = { 媒体工具: "🎬", 开发工具: "⚙", 办公软件: "📋", 实用工具: "🔧" };
+const navEsc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+function buildSidebarNav(all) {
+  const counts = new Map();
+  for (const s of all) {
+    const c = s.category || "未分类";
+    counts.set(c, (counts.get(c) || 0) + 1);
+  }
+  const groupOf = new Map();
+  NAV_GROUPS.forEach((g) => g.cats.forEach((c) => groupOf.set(c, g.id)));
+  const buckets = new Map(NAV_GROUPS.map((g) => [g.id, []]));
+  const rest = [];
+  for (const c of counts.keys()) {
+    const gid = groupOf.get(c);
+    if (gid) buckets.get(gid).push(c);
+    else rest.push(c);
+  }
+  const item = (c) =>
+    `<a class="category-item-side " data-cat="${navEsc(c)}" href="/cat/${catSlug(c)}.html">` +
+    `<span class="icon">${NAV_ICONS[c] || "📦"}</span><span class="name">${navEsc(c)}</span>` +
+    `<span class="count">${counts.get(c)}</span></a>`;
+  let html = `<div class="category-item-all active" data-cat="all"><span class="icon">◇</span><span class="name">全部</span><span class="count">${all.length}</span></div>`;
+  const renderGroup = (id, name, icon, items) => {
+    if (!items.length) return "";
+    return (
+      `<div class="category-group"><div class="group-header" data-group="${id}">` +
+      `<span class="group-icon">${icon}</span><span class="group-name">${name}</span>` +
+      `<span class="group-badge">${items.length}</span><span class="toggle-icon ">▶</span></div>` +
+      `<div class="group-items ">${items.map(item).join("")}</div></div>`
+    );
+  };
+  for (const g of NAV_GROUPS) html += renderGroup(g.id, g.name, g.icon, buckets.get(g.id));
+  html += renderGroup("other", "其他分类", "📁", rest);
+  return html;
+}
+
+try {
+  let idx = await readFile(join(ROOT, "index.html"), "utf8");
+  const open = '<div class="category-list" id="categoryList">';
+  const close = '<div class="sidebar-bottom">';
+  const a = idx.indexOf(open);
+  const b = idx.indexOf(close, a);
+  if (a < 0 || b < 0) throw new Error("未找到 #categoryList 区块");
+  const nav = buildSidebarNav(softs);
+  idx = idx.slice(0, a + open.length) + nav + "</div>\n" + idx.slice(b);
+  idx = idx.replace(/(<span id="sidebarTotalCount">)共 \d+ 款软件/, `$1共 ${softs.length} 款软件`);
+  // <a> 需要去掉默认下划线与链接色，其余样式沿用 .category-item-side
+  if (!idx.includes("a.category-item-side{text-decoration:none")) {
+    idx = idx.replace(
+      ".category-item-side{",
+      "a.category-item-side{text-decoration:none;color:var(--text-secondary)}\n.category-item-side{"
+    );
+  }
+  await writeFile(join(ROOT, "index.html"), idx, "utf8");
+  console.log(`首页侧栏静态导航：${nav.split('href="/cat/').length - 1} 条分类链接（共 ${softs.length} 款）`);
+} catch (e) {
+  console.warn(`⚠ 首页侧栏静态导航未更新：${e.message}`);
+}
+
 await writeFile(join(ROOT, "sitemap.xml"), renderSitemapXml(softs, tutorials), "utf8");
 const sm = renderSitemapHtml(softs, tutorials);
 await writeFile(join(ROOT, "sitemap.html"), sm.html, "utf8");
