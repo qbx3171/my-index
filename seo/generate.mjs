@@ -303,14 +303,14 @@ console.log(`sitemap.xml + sitemap.html 完成（共 ${softs.length + tutorials.
 // 重跑一次大概率拿到干净副本；每日流程应在 exit 2 时自动重跑，最多 3 次）
 const { readdirSync, statSync } = await import("node:fs");
 const badFiles = [];
-const scanDir = (dir) => {
+const scanDir = async (dir) => {
   for (const f of readdirSync(dir)) {
     const p = join(dir, f);
     if (statSync(p).isDirectory()) scanDir(p);
     else if (f.endsWith(".html") && (await readFile(p, "utf8")).includes(FFD)) badFiles.push(p);
   }
 };
-for (const dir of ["soft", "cat", "tutorial"]) scanDir(join(ROOT, dir));
+for (const dir of ["soft", "cat", "tutorial"]) await scanDir(join(ROOT, dir));
 for (const f of readdirSync(ROOT)) {
   if (f.endsWith(".html") && (await readFile(join(ROOT, f), "utf8")).includes(FFD)) badFiles.push(f);
 }
