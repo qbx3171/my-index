@@ -49,7 +49,7 @@ async function fetchOnce(query) {
   return JSON.parse(Buffer.from(await res.arrayBuffer()).toString("utf8"));
 }
 
-async function sb(query, copies = 5) {
+async function sb(query, copies = 8) {
   const parsed = [];
   let lastErr;
   for (let i = 0; i < copies; i++) {
@@ -89,7 +89,7 @@ async function sb(query, copies = 5) {
   // 治愈环节：合并后仍有乱码的记录，改用按 id 的单条小响应重拉
   // （响应越小越不容易被代理截断），最多重试 5 轮
   const table = query.split("?")[0];
-  for (let round = 0; round < 5; round++) {
+  for (let round = 0; round < 8; round++) {
     const badIds = rows
       .filter((r) => Object.values(r).some((v) => typeof v === "string" && v.includes(FFD)))
       .map((r) => r.id)
@@ -129,6 +129,11 @@ const TEXT_FIXUPS = [
     from: /更顺\uFFFD+的交互/,
     to: "更顺畅的交互",
   },
+  // Photoshop 入门教程（acd18f73…）传输损坏兜底，按已知原文定点还原
+  { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", from: /图像\uFFFD小/, to: "图像大小" },
+  { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", from: /「改哪里」\uFFFD矩形/, to: "「改哪里」。矩形" },
+  { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", from: /1–2\s*\uFFFD*像素/, to: "1–2 像素" },
+  { id: "ba65264357f25999f28052c1", field: "description", from: /镜头品牌与\uFFFD+号/, to: "镜头品牌与型号" },
 ];
 function applyFixups(rows) {
   for (const row of rows) {
@@ -143,6 +148,18 @@ function applyFixups(rows) {
 
 const softs = applyFixups(await sb("software?select=*&limit=1000"));
 const tutorials = applyFixups(await sb("tutorials?select=*&limit=500"));
+// 母本兜底：长正文（>2KB）经代理传输损坏位置随机，定点修复覆盖不全。
+// 对配置了母本的记录，若合并后正文仍残留乱码，直接用本地母本整体覆盖。
+const CONTENT_MASTERS = [
+  { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", file: "content-master-acd18f73.txt" },
+];
+for (const m of CONTENT_MASTERS) {
+  const row = tutorials.find((t) => t.id === m.id);
+  if (row && typeof row[m.field] === "string" && row[m.field].includes(FFD)) {
+    row[m.field] = await readFile(join(ROOT, "seo", m.file), "utf8");
+    console.log(`已用母本覆盖 ${m.id}.${m.field}（传输乱码兜底）`);
+  }
+}
 console.log(`数据：software=${softs.length}，tutorials=${tutorials.length}`);
 
 // 清理旧产物，避免删除的软件留下死页
