@@ -52,41 +52,10 @@ function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// 行宽计算：CJK=1、ASCII=0.6
-const visWidth = (s) => [...s].reduce((n, ch) => n + (/[\x20-\x7e]/.test(ch) ? 0.6 : 1), 0);
-
-// 标题换行：英文/数字单词不拆分，CJK 逐字可断
-function wrapTitle(title, maxPer = 16, maxLines = 3) {
-  const tokens = String(title).match(/[A-Za-z0-9]+| +|./gs) || [];
-  const lines = [];
-  let cur = "";
-  for (const tk of tokens) {
-    if (/^ +$/.test(tk)) {
-      // 空格：行首不留；放不下时跳过（断行处自然不吃空格）
-      if (cur && visWidth(cur) + 0.6 <= maxPer) cur += tk;
-      continue;
-    }
-    if (cur && visWidth(cur) + visWidth(tk) > maxPer) {
-      lines.push(cur.trim());
-      cur = tk;
-      if (lines.length === maxLines) return lines;
-    } else {
-      cur += tk;
-    }
-  }
-  if (cur && lines.length < maxLines) lines.push(cur);
-  return lines;
-}
-
 function buildSvg(title, category) {
   const [c1, c2] = paletteFor(category || "教程");
   const icon = CATEGORY_ICON[category] || "📘";
-  const lines = wrapTitle(title);
-  const fontSize = lines.some((l) => visWidth(l) > 12) ? 52 : 60;
-  const startY = 320;
-  const text = lines
-    .map((l, i) => `<text x="80" y="${startY + i * (fontSize + 16)}" font-family="'Microsoft YaHei','PingFang SC',sans-serif" font-size="${fontSize}" font-weight="700" fill="#ffffff">${esc(l)}</text>`)
-    .join("\n  ");
+  const cat = (category || "软件教程").slice(0, 12);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -98,9 +67,10 @@ function buildSvg(title, category) {
   <circle cx="${W - 140}" cy="120" r="200" fill="#ffffff" opacity="0.06"/>
   <circle cx="${W - 40}" cy="${H - 60}" r="260" fill="#ffffff" opacity="0.05"/>
   <circle cx="40" cy="${H + 80}" r="180" fill="#000000" opacity="0.08"/>
-  <text x="72" y="170" font-family="'Segoe UI Emoji','Apple Color Emoji',sans-serif" font-size="150">${icon}</text>
-  ${text}
-  <text x="80" y="${H - 56}" font-family="'Microsoft YaHei',sans-serif" font-size="30" fill="#ffffff" opacity="0.85">乐哲软件 · 图文教程</text>
+  <text x="76" y="240" font-family="'Segoe UI Emoji','Apple Color Emoji',sans-serif" font-size="190">${icon}</text>
+  <text x="80" y="360" font-family="'Microsoft YaHei','PingFang SC',sans-serif" font-size="56" font-weight="700" fill="#ffffff">${esc(cat)}</text>
+  <text x="80" y="424" font-family="'Microsoft YaHei',sans-serif" font-size="34" fill="#ffffff" opacity="0.8">图文使用教程</text>
+  <text x="80" y="${H - 56}" font-family="'Microsoft YaHei',sans-serif" font-size="30" fill="#ffffff" opacity="0.85">乐哲软件 · lezhesoft.cn</text>
 </svg>`;
 }
 
@@ -119,8 +89,10 @@ export async function ensureCovers(tutorials) {
     const id = t.id;
     if (!id) continue;
     const localUrl = `${SITE}/tutorial/cover/${id}.png`;
-    if (t.cover === localUrl) continue; // 已是本地生成封面
     const outPng = join(OUT_DIR, `${id}.png`);
+    // 已指向本地且 PNG 文件仍在 → 无需处理（注意：generate.mjs 每次会清空 tutorial/
+    // 目录连 cover/ 一起删掉，所以即使 cover 字段已是本地 URL，PNG 缺失时也必须重生成）
+    if (t.cover === localUrl && existsSync(outPng)) continue;
     if (!existsSync(outPng)) {
       browser = browser ?? findBrowser();
       if (!browser) {

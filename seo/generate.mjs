@@ -170,8 +170,32 @@ for (const dir of ["soft", "cat", "tutorial"]) {
 }
 
 // 教程封面：必须在目录清理之后生成（清理会连 tutorial/cover/ 一起删掉）
+const coverBefore = new Map(tutorials.map((t) => [t.id, t.cover || ""]));
 const newCovers = await ensureCovers(tutorials);
 if (newCovers.length) console.log(`新增教程封面：${newCovers.length} 张`);
+
+// 封面回写数据库：站内前端（index.html）教程列表/详情直读 DB，
+// 只改静态页会导致「新教程在站内没有封面」，这里把封面地址同步进 tutorials.cover。
+for (const t of tutorials) {
+  if (!t.id || !t.cover) continue;
+  if (coverBefore.get(t.id) === t.cover) continue;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/tutorials?id=eq.${encodeURIComponent(t.id)}`, {
+      method: "PATCH",
+      headers: {
+        apikey: KEY,
+        Authorization: `Bearer ${KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({ cover: t.cover }),
+    });
+    if (res.ok) console.log(`封面已回写数据库：${t.id}`);
+    else console.warn(`封面回写失败 ${t.id}: HTTP ${res.status}`);
+  } catch (e) {
+    console.warn(`封面回写异常 ${t.id}: ${e.message}`);
+  }
+}
 
 let count = 0;
 // 标题/描述去重：同名的记录（通常是 Windows/Mac 两个平台各一条，或有克隆记录），
