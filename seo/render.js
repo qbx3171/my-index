@@ -67,6 +67,16 @@ const clip = (s, max) => {
   return head.replace(/[，。；：、,.;:!?\s]+$/, "");
 };
 
+// 软件名按空格/中点边界裁剪，绝不截出半个词（标题用）
+const clipName = (s, max) => {
+  if (max <= 4) return "";
+  const chars = [...s];
+  if (chars.length <= max) return s;
+  const head = chars.slice(0, max).join("");
+  const cut = head.replace(/[\s·、|/（(《【\-—,，.。:：]+[^\s·、|/（(《【\-—,，.。:：]*$/, "");
+  return (cut.length >= Math.max(6, max * 0.55) ? cut : head).trim();
+};
+
 export const platformLabel = (s) => {
   const p = Array.isArray(s?.platforms) ? s.platforms.join(",") : String(s?.platforms ?? "");
   if (/win/i.test(p)) return "Windows";
@@ -151,8 +161,22 @@ export function renderSoftPage(soft, related = [], opts = {}) {
   const canonical = softUrl(id);
 
   // 标题：同名同版本的多平台记录（Windows/Mac 各一条）用平台后缀区分，避免重复标题
+  // 控制在 60 字以内，超出时按词边界截断软件名（SERP 超长会被截断，浪费品牌词）
   const dupPlatform = opts.dupPlatform || null;
-  const title = `${name}下载${version ? ` v${version}` : ""}${dupPlatform ? `（${dupPlatform}版）` : ""} - ${category} | 乐哲软件`;
+  const platPart = dupPlatform ? `（${dupPlatform}版）` : "";
+  const catSuffix = `${platPart} - ${category} | 乐哲软件`;
+  // 以「渲染后可见字符数」计量，&amp; 这类实体会被搜索引擎当作 1 个字符
+  const visLen = (s) =>
+    [...String(s).replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"')].length;
+  const nameHasVersion = version && name.includes(version);
+  let verPart = version && !nameHasVersion ? ` v${version}` : "";
+  const fits = (n) => visLen(n) + 2 + visLen(verPart) + visLen(catSuffix) <= 60;
+  let baseName = name;
+  if (!fits(baseName)) {
+    if (verPart) verPart = ""; // 先牺牲版本号，保软件名
+    if (!fits(baseName)) baseName = clipName(baseName, 60 - visLen(catSuffix) - 2);
+  }
+  const title = `${baseName}下载${verPart}${catSuffix}`;
 
   // 描述：过短则用 detail 正文补足；同名/碰撞记录强制追加尾注并预留尾部空间，
   // 保证截断到 158 字后各页描述仍然唯一
@@ -232,18 +256,67 @@ ${foot()}`;
 
 export function renderCategoryPage(category, rows = []) {
   const canonical = catUrl(category);
-  const title = `${category}软件下载大全_共${rows.length}款 - 乐哲软件`;
+  // 「办公软件」这类本身已含“软件”的分类，避免出现「办公软件软件下载大全」
+  const label = /(软件|工具|系列)$/.test(category) ? `${category}下载大全` : `${category}软件下载大全`;
+  const title = `${label}_共${rows.length}款 - 乐哲软件`;
   const topNames = rows.slice(0, 6).map((r) => pick(r, ["name"])).filter(Boolean);
   const desc = `乐哲软件${category}分类页，共收录${rows.length}款${category}软件，涵盖${topNames.join("、")}等常用工具，每款软件均标注最新版本号、更新日期与平台兼容性，全部提供高速免费下载与详细安装教程，列表持续更新，帮助你快速找到合适的${category}软件。`;
+  // 分类导语：用真实数据拼，避免与其他分类页雷同（同时解决小分类正文过薄）
+  const newest = rows[0] || {};
+  const newestName = pick(newest, ["name"]);
+  const newestVer = pick(newest, ["version"]);
+  const newestDate = pick(newest, ["date", "created_at"]);
+  const newestPlatform = platformLabel(newest);
+  const intro = [
+    `${category}分类目前收录 ${rows.length} 款软件${topNames.length ? `，包括 ${topNames.slice(0, 3).join("、")}` : ""}${
+      rows.length > 3 ? " 等" : ""
+    }。`,
+    newestName
+      ? `最近更新的是 ${newestName}${newestVer ? ` v${newestVer}` : ""}${newestDate ? `（${String(newestDate).slice(0, 10)}）` : ""}${
+          newestPlatform ? `，适用于 ${newestPlatform}` : ""
+        }。`
+      : "",
+    `每款软件都标注了版本号、更新时间与支持平台，点开即可查看功能介绍、安装步骤与下载入口。`,
+    rows.length >= 2 ? `列表按最近更新排序，方便你判断版本新旧。` : "该分类下目前只有一款软件，后续会随资源更新持续补充。",
+  ]
+    .filter(Boolean)
+    .join("");
   const html = head(
     title,
     desc.slice(0, 158),
-    canonical
+    canonical,
+    jsonLd({
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: title,
+      description: desc.slice(0, 158),
+      url: canonical,
+      isPartOf: { "@type": "WebSite", name: "乐哲软件", url: `${SITE}/` },
+      mainEntity: {
+        "@type": "ItemList",
+        numberOfItems: rows.length,
+        itemListElement: rows.slice(0, 20).map((r, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: pick(r, ["name"]),
+          url: softUrl(pick(r, ["id"])),
+        })),
+      },
+    }) +
+      jsonLd({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "首页", item: `${SITE}/` },
+          { "@type": "ListItem", position: 2, name: category, item: canonical },
+        ],
+      })
   ) + `
 <main>
 ${crumb([{ name: "首页", url: `${SITE}/` }, { name: category }])}
-<h1>${esc(category)}软件下载大全</h1>
-<p>共收录 ${rows.length} 款${esc(category)}类软件：</p>
+<h1>${esc(label)}</h1>
+<p>${esc(intro)}</p>
+<h2>${esc(/软件$/.test(category) ? `${category}列表` : `${category}软件列表`)}（${rows.length} 款）</h2>
 <ul>
 ${rows
   .map((r) => {
