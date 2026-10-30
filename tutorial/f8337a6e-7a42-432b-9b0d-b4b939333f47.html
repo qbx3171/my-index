@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="applicable-device" content="pc,mobile">
+<title>AdGuard - 多平台广告拦截软件使用教程：从安装到过滤器配置的入门指南_乐哲软件教程</title>
+<meta name="description" content="AdGuard 是一款支持 Windows 与 macOS 的系统级广告拦截软件。本教程讲解安装步骤（含 HTTPS 证书信任）、广告拦截、跟踪保护、浏览安全与 DNS 防护四大模块的配置要点，并解答网页显示异常、与浏览器插件的区别、证书安全性等常见问题，帮助新用户快速上手。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.lezhesoft.cn/tutorial/f8337a6e-7a42-432b-9b0d-b4b939333f47.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="乐哲软件">
+<meta property="og:title" content="AdGuard - 多平台广告拦截软件使用教程：从安装到过滤器配置的入门指南_乐哲软件教程">
+<meta property="og:description" content="AdGuard 是一款支持 Windows 与 macOS 的系统级广告拦截软件。本教程讲解安装步骤（含 HTTPS 证书信任）、广告拦截、跟踪保护、浏览安全与 DNS 防护四大模块的配置要点，并解答网页显示异常、与浏览器插件的区别、证书安全性等常见问题，帮助新用户快速上手。">
+<meta property="og:url" content="https://www.lezhesoft.cn/tutorial/f8337a6e-7a42-432b-9b0d-b4b939333f47.html">
+<meta property="og:image" content="https://www.lezhesoft.cn/tutorial/cover/f8337a6e-7a42-432b-9b0d-b4b939333f47.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"AdGuard - 多平台广告拦截软件使用教程：从安装到过滤器配置的入门指南","image":"https://www.lezhesoft.cn/tutorial/cover/f8337a6e-7a42-432b-9b0d-b4b939333f47.png","datePublished":"2026-10-30T00:08:27.594064+00:00","dateModified":"2026-10-30T00:08:27.594064+00:00","author":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"},"publisher":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"}}</script>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
+header{background:#0077ff;color:#fff;padding:14px 20px;font-size:17px;font-weight:500}
+header a{color:#fff;text-decoration:none}
+main{max-width:760px;margin:0 auto;padding:24px 20px}
+.meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
+.btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
+.rel{margin-top:36px;border-top:1px solid #eee;padding-top:18px}
+.rel a{display:inline-block;margin:0 10px 10px 0;color:#0077ff;text-decoration:none}
+article img{max-width:100%}
+footer{max-width:760px;margin:0 auto;padding:20px;color:#888;font-size:13px}
+footer a{color:#888}
+nav.crumb{font-size:13px;color:#999;margin-bottom:12px}nav.crumb a{color:#999;text-decoration:none}
+h1{font-size:24px;margin:8px 0}
+</style>
+</head>
+<body>
+<header><a href="https://www.lezhesoft.cn/">乐哲软件</a></header>
+<main>
+<nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / 实用工具教程</nav>
+<h1>AdGuard - 多平台广告拦截软件使用教程：从安装到过滤器配置的入门指南</h1>
+<div class="meta"><span>发布：2026-10-30</span><span>分类：实用工具</span></div>
+<img src="https://www.lezhesoft.cn/tutorial/cover/f8337a6e-7a42-432b-9b0d-b4b939333f47.png" alt="AdGuard - 多平台广告拦截软件使用教程：从安装到过滤器配置的入门指南封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+<article><h2>软件简介与适用场景</h2>
+<p>AdGuard 是一款系统级广告拦截软件，与普通浏览器插件不同，它直接过滤整台电脑的网络流量，因此不仅能清理浏览器中的横幅广告、弹窗和视频贴片广告，还能拦截本机各类应用中的广告与追踪器。软件同时提供 Windows 与 macOS 版本，适合三类人群：一是常被弹窗、浮层广告打扰的普通用户；二是注重隐私、希望屏蔽跟踪器和第三方 Cookie 的进阶用户；三是想为孩子过滤不良内容、需要家长控制功能的家庭用户。</p>
+
+<h2>安装步骤</h2>
+<p>1. 前往 AdGuard 官网或本站下载页，选择对应系统的版本下载安装包。2. 双击运行安装程序，按向导提示完成安装，过程无需复杂配置。3. 首次启动时，软件会提示安装根证书，用于过滤 HTTPS 加密网页中的广告——这是正常且必要的步骤，建议按提示信任证书，否则大部分现代网站的广告无法拦截。4. 安装完成后 AdGuard 会自动在后台启动并开始过滤，主界面顶部总开关可随时暂停或恢复保护。</p>
+
+<h2>核心功能操作要点</h2>
+<p>「广告拦截」是主模块：默认已启用 AdGuard 基础过滤器和中文语言过滤器，无需额外设置即可工作；遇到误杀网页元素时，打开「过滤日志」找到对应请求手动放行，或用过滤器编辑器添加自定义规则。「跟踪保护」可自动清除第三方 Cookie、阻止网站获取你的搜索来源与位置信息，隐私敏感用户建议开启。「浏览安全」模块会在你即将访问钓鱼或恶意网站时发出警告，注意它不是杀毒软件，不能替代杀毒。「DNS 防护」可选 AdGuard DNS 等可信服务器，在 DNS 层面再拦一道广告与追踪，并加密 DNS 流量避免运营商窥探。浏览器内还可用 AdGuard 助手小盾牌图标，对单个网页快速放行、屏蔽元素或上报漏拦广告。</p>
+
+<h2>常见问题 FAQ</h2>
+<p><strong>Q：开启 AdGuard 后某个网页显示异常怎么办？</strong><br>A：多为过滤规则误伤，将该网站加入白名单（允许列表）即可恢复，也可在过滤日志中定位具体被拦截的请求针对性放行。</p>
+<p><strong>Q：AdGuard 和浏览器广告插件有什么区别？</strong><br>A：插件只能在单个浏览器内生效，AdGuard 工作在系统层面，能过滤所有浏览器和本机应用的流量，还提供 DNS 防护、家长控制等插件做不到的能力。</p>
+<p><strong>Q：必须信任根证书才安全吗？</strong><br>A：拦截 HTTPS 加密广告必须本地解密流量，AdGuard 只在本地处理且证书仅在本机生效，按官方引导操作是安全的；不信任证书则只能过滤非加密内容，效果大打折扣。</p></article>
+<div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/91e1887a-ebb6-4171-a588-99866f62aca2.html">MacOS 提示「已损坏，无法打开」怎么办？</a><a href="https://www.lezhesoft.cn/tutorial/7aa79aaa-b1ba-4f8a-9056-20b0a731afb3.html">0xc000007b应用程序错误</a><a href="https://www.lezhesoft.cn/tutorial/ca626bf2-5874-41f5-ad12-8bb4c1309499.html">关于Adobe Genuine Service Alert盗版提示的解决方法</a><a href="https://www.lezhesoft.cn/tutorial/acd18f73-4840-4e8c-b6c2-d38d7625f0e8.html">Adobe Photoshop使用教程：新手从安装到出图的完整入门指南</a></div>
+</main>
+<footer><a href="https://www.lezhesoft.cn/">lezhesoft.cn</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
+</body></html>

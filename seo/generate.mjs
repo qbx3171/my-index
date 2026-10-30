@@ -161,6 +161,21 @@ for (const m of CONTENT_MASTERS) {
     console.log(`已用母本覆盖 ${m.id}.${m.field}（传输乱码兜底）`);
   }
 }
+// 描述定点重写：个别记录源描述含采集噪声且过短（触发薄内容/描述告警），用真实信息整体重写
+const DESC_OVERRIDES = {
+  // Keka 解压缩软件：源描述为「一款Mac上好用又免费的文件解压缩软件软件详情：提取码：x13i」，
+  // 含提取码噪声且正文仅 265 字，按软件公开功能重写
+  mrt05wkthp9y:
+    "Keka 是 macOS 平台免费好用的解压缩工具，支持 7z、Zip、Tar、Gzip 等常见压缩格式的创建与解压，也可解压 RAR 分卷压缩包，支持设置密码保护与分卷压缩，把文件拖到程序图标即可开始处理，适合日常压缩传输与接收解压场景。",
+};
+for (const [id, desc] of Object.entries(DESC_OVERRIDES)) {
+  const row = softs.find((s) => s.id === id);
+  if (row) {
+    row.description = desc;
+    console.log(`已重写 ${id} 的 description（源描述噪声/过短）`);
+  }
+}
+
 console.log(`数据：software=${softs.length}，tutorials=${tutorials.length}`);
 
 // 清理旧产物，避免删除的软件留下死页

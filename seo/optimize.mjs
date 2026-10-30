@@ -90,8 +90,16 @@ const bucket = (arr, edges) => {
 const thin = idx.filter((p) => p.textLen < 300).sort((a, b) => a.textLen - b.textLen);
 const lowInbound = idx.filter((p) => p.inbound < 3 && p.rel.startsWith("soft/")).sort((a, b) => a.inbound - b.inbound);
 const orphan = idx.filter((p) => p.inbound === 0);
-const longTitle = idx.filter((p) => [...p.title].length > 60);
-const longDesc = idx.filter((p) => [...p.desc].length > 165);
+// 实体解码：&amp; 这类实体会被搜索引擎当作 1 个可见字符，统计口径与 render.js 的 visLen 保持一致
+const decodeEnt = (s) =>
+  String(s)
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+const longTitle = idx.filter((p) => [...decodeEnt(p.title)].length > 60);
+const longDesc = idx.filter((p) => [...decodeEnt(p.desc)].length > 165);
 const badH1 = idx.filter((p) => p.h1 !== 1);
 const noSchema = idx.filter((p) => p.schemaTypes.length === 0);
 const imgNoAlt = idx.filter((p) => p.imgsNoAlt > 0);
@@ -116,7 +124,7 @@ const report = {
   },
   meta: {
     longTitleCount: longTitle.length,
-    longTitleSample: longTitle.slice(0, 5).map((p) => ({ rel: p.rel, len: [...p.title].length })),
+    longTitleSample: longTitle.slice(0, 5).map((p) => ({ rel: p.rel, len: [...decodeEnt(p.title)].length })),
     longDescCount: longDesc.length,
     h1NotOne: badH1.length,
     h1Sample: badH1.slice(0, 5).map((p) => ({ rel: p.rel, h1: p.h1 })),
