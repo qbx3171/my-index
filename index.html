@@ -4745,8 +4745,6 @@ var state=ch.presenceState();
 var count=Object.keys(state).length;
 var el=document.getElementById('onlineCount');
 if(el)el.textContent=count;
-var wrap=document.getElementById('onlineWrap');
-if(wrap&&count>0)wrap.style.display='inline';
 }).subscribe(function(status){
 if(status==='SUBSCRIBED'){try{localStorage.removeItem('lezhe_rt_dead');}catch(e){}ch.track({online_at:new Date().toISOString()});}
 else if(rtIsError(status))rtNoteFail();
