@@ -14,6 +14,7 @@ import {
   renderSitemapXml,
   renderSitemapHtml,
   catSlug,
+  catUrl,
   platformLabel,
 } from "./render.js";
 import { ensureCovers } from "./cover.mjs";
@@ -235,19 +236,61 @@ for (const s of softs) {
 const heat = (x) => String(x.id ?? "");
 for (const list of catList.values()) list.sort((a, b) => (heat(a) < heat(b) ? -1 : heat(a) > heat(b) ? 1 : 0));
 const REL_N = 8;
+// 小分类兜底顺序：按 id 升序（稳定，不随热度变化）
+const stableAll = [...softs].sort((a, b) => (String(a.id) < String(b.id) ? -1 : String(a.id) > String(b.id) ? 1 : 0));
 const pickRelated = (s) => {
   const list = catList.get(s.category) || [];
-  if (list.length <= REL_N + 1) return list.filter((x) => x.id !== s.id);
+  if (list.length <= REL_N + 1) {
+    const out = list.filter((x) => x.id !== s.id);
+    if (out.length >= 3) return out;
+    // 「驱动管理」这类只有一个成员的分类，页面上只剩 分类页+首页 两条入链。
+    // 不足 3 条时用全站稳定序列补齐（标题相应改为「同类与热门软件」，避免文案与内容不符）。
+    const have = new Set(out.map((x) => x.id));
+    have.add(s.id);
+    for (const x of stableAll) {
+      if (have.has(x.id)) continue;
+      have.add(x.id);
+      out.push(x);
+      if (out.length >= REL_N) break;
+    }
+    return out;
+  }
   const idx = list.findIndex((x) => x.id === s.id);
   if (idx < 0) return list.slice(0, REL_N);
   const out = [];
   for (let i = 1; i <= REL_N; i += 1) out.push(list[(idx + i) % list.length]);
   return out;
 };
+// 教程 ↔ 软件 互链：教程标题里出现完整软件名（去空格、忽略大小写，长度≥3）即视为同一主题。
+// 现状 6 篇教程只命中 2 款软件，命中率低属正常；教程每日 +1，这条链路会自动变密，
+// 且匹配不到时该区块整段不渲染（不会输出空壳或无关推荐）。
+const norm = (s) => String(s || "").toLowerCase().replace(/\s+/g, "");
+const tutBySoft = new Map();
+for (const s of softs) {
+  const n = norm(s.name);
+  if (n.length < 3) continue;
+  const hit = tutorials.filter((t) => norm(t.title).includes(n)).slice(0, 3);
+  if (hit.length) tutBySoft.set(s.id, hit);
+}
+const softByTut = new Map();
+for (const t of tutorials) {
+  const nt = norm(t.title);
+  const hit = softs
+    .filter((s) => s.name && norm(s.name).length >= 3 && nt.includes(norm(s.name)))
+    .slice(0, 4);
+  if (hit.length) softByTut.set(t.id, hit);
+}
+const catSet = new Set(softs.map((s) => s.category).filter(Boolean));
+const optsFor = (s, related = []) => ({
+  ...(nameCounts.get(s.name ?? "") > 1 ? { dupPlatform: platformLabel(s) || s.id } : {}),
+  tutorials: tutBySoft.get(s.id) || [],
+  // 兜底补链时列表里混入了其他分类，标题随之调整，保证标题与内容一致
+  mixedRelated: related.some((x) => x.category && x.category !== s.category),
+});
 const rendered = softs.map((s) => {
   const related = pickRelated(s);
-  const dup = (nameCounts.get(s.name ?? "") || 0) > 1;
-  return { s, related, ...renderSoftPage(s, related, dup ? { dupPlatform: platformLabel(s) || s.id } : {}) };
+  const opts = optsFor(s, related);
+  return { s, related, opts, ...renderSoftPage(s, related, opts) };
 });
 // 描述碰撞兜底：名字有细微差别的克隆记录（同名不同版本）描述可能雷同，
 // 对最终 meta description 相同的页面强制追加「版本+平台」尾注后重渲染
@@ -260,7 +303,7 @@ for (const b of rendered) {
 for (const group of descGroups.values()) {
   if (group.length < 2) continue;
   for (const b of group) {
-    const re = renderSoftPage(b.s, b.related, { forceDescTail: true });
+    const re = renderSoftPage(b.s, b.related, { ...b.opts, forceDescTail: true });
     b.html = re.html;
     b.title = re.title;
   }
@@ -273,13 +316,18 @@ for (const b of rendered) {
 console.log(`软件详情页：${count}`);
 
 let tCount = 0;
+let tLinked = 0;
 for (const t of tutorials) {
   const related = tutorials.filter((x) => x.id !== t.id).slice(0, 6);
-  const { html } = renderTutorialPage(t, related);
+  const hits = softByTut.get(t.id) || [];
+  if (hits.length) tLinked += 1;
+  // 分类链接只在「该分类确实有分类页」时才给，避免造出 /cat/cat-xxxx 死链
+  const catLink = catSet.has(t.category) ? catUrl(t.category) : null;
+  const { html } = renderTutorialPage(t, related, { softs: hits, catLink });
   await writeFile(join(ROOT, "tutorial", `${encodeURIComponent(t.id)}.html`), html, "utf8");
   tCount++;
 }
-console.log(`教程页：${tCount}`);
+console.log(`教程页：${tCount}（其中 ${tLinked} 篇回链到对应软件详情页）`);
 
 const cats = [...new Set(softs.map((s) => s.category).filter(Boolean))];
 let cCount = 0;
@@ -337,6 +385,44 @@ function buildSidebarNav(all) {
   return html;
 }
 
+// —— 首页「热门软件索引」静态块 ——
+// 首页软件卡片全部由 JS 渲染的 <div> 构成，原始 HTML 里 0 条 /soft/ 链接，
+// 首页权重无法向下传递，158 个详情页只能靠分类页拿内链。
+// 这里在首页底部输出一份纯文本索引（真实 <a>，可见、可点击、非隐藏文本），
+// 按「浏览 + 下载×3」排序取前 24 款，让爬虫从首页一跳直达核心详情页。
+const HOT_N = 24;
+function buildHotIndex(all) {
+  const seen = new Set();
+  const list = all
+    .filter((s) => s.name && String(s.name).trim())
+    .map((s) => ({
+      id: s.id,
+      name: String(s.name).trim(),
+      score: (Number(s.views) || 0) + (Number(s.downloads) || 0) * 3,
+    }))
+    .sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1));
+  const picked = [];
+  for (const s of list) {
+    // 同名多平台记录（含「Eagle  图像管理」这类多空格变体）只留一条
+    const key = s.name.replace(/\s+/g, "").toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    picked.push(s);
+    if (picked.length >= HOT_N) break;
+  }
+  const items = picked
+    .map((s) => `<li><a href="/soft/${encodeURIComponent(s.id)}.html">${navEsc(s.name)}</a></li>`)
+    .join("");
+  return (
+    `<div class="hotindex" id="hotSoftIndex">` +
+    `<h2 class="section-title">✦ 热门软件索引</h2>` +
+    `<p class="section-sub">按站内浏览与下载热度排序，点击名称直达详情页</p>` +
+    `<ul class="hotindex-list">${items}</ul>` +
+    `<p class="hotindex-more">完整清单：<a href="/sitemap.html">软件与教程索引</a>（共 ${all.length} 款软件）</p>` +
+    `</div><!--/hotindex-->`
+  );
+}
+
 try {
   let idx = await readFile(join(ROOT, "index.html"), "utf8");
   const open = '<div class="category-list" id="categoryList">';
@@ -354,8 +440,35 @@ try {
       "a.category-item-side{text-decoration:none;color:var(--text-secondary)}\n.category-item-side{"
     );
   }
+  // 热门软件索引：有旧块则原位替换，没有则插到 #pageHome 末尾（提交按钮之前）
+  const hot = buildHotIndex(softs);
+  const hs = idx.indexOf('<div class="hotindex" id="hotSoftIndex">');
+  const he = idx.indexOf("<!--/hotindex-->");
+  if (hs >= 0 && he > hs) {
+    idx = idx.slice(0, hs) + hot + idx.slice(he + "<!--/hotindex-->".length);
+  } else {
+    const anchor = '<div style="margin-top:24px;text-align:center;">';
+    const ai = idx.indexOf(anchor);
+    if (ai > 0) idx = idx.slice(0, ai) + hot + "\n" + idx.slice(ai);
+    else console.warn("⚠ 未找到首页热门索引插入锚点");
+  }
+  // 一次性注入样式（幂等）
+  if (!idx.includes(".hotindex-list{")) {
+    idx = idx.replace(
+      "</style>",
+      ".hotindex{margin-top:26px;padding:14px 16px;border:1px solid var(--border-glow);border-radius:14px;background:var(--bg-card-solid,rgba(255,255,255,.6))}\n" +
+        ".hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px;margin:10px 0 8px;padding:0}\n" +
+        ".hotindex-list li{font-size:.72rem;margin:0}\n" +
+        ".hotindex-list a{color:var(--text-secondary);text-decoration:none;padding:3px 9px;border-radius:6px;background:rgba(0,136,255,.05);display:inline-block;line-height:1.5}\n" +
+        ".hotindex-list a:hover{color:var(--accent-cyan);background:rgba(0,136,255,.1)}\n" +
+        ".hotindex-more{font-size:.7rem;color:var(--text-dim);margin:0}\n" +
+        ".hotindex-more a{color:var(--accent-cyan);text-decoration:none}\n" +
+        "</style>"
+    );
+  }
   await writeFile(join(ROOT, "index.html"), idx, "utf8");
   console.log(`首页侧栏静态导航：${nav.split('href="/cat/').length - 1} 条分类链接（共 ${softs.length} 款）`);
+  console.log(`首页热门索引：${hot.split('href="/soft/').length - 1} 条软件详情链接`);
 } catch (e) {
   console.warn(`⚠ 首页侧栏静态导航未更新：${e.message}`);
 }

@@ -48,7 +48,7 @@ const catHash = (s) => {
   return h.toString(36);
 };
 export const catSlug = (c) => CAT_SLUGS[c] || `cat-${catHash(c)}`;
-const catUrl = (c) => `${SITE}/cat/${catSlug(c)}.html`;
+export const catUrl = (c) => `${SITE}/cat/${catSlug(c)}.html`;
 
 // —— SEO 文案辅助 ——
 const stripHtml = (s) =>
@@ -279,7 +279,8 @@ ${date ? `<span>更新：${esc(String(date).slice(0, 10))}</span>` : ""}
 <p>${esc(description)}</p>
 ${downloadUrl ? `<a class="btn" href="${esc(downloadUrl)}" rel="nofollow">立即下载 ${esc(name)}</a>` : ""}
 <p>${esc(name)}由乐哲软件收录整理。下载前请阅读软件许可协议；安装中如遇缺少运行库、报错代码等问题，请参考站内相关教程。</p>
-${relatedBlock("同分类软件", related)}
+${relatedBlock(opts.mixedRelated ? "同类与热门软件" : "同分类软件", related)}
+${relatedBlock("相关教程", opts.tutorials || [])}
 </main>
 ${foot(canonical)}`;
   return { html, title };
@@ -368,7 +369,7 @@ ${foot(canonical)}`;
 
 /* ---------------- 教程文章页 ---------------- */
 
-export function renderTutorialPage(t, related = []) {
+export function renderTutorialPage(t, related = [], opts = {}) {
   const id = pick(t, ["id"]);
   const title0 = pick(t, ["title"]);
   const category = pick(t, ["category"], "实用");
@@ -409,9 +410,10 @@ export function renderTutorialPage(t, related = []) {
 <main>
 ${crumb([{ name: "首页", url: `${SITE}/` }, { name: `${category}教程` }])}
 <h1>${esc(title0)}</h1>
-<div class="meta">${createdAt ? `<span>发布：${esc(String(createdAt).slice(0, 10))}</span>` : ""}<span>分类：${esc(category)}</span></div>
+<div class="meta">${createdAt ? `<span>发布：${esc(String(createdAt).slice(0, 10))}</span>` : ""}<span>分类：${opts.catLink ? `<a href="${esc(opts.catLink)}">${esc(category)}</a>` : esc(category)}</span></div>
 ${cover ? `<img src="${esc(cover)}" alt="${esc(title0)}封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">` : ""}
 <article>${content}</article>
+${relatedBlock("相关软件下载", opts.softs || [])}
 ${relatedBlock("相关教程", related)}
 </main>
 ${foot(canonical)}`;
