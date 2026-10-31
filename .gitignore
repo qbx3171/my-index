@@ -4,3 +4,8 @@
 # 百度主动推送 token（本机私有）
 seo/baidu-token.txt
 seo/baidu-pushed.json
+
+# Cloudflare API token（本机私有）
+seo/cf-token.txt
+seo/bing-api-key.txt
+seo/bing-batched.json

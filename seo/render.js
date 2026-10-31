@@ -163,6 +163,17 @@ const relatedBlock = (title, list) =>
 const jsonLd = (obj) =>
   `<script type="application/ld+json">${JSON.stringify(obj)}</script>`;
 
+/* 教程正文里的图片多为采集来的截图，普遍没有 alt。
+   在渲染层统一补上「标题 + 序号」的描述性 alt，避免无障碍/图片搜索扣分。 */
+const addImgAlt = (html, base) => {
+  let n = 0;
+  return String(html || "").replace(/<img\b([^>]*)>/gi, (m, attrs) => {
+    if (/\balt\s*=/.test(attrs)) return m;
+    n += 1;
+    return `<img alt="${esc(base)} 教程配图${n}"${attrs}>`;
+  });
+};
+
 /* ---------------- 软件详情页 ---------------- */
 
 export function renderSoftPage(soft, related = [], opts = {}) {
@@ -359,7 +370,7 @@ export function renderTutorialPage(t, related = []) {
   const summary = pick(t, ["summary"], `「${title0}」- 乐哲软件图文教程。`);
   const cover = pick(t, ["cover"]);
   const createdAt = pick(t, ["created_at"]);
-  const content = t.content || "";
+  const content = addImgAlt(t.content || "", title0);
   const canonical = tutUrl(id);
   const title = `${title0}_乐哲软件教程`;
 

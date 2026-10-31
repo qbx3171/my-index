@@ -153,6 +153,8 @@ const tutorials = applyFixups(await sb("tutorials?select=*&limit=500"));
 // 对配置了母本的记录，若合并后正文仍残留乱码，直接用本地母本整体覆盖。
 const CONTENT_MASTERS = [
   { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", file: "content-master-acd18f73.txt" },
+  { id: "ab616030-0d0e-4462-be04-847abc6e9de5", field: "content", file: "content-master-ab616030.txt" },
+  { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "summary", file: "summary-master-acd18f73.txt" },
 ];
 for (const m of CONTENT_MASTERS) {
   const row = tutorials.find((t) => t.id === m.id);
@@ -217,8 +219,30 @@ let count = 0;
 // 标题与描述里追加平台后缀，避免「许多页面具有相同标题/描述」
 const nameCounts = new Map();
 for (const s of softs) nameCounts.set(s.name ?? "", (nameCounts.get(s.name ?? "") || 0) + 1);
+// 同分类相关推荐：按热度排序后「环形轮转」取后续 8 条。
+// 改动原因：此前固定取分类前 8 条，大分类里排在后面的 59 个软件页只拿到 2 条内链
+// （分类页 + 首页），形成内链孤岛。环形轮转后同分类内每页都指向不同组合，
+// 入链分布趋于均匀，且每页推荐数量不变（仍是 8 条，不会变成全站链接堆砌）。
+const catList = new Map();
+for (const s of softs) {
+  if (!s.category) continue;
+  if (!catList.has(s.category)) catList.set(s.category, []);
+  catList.get(s.category).push(s);
+}
+const heat = (x) => (Number(x.views) || 0) + (Number(x.downloads) || 0) * 3;
+for (const list of catList.values()) list.sort((a, b) => heat(b) - heat(a));
+const REL_N = 8;
+const pickRelated = (s) => {
+  const list = catList.get(s.category) || [];
+  if (list.length <= REL_N + 1) return list.filter((x) => x.id !== s.id);
+  const idx = list.findIndex((x) => x.id === s.id);
+  if (idx < 0) return list.slice(0, REL_N);
+  const out = [];
+  for (let i = 1; i <= REL_N; i += 1) out.push(list[(idx + i) % list.length]);
+  return out;
+};
 const rendered = softs.map((s) => {
-  const related = softs.filter((x) => x.category === s.category && x.id !== s.id).slice(0, 8);
+  const related = pickRelated(s);
   const dup = (nameCounts.get(s.name ?? "") || 0) > 1;
   return { s, related, ...renderSoftPage(s, related, dup ? { dupPlatform: platformLabel(s) || s.id } : {}) };
 });
