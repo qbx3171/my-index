@@ -227,12 +227,15 @@ body.nav-open .sidebar-backdrop{opacity:1;pointer-events:auto}
 .table-wrap td .icon-thumb{width:36px;height:36px;border-radius:12px;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:var(--glassSoft);font-size:19px;border:1px solid var(--bd)}
 .table-wrap td .icon-thumb img{width:100%;height:100%;object-fit:cover}
 .table-wrap td .actions{display:flex;gap:6px;flex-wrap:wrap}
-.table-wrap td .actions button{padding:3px 12px;border-radius:999px;font-size:.63rem;font-weight:600;border:1px solid transparent;min-height:28px;transition:var(--tr);-webkit-tap-highlight-color:transparent}
+.table-wrap td .actions button{padding:3px 12px;border-radius:999px;font-size:.63rem;font-weight:600;border:1px solid transparent;min-height:28px;transition:var(--tr);-webkit-tap-highlight-color:transparent;white-space:nowrap}
 .table-wrap td .actions button:active{transform:scale(.95)}
 .table-wrap td .actions .edit-btn{background:rgba(10,132,255,.1);color:var(--cy);border-color:rgba(10,132,255,.14)}
 .table-wrap td .actions .edit-btn:hover{background:var(--cy);color:#fff;border-color:transparent}
 .table-wrap td .actions .del-btn{background:rgba(239,68,68,.1);color:var(--rd);border-color:rgba(239,68,68,.14)}
 .table-wrap td .actions .del-btn:hover{background:var(--rd);color:#fff;border-color:transparent}
+.table-wrap td .actions .ren-btn{background:rgba(10,132,255,.1);color:var(--cy);border-color:rgba(10,132,255,.14)}
+.table-wrap td .actions .ren-btn:hover:not(:disabled){background:var(--cy);color:#fff;border-color:transparent}
+.table-wrap td .actions button:disabled{opacity:.55;cursor:not-allowed}
 .table-wrap td .actions .view-btn{background:rgba(139,92,246,.1);color:var(--pu);border-color:rgba(139,92,246,.14)}
 .table-wrap td .actions .view-btn:hover{background:var(--pu);color:#fff;border-color:transparent}
 .table-wrap td .actions .reply-btn{background:rgba(15,169,104,.1);color:var(--gr);border-color:rgba(15,169,104,.14)}
@@ -2470,7 +2473,7 @@ var h='<h2 class="page-title">⌗ 分类管理</h2><p class="page-sub">管理分
 h+='<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">';
 h+='<input type="text" id="newCatName" placeholder="分类名称" style="padding:10px 16px;border-radius:999px;border:1px solid var(--glassBd);background:var(--inp);flex:1;min-width:140px;color:var(--tx);min-height:44px;" />';
 h+='<button class="btn btn-sm btn-primary" id="addCatBtn">⊕ 添加</button></div>';
-h+='<div class="table-wrap"><table><thead><tr><th>分类名称</th><th>软件数</th><th style="width:80px;">操作</th></tr></thead><tbody>';
+h+='<div class="table-wrap"><table><thead><tr><th>分类名称</th><th>软件数</th><th style="width:150px;">操作</th></tr></thead><tbody>';
 if(cats.length===0)h+='<tr class="empty-row"><td colspan="3">暂无分类</td></tr>';
 else{
 for(var i=0;i<cats.length;i++){

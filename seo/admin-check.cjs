@@ -27,6 +27,9 @@ const checks = [
   ["吉祥物文案1", /在左侧进入「上传软件」，填写名称/],
   ["吉祥物文案2", /商城商品在「积分商城」维护/],
   ["吉祥物文案3", /「仪表盘」汇总软件数/],
+  ["ren-btn 样式与删除按钮一致", /actions \.ren-btn\{background:rgba\(10,132,255,\.1\)/],
+  ["操作按钮禁止文字换行", /font-weight:600;border:1px solid transparent;min-height:28px;transition:var\(--tr\);-webkit-tap-highlight-color:transparent;white-space:nowrap\}/],
+  ["分类操作列加宽", /<th style="width:150px;">操作<\/th>/],
 ];
 checks.forEach(([name, re]) => {
   const ok = re.test(h);
