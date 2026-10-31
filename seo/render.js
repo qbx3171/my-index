@@ -107,8 +107,13 @@ const head = (title, desc, canonical, extra = "", robots = "index,follow,max-ima
 ${extra}
 <style>
 body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
-header{background:#0077ff;color:#fff;padding:14px 20px;font-size:17px;font-weight:500}
-header a{color:#fff;text-decoration:none}
+header{background:#0077ff;color:#fff;padding:14px 20px;font-size:17px;font-weight:500;display:flex;align-items:center;gap:14px}
+header a{color:#fff;text-decoration:none;flex:0 0 auto}
+header form{margin:0 0 0 auto;display:flex;gap:6px}
+header input{width:150px;padding:6px 10px;border:0;border-radius:6px;font-size:14px;background:rgba(255,255,255,.95);color:#1a1a1a;outline:none;font-family:inherit}
+header button{padding:6px 12px;border:0;border-radius:6px;background:rgba(255,255,255,.22);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+header button:hover{background:rgba(255,255,255,.34)}
+@media(max-width:480px){header input{width:96px}}
 main{max-width:760px;margin:0 auto;padding:24px 20px}
 .meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
 .btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
@@ -122,7 +127,7 @@ h1{font-size:24px;margin:8px 0}
 </style>
 </head>
 <body>
-<header><a href="${SITE}/">乐哲软件</a></header>`;
+<header><a href="${SITE}/">乐哲软件</a><form action="${SITE}/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form></header>`;
 
 // 品牌锚文本轮换：按页面 URL 的稳定 hash 分配，覆盖「官网词 / 精确品牌词 / 域名」三种变体，
 // 避免 177 个页面页脚清一色同一个锚文本（机械感强，且只覆盖单一变体）
@@ -454,6 +459,31 @@ export function renderSitemapHtml(softs = [], tutorials = []) {
   for (const s of softs) {
     (byCat[s.category || "其他"] = byCat[s.category || "其他"] || []).push(s);
   }
+  // 前端筛选：只操作已渲染的 DOM，不请求任何数据，也不依赖首页那套有状态搜索。
+  // 静态页 header 的搜索框把 ?q= 带到这里，落地即筛出结果。
+  const filterJs = `<script>
+(function(){
+var inp=document.getElementById('sf'),cnt=document.getElementById('sfc');
+if(!inp)return;
+function isItem(a){var h=a.getAttribute('href')||'';return h.indexOf('/soft/')>=0||h.indexOf('/tutorial/')>=0;}
+var links=[].slice.call(document.querySelectorAll('main a')).filter(isItem);
+var paras=[].slice.call(document.querySelectorAll('main p')).filter(function(p){return [].some.call(p.querySelectorAll('a'),isItem);});
+var heads=[].slice.call(document.querySelectorAll('main h2'));
+function norm(s){return String(s).toLowerCase().replace(/\\s+/g,'');}
+function run(){
+var k=norm(inp.value);
+if(!k){links.forEach(function(a){a.style.display='';});paras.forEach(function(p){p.style.display='';});heads.forEach(function(h){h.style.display='';});cnt.textContent='';return;}
+var hit=0;
+links.forEach(function(a){var ok=norm(a.textContent).indexOf(k)>=0;a.style.display=ok?'':'none';if(ok)hit++;});
+paras.forEach(function(p){var vis=[].some.call(p.querySelectorAll('a'),function(a){return isItem(a)&&a.style.display!=='none';});p.style.display=vis?'':'none';});
+heads.forEach(function(h){var n=h.nextElementSibling;h.style.display=(n&&n.style.display!=='none')?'':'none';});
+cnt.textContent=hit?('命中 '+hit+' 条'):'没有匹配的内容，换个关键词试试';
+}
+inp.addEventListener('input',run);
+try{var q=new URLSearchParams(location.search).get('q');if(q){inp.value=q;run();}}catch(e){}
+})();
+</script>`;
+
   const html = head(
     "网站地图 - 全部软件与教程 | 乐哲软件",
     `乐哲软件网站地图，收录全部 ${softs.length} 款软件详情页、${cats.length} 个分类聚合页与 ${tutorials.length} 篇图文教程的完整链接索引，方便搜索引擎抓取全站内容，也便于用户快速导航找到所需软件的下载页与安装教程，列表每日更新。`,
@@ -464,6 +494,7 @@ export function renderSitemapHtml(softs = [], tutorials = []) {
 <main>
 <h1>网站地图</h1>
 <p>全部 ${softs.length} 款软件 · ${tutorials.length} 篇教程 · ${cats.length} 个分类：</p>
+<div style="margin:16px 0 4px"><input id="sf" type="search" placeholder="输入软件名或教程标题筛选…" aria-label="筛选全站内容" autocomplete="off" style="width:100%;box-sizing:border-box;padding:11px 14px;font-size:15px;border:1px solid #d5dbe5;border-radius:9px;outline:none;font-family:inherit;color:#1a1a1a"><div id="sfc" style="color:#888;font-size:13px;margin-top:6px;min-height:18px"></div></div>
 ${cats
   .map(
     (c) => `<h2><a href="${catUrl(c)}" style="color:#0077ff;text-decoration:none">${esc(c)}</a>（${(byCat[c] || []).length}）</h2>
@@ -478,6 +509,7 @@ ${tutorials.length
       .join("")}</p>`
   : ""}
 </main>
+${filterJs}
 ${foot("sitemap")}`;
   return { html, title: "网站地图 - 全部软件与教程 | 乐哲软件" };
 }

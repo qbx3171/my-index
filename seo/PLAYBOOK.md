@@ -90,6 +90,10 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [x] 首页静态 /soft/ 链接（2026-10-31 完成，0 → 24 条；做法：generate.mjs `buildHotIndex()` 在 #pageHome 末尾输出「热门软件索引」块，按「浏览 + 下载×3」取前 24，同名多平台记录按去空格后名称去重；块内另有 /sitemap.html 全量索引链接。样式一次性注入 `.hotindex-*`，幂等替换靠 `<!--/hotindex-->` 标记）
 - [x] 教程/软件页互链（2026-10-31 完成；做法：按「教程标题包含完整软件名」双向匹配，软件页渲染「相关教程」、教程页渲染「相关软件下载」，无命中则整块不输出；教程页「分类」改为可点链接，仅在该分类确有分类页时输出，避免造 /cat/cat-xxxx 死链。现 6 篇教程命中 2 篇，随每日新增自动变密）
 - [ ] 数据质量：`驱动管理` 分类仅 1 条记录，且标题是促销文案「…限时 7 折特惠快入手！」（SERP 里会当标题展示，属低质信号）。建议后台改名为「Driver Booster 13 Pro」并归入 系统工具/实用工具，改名后自动获得同分类内链，该页入链 2→3 以上
-- [ ] 首页 604KB / 内联 343KB 拆分（同上，需灰度验证）
+- [x] 404 兜底页（2026-10-31 完成；此前线上 404 是 GitHub 英文默认页、整页 0 处本站链接。做法：render.js `render404()` + generate.mjs 落盘 404.html，GitHub Pages 原生接管且保持 404 状态码；页面自带 164 条搜索索引（158 软件 + 6 教程，含 URL 中文关键词预填）+ 热门 12 + 分类 15 + 全站索引出口，noindex。audit.mjs 第 15 项永久检查。产物 22.5KB / gzip 8.3KB）
+- [ ] 教程封面 PNG→WebP：6 张各 294KB 共 1.76MB，但 cover 由 `ensureCovers()` 远端拉取重建、路径存数据库 `tutorials.cover`，且该 URL 兼作 og:image（微信对 webp 分享卡兼容存疑），改造需动 ensureCovers + render 双通道（img 用 webp、og:image 留 png），有设计成本，暂缓
+- [ ] 站内搜索（全站级）：404 页已验证「自带索引 JSON + 前端子串匹配」模式可行，可平移到 sitemap.html / 首页；158 软件索引 JSON 仅 ~11KB
+- [ ] 首页减重：内联 JS 338KB = 主脚本 205KB + **supabase UMD 100KB（被整段内联，而根目录 supabase.umd.js 从未被引用）** + DOMPurify 21KB；UMD 改外链 defer 是最低风险第一步（HTML 641→541KB，二次访问走缓存）
+- [ ] 软件页内容深化：158 页均只有 1 个 H1、0 个 H2、正文中位 553 字，缺「适用场景/最低配置/常见问题」结构化段落（长尾词 + FAQ 富摘要资格）
 - [x] 统计「零第三方」（2026-10-31：前端已改成三层取值 —— ①自家 Supabase `site_hit/site_get` ②abacus 兜底 ③localStorage 上次值；自家通道探测失败后本会话不再重试。SQL 见 `seo/site-stats.sql`）
 - [x] Supabase 建表 + RPC（2026-10-31 已执行：`site_stats` 表 + `site_hit/site_get`；表无 policy、anon 直接 select 返回空数组，只能走函数。实测预检 200、自增正常、非法 key 返回 P0001。线上端到端验证：3 个请求全打自家 RPC，abacus 零调用。自检命令 `node seo/stat-check.mjs`）
