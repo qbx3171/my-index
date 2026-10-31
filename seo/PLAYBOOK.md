@@ -88,4 +88,4 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [ ] 数据质量：`驱动管理` 分类仅 1 条记录，且标题是促销文案「…限时 7 折特惠快入手！」（SERP 里会当标题展示，属低质信号）。建议后台改名为「Driver Booster 13 Pro」并归入 系统工具/实用工具，改名后自动获得同分类内链，该页入链 2→3 以上
 - [ ] 首页 604KB / 内联 343KB 拆分（同上，需灰度验证）
 - [x] 统计「零第三方」（2026-10-31：前端已改成三层取值 —— ①自家 Supabase `site_hit/site_get` ②abacus 兜底 ③localStorage 上次值；自家通道探测失败后本会话不再重试。SQL 见 `seo/site-stats.sql`）
-- [ ] **待办（需人工 1 次）**：在 Supabase SQL Editor 执行 `seo/site-stats.sql` 建表 + RPC。执行后前端会在下次访问自动切到自家计数，无需重新部署；未执行时继续走 abacus，页脚照常显示数字
+- [x] Supabase 建表 + RPC（2026-10-31 已执行：`site_stats` 表 + `site_hit/site_get`；表无 policy、anon 直接 select 返回空数组，只能走函数。实测预检 200、自增正常、非法 key 返回 P0001。线上端到端验证：3 个请求全打自家 RPC，abacus 零调用。自检命令 `node seo/stat-check.mjs`）
