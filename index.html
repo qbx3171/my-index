@@ -133,6 +133,15 @@ setTimeout(function(){clearInterval(_checkInt);},15000);
 :root{--bg-primary:#f6f8fc;--bg-secondary:#eef2f9;--bg-card:rgba(255,255,255,.78);--bg-card-solid:#ffffff;--border-glow:rgba(15,26,46,.08);--border-glow-strong:rgba(15,26,46,.16);--text-primary:#0f1a2e;--text-secondary:#4a5a72;--text-dim:#94a3b8;--accent-cyan:#0077ff;--accent-purple:#6c5ce7;--accent-gradient:linear-gradient(135deg,#0077ff,#6c5ce7);--shadow-card:0 4px 16px rgba(15,26,46,.06),0 2px 6px rgba(15,26,46,.04);--shadow-card-hover:0 12px 32px rgba(15,26,46,.10);--shadow-sm:0 1px 2px rgba(15,26,46,.05),0 1px 3px rgba(15,26,46,.04);--radius-lg:20px;--radius-md:14px;--radius-sm:10px;--transition:.22s cubic-bezier(.2,0,0,1);--font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;--max-width:1200px;--header-height:64px;--danger:#e74c3c;--success:#22a05e;--warning:#f39c12;--sidebar-width:280px;--sidebar-trigger-width:32px}
 [data-theme="dark"]{--bg-primary:#0d1424;--bg-secondary:#131c30;--bg-card:rgba(19,28,48,.82);--bg-card-solid:#131c30;--border-glow:rgba(255,255,255,.07);--border-glow-strong:rgba(255,255,255,.14);--text-primary:#e8eef8;--text-secondary:#a8b5c9;--text-dim:#6b7a91;--shadow-card:0 4px 16px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.25);--shadow-card-hover:0 12px 32px rgba(0,0,0,.5);--shadow-sm:0 1px 2px rgba(0,0,0,.3)}
 [data-theme="glass"]{--bg-primary:#050a14;--bg-secondary:#0a1222;--bg-card:rgba(255,255,255,.07);--bg-card-solid:rgba(18,26,44,.78);--border-glow:rgba(255,255,255,.14);--border-glow-strong:rgba(255,255,255,.26);--text-primary:#f2f6ff;--text-secondary:#bfcbe0;--text-dim:#7c8aa5;--accent-cyan:#5eb8ff;--accent-purple:#b794f6;--accent-gradient:linear-gradient(135deg,#5eb8ff 0%,#b794f6 100%);--shadow-card:0 8px 32px rgba(0,10,30,.45),inset 0 1px 0 rgba(255,255,255,.10);--shadow-card-hover:0 14px 44px rgba(94,184,255,.28),inset 0 1px 0 rgba(255,255,255,.22);--shadow-sm:0 4px 16px rgba(0,10,30,.35),inset 0 1px 0 rgba(255,255,255,.10)}
+/* —— 卡通 / 清新主题（浅色系，仅换变量 + 页底柔光背景，不改布局） —— */
+[data-theme="doraemon"]{--bg-primary:#eaf4ff;--bg-secondary:#dceaff;--bg-card:rgba(255,255,255,.86);--bg-card-solid:#ffffff;--border-glow:rgba(0,102,204,.14);--border-glow-strong:rgba(0,102,204,.26);--text-primary:#0f2947;--text-secondary:#41618a;--text-dim:#7d97b8;--accent-cyan:#0a84ff;--accent-purple:#ff5a5f;--accent-gradient:linear-gradient(135deg,#0a84ff 0%,#5ac8fa 100%);--shadow-card:0 4px 16px rgba(10,60,120,.08),0 2px 6px rgba(10,60,120,.05);--shadow-card-hover:0 12px 32px rgba(10,60,120,.14);--shadow-sm:0 1px 2px rgba(10,60,120,.06)}
+[data-theme="doraemon"] body{background-image:radial-gradient(620px 440px at 6% -8%,rgba(90,200,250,.40),transparent 62%),radial-gradient(520px 400px at 98% 2%,rgba(255,195,0,.20),transparent 62%),radial-gradient(760px 520px at 50% 110%,rgba(10,132,255,.14),transparent 62%);background-attachment:fixed}
+[data-theme="shinchan"]{--bg-primary:#fff8ee;--bg-secondary:#ffefd9;--bg-card:rgba(255,253,248,.88);--bg-card-solid:#fffdf8;--border-glow:rgba(190,92,34,.14);--border-glow-strong:rgba(190,92,34,.26);--text-primary:#3b2a20;--text-secondary:#7a5a42;--text-dim:#b08c6f;--accent-cyan:#f25c2a;--accent-purple:#ffb703;--accent-gradient:linear-gradient(135deg,#f25c2a 0%,#ffb703 100%);--shadow-card:0 4px 16px rgba(150,80,20,.08),0 2px 6px rgba(150,80,20,.05);--shadow-card-hover:0 12px 32px rgba(150,80,20,.14);--shadow-sm:0 1px 2px rgba(150,80,20,.06)}
+[data-theme="shinchan"] body{background-image:radial-gradient(620px 440px at 8% -6%,rgba(255,183,3,.26),transparent 62%),radial-gradient(560px 400px at 96% 0%,rgba(242,92,42,.18),transparent 62%),radial-gradient(700px 480px at 50% 108%,rgba(255,214,102,.22),transparent 62%);background-attachment:fixed}
+[data-theme="cartoon"]{--bg-primary:#f7f2ff;--bg-secondary:#efe6ff;--bg-card:rgba(255,255,255,.88);--bg-card-solid:#ffffff;--border-glow:rgba(124,92,255,.14);--border-glow-strong:rgba(124,92,255,.26);--text-primary:#241a44;--text-secondary:#5b4b86;--text-dim:#9b8fc0;--accent-cyan:#7c5cff;--accent-purple:#ff5fa2;--accent-gradient:linear-gradient(135deg,#7c5cff 0%,#ff5fa2 100%);--shadow-card:0 4px 16px rgba(90,60,180,.09),0 2px 6px rgba(90,60,180,.05);--shadow-card-hover:0 12px 32px rgba(90,60,180,.15);--shadow-sm:0 1px 2px rgba(90,60,180,.06)}
+[data-theme="cartoon"] body{background-image:radial-gradient(600px 420px at 4% -8%,rgba(124,92,255,.24),transparent 62%),radial-gradient(560px 420px at 98% 4%,rgba(255,95,162,.22),transparent 62%),radial-gradient(720px 500px at 60% 110%,rgba(120,220,255,.18),transparent 62%);background-attachment:fixed}
+[data-theme="fresh"]{--bg-primary:#f1fbf6;--bg-secondary:#e2f7ec;--bg-card:rgba(255,255,255,.88);--bg-card-solid:#ffffff;--border-glow:rgba(20,150,120,.14);--border-glow-strong:rgba(20,150,120,.26);--text-primary:#12332b;--text-secondary:#3d6b5e;--text-dim:#7fa79b;--accent-cyan:#12b886;--accent-purple:#4ade80;--accent-gradient:linear-gradient(135deg,#12b886 0%,#4ade80 100%);--shadow-card:0 4px 16px rgba(12,90,70,.08),0 2px 6px rgba(12,90,70,.05);--shadow-card-hover:0 12px 32px rgba(12,90,70,.14);--shadow-sm:0 1px 2px rgba(12,90,70,.06)}
+[data-theme="fresh"] body{background-image:radial-gradient(620px 440px at 6% -8%,rgba(74,222,128,.26),transparent 62%),radial-gradient(540px 400px at 98% 2%,rgba(56,189,248,.18),transparent 62%),radial-gradient(720px 500px at 50% 110%,rgba(18,184,134,.14),transparent 62%);background-attachment:fixed}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{overflow-x:hidden;width:100%;-webkit-tap-highlight-color:transparent}
 html[data-theme="glass"]{background:#050a14}
@@ -238,7 +247,7 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 @keyframes heroAurora{0%{transform:translate(0,0) scale(1)}50%{transform:translate(2%,-2%) scale(1.06)}100%{transform:translate(-2%,1.5%) scale(1.03)}}
 @media (prefers-reduced-motion:reduce){.hero::before{animation:none}}
 .hero h1{font-size:2.3rem;font-weight:800;letter-spacing:-1px;color:var(--text-primary);margin-bottom:8px;line-height:1.2}
-.hero h1 .highlight{background:linear-gradient(120deg,#0077ff 10%,#6c5ce7 60%,#5eb8ff 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:heroGradientShift 6s linear infinite alternate}
+.hero h1 .highlight{background:linear-gradient(120deg,var(--accent-cyan,#0077ff) 10%,var(--accent-purple,#6c5ce7) 60%,var(--accent-cyan,#5eb8ff) 100%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:heroGradientShift 6s linear infinite alternate}
 @keyframes heroGradientShift{from{background-position:0% 50%}to{background-position:100% 50%}}
 @media (prefers-reduced-motion:reduce){.hero h1 .highlight{animation:none}}
 .hero p{font-size:.88rem;color:var(--text-secondary);max-width:460px;margin:0 auto 16px;font-weight:400}
@@ -787,6 +796,22 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
 .theme-preview-auto .tp-card:nth-of-type(1) span{background:#3d5068}
 .theme-preview-auto .tp-card:nth-of-type(2){background:rgba(255,255,255,.06)}
 .theme-preview-auto .tp-card:nth-of-type(2) span{background:#94a3b8}
+.theme-preview-doraemon{background:linear-gradient(135deg,#e8f4ff 0%,#cfe7ff 100%)}
+.theme-preview-doraemon .tp-bar{background:#0a84ff}
+.theme-preview-doraemon .tp-card{background:rgba(255,255,255,.85)}
+.theme-preview-doraemon .tp-card span{background:#41618a}
+.theme-preview-shinchan{background:linear-gradient(135deg,#fff8ee 0%,#ffe3c2 100%)}
+.theme-preview-shinchan .tp-bar{background:#f25c2a}
+.theme-preview-shinchan .tp-card{background:rgba(255,253,248,.9)}
+.theme-preview-shinchan .tp-card span{background:#7a5a42}
+.theme-preview-cartoon{background:linear-gradient(135deg,#f2e9ff 0%,#ffd9ec 100%)}
+.theme-preview-cartoon .tp-bar{background:linear-gradient(90deg,#7c5cff,#ff5fa2)}
+.theme-preview-cartoon .tp-card{background:rgba(255,255,255,.88)}
+.theme-preview-cartoon .tp-card span{background:#5b4b86}
+.theme-preview-fresh{background:linear-gradient(135deg,#eafaf1 0%,#cdf3e2 100%)}
+.theme-preview-fresh .tp-bar{background:linear-gradient(90deg,#12b886,#4ade80)}
+.theme-preview-fresh .tp-card{background:rgba(255,255,255,.9)}
+.theme-preview-fresh .tp-card span{background:#3d6b5e}
 .theme-option-info{text-align:center;margin-top:8px}
 .theme-option-name{font-size:.82rem;font-weight:700;color:var(--text-primary)}
 .theme-option-desc{font-size:.62rem;color:var(--text-dim);margin-top:2px}
@@ -954,7 +979,7 @@ html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover{backgrou
 .liquid-orb{animation:none !important;filter:blur(30px) !important}
 .hero h1{background:none !important;-webkit-text-fill-color:var(--text-primary) !important;color:var(--text-primary) !important}
 [data-theme="glass"] .hero h1{-webkit-text-fill-color:#ffffff !important;color:#ffffff !important}
-.hero h1 .highlight{background:linear-gradient(120deg,#0077ff 10%,#6c5ce7 60%,#5eb8ff 100%) !important;-webkit-background-clip:text !important;background-clip:text !important;-webkit-text-fill-color:transparent !important;background-size:200% auto !important;animation:heroGradientShift 6s linear infinite alternate !important}
+.hero h1 .highlight{background:linear-gradient(120deg,var(--accent-cyan,#0077ff) 10%,var(--accent-purple,#6c5ce7) 60%,var(--accent-cyan,#5eb8ff) 100%) !important;-webkit-background-clip:text !important;background-clip:text !important;-webkit-text-fill-color:transparent !important;background-size:200% auto !important;animation:heroGradientShift 6s linear infinite alternate !important}
 body{background-attachment:scroll !important}
 .divider-cyber{margin:12px 0 10px !important}
 .sidebar-categories{box-shadow:4px 0 20px rgba(0,0,0,0.15) !important}
@@ -1096,8 +1121,8 @@ body.ls-locked{overflow:hidden !important}
 .hotindex-more:hover{color:var(--accent-cyan)}
 .hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0}
 .hotindex-list li{margin:0}
-.hotindex-list a{display:inline-block;font-size:.75rem;line-height:1;padding:7px 12px;border-radius:8px;color:var(--text-secondary);text-decoration:none;border:1px solid rgba(0,136,255,.14);background:rgba(0,136,255,.04);transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease}
-.hotindex-list a:hover{color:var(--accent-cyan);border-color:rgba(0,136,255,.4);background:rgba(0,136,255,.09);transform:translateY(-1px)}
+.hotindex-list a{display:inline-block;font-size:.75rem;line-height:1;padding:7px 12px;border-radius:8px;color:var(--text-secondary);text-decoration:none;border:1px solid var(--border-glow-strong,rgba(15,26,46,.16));background:var(--bg-card,rgba(255,255,255,.78));transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease}
+.hotindex-list a:hover{color:var(--accent-cyan);border-color:var(--accent-cyan);background:var(--bg-secondary,#eef2f9);transform:translateY(-1px)}
 @media(max-width:600px){.hotindex-list{gap:6px}.hotindex-list a{font-size:.72rem;padding:6px 10px}}
 </style>
 </head>
@@ -1346,6 +1371,26 @@ body.ls-locked{overflow:hidden !important}
 <div class="theme-option-info"><div class="theme-option-name">自动</div><div class="theme-option-desc">日落后切暗</div></div>
 <div class="theme-option-check"><i class="fas fa-check"></i></div>
 </div>
+<div class="theme-option" data-theme-value="doraemon">
+<div class="theme-preview theme-preview-doraemon"><div class="tp-bar"></div><div class="tp-card"><span></span><span></span></div><div class="tp-card"><span></span><span></span></div></div>
+<div class="theme-option-info"><div class="theme-option-name">哆啦A梦</div><div class="theme-option-desc">蓝白铃铛</div></div>
+<div class="theme-option-check"><i class="fas fa-check"></i></div>
+</div>
+<div class="theme-option" data-theme-value="shinchan">
+<div class="theme-preview theme-preview-shinchan"><div class="tp-bar"></div><div class="tp-card"><span></span><span></span></div><div class="tp-card"><span></span><span></span></div></div>
+<div class="theme-option-info"><div class="theme-option-name">蜡笔小新</div><div class="theme-option-desc">奶油暖橙</div></div>
+<div class="theme-option-check"><i class="fas fa-check"></i></div>
+</div>
+<div class="theme-option" data-theme-value="cartoon">
+<div class="theme-preview theme-preview-cartoon"><div class="tp-bar"></div><div class="tp-card"><span></span><span></span></div><div class="tp-card"><span></span><span></span></div></div>
+<div class="theme-option-info"><div class="theme-option-name">卡通乐园</div><div class="theme-option-desc">糖果紫粉</div></div>
+<div class="theme-option-check"><i class="fas fa-check"></i></div>
+</div>
+<div class="theme-option" data-theme-value="fresh">
+<div class="theme-preview theme-preview-fresh"><div class="tp-bar"></div><div class="tp-card"><span></span><span></span></div><div class="tp-card"><span></span><span></span></div></div>
+<div class="theme-option-info"><div class="theme-option-name">清新薄荷</div><div class="theme-option-desc">抹茶呼吸感</div></div>
+<div class="theme-option-check"><i class="fas fa-check"></i></div>
+</div>
 </div>
 </div>
 </div>
@@ -1439,8 +1484,8 @@ document.head.appendChild(s);
 tryNext();
 }
 tryInitSupabaseWithRetry();
-var THEME_VALUES=['light','dark','glass','auto'];
-var THEME_LABELS={light:'白天',dark:'黑夜',glass:'玻璃',auto:'自动'};
+var THEME_VALUES=['light','dark','glass','auto','doraemon','shinchan','cartoon','fresh'];
+var THEME_LABELS={light:'白天',dark:'黑夜',glass:'玻璃',auto:'自动',doraemon:'哆啦A梦',shinchan:'蜡笔小新',cartoon:'卡通乐园',fresh:'清新薄荷'};
 var RESET_COOLDOWN_MS=300000;
 function resolveTheme(t){
 if(t!=='auto')return t;
@@ -1454,7 +1499,7 @@ document.documentElement.setAttribute('data-theme-stored',theme);
 var actual=resolveTheme(theme);
 document.documentElement.setAttribute('data-theme',actual);
 var headerBtn=document.getElementById('headerThemeBtn');
-if(headerBtn){var ic=actual==='dark'?'fa-sun':(actual==='glass'?'fa-gem':'fa-moon');headerBtn.innerHTML='<i class="fas '+ic+'"></i>';}
+if(headerBtn){var ic=actual==='dark'?'fa-sun':(actual==='glass'?'fa-gem':(actual==='fresh'?'fa-leaf':(actual==='doraemon'||actual==='shinchan'||actual==='cartoon'?'fa-face-smile':'fa-moon')));headerBtn.innerHTML='<i class="fas '+ic+'"></i>';}
 var themeLabel=document.getElementById('themeLabel');
 if(themeLabel){
 themeLabel.textContent=THEME_LABELS[theme]||'白天';

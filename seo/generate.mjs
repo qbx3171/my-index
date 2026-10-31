@@ -479,8 +479,8 @@ try {
     ".hotindex-more:hover{color:var(--accent-cyan)}\n" +
     ".hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0}\n" +
     ".hotindex-list li{margin:0}\n" +
-    ".hotindex-list a{display:inline-block;font-size:.75rem;line-height:1;padding:7px 12px;border-radius:8px;color:var(--text-secondary);text-decoration:none;border:1px solid rgba(0,136,255,.14);background:rgba(0,136,255,.04);transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease}\n" +
-    ".hotindex-list a:hover{color:var(--accent-cyan);border-color:rgba(0,136,255,.4);background:rgba(0,136,255,.09);transform:translateY(-1px)}\n" +
+    ".hotindex-list a{display:inline-block;font-size:.75rem;line-height:1;padding:7px 12px;border-radius:8px;color:var(--text-secondary);text-decoration:none;border:1px solid var(--border-glow-strong,rgba(15,26,46,.16));background:var(--bg-card,rgba(255,255,255,.78));transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease}\n" +
+    ".hotindex-list a:hover{color:var(--accent-cyan);border-color:var(--accent-cyan);background:var(--bg-secondary,#eef2f9);transform:translateY(-1px)}\n" +
     "@media(max-width:600px){.hotindex-list{gap:6px}.hotindex-list a{font-size:.72rem;padding:6px 10px}}\n";
   // 清掉所有含 .hotindex 的旧样式行（含 @media 行，否则每次生成都会叠一份）
   idx = idx.replace(/^[^\n]*\.hotindex[^\n]*\n/gm, "");
