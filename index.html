@@ -1088,15 +1088,16 @@ body.ls-locked{overflow:hidden !important}
 .dt-reveal{opacity:1!important;transform:none!important}
 .detail-page>h2::after{display:none}
 }
-.hotindex{margin-top:18px;padding-top:12px;border-top:1px solid var(--border-glow,rgba(0,136,255,.15))}
-.hotindex-title{font-size:.78rem;font-weight:600;color:var(--text-dim);margin:0 0 6px}
-.hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:2px 0;margin:0;padding:0;line-height:1.9}
-.hotindex-list li{font-size:.72rem;margin:0}
-.hotindex-list li+li::before{content:"·";margin:0 7px;color:var(--text-dim,rgba(120,130,150,.6))}
-.hotindex-list a{color:var(--text-secondary);text-decoration:none}
-.hotindex-list a:hover{color:var(--accent-cyan);text-decoration:underline}
-.hotindex-more{font-size:.7rem;color:var(--text-dim);margin:6px 0 0}
-.hotindex-more a{color:var(--accent-cyan);text-decoration:none}
+.hotindex{margin-top:26px;padding-top:16px;border-top:1px solid var(--border-glow,rgba(0,136,255,.12))}
+.hotindex-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+.hotindex-title{font-size:.86rem;font-weight:600;color:var(--text-secondary);margin:0;letter-spacing:.02em}
+.hotindex-more{font-size:.74rem;color:var(--text-dim);text-decoration:none;white-space:nowrap;transition:color .18s ease}
+.hotindex-more:hover{color:var(--accent-cyan)}
+.hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0}
+.hotindex-list li{margin:0}
+.hotindex-list a{display:inline-block;font-size:.75rem;line-height:1;padding:7px 12px;border-radius:8px;color:var(--text-secondary);text-decoration:none;border:1px solid rgba(0,136,255,.14);background:rgba(0,136,255,.04);transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease}
+.hotindex-list a:hover{color:var(--accent-cyan);border-color:rgba(0,136,255,.4);background:rgba(0,136,255,.09);transform:translateY(-1px)}
+@media(max-width:600px){.hotindex-list{gap:6px}.hotindex-list a{font-size:.72rem;padding:6px 10px}}
 </style>
 </head>
 <body class="">
@@ -1169,7 +1170,7 @@ body.ls-locked{overflow:hidden !important}
 <div style="margin-top:24px;text-align:center;">
 <button class="btn btn-primary" id="openSubmitSoftwareBtn" style="padding:10px 28px;"><i class="fas fa-rocket"></i> 开发者入驻 · 提交软件</button>
 </div>
-<div class="hotindex" id="hotSoftIndex"><h2 class="hotindex-title">热门软件</h2><ul class="hotindex-list"><li><a href="/soft/mrjyswit178r.html">Adobe Photoshop</a></li><li><a href="/soft/48cd558217de59137171e7f2.html">FilmCraft 跨平台非线性视频编辑器</a></li><li><a href="/soft/mryowri0r74x.html">Eagle  图像管理查看</a></li><li><a href="/soft/msft1pau5r3f.html">PS全套插件一键安装</a></li><li><a href="/soft/mrmxq3cqxuos.html">GenP Adobe软件一键激活工具</a></li><li><a href="/soft/mrk0guac155a.html">Autodesk Maya</a></li><li><a href="/soft/mto1tkxt44mh.html">VMware Workstation PRO 安装版</a></li><li><a href="/soft/54b8e3b9ca96b783dab47584.html">AdGuard - 多平台广告拦截软件</a></li><li><a href="/soft/mrk0mazwphee.html">Permute 4 - Mac图片音视频格式转换工具</a></li><li><a href="/soft/mrjzr6p10va7.html">Autodesk CAD</a></li><li><a href="/soft/885152adfc253fb7d419f841.html">CleanMyMac 苹果电脑清理工具软件</a></li><li><a href="/soft/ff9eab61a6cf4b5c1e38fab3.html">MuMuPlayer Pro 网易MuMu安卓模拟器</a></li><li><a href="/soft/mrjziyjpeide.html">Rhino</a></li><li><a href="/soft/8822c22760962f14a2d77b8c.html">CorelDRAW Graphics Suite</a></li><li><a href="/soft/0fd1ab6dc420242e821d5a79.html">Parallels Desktop 27 - Mac 虚拟机管理软件</a></li><li><a href="/soft/dcde42df23c322326dc8e07b.html">傲梅轻松备份AOMEI Backupper Technician Plus系统数据备份恢复</a></li><li><a href="/soft/mrjz2xrx56es.html">Adobe Bridge</a></li><li><a href="/soft/mrjykkdxpfux.html">Adobe Illustrator</a></li><li><a href="/soft/mrjyx1s5dgkq.html">Adobe InDesign</a></li><li><a href="/soft/mt9t22qe9vjx.html">Moom 软件窗口管理</a></li><li><a href="/soft/mrkafvi766wb.html">2345看图王</a></li><li><a href="/soft/mrjyupf9xumx.html">Adobe Premiere Pro</a></li><li><a href="/soft/msfss38u9vvc.html">Ae全套插件一键安装</a></li><li><a href="/soft/mrvctqlyyejc.html">Capture One Enterprise RAW图像编辑处理</a></li></ul><p class="hotindex-more">完整清单：<a href="/sitemap.html">软件与教程索引</a>（共 158 款软件）</p></div><!--/hotindex-->
+<section class="hotindex" id="hotSoftIndex" aria-labelledby="hotSoftTitle"><div class="hotindex-head"><h2 class="hotindex-title" id="hotSoftTitle">🔥 热门软件</h2><a class="hotindex-more" href="/sitemap.html">全部 158 款索引 <i class="fas fa-angle-right"></i></a></div><ul class="hotindex-list"><li><a href="/soft/mrjyswit178r.html">Adobe Photoshop</a></li><li><a href="/soft/48cd558217de59137171e7f2.html">FilmCraft 跨平台非线性视频编辑器</a></li><li><a href="/soft/mryowri0r74x.html">Eagle  图像管理查看</a></li><li><a href="/soft/msft1pau5r3f.html">PS全套插件一键安装</a></li><li><a href="/soft/mrmxq3cqxuos.html">GenP Adobe软件一键激活工具</a></li><li><a href="/soft/mrk0guac155a.html">Autodesk Maya</a></li><li><a href="/soft/mto1tkxt44mh.html">VMware Workstation PRO 安装版</a></li><li><a href="/soft/54b8e3b9ca96b783dab47584.html">AdGuard - 多平台广告拦截软件</a></li><li><a href="/soft/mrk0mazwphee.html">Permute 4 - Mac图片音视频格式转换工具</a></li><li><a href="/soft/mrjzr6p10va7.html">Autodesk CAD</a></li><li><a href="/soft/885152adfc253fb7d419f841.html">CleanMyMac 苹果电脑清理工具软件</a></li><li><a href="/soft/ff9eab61a6cf4b5c1e38fab3.html">MuMuPlayer Pro 网易MuMu安卓模拟器</a></li><li><a href="/soft/mrjziyjpeide.html">Rhino</a></li><li><a href="/soft/8822c22760962f14a2d77b8c.html">CorelDRAW Graphics Suite</a></li><li><a href="/soft/0fd1ab6dc420242e821d5a79.html">Parallels Desktop 27 - Mac 虚拟机管理软件</a></li><li><a href="/soft/dcde42df23c322326dc8e07b.html">傲梅轻松备份AOMEI Backupper Technician Plus系统数据备份恢复</a></li><li><a href="/soft/mrjz2xrx56es.html">Adobe Bridge</a></li><li><a href="/soft/mrjykkdxpfux.html">Adobe Illustrator</a></li><li><a href="/soft/mrjyx1s5dgkq.html">Adobe InDesign</a></li><li><a href="/soft/mt9t22qe9vjx.html">Moom 软件窗口管理</a></li><li><a href="/soft/mrkafvi766wb.html">2345看图王</a></li><li><a href="/soft/mrjyupf9xumx.html">Adobe Premiere Pro</a></li><li><a href="/soft/msfss38u9vvc.html">Ae全套插件一键安装</a></li><li><a href="/soft/mrvctqlyyejc.html">Capture One Enterprise RAW图像编辑处理</a></li></ul></section><!--/hotindex-->
 </section>
 <section id="pageList" class="hidden">
 <div style="padding:12px 0 4px;"><h2 class="section-title">✦ 软件库</h2><p class="section-sub" id="listSub">全部资源</p></div>
