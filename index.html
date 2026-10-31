@@ -1506,7 +1506,7 @@ try{localStorage.setItem('theme',theme);}catch(e){}
 document.documentElement.setAttribute('data-theme-stored',theme);
 var actual=resolveTheme(theme);
 document.documentElement.setAttribute('data-theme',actual);
-try{window.MASCOT_POOLS=window.MASCOT_POOLS||{doraemon:['assets/theme/pool/doraemon-1.png','assets/theme/pool/doraemon-2.png','assets/theme/pool/doraemon-3.png'],shinchan:['assets/theme/pool/shinchan-1.png','assets/theme/pool/shinchan-2.png','assets/theme/pool/shinchan-3.png'],_picked:{}};var mp=window.MASCOT_POOLS;if(mp[actual]){if(!mp._picked[actual])mp._picked[actual]=mp[actual][Math.floor(Math.random()*mp[actual].length)];document.documentElement.style.setProperty('--mascot-'+actual,'url("'+mp._picked[actual]+'?v=2")');}}catch(e){}
+try{window.MASCOT_POOLS=window.MASCOT_POOLS||{doraemon:['assets/theme/pool/doraemon-1.png','assets/theme/pool/doraemon-2.png','assets/theme/pool/doraemon-3.png','assets/theme/pool/doraemon-4.png','assets/theme/pool/doraemon-5.png'],shinchan:['assets/theme/pool/shinchan-1.png','assets/theme/pool/shinchan-2.png','assets/theme/pool/shinchan-3.png','assets/theme/pool/shinchan-4.png','assets/theme/pool/shinchan-5.png'],_picked:{}};var mp=window.MASCOT_POOLS;if(mp[actual]){if(!mp._picked[actual])mp._picked[actual]=mp[actual][Math.floor(Math.random()*mp[actual].length)];document.documentElement.style.setProperty('--mascot-'+actual,'url("'+mp._picked[actual]+'?v=2")');}}catch(e){}
 var headerBtn=document.getElementById('headerThemeBtn');
 if(headerBtn){var ic=actual==='dark'?'fa-sun':(actual==='glass'?'fa-gem':(actual==='fresh'?'fa-leaf':(actual==='doraemon'||actual==='shinchan'||actual==='cartoon'?'fa-face-smile':'fa-moon')));headerBtn.innerHTML='<i class="fas '+ic+'"></i>';}
 var themeLabel=document.getElementById('themeLabel');
@@ -1552,7 +1552,7 @@ var cur='';try{cur=localStorage.getItem('theme')||'';}catch(e){}
 if(cur==='auto'){
 var actual=resolveTheme('auto');
 if(document.documentElement.getAttribute('data-theme')!==actual)document.documentElement.setAttribute('data-theme',actual);
-try{window.MASCOT_POOLS=window.MASCOT_POOLS||{doraemon:['assets/theme/pool/doraemon-1.png','assets/theme/pool/doraemon-2.png','assets/theme/pool/doraemon-3.png'],shinchan:['assets/theme/pool/shinchan-1.png','assets/theme/pool/shinchan-2.png','assets/theme/pool/shinchan-3.png'],_picked:{}};var mp=window.MASCOT_POOLS;if(mp[actual]){if(!mp._picked[actual])mp._picked[actual]=mp[actual][Math.floor(Math.random()*mp[actual].length)];document.documentElement.style.setProperty('--mascot-'+actual,'url("'+mp._picked[actual]+'?v=2")');}}catch(e){}
+try{window.MASCOT_POOLS=window.MASCOT_POOLS||{doraemon:['assets/theme/pool/doraemon-1.png','assets/theme/pool/doraemon-2.png','assets/theme/pool/doraemon-3.png','assets/theme/pool/doraemon-4.png','assets/theme/pool/doraemon-5.png'],shinchan:['assets/theme/pool/shinchan-1.png','assets/theme/pool/shinchan-2.png','assets/theme/pool/shinchan-3.png','assets/theme/pool/shinchan-4.png','assets/theme/pool/shinchan-5.png'],_picked:{}};var mp=window.MASCOT_POOLS;if(mp[actual]){if(!mp._picked[actual])mp._picked[actual]=mp[actual][Math.floor(Math.random()*mp[actual].length)];document.documentElement.style.setProperty('--mascot-'+actual,'url("'+mp._picked[actual]+'?v=2")');}}catch(e){}
 }
 },300000);
 var CACHE_KEY='lezhe_software_cache';
