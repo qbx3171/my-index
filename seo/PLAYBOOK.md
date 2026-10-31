@@ -80,6 +80,8 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [x] preview.html canonical（2026-10-31：原来指向 https://lezhesoft.cn/ 非 www 首页，改为自引用并取消深链改写）
 - [x] 分类页缺 og:image（2026-10-31：15 个分类页统一回落 og-cover.png 1200x630）
 - [x] sitemap lastmod 补齐（2026-10-31：仅首页有 lastmod，现 180/180 全带）
+- [x] 首屏静态卡片图标（2026-10-31：12 张卡片的 `<img>` 全写死「软」字占位 SVG，JS 拉数据前满屏蓝底「软」＝用户以为没图标。generate.mjs 按 data-id 回填真实 icon_url，audit.mjs 加永久检查）
+- [x] 页脚访问统计（2026-10-31：不蒜子 JS 能 200 但计数接口 `/busuanzi?jsonpCallback=` 20s 无响应 → 改 abacus 自建计数并做「拿不到就整段隐藏」降级；「N 人在线」依赖 Supabase realtime，经腾讯 CloudBase supabase-proxy 实测 WebSocket 升级无响应（握手无 101），永久出不来 → 改展示「今日浏览」。两处均已加 audit 检查）
 - [ ] 首页 HTML 604KB、内联脚本 343KB：移动端 LCP 风险，评估外链拆包（拆错会白屏，需先在灰度页验证）
 - [x] 首页静态 /soft/ 链接（2026-10-31 完成，0 → 24 条；做法：generate.mjs `buildHotIndex()` 在 #pageHome 末尾输出「热门软件索引」块，按「浏览 + 下载×3」取前 24，同名多平台记录按去空格后名称去重；块内另有 /sitemap.html 全量索引链接。样式一次性注入 `.hotindex-*`，幂等替换靠 `<!--/hotindex-->` 标记）
 - [x] 教程/软件页互链（2026-10-31 完成；做法：按「教程标题包含完整软件名」双向匹配，软件页渲染「相关教程」、教程页渲染「相关软件下载」，无命中则整块不输出；教程页「分类」改为可点链接，仅在该分类确有分类页时输出，避免造 /cat/cat-xxxx 死链。现 6 篇教程命中 2 篇，随每日新增自动变密）
