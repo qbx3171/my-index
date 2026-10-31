@@ -415,8 +415,7 @@ function buildHotIndex(all) {
     .join("");
   return (
     `<div class="hotindex" id="hotSoftIndex">` +
-    `<h2 class="section-title">✦ 热门软件索引</h2>` +
-    `<p class="section-sub">按站内浏览与下载热度排序，点击名称直达详情页</p>` +
+    `<h2 class="hotindex-title">热门软件</h2>` +
     `<ul class="hotindex-list">${items}</ul>` +
     `<p class="hotindex-more">完整清单：<a href="/sitemap.html">软件与教程索引</a>（共 ${all.length} 款软件）</p>` +
     `</div><!--/hotindex-->`
@@ -440,31 +439,59 @@ try {
       "a.category-item-side{text-decoration:none;color:var(--text-secondary)}\n.category-item-side{"
     );
   }
-  // 热门软件索引：有旧块则原位替换，没有则插到 #pageHome 末尾（提交按钮之前）
+  // 热门软件索引：先移除旧块（可能在提交按钮之前），再插到「提交软件」按钮之后，
+  // 作为首页底部的低调文字索引区（不要卡片大框，用户反馈不好看）
   const hot = buildHotIndex(softs);
-  const hs = idx.indexOf('<div class="hotindex" id="hotSoftIndex">');
-  const he = idx.indexOf("<!--/hotindex-->");
-  if (hs >= 0 && he > hs) {
-    idx = idx.slice(0, hs) + hot + idx.slice(he + "<!--/hotindex-->".length);
+  {
+    const hs = idx.indexOf('<div class="hotindex" id="hotSoftIndex">');
+    const he = idx.indexOf("<!--/hotindex-->");
+    if (hs >= 0 && he > hs) idx = idx.slice(0, hs) + idx.slice(he + "<!--/hotindex-->".length);
+  }
+  const btnA = idx.indexOf('id="openSubmitSoftwareBtn"');
+  if (btnA > 0) {
+    const divEnd = idx.indexOf("</div>", btnA);
+    // 把「提交按钮 wrapper 结束」到下一个 </section> 之间的空白规范成单个换行，
+    // 否则每次生成都会多残留一个空行，index.html 永远不可重复
+    const secB = idx.indexOf("</section>", divEnd);
+    if (secB > divEnd) {
+      const span = idx.slice(divEnd + "</div>".length, secB); // 从 wrapper 结束之后开始，不能含 </div> 本身
+      if (!/[<>]/.test(span)) {
+        let s = secB;
+        while (s > 0 && /\s/.test(idx[s - 1])) s -= 1;
+        idx = idx.slice(0, s) + "\n" + idx.slice(secB);
+      }
+    }
+    const at = divEnd + "</div>".length;
+    idx = idx.slice(0, at) + "\n" + hot + idx.slice(at);
   } else {
     const anchor = '<div style="margin-top:24px;text-align:center;">';
     const ai = idx.indexOf(anchor);
     if (ai > 0) idx = idx.slice(0, ai) + hot + "\n" + idx.slice(ai);
     else console.warn("⚠ 未找到首页热门索引插入锚点");
   }
-  // 一次性注入样式（幂等）
-  if (!idx.includes(".hotindex-list{")) {
-    idx = idx.replace(
-      "</style>",
-      ".hotindex{margin-top:26px;padding:14px 16px;border:1px solid var(--border-glow);border-radius:14px;background:var(--bg-card-solid,rgba(255,255,255,.6))}\n" +
-        ".hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px;margin:10px 0 8px;padding:0}\n" +
-        ".hotindex-list li{font-size:.72rem;margin:0}\n" +
-        ".hotindex-list a{color:var(--text-secondary);text-decoration:none;padding:3px 9px;border-radius:6px;background:rgba(0,136,255,.05);display:inline-block;line-height:1.5}\n" +
-        ".hotindex-list a:hover{color:var(--accent-cyan);background:rgba(0,136,255,.1)}\n" +
-        ".hotindex-more{font-size:.7rem;color:var(--text-dim);margin:0}\n" +
-        ".hotindex-more a{color:var(--accent-cyan);text-decoration:none}\n" +
-        "</style>"
-    );
+  // 一次性注入样式（幂等）；旧版「卡片+药丸」样式若存在则原位替换
+  const HOT_CSS_OLD =
+    ".hotindex{margin-top:26px;padding:14px 16px;border:1px solid var(--border-glow);border-radius:14px;background:var(--bg-card-solid,rgba(255,255,255,.6))}\n" +
+    ".hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px;margin:10px 0 8px;padding:0}\n" +
+    ".hotindex-list li{font-size:.72rem;margin:0}\n" +
+    ".hotindex-list a{color:var(--text-secondary);text-decoration:none;padding:3px 9px;border-radius:6px;background:rgba(0,136,255,.05);display:inline-block;line-height:1.5}\n" +
+    ".hotindex-list a:hover{color:var(--accent-cyan);background:rgba(0,136,255,.1)}\n" +
+    ".hotindex-more{font-size:.7rem;color:var(--text-dim);margin:0}\n" +
+    ".hotindex-more a{color:var(--accent-cyan);text-decoration:none}\n";
+  const HOT_CSS =
+    ".hotindex{margin-top:18px;padding-top:12px;border-top:1px solid var(--border-glow,rgba(0,136,255,.15))}\n" +
+    ".hotindex-title{font-size:.78rem;font-weight:600;color:var(--text-dim);margin:0 0 6px}\n" +
+    ".hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:2px 0;margin:0;padding:0;line-height:1.9}\n" +
+    ".hotindex-list li{font-size:.72rem;margin:0}\n" +
+    '.hotindex-list li+li::before{content:"·";margin:0 7px;color:var(--text-dim,rgba(120,130,150,.6))}\n' +
+    ".hotindex-list a{color:var(--text-secondary);text-decoration:none}\n" +
+    ".hotindex-list a:hover{color:var(--accent-cyan);text-decoration:underline}\n" +
+    ".hotindex-more{font-size:.7rem;color:var(--text-dim);margin:6px 0 0}\n" +
+    ".hotindex-more a{color:var(--accent-cyan);text-decoration:none}\n";
+  if (idx.includes(HOT_CSS_OLD)) {
+    idx = idx.replace(HOT_CSS_OLD, HOT_CSS);
+  } else if (!idx.includes(".hotindex-list{")) {
+    idx = idx.replace("</style>", HOT_CSS + "</style>");
   }
   // 首页静态卡片图标回填：这些卡片是给首屏和爬虫看的静态 HTML，
   // 但 <img src> 一直被写成「软」字占位 SVG（%E8%BD%AF），
