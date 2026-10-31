@@ -179,6 +179,27 @@ if (await exists(join(ROOT, "sw.js"))) {
   if (!registered) add(warn, "sw.js 无人注册", "sw.js", "已改为自注销版本，可保留或删除");
 }
 
+/* 11) 首屏静态卡片图标：不得再用「软」字占位 SVG
+   这类卡片是给首屏和爬虫看的静态 HTML，占位图会让用户在 JS 拉回数据前
+   看到一屏蓝底「软」方块，体感就是「网站没有图标」。 */
+for (const f of ["index.html", "preview.html"]) {
+  if (!(await exists(join(ROOT, f)))) continue;
+  const h = await readFile(join(ROOT, f), "utf8");
+  const n = (h.match(/data:image\/svg\+xml[^"]*%E8%BD%AF/g) || []).length;
+  if (n) add(blocker, "首屏静态卡片仍是「软」占位图标", f, `${n} 处，图片回填未生效`);
+}
+
+/* 12) 页脚访问统计：不蒜子（busuanzi）计数接口已失效，不得再加载；
+   有统计占位就必须有可用的计数实现，否则页脚会出现「总访问量  次」空壳。 */
+for (const f of ["index.html", "preview.html"]) {
+  if (!(await exists(join(ROOT, f)))) continue;
+  const h = await readFile(join(ROOT, f), "utf8");
+  if (/busuanzi\.ibruce\.info\/busuanzi\/2\.3/.test(h))
+    add(blocker, "仍在加载已失效的不蒜子计数脚本", f, "接口 20s 无响应，应改用自建计数");
+  if (/id="busuanzi_container_site_pv"/.test(h) && !/abacus\.jasoncameron\.dev/.test(h))
+    add(warn, "统计栏有占位但没有计数脚本", f, "");
+}
+
 const report = {
   generatedAt: new Date().toISOString(),
   pages: files.length,
