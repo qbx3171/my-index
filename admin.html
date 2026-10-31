@@ -1376,8 +1376,9 @@ var DB={
 _sw:null,_swT:0,_ca:null,_caT:0,_tu:null,_tuT:0,_qu:null,_quT:0,_an:null,_anT:0,_cm:null,_cmT:0,_fb:null,_fbT:0,_sb:null,_sbT:0,_pf:null,_pfT:0,_ml:null,_mlT:0,_rd:null,_rdT:0,_mlErr:null,_ttl:120000,
 _t:function(p,ms){ms=ms||10000;return new Promise(function(res,rej){var t=setTimeout(function(){rej(new Error('请求超时'));},ms);p.then(function(v){clearTimeout(t);res(v);},function(e){clearTimeout(t);rej(e);});});},
 invalidate:function(){this._sw=null;this._ca=null;this._tu=null;this._qu=null;this._an=null;this._cm=null;this._fb=null;this._sb=null;this._pf=null;this._ml=null;this._rd=null;this._mlErr=null;},
-async soft(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sw&&n-this._swT<this._ttl)return this._sw;try{var r=await this._t(supabaseClient.from('software').select('*').order('created_at',{ascending:false}));if(r.error)return this._sw||[];this._sw=r.data||[];this._swT=n;return this._sw;}catch(e){return this._sw||[];}},
-async cats(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._ca&&n-this._caT<this._ttl)return this._ca;try{var r=await this._t(supabaseClient.from('categories').select('*').order('name'));if(r.error)return [];this._ca=r.data||[];this._caT=n;return this._ca;}catch(e){return [];}},
+async soft(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sw&&n-this._swT<this._ttl)return this._sw;try{var r=await this._t(supabaseClient.from('software').select('id,name,category,version,icon,icon_url,platforms,downloads,views,recommend,created_at').order('created_at',{ascending:false}));if(r.error)return this._sw||[];this._sw=r.data||[];this._swT=n;return this._sw;}catch(e){return this._sw||[];}},
+async cats(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._ca&&n-this._caT<this._ttl)return this._ca;try{var r=await this._t(supabaseClient.from('categories').select('*').order('name'));if(r.error)return this._ca||[];this._ca=r.data||[];this._caT=n;return this._ca;}catch(e){return this._ca||[];}},
+async softOne(id){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').select('*').eq('id',id).limit(1));if(r.error)return null;return (r.data&&r.data[0])||null;}catch(e){return null;}},
 async addSoft(s){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').insert(s).select());if(r.error)return null;this.invalidate();return r.data?r.data[0]:null;}catch(e){return null;}},
 async updSoft(id,u){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').update(u).eq('id',id).select());if(r.error)throw r.error;this.invalidate();},
 async delSoft(id){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').delete().eq('id',id).select('id'));if(r.error)throw r.error;if(!r.data||r.data.length===0)throw new Error('删除失败或权限不足');this.invalidate();},
@@ -1385,6 +1386,19 @@ async delSoftBatch(ids){if(!supabaseClient)throw new Error('客户端未初始�
 async recSoftBatch(ids,rec){if(!supabaseClient)throw new Error('客户端未初始化');if(!ids||ids.length===0)return;var r=await this._t(supabaseClient.from('software').update({recommend:rec}).in('id',ids));if(r.error)throw r.error;this.invalidate();},
 async addCat(n){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('categories').insert({name:n}));if(r.error)throw r.error;this._ca=null;},
 async delCat(n){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('categories').delete().eq('name',n));if(r.error)throw r.error;this._ca=null;},
+async renameCat(oldN,newN){
+if(!supabaseClient)throw new Error('客户端未初始化');
+// 先同步软件表，再改分类表；分类表失败时回滚软件，避免出现两边不一致
+var r=await this._t(supabaseClient.from('software').update({category:newN}).eq('category',oldN).select('id'));
+if(r.error)throw r.error;
+var r2=await this._t(supabaseClient.from('categories').update({name:newN}).eq('name',oldN).select('name'));
+if(r2.error||!r2.data||r2.data.length===0){
+try{await this._t(supabaseClient.from('software').update({category:oldN}).eq('category',newN));}catch(e){}
+throw (r2.error||new Error('重命名失败或权限不足'));
+}
+this._ca=null;this._sw=null;
+return (r.data||[]).length;
+},
 async tut(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._tu&&n-this._tuT<this._ttl)return this._tu;try{var r=await this._t(supabaseClient.from('tutorials').select('*').order('created_at',{ascending:false}));if(r.error)return this._tu||[];this._tu=r.data||[];this._tuT=n;return this._tu;}catch(e){return this._tu||[];}},
 async delTut(id){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('tutorials').delete().eq('id',id).select('id'));if(r.error)throw r.error;if(!r.data||r.data.length===0)throw new Error('删除失败或权限不足');this._tu=null;},
 async q(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._qu&&n-this._quT<this._ttl)return this._qu;try{var r=await this._t(supabaseClient.from('questions').select('*').order('created_at',{ascending:false}));if(r.error)return this._qu||[];this._qu=r.data||[];this._quT=n;return this._qu;}catch(e){return this._qu||[];}},
@@ -2141,7 +2155,7 @@ if(!this._all)this._all=[];
 var all=this._all;
 var kw=this._kw.toLowerCase().trim();
 var fcat=this._catF;
-var fil=all.filter(function(s){var mn=(s.name||'').toLowerCase().includes(kw);var mc=fcat==='all'||s.category===fcat;return mn&&mc;});
+var fil=all.filter(function(s){var mn=((s.name||'')+' '+(s.category||'')+' '+(s.description||'')).toLowerCase().includes(kw);var mc=fcat==='all'||s.category===fcat;return mn&&mc;});
 if(this._sortF){
 var f=this._sortF,o=this._sortO||'asc';
 fil.sort(function(a,b){var va=(a[f]||'').toString().toLowerCase(),vb=(b[f]||'').toString().toLowerCase();if(f==='downloads'){va=parseInt(a[f])||0;vb=parseInt(b[f])||0;}if(va<vb)return o==='asc'?-1:1;if(va>vb)return o==='asc'?1:-1;return 0;});
@@ -2160,7 +2174,7 @@ for(var i=0;i<all.length;i++){var cc=all[i].category;if(cc&&!cs[cc]){cs[cc]=true
 cn.sort();
 var sel=this.sel();
 var h='<h2 class="page-title">⊞ 软件管理</h2><p class="page-sub">共 '+total+' 款资源</p><div class="toolbar">';
-h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="搜索软件名称..." value="'+escapeAttr(this._kw)+'" /></div>';
+h+='<div class="search-box"><span class="icon">🔍</span><input type="text" id="searchInput" placeholder="搜索名称 / 分类 / 简介..." value="'+escapeAttr(this._kw)+'" /></div>';
 h+='<select id="categoryFilter"><option value="all" '+(this._catF==='all'?'selected':'')+'>全部分类</option>';
 for(var ci=0;ci<cn.length;ci++){h+='<option value="'+escapeAttr(cn[ci])+'" '+(cn[ci]===this._catF?'selected':'')+'>'+escapeHTML(cn[ci])+'</option>';}
 h+='</select>';
@@ -2219,7 +2233,7 @@ if(sa)sa.addEventListener('change',function(){var v=this.checked;for(var x=0;x<r
 for(var r=0;r<rcb.length;r++)rcb[r].addEventListener('change',updT);
 if(sa){var allChecked=rcb.length>0;for(var ai=0;ai<rcb.length;ai++){if(!rcb[ai].checked){allChecked=false;break;}}sa.checked=allChecked;}
 updT();
-w.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;var s=self._all.find(function(x){return x.id===id;});if(s)App.showSoft(s);});});
+w.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;var btn=this;btn.disabled=true;DB.softOne(id).then(function(s){btn.disabled=false;if(s)App.showSoft(s);else toast('详情加载失败','error');}).catch(function(){btn.disabled=false;toast('详情加载失败','error');});});});
 w.querySelectorAll('.edit-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;self._editId=id;self.setSel([]);self.renderTab('add');});});
 w.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',async function(e){e.stopPropagation();var id=this.dataset.id;if(!(await uiConfirm('确定要删除此软件吗？删除后不可恢复。',{title:'删除软件',icon:'🗑',danger:true,okText:'删除'})))return;DB.delSoft(id).then(function(){DB.addLog('删除软件','ID: '+shortId(id));toast('已删除');DB.soft(true).then(function(d){self._all=d;self._fil=d.slice();self._renderSoftPage(c);});}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');});});});
 var si=c.querySelector('#searchInput');
@@ -2462,7 +2476,7 @@ else{
 for(var i=0;i<cats.length;i++){
 var cat=cats[i];
 var cnt=all.filter(function(s){return s.category===cat.name;}).length;
-h+='<tr><td data-label="分类名称"><strong>'+escapeHTML(cat.name)+'</strong></td><td data-label="软件数">'+cnt+'</td><td data-label="操作"><div class="actions"><button class="del-btn" data-cat="'+escapeAttr(cat.name)+'">删除</button></div></td></tr>';
+h+='<tr><td data-label="分类名称"><strong>'+escapeHTML(cat.name)+'</strong></td><td data-label="软件数">'+cnt+'</td><td data-label="操作"><div class="actions"><button class="ren-btn" data-cat="'+escapeAttr(cat.name)+'">重命名</button><button class="del-btn" data-cat="'+escapeAttr(cat.name)+'">删除</button></div></td></tr>';
 }
 }
 h+='</tbody></table></div>';
@@ -2483,22 +2497,39 @@ if(allSoft.some(function(s){return s.category===cat;})){toast('该分类下还�
 if(!(await uiConfirm('确定删除分类 "'+cat+'" 吗？',{title:'删除分类',icon:'🗑',danger:true,okText:'删除'}))){btn.disabled=false;return;}
 try{await DB.delCat(cat);DB.addLog('删除分类','分类: '+cat);toast('已删除');self.renderCats(c);}catch(e){toast('删除失败: '+(e.message||''),'error');btn.disabled=false;}
 });});
+c.querySelectorAll('.ren-btn[data-cat]').forEach(function(b){b.addEventListener('click',async function(){
+var btn=this;var old=btn.dataset.cat;
+btn.disabled=true;btn.textContent='...';
+var nv=await uiPrompt('将分类「'+old+'」重命名为：（该分类下所有软件会同步更新）',old,{title:'重命名分类',icon:'✎',okText:'确认重命名'});
+if(nv===null||!nv.trim()){btn.disabled=false;btn.textContent='重命名';return;}
+nv=nv.trim();
+if(nv===old){btn.disabled=false;btn.textContent='重命名';return;}
+var lst=await DB.cats(true);
+if(lst.some(function(x){return x.name===nv;})){toast('已存在同名分类「'+nv+'」','error');btn.disabled=false;btn.textContent='重命名';return;}
+try{
+var n=await DB.renameCat(old,nv);
+DB.addLog('重命名分类',old+' → '+nv+'（同步 '+n+' 款软件）');
+toast('✅ 已重命名，'+n+' 款软件同步更新');
+self.renderCats(c);
+}catch(e){toast('重命名失败: '+(e.message||''),'error');btn.disabled=false;btn.textContent='重命名';}
+});});
 },
 renderAddForm:async function(c){
 var self=this;
+this._editRow=null;
 if(this._editId){
 c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
 var seq=this._seq;
 try{
-var fresh=await DB.soft(true);
+// 编辑时按需拉取完整单行（列表缓存是精简字段，不含简介/详情/截图）
+var row=await DB.softOne(this._editId);
 if(seq!==this._seq)return;
-this._all=fresh||[];
-this._fil=(fresh||[]).slice();
-}catch(e){ this._all=this._all||[]; }
+this._editRow=row;
+}catch(e){ this._editRow=null; }
 }
 if(!this._all)this._all=[];
 var isEdit=!!this._editId;
-var editName=isEdit?((this._all.find(function(s){return s.id===self._editId;})||{}).name||''):'';
+var editName=isEdit?((this._editRow||{}).name||''):'';
 // 修复：每次打开「上传软件/编辑软件」表单都重置截图列表，避免把上一次软件遗留的截图自动带进新软件
 App._softShots=[];
 var h='<h2 class="page-title">';
@@ -2511,10 +2542,10 @@ var catsSeq=self._seq;
 DB.cats().then(function(cats){
 if(catsSeq!==self._seq)return;
 if(sel){sel.innerHTML=cats.map(function(x){return '<option value="'+escapeAttr(x.name)+'">'+escapeHTML(x.name)+'</option>';}).join('');
-if(self._editId){var s=self._all.find(function(x){return x.id===self._editId;});if(s)sel.value=s.category||'';}
+if(self._editId){var s=self._editRow;if(s)sel.value=s.category||'';}
 }
 if(self._editId){
-var s=self._all.find(function(x){return x.id===self._editId;});
+var s=self._editRow;
 if(s){
 var f=document.getElementById('adminForm');
 if(!f)return;
@@ -2539,7 +2570,7 @@ try{existingShots=normalizePlatforms(s.screenshots)||[];}catch(e){existingShots=
 if(!Array.isArray(existingShots))existingShots=[];
 App._softShots=existingShots;
 App._renderShotsList();
-}
+}else{toast('⚠️ 未能加载该软件的完整数据（网络异常），表单为空，请返回列表重新点「编辑」','error');}
 }
 });
 // Screenshots management
@@ -2618,6 +2649,11 @@ screenshots:App._softShots||[]
 };
 if(!d.name||!d.category||!d.version||!d.description){toast('请填写完整信息','error');return;}
 if(p.length===0){toast('请至少选择一个平台','error');return;}
+var dupRow=self._all.find(function(x){return (x.name||'')===d.name&&x.id!==self._editId;});
+if(dupRow){
+var goOn=await uiConfirm('已存在同名软件「'+d.name+'」（分类：'+(dupRow.category||'未分类')+'）。\n\n继续保存会在前台出现两条同名软件，建议先核对是否为同一款。',{title:'发现同名软件',icon:'⚠️',okText:'仍要保存',cancelText:'返回修改'});
+if(!goOn)return;
+}
 if(self._editId){
 await DB.updSoft(self._editId,d);
 DB.addLog('更新软件','软件: '+d.name);
@@ -3388,13 +3424,27 @@ return;
 var insertData=Object.assign({likes:0},data);
 var isNetErr=function(m){return /fetch|network|timeout|timed|超时/i.test(m||'');};
 var fmtErr=function(e){if(!e)return '未知错误';var c=e.code||'';var m=e.message||e.msg||'';var x=[e.details,e.hint].filter(Boolean).join('；');return (c?('['+c+'] '):'')+m+(x?(' ｜ '+x):'');};
+// 网络重试前先查重：上一次请求可能已实际写入（响应超时），直接重试会造成重复教程
+var checkDupThen=function(next){
+supabaseClient.from('tutorials').select('id').eq('title',title).limit(1).then(function(chk){
+if(!chk.error&&chk.data&&chk.data.length>0){
+if(editSource==='draftPub'&&pubDraftId){deleteDraft(pubDraftId);}
+if(editId){deleteDraft(editId);}
+toast('🎉 发布成功（首次请求已生效，已自动避免重复插入）');
+closeAndReset();
+self.renderTab(self._tab);
+return;
+}
+next();
+}).catch(function(){next();});
+};
 var doInsert=function(attempt){
 supabaseClient.from('tutorials').insert([insertData]).select().then(function(r){
 if(r.error){
 var m=fmtErr(r.error);
 var col=((r.error&&(r.error.message||r.error.msg))||'').match(/Could not find the '([^']+)' column/);
 if(col&&Object.prototype.hasOwnProperty.call(insertData,col[1])){delete insertData[col[1]];toast('⚠️ 数据表缺少字段 '+col[1]+'，已自动跳过并重试','warning');setTimeout(function(){doInsert(attempt);},300);return;}
-if(attempt<3&&isNetErr(r.error&&(r.error.message||r.error.msg))){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doInsert(attempt+1);},1500);return;}
+if(attempt<3&&isNetErr(r.error&&(r.error.message||r.error.msg))){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){checkDupThen(function(){doInsert(attempt+1);});},1500);return;}
 saveToDrafts(m);return;}
 if(!r.data||r.data.length===0){saveToDrafts('插入失败或权限不足');return;}
 toast('🎉 发布成功');
@@ -3408,7 +3458,7 @@ DB.sendNotificationToAll('【新教程发布】'+title+'，快来看看吧！').
 closeAndReset();
 self.renderTab(self._tab);
 }).catch(function(e){
-if(attempt<3){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){doInsert(attempt+1);},1500);return;}
+if(attempt<3){toast('⚠️ 网络异常，正在自动重试 ('+attempt+'/2)...','warning');setTimeout(function(){checkDupThen(function(){doInsert(attempt+1);});},1500);return;}
 saveToDrafts(e.message);});
 };
 doInsert(1);
@@ -3683,6 +3733,7 @@ var r=(App._redeems||[]).find(function(x){return x.id===id;});
 if(!r)return;
 if(act==='detail'){App.showRedeemDetail(r);return;}
 if(act==='deliver'){
+if((r.status||'pending')!=='pending'){toast('该订单已被处理过，正在刷新列表','warning');App.renderRedeems(document.getElementById('adminMain'));return;}
 var note=await uiPrompt('请输入处理备注（可留空，例如：已通过微信发放）','',{title:'标记发放',icon:'✉️',placeholder:'可留空',okText:'下一步'});
 if(note===null)return;
 if(!(await uiConfirm('确认已向用户发放「'+(r.item_name||'该商品')+'」？\n\n联系方式：'+(r.contact||'-'),{title:'确认发放',icon:'✅'})))return;
@@ -3700,16 +3751,25 @@ App.refreshRedeemBadge();
 return;
 }
 if(act==='reject'){
+if((r.status||'pending')!=='pending'){toast('该订单已被处理过，正在刷新列表','warning');App.renderRedeems(document.getElementById('adminMain'));return;}
 if(!(await uiConfirm('确认拒绝此兑换？积分将退还给用户。',{title:'拒绝兑换',icon:'❌',danger:true,okText:'拒绝并退款'})))return;
 this.disabled=true;this.textContent='处理中...';
 try{
-await DB.updRedeem(id,{status:'rejected'});
+await DB.updRedeem(id,{status:'rejected',note:(r.note?r.note+'；':'')+'已拒绝，应退 '+(r.cost||0)+' 积分'});
+var refundOk=true;
 if(r.user_id&&r.cost){
-await DB.refundPoints(r.user_id,r.cost).catch(function(){});
+try{await DB.refundPoints(r.user_id,r.cost);}
+catch(re){
+refundOk=false;
+DB.addLog('拒绝兑换-退款失败','订单 '+shortId(id)+' 用户 '+shortId(r.user_id||'')+' 应退 '+(r.cost||0)+' 积分，原因: '+(re.message||'网络异常'));
+toast('⚠️ 订单已拒绝，但积分退还失败，请手动为该用户退还 '+r.cost+' 积分','error');
+}
+}
+if(refundOk&&r.user_id&&r.cost){
 await DB.sendNotificationToUser(r.user_id,'【兑换未通过】您兑换的「'+(r.item_name||'商品')+'」未通过审核，已退还 '+r.cost+' 积分。').catch(function(){});
 }
-DB.addLog('拒绝兑换','订单 '+shortId(id)+' 退还 '+r.cost+' 积分');
-toast('已拒绝并退还积分');
+DB.addLog('拒绝兑换','订单 '+shortId(id)+' 退还 '+(r.cost||0)+' 积分'+(refundOk?'':'（退款失败待手动处理）'));
+if(refundOk)toast('已拒绝并退还积分');
 App.renderRedeems(document.getElementById('adminMain'));
 App.refreshRedeemBadge();
 }catch(e){toast('操作失败: '+(e.message||''),'error');this.disabled=false;this.textContent='❌ 拒绝退回';}
@@ -3983,12 +4043,12 @@ var CHIPS=['怎么添加软件','登录失败怎么办','积分商城怎么用',
 var KNOWLEDGE=[
 {k:['登录','密码','进不去','登不上','邮箱'],a:'登录需要管理员邮箱和密码。如果提示 <em>邮箱或密码错误</em>，请确认大小写；连续失败先检查网络，或在网址后加 <em>?sb=代理地址</em> 试试。'},
 {k:['网络','连不上','加载失败','超时','代理'],a:'网络异常时可以在网址后追加 <em>?sb=你的代理地址</em> 走自定义代理。若提示 Supabase 组件加载失败，刷新页面即可。'},
-{k:['软件','上传','新增','添加'],a:'在左侧进入「软件管理」，点右上角新增即可。编辑支持图标、截图和平台标签，保存后前台自动同步。'},
+{k:['软件','上传','新增','添加'],a:'在左侧进入「上传软件」，填写名称、分类、版本、简介后提交即可；编辑已有软件请在「软件管理」列表点「编辑」。支持图标、截图和平台标签，保存后前台自动同步。'},
 {k:['用户','账号','子账号','权限'],a:'「子账号管理」可以创建子账号并勾选它能访问的模块。管理员权限由 profiles 表的 is_admin 字段控制。'},
-{k:['积分','签到','商城','兑换'],a:'积分相关在「签到管理」和「积分商城」。兑换记录在「兑换管理」审核发放，自动发货商品会直接给内容。'},
+{k:['积分','签到','商城','兑换'],a:'商城商品在「积分商城」维护；用户兑换记录在「兑换订单」里审核发放，自动发货商品会即时发放内容。'},
 {k:['教程','文章','发布'],a:'「教程管理」支持图文教程，封面、标签、正文都能编辑，发布后出现在前台教程页。'},
 {k:['反馈','建议','bug','问题'],a:'用户反馈在「反馈管理」里查看、回复和标记状态，提到的 bug 我都会记下。'},
-{k:['数据','统计','报表','图表','看板'],a:'「数据看板」汇总软件数、用户数、下载量和浏览量，还有趋势图表，方便看整体情况。'},
+{k:['数据','统计','报表','图表','看板'],a:'「仪表盘」汇总软件数、用户数、下载量、浏览量和待审核/待发放等待办数量，方便看整体情况。'},
 {k:['主题','暗色','黑色','颜色'],a:'后台支持明暗主题切换，右上角的 🌓 按钮就能换。'},
 {k:['你好','hi','hello','在吗','嗨','哈喽'],a:'你好呀！我是<em>小乐</em>，可以问我登录、软件管理、用户权限、积分商城这些事 ✦'},
 {k:['你叫什么','你是谁','名字','介绍'],a:'我叫<em>小乐</em>，是这个后台的小向导，会自己玩、自己动，戳我一下我就换个动作～'},
