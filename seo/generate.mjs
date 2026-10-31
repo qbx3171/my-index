@@ -466,9 +466,35 @@ try {
         "</style>"
     );
   }
+  // 首页静态卡片图标回填：这些卡片是给首屏和爬虫看的静态 HTML，
+  // 但 <img src> 一直被写成「软」字占位 SVG（%E8%BD%AF），
+  // JS 把数据拉回来之前 12 张卡全是蓝底「软」方块，用户会觉得「网站没有图标」。
+  // 这里按 data-id 从数据库回填真实 icon_url，首屏就是真图标；
+  // 原 onerror（隐藏 img 并显示 📦）保留，图片挂了也不会出现白块。
+  let iconPatched = 0;
+  {
+    const byId = new Map(softs.map((s) => [String(s.id), s]));
+    const seg = idx.split('<div class="software-card"');
+    for (let i = 1; i < seg.length; i += 1) {
+      const idm = seg[i].match(/^ data-id="([^"]+)"/);
+      if (!idm) continue;
+      const s = byId.get(idm[1]);
+      const icon = s && s.icon_url ? String(s.icon_url).trim() : "";
+      if (!icon) continue;
+      if (!/src="data:image\/svg\+xml/.test(seg[i])) continue;
+      seg[i] = seg[i].replace(
+        /(<div class="card-icon"><img src=")data:image\/svg\+xml[^"]*(")/,
+        `$1${icon.replace(/"/g, "&quot;")}$2`
+      );
+      iconPatched += 1;
+    }
+    idx = seg.join('<div class="software-card"');
+  }
+
   await writeFile(join(ROOT, "index.html"), idx, "utf8");
   console.log(`首页侧栏静态导航：${nav.split('href="/cat/').length - 1} 条分类链接（共 ${softs.length} 款）`);
   console.log(`首页热门索引：${hot.split('href="/soft/').length - 1} 条软件详情链接`);
+  console.log(`首页静态卡片图标回填：${iconPatched} 张`);
 } catch (e) {
   console.warn(`⚠ 首页侧栏静态导航未更新：${e.message}`);
 }
