@@ -5,6 +5,10 @@
 
 export const SITE = "https://www.lezhesoft.cn";
 
+// 全站兜底分享图（1200x630）。分类页没有专属封面、部分软件页没有 icon，
+// 缺 og:image 时在微信/Bing 分享卡片里会显示纯文字，统一回落到这张。
+const OG_FALLBACK = `${SITE}/og-cover.png`;
+
 export const pick = (row, keys, dflt = "") => {
   for (const k of keys) if (row?.[k] != null && row[k] !== "") return row[k];
   return dflt;
@@ -234,7 +238,7 @@ export function renderSoftPage(soft, related = [], opts = {}) {
     title,
     metaDesc,
     canonical,
-    (iconUrl ? `<meta property="og:image" content="${esc(iconUrl)}">` : "") +
+    `<meta property="og:image" content="${esc(iconUrl || OG_FALLBACK)}">` +
       jsonLd({
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
@@ -314,7 +318,8 @@ export function renderCategoryPage(category, rows = []) {
     title,
     desc.slice(0, 158),
     canonical,
-    jsonLd({
+    `<meta property="og:image" content="${esc(OG_FALLBACK)}">` +
+      jsonLd({
       "@context": "https://schema.org",
       "@type": "CollectionPage",
       name: title,
@@ -418,11 +423,23 @@ ${foot(canonical)}`;
 export function renderSitemapXml(softs = [], tutorials = []) {
   const cats = [...new Set(softs.map((s) => s.category).filter(Boolean))];
   const today = new Date().toISOString().slice(0, 10);
+  // lastmod：只有首页带 lastmod 时，搜索引擎无法判断其他页面的更新频率，
+  // 这里按各自数据日期补齐（缺失/格式异常的回落为生成日期）。
+  const ymd = (v) => {
+    const m = String(v ?? "").match(/(\d{4})-(\d{2})-(\d{2})/);
+    return m ? `${m[1]}-${m[2]}-${m[3]}` : "";
+  };
+  const softDate = (s) => ymd(pick(s, ["date", "updated_at", "created_at"])) || today;
+  const catDate = (c) => {
+    const ds = softs.filter((s) => s.category === c).map(softDate).sort();
+    return ds.length ? ds[ds.length - 1] : today;
+  };
+  const url = (loc, lastmod) => `  <url><loc>${loc}</loc><lastmod>${lastmod}</lastmod></url>`;
   const entries = [
-    `  <url><loc>${SITE}/</loc><lastmod>${today}</lastmod></url>`,
-    ...cats.map((c) => `  <url><loc>${catUrl(c)}</loc></url>`),
-    ...softs.map((s) => `  <url><loc>${softUrl(pick(s, ["id"]))}</loc></url>`),
-    ...tutorials.map((t) => `  <url><loc>${tutUrl(pick(t, ["id"]))}</loc></url>`),
+    url(`${SITE}/`, today),
+    ...cats.map((c) => url(catUrl(c), catDate(c))),
+    ...softs.map((s) => url(softUrl(pick(s, ["id"])), softDate(s))),
+    ...tutorials.map((t) => url(tutUrl(pick(t, ["id"])), ymd(pick(t, ["created_at"])) || today)),
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join(
     "\n"

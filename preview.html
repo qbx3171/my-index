@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex,follow">
 <meta name="theme-color" content="#0077ff">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230077ff'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='40' font-family='Arial,sans-serif' font-weight='700' fill='white'%3E%E4%B9%90%3C/text%3E%3C/svg%3E">
-<link rel="canonical" href="https://lezhesoft.cn/">
+<link rel="canonical" href="https://www.lezhesoft.cn/preview.html">
 <script>
 /* 深度链接 canonical 同步：?soft= / ?cat= 页面指向自身，避免被搜索引擎当作首页重复页丢弃 */
 (function(){
@@ -17,10 +17,10 @@ if(location.protocol==='file:'||location.hostname!=='lezhesoft.cn')return;
 var p=new URLSearchParams(location.search);
 var soft=p.get('soft'),cat=p.get('cat');
 var u=null;
-if(soft)u='https://lezhesoft.cn/?soft='+encodeURIComponent(soft);
-else if(cat)u='https://lezhesoft.cn/?cat='+encodeURIComponent(cat);
+if(soft)u='https://www.lezhesoft.cn/?soft='+encodeURIComponent(soft);
+else if(cat)u='https://www.lezhesoft.cn/?cat='+encodeURIComponent(cat);
 if(!u)return;
-var l=document.querySelector('link[rel="canonical"]');if(l)l.setAttribute('href',u);
+
 var o=document.querySelector('meta[property="og:url"]');if(o)o.setAttribute('content',u);
 }catch(e){}
 })();
@@ -1372,7 +1372,7 @@ body.ls-locked{overflow:hidden !important}
 <div class="form-actions"><button class="btn btn-outline" id="fbCancel">取消</button><button class="btn btn-primary" id="fbSubmit">提交</button></div>
 </div>
 </div>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 var IS_LOCAL_HOST=/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 var IS_FILE_PREVIEW=location.protocol==='file:';
 var IS_LOCAL_PREVIEW=IS_FILE_PREVIEW||IS_LOCAL_HOST;
@@ -2265,8 +2265,6 @@ var ogUrl=document.querySelector('meta[property="og:url"]');
 if(ogUrl)ogUrl.setAttribute('content',_canon);
 var ogImg=document.querySelector('meta[property="og:image"]');
 if(ogImg){var _img=(soft.screenshots&&soft.screenshots.length)?soft.screenshots[0]:(soft.icon_url||'');if(_img)ogImg.setAttribute('content',_img);}
-var canonicalLink=document.querySelector('link[rel="canonical"]');
-if(canonicalLink)canonicalLink.setAttribute('href',_canon);
 this._updateSchema(soft);
 }catch(e){console.warn('[SEO] 更新失败',e);}
 },

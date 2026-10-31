@@ -229,8 +229,11 @@ for (const s of softs) {
   if (!catList.has(s.category)) catList.set(s.category, []);
   catList.get(s.category).push(s);
 }
-const heat = (x) => (Number(x.views) || 0) + (Number(x.downloads) || 0) * 3;
-for (const list of catList.values()) list.sort((a, b) => heat(b) - heat(a));
+// 注意：排序键必须「稳定」，不能用 views/downloads —— 热度每天在变，会让 158 个页面
+// 的推荐块天天换组合，白白制造 diff、浪费抓取预算。这里按 id 排序（与数据序无关、
+// 只随增删变化），轮转依旧能保证同分类内入链均匀。
+const heat = (x) => String(x.id ?? "");
+for (const list of catList.values()) list.sort((a, b) => (heat(a) < heat(b) ? -1 : heat(a) > heat(b) ? 1 : 0));
 const REL_N = 8;
 const pickRelated = (s) => {
   const list = catList.get(s.category) || [];

@@ -5,12 +5,34 @@
 ## 第一步：体检
 
 ```bash
+node seo/audit.mjs               # 结构性 BUG 体检（每日必跑，见下方「第零步」）
 node seo/optimize.mjs            # 人读报告 + 优先级建议
 node seo/optimize.mjs --json     # 机器读，便于取数
 node seo/qa.mjs                  # 硬性红线：重复/短描述/乱码/死链
 ```
 
 `priorities` 数组即当日候选清单，按 P1 → P3 取最上面的一到两项。
+
+## 第零步：BUG 体检（2026-10-31 新增，每日必跑）
+
+`qa.mjs` 只管内容红线，`audit.mjs` 管结构性 BUG，两者互补、都要跑：
+
+```bash
+node seo/audit.mjs          # 有 BLOCKER 时 exit 2
+node seo/audit.mjs --json   # 自动化取数用
+```
+
+检查项：站内资源 404（img/script/link/poster）、canonical 是否自引用、H1 数量、
+JSON-LD 语法、og:image 缺失、工具页是否 noindex、页脚品牌回链、sitemap 与磁盘页面双向一致、
+sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态链接数、sw.js 注册状态。
+
+判定：**BLOCKER 当天必修**，修不了要写明原因；WARN 记入待办池择期处理。
+
+已知豁免（不算 BUG，不要「修」）：
+- `all.html`：有意的跳转存根（noindex + JS 跳 sitemap.html），canonical 指向 sitemap.html
+- `admin/manager/submanager.html`：后台 SPA，视图内是 h2，noindex，不补隐藏 h1
+- `baidu_verify_*.html` / `googleda*.html`：纯文本校验文件，不能加 head 标签
+- `sitemap.html` 描述 96 字、`preview/text1/vip` 属工具页：短描述/无 H1 可接受
 
 ## 第二步：按问题类型执行（对应改法）
 
@@ -36,7 +58,7 @@ node seo/qa.mjs                  # 硬性红线：重复/短描述/乱码/死链
 
 ## 第四步：发布与提交
 
-1. `node seo/generate.mjs` → `node seo/qa.mjs` → `node seo/optimize.mjs`（对比修改前后数字）
+1. `node seo/generate.mjs` → `node seo/qa.mjs` → `node seo/audit.mjs` → `node seo/optimize.mjs`（对比修改前后数字）
 2. `node ".../api-push.mjs" "SEO每日优化: ... YYYY-MM-DD"`（本地 push 被墙，必须走 API 脚本）
 3. 等 40s 后 curl 验证：sitemap loc 数、抽查 2 个改过的页面 200、抽查改动点已生效
 4. IndexNow 提交本次有实质变更的 URL
@@ -52,3 +74,12 @@ node seo/qa.mjs                  # 硬性红线：重复/短描述/乱码/死链
 - [ ] 软件页正文深度：目前中位数 548 字，可补「最低配置/适用场景/常见问题」结构化段落（2026-10-30 已修复最后一个薄页 Keka，薄内容 1→0；optimize.mjs 标题统计已改为按解码后可见字符计数，&amp; 不再误报超长）
 - [ ] 移动端 CWV 实测（需真实设备数据，Pages 无字段数据时用 PSI API）
 - [x] 图片缺 alt（2026-10-31 完成，4 页 23 张 → 1 页 2 张；教程页正文图片在 render 层补「标题 + 序号」alt，剩余 admin.html 为 JS 模板字符串误报）
+- [x] 建立每日 BUG 体检（2026-10-31 新增 seo/audit.mjs，BLOCKER 0 / WARN 1）
+- [x] sw.js 半坏缓存（2026-10-31：预热不存在的 ./community.js → addAll 全失败；改为自注销版本，清缓存并 unregister）
+- [x] 失效资源引用（2026-10-31：preview/text1 的 /cdn-cgi/email-decode.min.js 在 Pages 上 404，已删）
+- [x] preview.html canonical（2026-10-31：原来指向 https://lezhesoft.cn/ 非 www 首页，改为自引用并取消深链改写）
+- [x] 分类页缺 og:image（2026-10-31：15 个分类页统一回落 og-cover.png 1200x630）
+- [x] sitemap lastmod 补齐（2026-10-31：仅首页有 lastmod，现 180/180 全带）
+- [ ] 首页 HTML 604KB、内联脚本 343KB：移动端 LCP 风险，评估外链拆包（拆错会白屏，需先在灰度页验证）
+- [ ] 首页软件列表纯 JS 渲染（静态 HTML 里 0 条 /soft/ 链接）：可加「热门软件」静态块，让首页能把权重传给详情页
+- [ ] 教程/软件页互链缺失：软件页目前只链同分类软件，未链相关教程（教程页反链软件页）
