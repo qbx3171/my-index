@@ -13,6 +13,7 @@ import {
   renderTutorialPage,
   renderSitemapXml,
   renderSitemapHtml,
+  render404,
   catSlug,
   catUrl,
   platformLabel,
@@ -524,6 +525,13 @@ await writeFile(join(ROOT, "sitemap.xml"), renderSitemapXml(softs, tutorials), "
 const sm = renderSitemapHtml(softs, tutorials);
 await writeFile(join(ROOT, "sitemap.html"), sm.html, "utf8");
 console.log(`sitemap.xml + sitemap.html 完成（共 ${softs.length + tutorials.length + cats.length + 1} 个 URL）`);
+
+// 404 兜底页：GitHub Pages 自动接管根目录 404.html，同时保持 404 状态码。
+// 数据完全由当次产物派生（热门排序、分类、搜索索引），不做手工维护，避免与首页漂移。
+const p404 = render404(softs, tutorials);
+await writeFile(join(ROOT, "404.html"), p404.html, "utf8");
+const idxN404 = (p404.html.split("var IDX = ")[1].split(";\n")[0].match(/\["/g) || []).length;
+console.log(`404.html 完成（热门 12 条 · 搜索索引 ${idxN404} 条 = 软件 ${softs.length} + 教程 ${tutorials.length}）`);
 
 // 末尾自检：扫描全部产物，含 U+FFFD 即以 exit 2 退出（传输乱码随机出现，
 // 重跑一次大概率拿到干净副本；每日流程应在 exit 2 时自动重跑，最多 3 次）

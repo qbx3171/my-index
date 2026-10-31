@@ -481,3 +481,109 @@ ${tutorials.length
 ${foot("sitemap")}`;
   return { html, title: "网站地图 - 全部软件与教程 | 乐哲软件" };
 }
+
+/* ---------------- 404 页（GitHub Pages 认根目录 404.html） ----------------
+ * 背景（2026-10-31）：此前 404 落到 GitHub 默认英文页，页面内 0 处本站链接，
+ * 无导航无回首页，等于把每一个死链访客全额送走。GitHub Pages 会自动用
+ * 根目录 404.html 兜底（同时保持 HTTP 404 状态码），是零成本止损项。
+ * 设计目标：① 自带搜索，能当场找到目标页；② 热门+分类双出口；
+ * ③ 仍返回 404 且 noindex，绝不参与索引。
+ */
+
+export function render404(softs = [], tutorials = []) {
+  const score = (s) => (Number(s.views) || 0) + (Number(s.downloads) || 0) * 3;
+  const seen = new Set();
+  const hot = [];
+  for (const s of [...softs].sort((a, b) => score(b) - score(a))) {
+    const name = String(pick(s, ["name"]) || "").trim();
+    if (!name) continue;
+    const key = name.replace(/\s+/g, "").toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    hot.push(`<a href="${softUrl(pick(s, ["id"]))}">${esc(name)}</a>`);
+    if (hot.length >= 12) break;
+  }
+
+  const cats = [...new Set(softs.map((s) => s.category).filter(Boolean))].sort();
+  const catLinks = cats.map((c) => `<a href="${catUrl(c)}">${esc(c)}</a>`).join("");
+
+  // 搜索索引：[名称, 链接]，软件 + 教程一起收录（教程 URL 失效同样能当场找回）。
+  // 158 软件 + 6 教程约 11KB，gzip 后约 4KB。
+  // 404 是一次性落地页，访客唯一诉求是「找到正确那个页面」，
+  // 所以索引必须随页面自带，不能再发一次请求等接口。
+  const index = [
+    ...softs
+      .filter((s) => String(pick(s, ["name"]) || "").trim())
+      .map((s) => [String(pick(s, ["name"])).trim(), softUrl(pick(s, ["id"]))]),
+    ...tutorials
+      .filter((t) => String(pick(t, ["title"]) || "").trim())
+      .map((t) => [String(pick(t, ["title"])).trim(), tutUrl(pick(t, ["id"]))]),
+  ];
+  // 名称里可能有 </script> 之类的字符，把 < 转成 \u003c 防止提前闭合脚本
+  const idxJson = JSON.stringify(index).replace(/</g, "\\u003c");
+
+  const css = `<meta property="og:image" content="${OG_FALLBACK}">
+<style>
+h1{font-size:26px;margin:6px 0 6px}
+.lead{color:#666;margin:0 0 20px;font-size:15px}
+.searchbox input{width:100%;box-sizing:border-box;padding:13px 16px;font-size:16px;border:1px solid #d5dbe5;border-radius:10px;outline:none;color:#1a1a1a;background:#fff;font-family:inherit}
+.searchbox input:focus{border-color:#0077ff;box-shadow:0 0 0 3px rgba(0,119,255,.12)}
+.res{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.res a{display:inline-block;padding:7px 14px;border-radius:999px;background:#f0f5ff;color:#0077ff;text-decoration:none;font-size:14px}
+.res a:hover{background:#0077ff;color:#fff}
+.res .none{color:#888;font-size:14px;margin:0}
+.res .none a{background:none;padding:0;border-radius:0;color:#0077ff;text-decoration:underline}
+h2{font-size:17px;margin:32px 0 12px;padding-left:9px;border-left:3px solid #0077ff;line-height:1.3}
+.tags a{display:inline-block;padding:6px 13px;margin:0 8px 8px 0;border-radius:6px;background:#f5f6f8;color:#333;text-decoration:none;font-size:14px}
+.tags a:hover{background:#e8edf7;color:#0077ff}
+</style>`;
+
+  const js = `<script>
+(function(){
+  var IDX = ${idxJson};
+  var S = ${JSON.stringify(SITE)};
+  var el = document.getElementById("q404"), box = document.getElementById("r404");
+  var N = IDX.map(function(x){ return [x[0].toLowerCase().replace(/\\s+/g,""), x[1], x[0]]; });
+  function e(s){ return String(s).replace(/[&<>"]/g, function(c){ return c==="&"?"&amp;":c==="<"?"&lt;":c===">"?"&gt;":"&quot;"; }); }
+  function show(v){
+    var k = String(v || "").toLowerCase().replace(/\\s+/g, "");
+    if (!k) { box.innerHTML = ""; return; }
+    var hit = N.filter(function(x){ return x[0].indexOf(k) >= 0; });
+    if (!hit.length) { box.innerHTML = '<p class="none">没有匹配的软件，试试 <a href="' + S + '/sitemap.html">全站索引</a></p>'; return; }
+    box.innerHTML = hit.slice(0, 10).map(function(x){ return '<a href="' + x[1] + '">' + e(x[2]) + "</a>"; }).join("");
+  }
+  el.addEventListener("input", function(){ show(el.value); });
+  // 从错误地址里猜关键词：/tutorial/中文标题.html 这类能直接预填搜索
+  try {
+    var p = decodeURIComponent(location.pathname).split("/").pop().replace(/\\.html?$/i, "");
+    if (p && /[\\u4e00-\\u9fa5]/.test(p)) { el.value = p; show(p); }
+  } catch (err) {}
+})();
+</script>`;
+
+  const html = `${head(
+    "页面未找到 - 乐哲软件",
+    "你访问的页面不存在，可能是软件已下架或链接已失效。可在页面内直接搜索软件名，或从热门推荐与分类目录继续浏览乐哲软件的全部内容。",
+    `${SITE}/`,
+    css,
+    "noindex,follow"
+  )}
+<main>
+<h1>这个页面走丢了</h1>
+<p class="lead">地址可能已失效、软件已下架，或输入有误。搜一下你要找的软件：</p>
+<div class="searchbox"><input id="q404" type="search" placeholder="输入软件名，如 Photoshop、压缩、系统…" aria-label="搜索软件" autocomplete="off"></div>
+<div class="res" id="r404" aria-live="polite"></div>
+
+<h2>🔥 热门软件</h2>
+<div class="tags">${hot.join("")}</div>
+
+<h2>按分类浏览</h2>
+<div class="tags">${catLinks}</div>
+
+<h2>全部内容</h2>
+<div class="tags"><a href="${SITE}/sitemap.html">全站索引（${softs.length} 款软件 · ${tutorials.length} 篇教程）</a><a href="${SITE}/">返回首页</a></div>
+</main>
+${js}
+${foot("404")}`;
+  return { html, title: "页面未找到 - 乐哲软件" };
+}

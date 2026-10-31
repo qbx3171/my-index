@@ -95,9 +95,11 @@ for (const f of files) {
   }
 
   /* 2) canonical 必须自引用（noindex 工具页允许省略，但存在就必须正确）
-        all.html 是有意的跳转存根（noindex + JS 跳 sitemap.html），canonical 指向合并目标属设计，豁免 */
+        all.html 是有意的跳转存根（noindex + JS 跳 sitemap.html），canonical 指向合并目标属设计，豁免
+        404.html 由 GitHub Pages 在任意不存在的路径上返回，不存在「自己的 URL」，
+        canonical 固定指首页属设计，豁免 */
   const canonical = html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i)?.[1];
-  const CANON_EXEMPT = ["all.html"];
+  const CANON_EXEMPT = ["all.html", "404.html"];
   if (canonical && !CANON_EXEMPT.includes(f)) {
     const want = "https://www.lezhesoft.cn/" + (f === "index.html" ? "" : f);
     if (canonical.replace(/\/$/, "") !== want.replace(/\/$/, ""))
@@ -204,6 +206,19 @@ for (const f of ["index.html", "preview.html"]) {
   /* 14) 自建计数通道（site_hit/site_get）应已接线，等 Supabase 建表后自动启用 */
   if (/id="busuanzi_container_site_pv"/.test(h) && !/site_hit/.test(h))
     add(warn, "统计未接自建计数通道", f, "见 seo/site-stats.sql");
+}
+
+/* 15) 404 兜底页：GitHub Pages 会把任何不存在的路径交给根目录 404.html（同时保持 404 状态码）。
+   缺了它，访客看到的是 GitHub 英文「Page not found」——实测该页 0 处本站链接，
+   没有导航、没有回首页、没有搜索，等于把每一个死链访客全额送走。 */
+if (!(await exists(join(ROOT, "404.html")))) {
+  add(blocker, "缺 404.html", "404.html", "不存在的路径会回落到 GitHub 默认英文错误页");
+} else {
+  const h404 = await readFile(join(ROOT, "404.html"), "utf8");
+  if (!/href=["'](https:\/\/www\.lezhesoft\.cn)?\/sitemap\.html["']/.test(h404))
+    add(blocker, "404 页缺全站索引出口", "404.html", "访客无路可走");
+  if (!/id=["']q404["']/.test(h404)) add(warn, "404 页缺搜索框", "404.html", "无法当场找回目标页");
+  if (!/noindex/i.test(h404)) add(warn, "404 页未 noindex", "404.html", "不应参与索引");
 }
 
 const report = {
