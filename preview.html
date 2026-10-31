@@ -4842,42 +4842,82 @@ setTimeout(finishLoading,2500);
 })();
 </script>
 <script>
-/* 访问统计：原先用不蒜子（busuanzi.ibruce.info）。该服务的 JS 文件还能 200，
-   但真正的计数接口 /busuanzi?jsonpCallback= 实测 20s 无响应（status 000），
-   所以页脚长期只剩「总访问量  次」「访客数  人」空壳。
-   改用 abacus（Cloudflare Workers 托管、免 key）自建计数，并做降级：
-   3.5s 内拿不到数字就把整段隐藏，绝不再显示空壳文字。
-   另外「N 人在线」已撤下：它依赖 Supabase realtime，而站点走腾讯 CloudBase
-   supabase-proxy，实测 WebSocket 升级无响应（握手拿不到 101），该数字永远出不来；
+/* 访问统计：三层取值，任一层拿到数字即显示，绝不空壳
+   ① 自家 Supabase 计数（无第三方；需先在 Supabase 执行 seo/site-stats.sql）
+   ② abacus 公共计数（兜底，免 key）
+   ③ localStorage 上次成功值（离线兜底）
+   三层全失败才隐藏 —— 不会出现「总访问量  次」这种空壳。
+   注：「N 人在线」已撤下：它依赖 Supabase realtime，站点走腾讯 CloudBase
+   supabase-proxy，实测 WebSocket 升级无响应（拿不到 101），该数字永远出不来；
    改为展示同样真实可达的「今日浏览」。 */
 (function(){
-var NS='lezhesoft-main';
-var API='https://abacus.jasoncameron.dev';
+var SB=window.SUPABASE_URL||'',SK=window.SUPABASE_ANON_KEY||'';
+var API='https://abacus.jasoncameron.dev',NS='lezhesoft-main';
 function pad(n){return n<10?'0'+n:''+n;}
 var d=new Date();
 var dayKey='day-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+function num(j){
+  if(typeof j==='number'&&isFinite(j))return j;
+  if(typeof j==='string'&&/^\d+$/.test(j))return parseInt(j,10);
+  return null;
+}
+function cache(k,v){
+  if(v===undefined){try{var s=localStorage.getItem('lezhe_stat_'+k);return s===null?null:num(s);}catch(e){return null;}}
+  try{localStorage.setItem('lezhe_stat_'+k,String(v));}catch(e){}
+  return null;
+}
 function paint(valId,boxId,n){
   var v=document.getElementById(valId),box=document.getElementById(boxId);
   if(!v||!box)return;
   v.textContent=Number(n).toLocaleString('en-US');
   box.style.display='inline';
 }
-function req(kind,key,cb){
+function call(url,opt,ms){
   var ctl=window.AbortController?new AbortController():null;
-  var t=setTimeout(function(){if(ctl)try{ctl.abort();}catch(e){}},3500);
-  fetch(API+'/'+kind+'/'+NS+'/'+key,{cache:'no-store',signal:ctl?ctl.signal:undefined})
-    .then(function(r){return r.ok?r.json():null;})
-    .then(function(j){clearTimeout(t);cb(j&&typeof j.value==='number'?j.value:null);})
-    .catch(function(){clearTimeout(t);cb(null);});
+  var t=ctl?setTimeout(function(){try{ctl.abort();}catch(e){}},ms):0;
+  if(ctl)opt.signal=ctl.signal;
+  return fetch(url,opt).then(function(r){return r.ok?r.json():null;})
+    .then(function(j){if(t)clearTimeout(t);return j;})
+    .catch(function(){if(t)clearTimeout(t);return null;});
+}
+function own(kind,key,cb){
+  if(!SB||!SK)return cb(null);
+  try{if(sessionStorage.getItem('lezhe_stat_off')==='1')return cb(null);}catch(e){}
+  call(SB+'/rest/v1/rpc/'+(kind==='hit'?'site_hit':'site_get'),
+    {method:'POST',cache:'no-store',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({p_key:key})},2500)
+  .then(function(j){
+    var n=num(j);
+    if(n===null){try{sessionStorage.setItem('lezhe_stat_off','1');}catch(e){}}
+    cb(n);
+  });
+}
+function abacus(kind,key,cb){
+  call(API+'/'+kind+'/'+NS+'/'+key,{cache:'no-store'},3500)
+  .then(function(j){cb(j?num(j.value):null);});
 }
 function stat(cfg){
   var seen=false;
   try{seen=!!cfg.store.getItem(cfg.flag);}catch(e){}
-  req(seen?'get':'hit',cfg.key,function(n){
-    if(n===null&&seen){req('hit',cfg.key,function(m){if(m!==null)paint(cfg.valId,cfg.boxId,m);});return;}
-    if(n===null)return;
-    if(!seen){try{cfg.store.setItem(cfg.flag,'1');}catch(e){}}
-    paint(cfg.valId,cfg.boxId,n);
+  var kind=seen?'get':'hit';
+  function done(n){
+    if(n===null)return false;
+    try{if(!seen)cfg.store.setItem(cfg.flag,'1');}catch(e){}
+    cache(cfg.key,n);paint(cfg.valId,cfg.boxId,n);return true;
+  }
+  function last(){
+    var c=cache(cfg.key);
+    if(c!==null)paint(cfg.valId,cfg.boxId,c);
+  }
+  own(kind,cfg.key,function(n){
+    if(done(n))return;
+    abacus(kind,cfg.key,function(w){
+      if(w===null&&seen){
+        abacus('hit',cfg.key,function(m){if(done(m))return;last();});
+        return;
+      }
+      if(done(w))return;
+      last();
+    });
   });
 }
 try{

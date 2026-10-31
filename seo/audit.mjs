@@ -198,6 +198,12 @@ for (const f of ["index.html", "preview.html"]) {
     add(blocker, "仍在加载已失效的不蒜子计数脚本", f, "接口 20s 无响应，应改用自建计数");
   if (/id="busuanzi_container_site_pv"/.test(h) && !/abacus\.jasoncameron\.dev/.test(h))
     add(warn, "统计栏有占位但没有计数脚本", f, "");
+  /* 13) 统计必须带「本地缓存兜底」：第三方挂了也不能让数字消失 */
+  if (/abacus\.jasoncameron\.dev/.test(h) && !/lezhe_stat_/.test(h))
+    add(warn, "统计脚本缺少本地缓存兜底", f, "第三方失败时应回落到 localStorage 上次值");
+  /* 14) 自建计数通道（site_hit/site_get）应已接线，等 Supabase 建表后自动启用 */
+  if (/id="busuanzi_container_site_pv"/.test(h) && !/site_hit/.test(h))
+    add(warn, "统计未接自建计数通道", f, "见 seo/site-stats.sql");
 }
 
 const report = {
