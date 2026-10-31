@@ -28,6 +28,10 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 
 判定：**BLOCKER 当天必修**，修不了要写明原因；WARN 记入待办池择期处理。
 
+检查方法注意（2026-10-31 教训）：**FFFD/内容类检查必须先把页面落盘再读**，
+不要 `curl … | node` 直接查管道——分块边界会把多字节中文字符切断，产生 U+FFFD 假阳性
+（实测同页面落盘查为 0，管道查为 1）。死链/乱码以外的一致性断言同理。
+
 已知豁免（不算 BUG，不要「修」）：
 - `all.html`：有意的跳转存根（noindex + JS 跳 sitemap.html），canonical 指向 sitemap.html
 - `admin/manager/submanager.html`：后台 SPA，视图内是 h2，noindex，不补隐藏 h1
