@@ -280,6 +280,23 @@ export async function buildAiSection(ROOT, softs = []) {
   const cols = await fetchTable(U, K, "ai_collections");
   const tools = cols ? await fetchTable(U, K, "ai_tools") : null;
 
+  // 源数据定点修复：后台粘贴时个别字符写入即损坏（库里即 U+FFFD，重拉无效），按上下文还原
+  const AI_TEXT_FIXUPS = [
+    {
+      id: "109ac896-c7c5-4724-b3f2-be8861ce1c3b", // 蛙蛙写作
+      field: "summary",
+      from: /剧本创作\s*\uFFFD+\s*漫剧视频/,
+      to: "剧本创作、漫剧视频",
+    },
+  ];
+  for (const row of tools || []) {
+    for (const fx of AI_TEXT_FIXUPS) {
+      if (row.id !== fx.id) continue;
+      const v = row[fx.field];
+      if (typeof v === "string" && fx.from.test(v)) row[fx.field] = v.replace(fx.from, fx.to);
+    }
+  }
+
   const collections = (cols || [])
     .filter((c) => c.is_published !== false && c.slug && c.name)
     .sort((a, b) => (a.sort || 0) - (b.sort || 0));
@@ -292,8 +309,6 @@ export async function buildAiSection(ROOT, softs = []) {
     if (c) byCollection[c.slug].push(t);
   }
   for (const c of collections) byCollection[c.slug].sort((a, b) => (a.sort || 0) - (b.sort || 0));
-  // 只有非空工具集才有独立页；侧栏/导航只列这些，避免站内死链
-  for (const c of collections) c._hasPage = (byCollection[c.slug] || []).length > 0;
   // 只有非空工具集才有独立页；侧栏/导航只列这些，避免站内死链
   for (const c of collections) c._hasPage = (byCollection[c.slug] || []).length > 0;
 

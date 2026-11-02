@@ -102,4 +102,4 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [ ] 软件页内容深化：158 页均只有 1 个 H1、0 个 H2、正文中位 553 字，缺「适用场景/最低配置/常见问题」结构化段落（长尾词 + FAQ 富摘要资格）
 - [x] 统计「零第三方」（2026-10-31：前端已改成三层取值 —— ①自家 Supabase `site_hit/site_get` ②abacus 兜底 ③localStorage 上次值；自家通道探测失败后本会话不再重试。SQL 见 `seo/site-stats.sql`）
 - [x] Supabase 建表 + RPC（2026-10-31 已执行：`site_stats` 表 + `site_hit/site_get`；表无 policy、anon 直接 select 返回空数组，只能走函数。实测预检 200、自增正常、非法 key 返回 P0001。线上端到端验证：3 个请求全打自家 RPC，abacus 零调用。自检命令 `node seo/stat-check.mjs`）
-- [x] AI 工具集板块（/ai/）上线收尾（2026-11-02 已上线，commit aeebb22e）：站长仍需在 Supabase SQL Editor 执行  建表，然后到 admin.html 左侧「🤖AI工具集」上传内容，下次 generate.mjs 自动生成工具集独立页并入 sitemap
+- [x] AI 工具集板块（/ai/）上线收尾（2026-11-02 已上线，commit aeebb22e）：站长需执行 seo/ai-schema.sql 末尾的升级段（logo/slug/intro/screenshots 五个 ALTER），再到 admin.html「🤖AI工具集」上传工具集与工具（支持封面图URL、详细介绍、多张截图；无封面自动生成字母封面）
