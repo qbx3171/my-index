@@ -2018,7 +2018,7 @@ aiRenderCols:function(){var self=this,p=document.getElementById('aiPaneCol');if(
  h+='<div class="form-row"><div class="form-group"><label>名称 <span class="required">*</span></label><input id="aiColName" value="'+(e?escapeHTML(e.name):'')+'" placeholder="如：AI 绘画工具集" /></div>';
  h+='<div class="form-group"><label>URL 标识（slug，英文/数字/横线）<span class="required">*</span></label><input id="aiColSlug" value="'+(e?escapeHTML(e.slug):'')+'" placeholder="如：ai-huihua" /></div></div>';
  h+='<div class="form-group"><label>一句话介绍（页面导语 + 搜索引擎描述）</label><textarea id="aiColDesc" style="min-height:60px;">'+(e?escapeHTML(e.description||''):'')+'</textarea></div>';
- h+='<div class="form-row"><div class="form-group"><label>图标（emoji）</label><input id="aiColIcon" value="'+(e?escapeHTML(e.icon||'🧩'):'🧩')+'" /></div>';h+='<div class="form-group"><label>封面图标 URL（图床链接，选填；留空用 emoji）</label><input id="aiColLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /><div class="ai-url-prev" id="prev-aiColLogo"></div></div>';
+ h+='<div class="form-row"><div class="form-group"><label>图标（emoji 或图床图片链接）</label><input id="aiColIcon" value="'+(e?escapeHTML(e.icon||'🧩'):'🧩')+'" /></div>';h+='<div class="form-group"><label>封面图标 URL（图床链接，选填；留空用 emoji）</label><input id="aiColLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /><div class="ai-url-prev" id="prev-aiColLogo"></div></div>';
  h+='<div class="form-group"><label>排序（小的在前）</label><input id="aiColSort" type="number" value="'+(e?(e.sort||0):0)+'" /></div>';
  h+='<div class="form-group"><label>状态</label><select id="aiColPub"><option value="true"'+(e&&e.is_published===false?'':' selected')+'>已发布</option><option value="false"'+(e&&e.is_published===false?' selected':'')+'>下架</option></select></div></div>';
  h+='<div style="display:flex;gap:8px;margin-top:8px;"><button id="aiColSave" class="btn btn-primary btn-sm" type="button">保存工具集</button>'+(e?'<button id="aiColCancel" class="btn btn-outline btn-sm" type="button">取消编辑</button>':'')+'</div>';
@@ -2034,6 +2034,7 @@ aiRenderCols:function(){var self=this,p=document.getElementById('aiPaneCol');if(
  p.innerHTML=h;
  document.getElementById('aiColSave').addEventListener('click',function(){self.aiColSave();});
  if(document.getElementById('prev-aiColLogo'))aiPrev('prev-aiColLogo',document.getElementById('aiColLogo').value);
+ var _ci=document.getElementById('aiColIcon');if(_ci&&/^https?:\/\/\S+$/i.test(_ci.value.trim()))aiPrev('prev-aiColLogo',_ci.value.trim());
  if(e)document.getElementById('aiColCancel').addEventListener('click',function(){self._aiEditCol=null;self.aiRenderCols();});
  p.querySelectorAll('.ai-col-edit').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;self._aiEditCol=self._aiCols.find(function(x){return x.id===id;})||null;self.aiRenderCols();window.scrollTo({top:0,behavior:'smooth'});});});
  p.querySelectorAll('.ai-col-del').forEach(function(b){b.addEventListener('click',function(){self.aiColDel(this.dataset.id);});});
@@ -2041,6 +2042,7 @@ aiRenderCols:function(){var self=this,p=document.getElementById('aiPaneCol');if(
 aiColSave:function(){var self=this;
  var id=document.getElementById('aiColId').value;
  var payload={name:document.getElementById('aiColName').value.trim(),slug:document.getElementById('aiColSlug').value.trim().toLowerCase(),description:document.getElementById('aiColDesc').value.trim(),icon:document.getElementById('aiColIcon').value.trim()||'🧩',logo:document.getElementById('aiColLogo').value.trim(),sort:parseInt(document.getElementById('aiColSort').value,10)||0,is_published:document.getElementById('aiColPub').value==='true'};
+ if(/^https?:\/\//i.test(payload.icon)){payload.logo=payload.logo||payload.icon;payload.icon='🧩';}
  if(!payload.name||!payload.slug){toast('名称和 slug 必填','warning');return;}
  if(!/^[a-z0-9][a-z0-9-]*$/.test(payload.slug)){toast('slug 只能用小写英文、数字和横线','warning');return;}
  var q=id?supabaseClient.from('ai_collections').update(payload).eq('id',id):supabaseClient.from('ai_collections').insert(payload);
@@ -2076,7 +2078,7 @@ aiRenderTools:function(){var self=this,p=document.getElementById('aiPaneTool');i
  h+='<div class="form-group"><label>收费模式</label><select id="aiToolPricing">';
  ['免费','免费额度','订阅','买断'].forEach(function(o){h+='<option'+(e&&e.pricing===o?' selected':'')+'>'+o+'</option>';});
  h+='</select></div>';
- h+='<div class="form-group"><label>图标（emoji）</label><input id="aiToolIcon" value="'+(e?escapeHTML(e.icon||'🤖'):'🤖')+'" /></div>';h+='<div class="form-group"><label>工具图标 URL（图床链接，选填；卡片/详情页展示，留空自动生成字母封面）</label><input id="aiToolLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /><div class="ai-url-prev" id="prev-aiToolLogo"></div></div></div>';
+ h+='<div class="form-group"><label>图标（emoji 或图床图片链接）</label><input id="aiToolIcon" value="'+(e?escapeHTML(e.icon||'🤖'):'🤖')+'" /></div>';h+='<div class="form-group"><label>工具图标 URL（图床链接，选填；卡片/详情页展示，留空自动生成字母封面）</label><input id="aiToolLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /><div class="ai-url-prev" id="prev-aiToolLogo"></div></div></div>';
  h+='<div class="form-row"><div class="form-group"><label>排序（小的在前）</label><input id="aiToolSort" type="number" value="'+(e?(e.sort||0):0)+'" /></div>';
  h+='<div class="form-group"><label>状态</label><select id="aiToolPub"><option value="true"'+(e&&e.is_published===false?'':' selected')+'>上架</option><option value="false"'+(e&&e.is_published===false?' selected':'')+'>下架</option></select></div></div>';h+='<div class="form-group"><label>封面截图 URL（图床链接，选填，每行一张，详情页展示）</label><textarea id="aiToolShots" style="min-height:60px;">'+(e?escapeHTML(e.screenshots||''):'')+'</textarea><div class="ai-url-prev" id="prev-aiToolShots"></div></div>';h+='<div class="form-group"><label>详细介绍（选填，空行分段，详情页展示）</label><textarea id="aiToolIntro" style="min-height:110px;">'+(e?escapeHTML(e.intro||''):'')+'</textarea></div>';
  h+='<div style="display:flex;gap:8px;margin-top:8px;"><button id="aiToolSave" class="btn btn-primary btn-sm" type="button">保存工具</button>'+(e?'<button id="aiToolCancel" class="btn btn-outline btn-sm" type="button">取消编辑</button>':'')+'</div>';
@@ -2086,6 +2088,7 @@ aiRenderTools:function(){var self=this,p=document.getElementById('aiPaneTool');i
  document.getElementById('aiToolColSel').addEventListener('change',function(){self._aiEditTool=null;self.aiToolLoad(this.value);});
  document.getElementById('aiToolSave').addEventListener('click',function(){self.aiToolSave();});
  if(document.getElementById('prev-aiToolLogo')){aiPrev('prev-aiToolLogo',document.getElementById('aiToolLogo').value);aiPrev('prev-aiToolShots',document.getElementById('aiToolShots').value);}
+ var _ti=document.getElementById('aiToolIcon');if(_ti&&/^https?:\/\/\S+$/i.test(_ti.value.trim()))aiPrev('prev-aiToolLogo',_ti.value.trim());
  if(e)document.getElementById('aiToolCancel').addEventListener('click',function(){self._aiEditTool=null;self.aiRenderTools();});
  this.aiToolLoad(cur);
 },
@@ -2109,6 +2112,7 @@ aiToolSave:function(){var self=this;
  var cid=document.getElementById('aiToolColSel').value;
  var id=document.getElementById('aiToolId').value;
  var payload={collection_id:cid,name:document.getElementById('aiToolName').value.trim(),url:document.getElementById('aiToolUrl').value.trim(),summary:document.getElementById('aiToolSummary').value.trim(),tags:document.getElementById('aiToolTags').value.trim(),icon:document.getElementById('aiToolIcon').value.trim()||'🤖',logo:document.getElementById('aiToolLogo').value.trim(),slug:document.getElementById('aiToolSlug').value.trim(),intro:document.getElementById('aiToolIntro').value.trim(),screenshots:document.getElementById('aiToolShots').value.trim(),pricing:document.getElementById('aiToolPricing').value,sort:parseInt(document.getElementById('aiToolSort').value,10)||0,is_published:document.getElementById('aiToolPub').value==='true'};
+ if(/^https?:\/\//i.test(payload.icon)){payload.logo=payload.logo||payload.icon;payload.icon='🤖';}
  ['logo','slug','intro','screenshots'].forEach(function(k){if(!payload[k])delete payload[k];});if(!payload.name||!payload.url){toast('工具名和官网地址必填','warning');return;}
  if(!/^https?:\/\//i.test(payload.url)){toast('官网地址需以 http(s):// 开头','warning');return;}
  var q=id?supabaseClient.from('ai_tools').update(payload).eq('id',id):supabaseClient.from('ai_tools').insert(payload);
@@ -4461,6 +4465,7 @@ document.addEventListener('input',function(ev){
  if(id==='aiColLogo')aiPrev('prev-aiColLogo',ev.target.value);
  else if(id==='aiToolLogo')aiPrev('prev-aiToolLogo',ev.target.value);
  else if(id==='aiToolShots')aiPrev('prev-aiToolShots',ev.target.value);
+ else if(id==='aiColIcon'||id==='aiToolIcon'){var v=ev.target.value.trim();if(/^https?:\/\/\S+$/i.test(v))aiPrev(id==='aiColIcon'?'prev-aiColLogo':'prev-aiToolLogo',v);}
 });
 </script>
 </body>

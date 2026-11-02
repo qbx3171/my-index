@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { head, foot, crumb, jsonLd, SITE } from "./render.js";
 
 const AI_CSS = `
-<link rel="stylesheet" href="${SITE}/ai/ai.css">
+<link rel="stylesheet" href="${SITE}/ai/ai.css?v=${new Date().toISOString().slice(0, 13).replace(/\D/g, "")}">
 `;
 
 // —— Supabase 连接信息从仓库 index.html 提取 ——
@@ -53,12 +53,11 @@ function aiFallback(name, cls) {
 }
 const FALLBACK_SNIPPET = `<script>function aiFallback(n,c){var s=String(n||'AI'),ch=[...s][0]||'A',h=0;for(var i=0;i<s.length;i++)h=(h*31+s.codePointAt(i))>>>0;var hue=h%360;return '<span class="'+c+' ai-cover-fb" style="background:linear-gradient(135deg,hsl('+hue+',72%,52%),hsl('+((hue+46)%360)+',72%,42%))">'+ch+'</span>';}</script>`;
 
-// —— 工具卡片（ai-bot.cn 同款：圆形图标 + 名称/一句话简介上下排 + 角标；点击进站内详情页）——
+// —— 工具卡片（ai-bot.cn 同款：圆形图标 + 名称/一句话简介，无角标；点击进站内详情页）——
 function toolCard(t) {
   return `<a class="ai-card" href="${toolDetailUrl(t)}" title="${esc(t.summary || t.name)}">
   ${coverHtml(t, "ai-cover")}
   <span class="ai-card-main"><span class="ai-card-name">${esc(t.name)}</span><span class="ai-card-summary">${esc(t.summary || "")}</span></span>
-  <span class="ai-badge ${badgeClass(t.pricing)}">${esc(t.pricing || "免费")}</span>
 </a>`;
 }
 
@@ -145,7 +144,7 @@ function detailDesc(t, col) {
 function sideNav(collections, activeSlug) {
   const listed = collections.filter((c) => c._hasPage !== false);
   return `<aside class="ai-side">
-  <a class="ai-side-brand" href="${SITE}/ai/index.html">🤖 AI工具集</a>
+  <a class="ai-side-brand" href="${SITE}/ai/index.html"><span class="ai-side-brand-ico">🤖</span>乐哲Ai工具集</a>
   <nav class="ai-side-menu">
   ${listed
     .map(
@@ -175,7 +174,7 @@ export function renderAiHub(collections, byCollection) {
       return `<section class="ai-sec" id="${esc(c.slug)}">
   <div class="ai-sec-head">${c.logo && /^https?:\/\//i.test(c.logo) ? `<img class="ai-sec-logo" src="${esc(c.logo)}" alt="">` : `<span class="ai-sec-ico">${esc(c.icon || "🧩")}</span>`}
   <h2>${esc(c.name)}</h2><span class="ai-sec-count">${tools.length} 款</span>
-  <a class="ai-sec-more" href="${SITE}/ai/${esc(c.slug)}.html">查看全部 →</a></div>
+  <a class="ai-sec-more" href="${SITE}/ai/${esc(c.slug)}.html">查看更多 &gt;&gt;</a></div>
   <div class="ai-cards">${shown.map(toolCard).join("\n")}</div>
 </section>`;
     })
@@ -286,6 +285,21 @@ export async function buildAiSection(ROOT, softs = []) {
     }
   }
 
+  // 图床兼容：站长可能把图片链接直接贴进 icon 字段（该字段本应存 emoji），统一视为封面图
+  const asImg = (v) => (typeof v === "string" && /^https?:\/\/\S+$/i.test(v.trim()) ? v.trim() : "");
+  for (const t of tools || []) {
+    if (!String(t.logo || "").trim()) {
+      const u = asImg(t.icon);
+      if (u) t.logo = u;
+    }
+  }
+  for (const c of cols || []) {
+    if (!String(c.logo || "").trim()) {
+      const u = asImg(c.icon);
+      if (u) c.logo = u;
+    }
+  }
+
   const collections = (cols || [])
     .filter((c) => c.is_published !== false && c.slug && c.name)
     .sort((a, b) => (a.sort || 0) - (b.sort || 0));
@@ -352,13 +366,15 @@ function today() {
 
 const AI_STYLESHEET = `
 :root{--ai-border:#e5e9f0;--ai-dim:#5b6472}
-/* AI 板块专属布局：仿 ai-bot.cn 左侧固定导航（220px）+ 宽幅内容区 */
+/* AI 板块专属布局：仿 ai-bot.cn 左侧固定导航（220px）+ 宽幅内容区 + 浅灰页底 */
+body{background:var(--bg-secondary,#f5f6f8)}
 main{max-width:none;margin:0 0 0 220px;padding:22px 32px 60px}
 main>*{max-width:1400px;margin-left:auto;margin-right:auto}
 header{position:sticky;top:0;z-index:100}
 footer{margin-left:220px}
 .ai-side{position:fixed;top:57px;bottom:0;left:0;width:220px;background:var(--bg-card-solid,#fff);border-right:1px solid var(--ai-border);display:flex;flex-direction:column;padding:14px 12px;overflow-y:auto;z-index:40}
-.ai-side-brand{display:block;font-weight:800;font-size:1.02rem;color:var(--text-primary,#1c2333);text-decoration:none;padding:4px 10px 12px;border-bottom:1px solid var(--ai-border);margin-bottom:8px;white-space:nowrap}
+.ai-side-brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:1.05rem;color:var(--text-primary,#1a1f2b);text-decoration:none;padding:4px 10px 12px;border-bottom:1px solid var(--ai-border);margin-bottom:8px;white-space:nowrap}
+.ai-side-brand-ico{font-size:1.15rem;line-height:1}
 .ai-side-menu{display:flex;flex-direction:column;gap:2px;flex:1 0 auto}
 .ai-side-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;color:#4b5563;text-decoration:none;font-size:.9rem;transition:.15s}
 .ai-side-item:hover{background:#f3f5f9;color:#1c2333}
@@ -379,19 +395,19 @@ span.ai-col-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-con
 .ai-sec-ico{font-size:1.3rem}
 .ai-sec-logo{width:26px;height:26px;border-radius:7px;object-fit:cover}
 .ai-sec-head h2{margin:0;font-size:1.15rem}
-.ai-sec-count{font-size:.76rem;color:#0088ff;background:rgba(0,136,255,.08);padding:2px 10px;border-radius:20px}
-.ai-sec-more{margin-left:auto;font-size:.85rem;color:#0088ff;text-decoration:none;white-space:nowrap}
+.ai-sec-count{font-size:.74rem;color:#9aa3b2}
+.ai-sec-more{margin-left:auto;font-size:.84rem;color:#8a93a3;text-decoration:none;white-space:nowrap}
 .ai-sec-more:hover{text-decoration:underline}
 /* 卡片流（ai-bot.cn 同款：横排小卡 6 列自适应，圆形图标，hover 紫蓝描边） */
-.ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:14px}
-.ai-card{display:flex;align-items:center;gap:10px;background:var(--bg-card-solid,#fff);border:1px solid #eceff4;border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit;transition:.15s;min-width:0}
+.ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.ai-card{display:flex;align-items:center;gap:10px;background:var(--bg-card-solid,#fff);border:1px solid #ececf0;border-radius:10px;padding:13px 15px;text-decoration:none;color:inherit;transition:.15s;min-width:0;overflow:hidden}
 .ai-card:hover{border-color:#5961f9;box-shadow:0 4px 14px rgba(89,97,249,.13)}
-.ai-card-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.ai-card-name{font-weight:700;font-size:.93rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-card-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;max-width:100%}
+.ai-card-name{font-weight:700;font-size:.9rem;color:#1f2733;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .ai-badge{margin-left:auto;font-size:.68rem;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
 .ai-cover{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:0 1px 4px rgba(20,40,80,.12)}
 span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem}
-.ai-card-summary{margin:0;font-size:.78rem;color:#98a1b0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-card-summary{margin:0;font-size:.76rem;color:#a6adba;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .ai-badge.free{color:#0a8f4d;background:rgba(16,163,74,.1)}
 .ai-badge.freemium{color:#b07000;background:rgba(240,180,0,.12)}
 .ai-badge.sub{color:#0066cc;background:rgba(0,119,255,.1)}
