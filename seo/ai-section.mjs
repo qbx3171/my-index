@@ -104,13 +104,13 @@ ${sideNav(collections, col.slug)}
 <div class="ai-detail-head">
   ${coverHtml(t, "ai-detail-cover")}
   <div class="ai-detail-info">
-    <h1>${esc(t.name)}</h1>
-    <div class="ai-detail-meta"><span class="ai-badge ${badgeClass(t.pricing)}">${esc(t.pricing || "免费")}</span>${tags.map((g) => `<span class="chip">${esc(g)}</span>`).join("")}</div>
+    <div class="ai-detail-title"><h1>${esc(t.name)}</h1><span class="ai-badge ${badgeClass(t.pricing)}">${esc(t.pricing || "免费")}</span></div>
+    ${tags.length ? `<div class="ai-detail-meta">${tags.map((g) => `<span class="chip">${esc(g)}</span>`).join("")}</div>` : ""}
     <p class="ai-card-summary">${esc(t.summary || "")}</p>
     <div class="ai-detail-actions"><a class="ai-site-btn" rel="nofollow noopener" target="_blank" href="${esc(t.url)}">访问官网 ↗</a><a class="ai-ghost-btn" href="${SITE}/ai/${esc(col.slug)}.html">← ${esc(col.name)}</a></div>
   </div>
 </div>
-${shots.length ? `<div class="ai-shots">${shots.map((u, i) => `<img src="${esc(u)}" alt="${esc(t.name)} 截图${i + 1}" loading="lazy" referrerpolicy="no-referrer">`).join("")}</div>` : ""}
+${shots.length ? `<div class="ai-shots">${shots.map((u, i) => `<a class="ai-shot" href="${esc(u)}" target="_blank" rel="noopener" title="查看大图"><img src="${esc(u)}" alt="${esc(t.name)} 截图${i + 1}" loading="lazy" referrerpolicy="no-referrer"></a>`).join("")}</div>` : ""}
 ${introParas ? `<section class="ai-detail-sec"><h2>${esc(t.name)} 是什么</h2>${introParas}</section>` : ""}
 ${siblings.length ? `<section class="ai-detail-sec"><h2>同类工具推荐</h2><div class="ai-cards">${siblings.map(toolCard).join("\n")}</div></section>` : ""}
 <p class="ai-back"><a href="${SITE}/ai/index.html" style="color:#0077ff">← 全部工具集</a></p>
@@ -417,6 +417,8 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 /* 详情页 */
 .ai-detail-head{display:flex;align-items:flex-start;gap:20px;margin:8px 0 16px;padding:18px;background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:16px;box-shadow:0 1px 4px rgba(20,40,80,.05)}
 .ai-detail-head h1{margin:0 0 8px}
+.ai-detail-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ai-detail-title h1{margin:0}
 .ai-detail-cover{width:96px;height:96px;border-radius:18px;object-fit:cover;box-shadow:0 3px 12px rgba(20,40,80,.16);flex-shrink:0}
 span.ai-detail-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:2.2rem}
 .ai-detail-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-bottom:8px}
@@ -427,7 +429,9 @@ span.ai-detail-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-
 .ai-ghost-btn{display:inline-flex;align-items:center;color:var(--text-secondary,#41506b);text-decoration:none;font-size:.88rem;padding:10px 16px;border:1px solid var(--border-glow,var(--ai-border));border-radius:50px;transition:.16s}
 .ai-ghost-btn:hover{color:var(--text-primary,#1c2333);background:var(--bg-secondary,#eef2f8)}
 .ai-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:14px 0 6px}
-.ai-shots img{width:100%;border-radius:12px;border:1px solid var(--border-glow,var(--ai-border));display:block}
+.ai-shot{display:block;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid var(--border-glow,var(--ai-border));background:var(--bg-secondary,#f4f7fb)}
+.ai-shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
+.ai-shot:hover img{transform:scale(1.03)}
 .ai-detail-sec{margin:22px 0}
 .ai-detail-sec h2{font-size:1.15rem;margin:0 0 12px;padding-left:12px;border-left:4px solid #0077ff;line-height:1.3}
 .ai-detail-sec p{color:var(--text-secondary,#41506b);line-height:1.85;margin:0 0 12px;font-size:.94rem}

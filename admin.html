@@ -2018,7 +2018,7 @@ aiRenderCols:function(){var self=this,p=document.getElementById('aiPaneCol');if(
  h+='<div class="form-row"><div class="form-group"><label>名称 <span class="required">*</span></label><input id="aiColName" value="'+(e?escapeHTML(e.name):'')+'" placeholder="如：AI 绘画工具集" /></div>';
  h+='<div class="form-group"><label>URL 标识（slug，英文/数字/横线）<span class="required">*</span></label><input id="aiColSlug" value="'+(e?escapeHTML(e.slug):'')+'" placeholder="如：ai-huihua" /></div></div>';
  h+='<div class="form-group"><label>一句话介绍（页面导语 + 搜索引擎描述）</label><textarea id="aiColDesc" style="min-height:60px;">'+(e?escapeHTML(e.description||''):'')+'</textarea></div>';
- h+='<div class="form-row"><div class="form-group"><label>图标（emoji）</label><input id="aiColIcon" value="'+(e?escapeHTML(e.icon||'🧩'):'🧩')+'" /></div>';h+='<div class="form-group"><label>封面图 URL（选填，侧栏/卡片展示；留空用 emoji）</label><input id="aiColLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /></div>';
+ h+='<div class="form-row"><div class="form-group"><label>图标（emoji）</label><input id="aiColIcon" value="'+(e?escapeHTML(e.icon||'🧩'):'🧩')+'" /></div>';h+='<div class="form-group"><label>封面图标 URL（图床链接，选填；留空用 emoji）</label><input id="aiColLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /><div class="ai-url-prev" id="prev-aiColLogo"></div></div>';
  h+='<div class="form-group"><label>排序（小的在前）</label><input id="aiColSort" type="number" value="'+(e?(e.sort||0):0)+'" /></div>';
  h+='<div class="form-group"><label>状态</label><select id="aiColPub"><option value="true"'+(e&&e.is_published===false?'':' selected')+'>已发布</option><option value="false"'+(e&&e.is_published===false?' selected':'')+'>下架</option></select></div></div>';
  h+='<div style="display:flex;gap:8px;margin-top:8px;"><button id="aiColSave" class="btn btn-primary btn-sm" type="button">保存工具集</button>'+(e?'<button id="aiColCancel" class="btn btn-outline btn-sm" type="button">取消编辑</button>':'')+'</div>';
@@ -2033,6 +2033,7 @@ aiRenderCols:function(){var self=this,p=document.getElementById('aiPaneCol');if(
  h+='</tbody></table></div>';
  p.innerHTML=h;
  document.getElementById('aiColSave').addEventListener('click',function(){self.aiColSave();});
+ if(document.getElementById('prev-aiColLogo'))aiPrev('prev-aiColLogo',document.getElementById('aiColLogo').value);
  if(e)document.getElementById('aiColCancel').addEventListener('click',function(){self._aiEditCol=null;self.aiRenderCols();});
  p.querySelectorAll('.ai-col-edit').forEach(function(b){b.addEventListener('click',function(){var id=this.dataset.id;self._aiEditCol=self._aiCols.find(function(x){return x.id===id;})||null;self.aiRenderCols();window.scrollTo({top:0,behavior:'smooth'});});});
  p.querySelectorAll('.ai-col-del').forEach(function(b){b.addEventListener('click',function(){self.aiColDel(this.dataset.id);});});
@@ -2075,15 +2076,16 @@ aiRenderTools:function(){var self=this,p=document.getElementById('aiPaneTool');i
  h+='<div class="form-group"><label>收费模式</label><select id="aiToolPricing">';
  ['免费','免费额度','订阅','买断'].forEach(function(o){h+='<option'+(e&&e.pricing===o?' selected':'')+'>'+o+'</option>';});
  h+='</select></div>';
- h+='<div class="form-group"><label>图标（emoji）</label><input id="aiToolIcon" value="'+(e?escapeHTML(e.icon||'🤖'):'🤖')+'" /></div>';h+='<div class="form-group"><label>封面图 URL（选填，卡片/详情页展示；留空自动生成字母封面）</label><input id="aiToolLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /></div></div>';
+ h+='<div class="form-group"><label>图标（emoji）</label><input id="aiToolIcon" value="'+(e?escapeHTML(e.icon||'🤖'):'🤖')+'" /></div>';h+='<div class="form-group"><label>工具图标 URL（图床链接，选填；卡片/详情页展示，留空自动生成字母封面）</label><input id="aiToolLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /><div class="ai-url-prev" id="prev-aiToolLogo"></div></div></div>';
  h+='<div class="form-row"><div class="form-group"><label>排序（小的在前）</label><input id="aiToolSort" type="number" value="'+(e?(e.sort||0):0)+'" /></div>';
- h+='<div class="form-group"><label>状态</label><select id="aiToolPub"><option value="true"'+(e&&e.is_published===false?'':' selected')+'>上架</option><option value="false"'+(e&&e.is_published===false?' selected':'')+'>下架</option></select></div></div>';h+='<div class="form-group"><label>封面截图 URL（选填，多张用换行分隔，详情页展示）</label><textarea id="aiToolShots" style="min-height:60px;">'+(e?escapeHTML(e.screenshots||''):'')+'</textarea></div>';h+='<div class="form-group"><label>详细介绍（选填，空行分段，详情页展示）</label><textarea id="aiToolIntro" style="min-height:110px;">'+(e?escapeHTML(e.intro||''):'')+'</textarea></div>';
+ h+='<div class="form-group"><label>状态</label><select id="aiToolPub"><option value="true"'+(e&&e.is_published===false?'':' selected')+'>上架</option><option value="false"'+(e&&e.is_published===false?' selected':'')+'>下架</option></select></div></div>';h+='<div class="form-group"><label>封面截图 URL（图床链接，选填，每行一张，详情页展示）</label><textarea id="aiToolShots" style="min-height:60px;">'+(e?escapeHTML(e.screenshots||''):'')+'</textarea><div class="ai-url-prev" id="prev-aiToolShots"></div></div>';h+='<div class="form-group"><label>详细介绍（选填，空行分段，详情页展示）</label><textarea id="aiToolIntro" style="min-height:110px;">'+(e?escapeHTML(e.intro||''):'')+'</textarea></div>';
  h+='<div style="display:flex;gap:8px;margin-top:8px;"><button id="aiToolSave" class="btn btn-primary btn-sm" type="button">保存工具</button>'+(e?'<button id="aiToolCancel" class="btn btn-outline btn-sm" type="button">取消编辑</button>':'')+'</div>';
  h+='</div>';
  h+='<div style="margin-top:18px;overflow-x:auto;"><table class="tbl-software"><thead><tr><th>封面</th><th>名称</th><th>简介</th><th>收费</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody id="aiToolRows"><tr><td colspan="7" style="text-align:center;color:var(--dim);padding:20px 0;">加载中…</td></tr></tbody></table></div>';
  p.innerHTML=h;
  document.getElementById('aiToolColSel').addEventListener('change',function(){self._aiEditTool=null;self.aiToolLoad(this.value);});
  document.getElementById('aiToolSave').addEventListener('click',function(){self.aiToolSave();});
+ if(document.getElementById('prev-aiToolLogo')){aiPrev('prev-aiToolLogo',document.getElementById('aiToolLogo').value);aiPrev('prev-aiToolShots',document.getElementById('aiToolShots').value);}
  if(e)document.getElementById('aiToolCancel').addEventListener('click',function(){self._aiEditTool=null;self.aiRenderTools();});
  this.aiToolLoad(cur);
 },
@@ -4437,5 +4439,29 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"71bac664feb34e22b9c263d1c43c3ea7","r":1,"spa":2}' crossorigin="anonymous"></script>
 
+<!-- AI_PREV3 -->
+<style>
+.ai-url-prev{display:none;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ai-url-prev.on{display:flex}
+.ai-url-prev .aipv{display:block;width:64px;height:64px;border-radius:10px;overflow:hidden;border:1px solid rgba(120,140,170,.35);background:#f4f7fb;position:relative}
+.ai-url-prev .aipv img{width:100%;height:100%;object-fit:cover;display:block}
+.ai-url-prev .aipv.bad{display:flex;align-items:center;justify-content:center;font-size:11px;color:#c0392b}
+</style>
+<script>
+function aiPrev(boxId,val){
+ var box=document.getElementById(boxId);if(!box)return;
+ var urls=String(val||'').split(/[\n,，]/).map(function(x){return x.trim();}).filter(function(u){return /^https?:\/\/\S+$/i.test(u);}).slice(0,8);
+ if(!urls.length){box.innerHTML='';box.classList.remove('on');return;}
+ box.classList.add('on');
+ box.innerHTML=urls.map(function(u){return '<a class="aipv" href="'+u+'" target="_blank" rel="noopener" title="点击查看原图"><img src="'+u+'" loading="lazy" referrerpolicy="no-referrer"></a>';}).join('');
+ box.querySelectorAll('img').forEach(function(im){im.onerror=function(){var p=im.parentNode;if(p){p.classList.add('bad');p.textContent='加载失败';}};});
+}
+document.addEventListener('input',function(ev){
+ var id=ev.target&&ev.target.id;
+ if(id==='aiColLogo')aiPrev('prev-aiColLogo',ev.target.value);
+ else if(id==='aiToolLogo')aiPrev('prev-aiToolLogo',ev.target.value);
+ else if(id==='aiToolShots')aiPrev('prev-aiToolShots',ev.target.value);
+});
+</script>
 </body>
 </html>
