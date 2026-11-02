@@ -1,0 +1,47 @@
+name: AI sync
+# 每小时 5 分钟检查一次后台数据（Supabase），有变更才重新生成并提交；
+# 也可通过 workflow_dispatch 手动触发（后台「同步到前端」按钮）。
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ai-sync
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate static pages
+        run: |
+          ok=0
+          for i in 1 2 3; do
+            echo "== 第 $i 次尝试 =="
+            if node seo/generate.mjs; then ok=1; break; fi
+            echo "生成失败（疑似代理传输乱码，随机出现），5 秒后重试"
+            sleep 5
+          done
+          [ "$ok" = "1" ] || { echo "连续 3 次生成失败"; exit 2; }
+
+      - name: Commit & Push if changed
+        run: |
+          git config user.name "ai-sync-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -z "$(git status --porcelain -uall)" ]; then
+            echo "后台数据无变更，跳过"
+            exit 0
+          fi
+          git add -A
+          git commit -m "auto: 同步后台数据，重新生成全站 [skip ci]"
+          git push
