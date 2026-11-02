@@ -2018,15 +2018,15 @@ aiRenderCols:function(){var self=this,p=document.getElementById('aiPaneCol');if(
  h+='<div class="form-row"><div class="form-group"><label>名称 <span class="required">*</span></label><input id="aiColName" value="'+(e?escapeHTML(e.name):'')+'" placeholder="如：AI 绘画工具集" /></div>';
  h+='<div class="form-group"><label>URL 标识（slug，英文/数字/横线）<span class="required">*</span></label><input id="aiColSlug" value="'+(e?escapeHTML(e.slug):'')+'" placeholder="如：ai-huihua" /></div></div>';
  h+='<div class="form-group"><label>一句话介绍（页面导语 + 搜索引擎描述）</label><textarea id="aiColDesc" style="min-height:60px;">'+(e?escapeHTML(e.description||''):'')+'</textarea></div>';
- h+='<div class="form-row"><div class="form-group"><label>图标（emoji）</label><input id="aiColIcon" value="'+(e?escapeHTML(e.icon||'🧩'):'🧩')+'" /></div>';
+ h+='<div class="form-row"><div class="form-group"><label>图标（emoji）</label><input id="aiColIcon" value="'+(e?escapeHTML(e.icon||'🧩'):'🧩')+'" /></div>';h+='<div class="form-group"><label>封面图 URL（选填，侧栏/卡片展示；留空用 emoji）</label><input id="aiColLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /></div>';
  h+='<div class="form-group"><label>排序（小的在前）</label><input id="aiColSort" type="number" value="'+(e?(e.sort||0):0)+'" /></div>';
  h+='<div class="form-group"><label>状态</label><select id="aiColPub"><option value="true"'+(e&&e.is_published===false?'':' selected')+'>已发布</option><option value="false"'+(e&&e.is_published===false?' selected':'')+'>下架</option></select></div></div>';
  h+='<div style="display:flex;gap:8px;margin-top:8px;"><button id="aiColSave" class="btn btn-primary btn-sm" type="button">保存工具集</button>'+(e?'<button id="aiColCancel" class="btn btn-outline btn-sm" type="button">取消编辑</button>':'')+'</div>';
  h+='</div>';
- h+='<div style="margin-top:18px;overflow-x:auto;"><table class="tbl-software"><thead><tr><th>图标</th><th>名称</th><th>slug</th><th>工具数</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+ h+='<div style="margin-top:18px;overflow-x:auto;"><table class="tbl-software"><thead><tr><th>封面</th><th>名称</th><th>slug</th><th>工具数</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody>';
  if(!this._aiCols.length)h+='<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:20px 0;">还没有工具集，先在上面新增一个</td></tr>';
  this._aiCols.forEach(function(x){
-  h+='<tr><td>'+escapeHTML(x.icon||'🧩')+'</td><td><b>'+escapeHTML(x.name)+'</b></td><td>'+escapeHTML(x.slug)+'</td><td>'+(self._aiToolCnt[x.id]||0)+'</td><td>'+(x.sort||0)+'</td>'
+  h+='<tr><td>'+(x.logo?'<img src="'+escapeHTML(x.logo)+'" style="width:34px;height:34px;border-radius:8px;object-fit:cover;">':escapeHTML(x.icon||'🧩'))+'</td><td><b>'+escapeHTML(x.name)+'</b></td><td>'+escapeHTML(x.slug)+'</td><td>'+(self._aiToolCnt[x.id]||0)+'</td><td>'+(x.sort||0)+'</td>'
    +'<td>'+(x.is_published!==false?'<span style="color:#0a8f4d;">已发布</span>':'<span style="color:#c0392b;">下架</span>')+'</td>'
    +'<td><button class="btn btn-outline btn-sm ai-col-edit" data-id="'+x.id+'" type="button">编辑</button> <button class="btn btn-danger btn-sm ai-col-del" data-id="'+x.id+'" type="button">删除</button></td></tr>';
  });
@@ -2039,7 +2039,7 @@ aiRenderCols:function(){var self=this,p=document.getElementById('aiPaneCol');if(
 },
 aiColSave:function(){var self=this;
  var id=document.getElementById('aiColId').value;
- var payload={name:document.getElementById('aiColName').value.trim(),slug:document.getElementById('aiColSlug').value.trim().toLowerCase(),description:document.getElementById('aiColDesc').value.trim(),icon:document.getElementById('aiColIcon').value.trim()||'🧩',sort:parseInt(document.getElementById('aiColSort').value,10)||0,is_published:document.getElementById('aiColPub').value==='true'};
+ var payload={name:document.getElementById('aiColName').value.trim(),slug:document.getElementById('aiColSlug').value.trim().toLowerCase(),description:document.getElementById('aiColDesc').value.trim(),icon:document.getElementById('aiColIcon').value.trim()||'🧩',logo:document.getElementById('aiColLogo').value.trim(),sort:parseInt(document.getElementById('aiColSort').value,10)||0,is_published:document.getElementById('aiColPub').value==='true'};
  if(!payload.name||!payload.slug){toast('名称和 slug 必填','warning');return;}
  if(!/^[a-z0-9][a-z0-9-]*$/.test(payload.slug)){toast('slug 只能用小写英文、数字和横线','warning');return;}
  var q=id?supabaseClient.from('ai_collections').update(payload).eq('id',id):supabaseClient.from('ai_collections').insert(payload);
@@ -2062,25 +2062,25 @@ aiRenderTools:function(){var self=this,p=document.getElementById('aiPaneTool');i
  var cur=curSel?curSel.value:(this._aiCols[0].id);
  var h='';
  h+='<div class="form-group" style="max-width:420px;"><label>当前工具集</label><select id="aiToolColSel">';
- this._aiCols.forEach(function(x){h+='<option value="'+x.id+'"'+(x.id===cur?' selected':'')+'>'+escapeHTML(x.icon||'🧩')+' '+escapeHTML(x.name)+(x.is_published===false?'（已下架）':'')+'</option>';});
+ this._aiCols.forEach(function(x){h+='<option value="'+x.id+'"'+(x.id===cur?' selected':'')+'>'+(x.logo?'<img src="'+escapeHTML(x.logo)+'" style="width:34px;height:34px;border-radius:8px;object-fit:cover;">':escapeHTML(x.icon||'🧩'))+' '+escapeHTML(x.name)+(x.is_published===false?'（已下架）':'')+'</option>';});
  h+='</select></div>';
  var e=this._aiEditTool||null;
  h+='<div class="admin-form" style="max-width:820px;">';
  h+='<h3 style="margin:0 0 10px;font-size:1rem;">'+(e?'✏ 编辑工具：'+escapeHTML(e.name):'＋ 新增工具')+'</h3>';
  h+='<input type="hidden" id="aiToolId" value="'+(e?escapeHTML(e.id):'')+'" />';
  h+='<div class="form-row"><div class="form-group"><label>工具名 <span class="required">*</span></label><input id="aiToolName" value="'+(e?escapeHTML(e.name):'')+'" placeholder="如：豆包" /></div>';
- h+='<div class="form-group"><label>官网地址 <span class="required">*</span></label><input id="aiToolUrl" value="'+(e?escapeHTML(e.url||''):'')+'" placeholder="https://…" /></div></div>';
+ h+='<div class="form-group"><label>官网地址 <span class="required">*</span></label><input id="aiToolUrl" value="'+(e?escapeHTML(e.url||''):'')+'" placeholder="https://…" /></div>';h+='<div class="form-group"><label>页面标识（选填，英文/数字/横线，留空自动生成）</label><input id="aiToolSlug" value="'+(e?escapeHTML(e.slug||''):'')+'" placeholder="如：doubao" /></div></div>';
  h+='<div class="form-group"><label>一句话简介（卡片展示，建议 40–80 字）</label><textarea id="aiToolSummary" style="min-height:60px;">'+(e?escapeHTML(e.summary||''):'')+'</textarea></div>';
  h+='<div class="form-row"><div class="form-group"><label>标签（逗号分隔）</label><input id="aiToolTags" value="'+(e?escapeHTML(e.tags||''):'')+'" placeholder="图像生成,中文" /></div>';
  h+='<div class="form-group"><label>收费模式</label><select id="aiToolPricing">';
  ['免费','免费额度','订阅','买断'].forEach(function(o){h+='<option'+(e&&e.pricing===o?' selected':'')+'>'+o+'</option>';});
  h+='</select></div>';
- h+='<div class="form-group"><label>图标（emoji）</label><input id="aiToolIcon" value="'+(e?escapeHTML(e.icon||'🤖'):'🤖')+'" /></div></div>';
+ h+='<div class="form-group"><label>图标（emoji）</label><input id="aiToolIcon" value="'+(e?escapeHTML(e.icon||'🤖'):'🤖')+'" /></div>';h+='<div class="form-group"><label>封面图 URL（选填，卡片/详情页展示；留空自动生成字母封面）</label><input id="aiToolLogo" value="'+(e?escapeHTML(e.logo||''):'')+'" placeholder="https://…/logo.png" /></div></div>';
  h+='<div class="form-row"><div class="form-group"><label>排序（小的在前）</label><input id="aiToolSort" type="number" value="'+(e?(e.sort||0):0)+'" /></div>';
- h+='<div class="form-group"><label>状态</label><select id="aiToolPub"><option value="true"'+(e&&e.is_published===false?'':' selected')+'>上架</option><option value="false"'+(e&&e.is_published===false?' selected':'')+'>下架</option></select></div></div>';
+ h+='<div class="form-group"><label>状态</label><select id="aiToolPub"><option value="true"'+(e&&e.is_published===false?'':' selected')+'>上架</option><option value="false"'+(e&&e.is_published===false?' selected':'')+'>下架</option></select></div></div>';h+='<div class="form-group"><label>封面截图 URL（选填，多张用换行分隔，详情页展示）</label><textarea id="aiToolShots" style="min-height:60px;">'+(e?escapeHTML(e.screenshots||''):'')+'</textarea></div>';h+='<div class="form-group"><label>详细介绍（选填，空行分段，详情页展示）</label><textarea id="aiToolIntro" style="min-height:110px;">'+(e?escapeHTML(e.intro||''):'')+'</textarea></div>';
  h+='<div style="display:flex;gap:8px;margin-top:8px;"><button id="aiToolSave" class="btn btn-primary btn-sm" type="button">保存工具</button>'+(e?'<button id="aiToolCancel" class="btn btn-outline btn-sm" type="button">取消编辑</button>':'')+'</div>';
  h+='</div>';
- h+='<div style="margin-top:18px;overflow-x:auto;"><table class="tbl-software"><thead><tr><th>图标</th><th>名称</th><th>简介</th><th>收费</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody id="aiToolRows"><tr><td colspan="7" style="text-align:center;color:var(--dim);padding:20px 0;">加载中…</td></tr></tbody></table></div>';
+ h+='<div style="margin-top:18px;overflow-x:auto;"><table class="tbl-software"><thead><tr><th>封面</th><th>名称</th><th>简介</th><th>收费</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody id="aiToolRows"><tr><td colspan="7" style="text-align:center;color:var(--dim);padding:20px 0;">加载中…</td></tr></tbody></table></div>';
  p.innerHTML=h;
  document.getElementById('aiToolColSel').addEventListener('change',function(){self._aiEditTool=null;self.aiToolLoad(this.value);});
  document.getElementById('aiToolSave').addEventListener('click',function(){self.aiToolSave();});
@@ -2093,7 +2093,7 @@ aiToolLoad:function(cid){var self=this,rows=document.getElementById('aiToolRows'
   var list=r.data||[];
   if(!list.length){rows.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:20px 0;">该工具集下还没有工具</td></tr>';return;}
   rows.innerHTML=list.map(function(t){
-   return '<tr><td>'+escapeHTML(t.icon||'🤖')+'</td><td><b>'+escapeHTML(t.name)+'</b></td>'
+   return '<tr><td>'+(t.logo?'<img src="'+escapeHTML(t.logo)+'" style="width:34px;height:34px;border-radius:8px;object-fit:cover;">':escapeHTML(t.icon||'🤖'))+'</td><td><b>'+escapeHTML(t.name)+'</b></td>'
     +'<td style="max-width:280px;color:var(--dim);">'+escapeHTML((t.summary||'').slice(0,40))+((t.summary||'').length>40?'…':'')+'</td>'
     +'<td>'+escapeHTML(t.pricing||'免费')+'</td><td>'+(t.sort||0)+'</td>'
     +'<td>'+(t.is_published!==false?'<span style="color:#0a8f4d;">上架</span>':'<span style="color:#c0392b;">下架</span>')+'</td>'
@@ -2106,8 +2106,8 @@ aiToolLoad:function(cid){var self=this,rows=document.getElementById('aiToolRows'
 aiToolSave:function(){var self=this;
  var cid=document.getElementById('aiToolColSel').value;
  var id=document.getElementById('aiToolId').value;
- var payload={collection_id:cid,name:document.getElementById('aiToolName').value.trim(),url:document.getElementById('aiToolUrl').value.trim(),summary:document.getElementById('aiToolSummary').value.trim(),tags:document.getElementById('aiToolTags').value.trim(),icon:document.getElementById('aiToolIcon').value.trim()||'🤖',pricing:document.getElementById('aiToolPricing').value,sort:parseInt(document.getElementById('aiToolSort').value,10)||0,is_published:document.getElementById('aiToolPub').value==='true'};
- if(!payload.name||!payload.url){toast('工具名和官网地址必填','warning');return;}
+ var payload={collection_id:cid,name:document.getElementById('aiToolName').value.trim(),url:document.getElementById('aiToolUrl').value.trim(),summary:document.getElementById('aiToolSummary').value.trim(),tags:document.getElementById('aiToolTags').value.trim(),icon:document.getElementById('aiToolIcon').value.trim()||'🤖',logo:document.getElementById('aiToolLogo').value.trim(),slug:document.getElementById('aiToolSlug').value.trim(),intro:document.getElementById('aiToolIntro').value.trim(),screenshots:document.getElementById('aiToolShots').value.trim(),pricing:document.getElementById('aiToolPricing').value,sort:parseInt(document.getElementById('aiToolSort').value,10)||0,is_published:document.getElementById('aiToolPub').value==='true'};
+ ['logo','slug','intro','screenshots'].forEach(function(k){if(!payload[k])delete payload[k];});if(!payload.name||!payload.url){toast('工具名和官网地址必填','warning');return;}
  if(!/^https?:\/\//i.test(payload.url)){toast('官网地址需以 http(s):// 开头','warning');return;}
  var q=id?supabaseClient.from('ai_tools').update(payload).eq('id',id):supabaseClient.from('ai_tools').insert(payload);
  q.then(function(r){if(r.error){toast('保存失败：'+r.error.message,'error');return;}toast('已保存 ✓');self._aiEditTool=null;self.aiToolLoad(cid);});

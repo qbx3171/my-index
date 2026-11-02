@@ -102,4 +102,4 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [ ] 软件页内容深化：158 页均只有 1 个 H1、0 个 H2、正文中位 553 字，缺「适用场景/最低配置/常见问题」结构化段落（长尾词 + FAQ 富摘要资格）
 - [x] 统计「零第三方」（2026-10-31：前端已改成三层取值 —— ①自家 Supabase `site_hit/site_get` ②abacus 兜底 ③localStorage 上次值；自家通道探测失败后本会话不再重试。SQL 见 `seo/site-stats.sql`）
 - [x] Supabase 建表 + RPC（2026-10-31 已执行：`site_stats` 表 + `site_hit/site_get`；表无 policy、anon 直接 select 返回空数组，只能走函数。实测预检 200、自增正常、非法 key 返回 P0001。线上端到端验证：3 个请求全打自家 RPC，abacus 零调用。自检命令 `node seo/stat-check.mjs`）
-- [ ] AI 工具集板块（/ai/）上线收尾（2026-11-02 结构已建好，管理入口在 admin.html 左侧「🤖AI工具集」）：①站长先在 Supabase SQL Editor 执行 `seo/ai-schema.sql`（ai_collections/ai_tools 两表+RLS）；②后台登录→AI工具集→建工具集+加工具；③generate.mjs 自动拉库生成 /ai/index.html + 每工具集独立页 /ai/<slug>.html 并入 sitemap；空库只生成 hub 兜底页，空工具集不生成独立页（避免薄内容）。原独立 ai-admin.html 已并入 admin.html 并删除。
+- [x] AI 工具集板块（/ai/）上线收尾（2026-11-02 已上线，commit aeebb22e）：站长仍需在 Supabase SQL Editor 执行  建表，然后到 admin.html 左侧「🤖AI工具集」上传内容，下次 generate.mjs 自动生成工具集独立页并入 sitemap

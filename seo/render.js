@@ -470,7 +470,7 @@ export function renderSitemapHtml(softs = [], tutorials = [], ai = null) {
   const aiBlockHtml =
     ai && Array.isArray(ai.collections) && ai.collections.length
       ? `<h2>AI 工具集板块（${ai.collections.length} 个工具集）</h2>
-<p><a href="${SITE}/ai/index.html" ${aiLinkStyle}>AI 工具集导航</a>${ai.collections
+<p><a href="${SITE}/ai/index.html" ${aiLinkStyle}>AI 工具集导航</a>${ai.collections.filter((c) => c._hasPage !== false)
           .map(
             (c) =>
               `<a href="${SITE}/ai/${c.slug}.html" ${aiLinkStyle}>${esc(c.name)}（${(ai.byCollection[c.slug] || []).length}）</a>`
