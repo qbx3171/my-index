@@ -68,7 +68,7 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 ## 第四步：发布与提交
 
 1. `node seo/generate.mjs` → `node seo/qa.mjs` → `node seo/audit.mjs` → `node seo/optimize.mjs`（对比修改前后数字）
-2. `node ".../api-push.mjs" "SEO每日优化: ... YYYY-MM-DD"`（本地 push 被墙，必须走 API 脚本）
+2. `T=$(printf "protocol=https\nhost=github.com\n\n" | git credential fill | grep "^password=" | cut -d= -f2- | tr -d "\r\n") && GH_TOKEN="$T" node seo/api-push.mjs "提交信息"`（本地 push 被墙 502，必须走 API 脚本；清单自动来自 git status -uall，会话数据目录自动排除）
 3. 等 40s 后 curl 验证：sitemap loc 数、抽查 2 个改过的页面 200、抽查改动点已生效
 4. IndexNow 提交本次有实质变更的 URL
 5. `node seo/baidu-push.mjs`：百度配额 10 条/天，脚本自动按优先级续推，remain=0 即停

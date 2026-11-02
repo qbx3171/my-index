@@ -156,7 +156,6 @@ function sideNav(collections, activeSlug) {
       (c) => `<a class="ai-side-item${c.slug === activeSlug ? " on" : ""}" href="${SITE}/ai/${esc(c.slug)}.html">${c.logo && /^https?:\/\//i.test(c.logo) ? `<img class="ai-side-logo" src="${esc(c.logo)}" alt="" loading="lazy">` : `<span class="ai-side-ico">${esc(c.icon || "🧩")}</span>`}<span>${esc(c.name)}</span></a>`
     )
     .join("\n")}
-  <a class="ai-side-item" href="${SITE}/all.html"><span class="ai-side-ico">📦</span><span>软件库</span></a>
 </aside>`;
 }
 
@@ -204,7 +203,6 @@ ${sideNav(collections, "")}
 <section class="ai-note">
 <h2>关于本板块</h2>
 <p>AI 工具更新快、同名产品多，这里不做大而全的清单，而是按「一个场景一个工具集」整理，每个工具集内只保留实际可用、有明确定位的工具，并标注收费模式（免费 / 免费额度 / 订阅 / 买断）。工具集内容会持续增补调整，本页是全部工具集的入口。</p>
-<p>如果你要找的是可下载安装的桌面软件（含 AI 类桌面应用），请到<a href="${SITE}/all.html" style="color:#0077ff">软件库</a>查看。</p>
 </section>
 </main>
 ${jsonLd({
@@ -246,7 +244,7 @@ ${sideNav(collections, col.slug)}
 <div class="ai-cards">
 ${tools.map(toolCard).join("\n")}
 </div>
-<p class="ai-back"><a href="${SITE}/ai/index.html" style="color:#0077ff">← 返回全部工具集</a>　<a href="${SITE}/all.html" style="color:#0077ff">浏览软件库</a></p>
+<p class="ai-back"><a href="${SITE}/ai/index.html" style="color:#0077ff">← 返回全部工具集</a></p>
 </div>
 </div>
 </main>
@@ -386,21 +384,21 @@ span.ai-col-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-con
 .ai-sec-count{font-size:.76rem;color:#0088ff;background:rgba(0,136,255,.08);padding:2px 10px;border-radius:20px}
 .ai-sec-more{margin-left:auto;font-size:.85rem;color:#0088ff;text-decoration:none;white-space:nowrap}
 .ai-sec-more:hover{text-decoration:underline}
-/* 封面卡片流 */
-.ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-.ai-card{display:block;background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:14px;padding:15px 16px;text-decoration:none;color:inherit;transition:.16s;box-shadow:0 1px 3px rgba(20,40,80,.05)}
+/* 封面卡片流（对齐 ai-bot.cn：紧凑小卡多列网格） */
+.ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.ai-card{display:block;background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:12px;padding:13px 14px;text-decoration:none;color:inherit;transition:.16s;box-shadow:0 1px 3px rgba(20,40,80,.05)}
 .ai-card:hover{border-color:#0088ff;box-shadow:0 6px 18px rgba(0,136,255,.13);transform:translateY(-2px)}
-.ai-card-top{display:flex;align-items:center;gap:11px}
-.ai-cover{width:50px;height:50px;border-radius:12px;object-fit:cover;flex-shrink:0;box-shadow:0 1px 5px rgba(20,40,80,.14)}
-span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.25rem}
-.ai-card-name{font-weight:700;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ai-badge{margin-left:auto;font-size:.7rem;padding:2px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.ai-card-top{display:flex;align-items:center;gap:9px}
+.ai-cover{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;box-shadow:0 1px 5px rgba(20,40,80,.14)}
+span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.05rem}
+.ai-card-name{font-weight:700;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-badge{margin-left:auto;font-size:.7rem;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
 .ai-badge.free{color:#0a8f4d;background:rgba(16,163,74,.1)}
 .ai-badge.freemium{color:#b07000;background:rgba(240,180,0,.12)}
 .ai-badge.sub{color:#0066cc;background:rgba(0,119,255,.1)}
 .ai-badge.once{color:#7a3ff2;background:rgba(122,63,242,.1)}
-.ai-card-summary{margin:10px 0 0;font-size:.87rem;color:var(--ai-dim);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.2em}
-.ai-card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.ai-card-summary{margin:8px 0 0;font-size:.82rem;color:var(--ai-dim);line-height:1.6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ai-card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .chip{font-size:.74rem;color:#41506b;background:#eef2f8;border-radius:6px;padding:2px 8px}
 /* 其余 */
 .ai-lead{color:var(--text-secondary,#5b6472);max-width:56em}
@@ -422,7 +420,7 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-detail-cover{width:96px;height:96px;border-radius:18px;object-fit:cover;box-shadow:0 3px 12px rgba(20,40,80,.16);flex-shrink:0}
 span.ai-detail-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:2.2rem}
 .ai-detail-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-bottom:8px}
-.ai-detail-info .ai-card-summary{margin:0;-webkit-line-clamp:3}
+.ai-detail-info .ai-card-summary{margin:0;white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
 .ai-detail-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 .ai-site-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;text-decoration:none;font-weight:700;font-size:.92rem;padding:10px 22px;border-radius:50px;box-shadow:0 3px 12px rgba(0,119,255,.3);transition:.16s}
 .ai-site-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,119,255,.4)}
