@@ -50,7 +50,72 @@ var o=document.querySelector('meta[property="og:url"]');if(o)o.setAttribute('con
 {"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://www.lezhesoft.cn/#website","url":"https://www.lezhesoft.cn/","name":"乐哲软件","alternateName":["LeZheSoft","乐哲软件官网","lezhesoft.cn"],"description":"乐哲软件是专注实用软件整理与下载的资源站，按设计、开发、办公、媒体、系统等分类收录常用软件，提供中文安装教程与常见问题解答。","inLanguage":"zh-CN","publisher":{"@id":"https://www.lezhesoft.cn/#organization"},"potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://www.lezhesoft.cn/?search={search_term_string}","actionPlatform":["https://schema.org/DesktopWebPlatform","https://schema.org/MobileWebPlatform"]},"query-input":"required name=search_term_string"}},{"@type":"Organization","@id":"https://www.lezhesoft.cn/#organization","name":"乐哲软件","alternateName":["LeZheSoft","乐哲"],"url":"https://www.lezhesoft.cn/","logo":{"@type":"ImageObject","@id":"https://www.lezhesoft.cn/#logo","url":"https://www.lezhesoft.cn/og-cover.png","contentUrl":"https://www.lezhesoft.cn/og-cover.png","width":1200,"height":630,"caption":"乐哲软件"},"image":{"@id":"https://www.lezhesoft.cn/#logo"},"email":"LeZheSoft@outlook.com","description":"乐哲软件是专注实用软件整理与下载的中文资源站，收录设计、开发、办公、媒体、三维、系统等分类的常用软件，提供版本信息与安装教程。","sameAs":["https://github.com/qbx3171/my-index"],"knowsAbout":["软件下载","安装教程","Adobe 系列软件","开发工具","办公软件"]},{"@type":"WebPage","@id":"https://www.lezhesoft.cn/#webpage","url":"https://www.lezhesoft.cn/","name":"乐哲软件官网 - 精选高效工具下载平台","isPartOf":{"@id":"https://www.lezhesoft.cn/#website"},"about":{"@id":"https://www.lezhesoft.cn/#organization"},"primaryImageOfPage":{"@id":"https://www.lezhesoft.cn/#logo"},"inLanguage":"zh-CN"}]}
 </script>
 <link rel="preconnect" href="https://registry.npmmirror.com/" crossorigin="">
-<link rel="preconnect" href="https://cdn.bootcdn.net/" crossorigin="">
+<style id="navMoreStyle">
+/* ===== 导航 方案B 胶囊分段 (navseg-v2) ===== */
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:var(--bg-secondary);border:1px solid var(--border-glow);border-radius:50px;padding:4px}
+.nav-links a{font-size:.9rem;font-weight:500;color:var(--text-secondary);transition:var(--transition);padding:8px 17px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-links a:hover{color:var(--text-primary)}
+.nav-links a.active{background:var(--bg-card-solid);color:var(--accent-cyan);font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{background:var(--accent-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+.nav-links a.nav-ai:hover{opacity:.8}
+.nav-links a.nav-ai.active{background:var(--bg-card-solid);-webkit-background-clip:padding-box;background-clip:padding-box;color:var(--accent-cyan);box-shadow:0 2px 8px rgba(15,26,46,.10)}
+/* 更多▾ 下拉 */
+.nav-more{position:relative}
+.nav-caret{font-size:.6rem;transition:transform .2s}
+.nav-more.open .nav-caret{transform:rotate(180deg)}
+.nav-more-panel{position:absolute;top:calc(100% + 10px);right:0;min-width:136px;background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:14px;box-shadow:var(--shadow-card-hover);padding:6px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.18s;z-index:60}
+.nav-more.open .nav-more-panel{opacity:1;visibility:visible;transform:none}
+.nav-more-panel a{display:flex;align-items:center;gap:9px;font-size:.86rem;font-weight:500;color:var(--text-secondary);text-decoration:none;padding:9px 12px;border-radius:9px}
+.nav-more-panel a:hover{background:var(--bg-secondary);color:var(--text-primary)}
+/* 操作区：打赏 + 登录 */
+.nav-actions{display:flex;align-items:center;gap:10px}
+.nav-donate-btn{display:inline-flex;align-items:center;gap:7px;font-size:.88rem;font-weight:700;color:#e74c3c;background:rgba(231,76,60,.09);border:1px solid rgba(231,76,60,.30);border-radius:50px;padding:9px 17px;text-decoration:none;transition:var(--transition);white-space:nowrap}
+.nav-donate-btn:hover{background:rgba(231,76,60,.16);transform:translateY(-1px);box-shadow:0 4px 12px rgba(231,76,60,.25)}
+.nav-donate-btn .fa-heart{animation:navHeart 2.6s ease-in-out infinite}
+@keyframes navHeart{0%,100%{transform:scale(1)}10%{transform:scale(1.22)}20%{transform:scale(1)}}
+.nav-actions #authNav{font-size:.88rem;font-weight:600;color:var(--text-secondary);text-decoration:none;padding:9px 19px;border-radius:50px;border:1px solid var(--border-glow);background:var(--bg-card-solid);transition:var(--transition);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.nav-actions #authNav:hover{color:var(--text-primary);transform:translateY(-1px)}
+.nav-actions #authNav.active{background:var(--accent-gradient);color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(0,119,255,.28)}
+/* 中屏紧凑 */
+@media (max-width:1100px) and (min-width:769px){
+.nav-links{padding:3px}.nav-links a{padding:6px 12px!important;font-size:.78rem!important}
+.nav-actions{gap:7px}.nav-donate-btn{padding:7px 13px;font-size:.82rem}.nav-actions #authNav{padding:7px 14px}
+}
+/* 移动端：竖排面板还原为全宽菜单；顶栏打赏收紧防溢出 */
+@media (max-width:768px){
+.nav-actions{margin-left:auto}
+.nav-donate-btn{padding:8px 13px;font-size:.84rem}
+.nav-actions #authNav{padding:8px 14px;font-size:.84rem}
+.nav-links{background:rgba(246,248,252,.97);border-radius:0;border:none;padding:16px 24px;gap:8px;box-shadow:var(--shadow-card)}
+[data-theme="dark"] .nav-links{background:rgba(13,20,36,.97)}
+[data-theme="glass"] .nav-links{background:rgba(18,26,44,.92)}
+.nav-links a{padding:10px 14px;border-radius:12px;font-size:.9rem}
+.nav-links a.active{background:var(--accent-gradient);color:#fff;box-shadow:none}
+.nav-links a.nav-ai.active{background:var(--accent-gradient);color:#fff;-webkit-background-clip:border-box;background-clip:border-box}
+.nav-more-panel{position:static;opacity:1;visibility:visible;transform:none;display:none;box-shadow:none;border:none;background:transparent;padding:2px 0 2px 14px}
+.nav-more.open .nav-more-panel{display:block}
+}
+@media (max-width:520px){
+.nav-donate-btn .nav-donate-text{display:none}
+.nav-donate-btn{width:36px;height:36px;padding:0;justify-content:center;border-radius:50%}
+.nav-actions{gap:8px}
+.nav-actions #authNav{padding:7px 12px;font-size:.8rem}
+}
+@media (max-width:380px){
+.nav-actions #authNav .auth-avatar{display:none!important}
+.nav-actions{gap:6px}
+}
+.hotindex{margin-top:26px;padding-top:16px;border-top:1px solid var(--border-glow,rgba(0,136,255,.12))}
+.hotindex-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+.hotindex-title{font-size:.86rem;font-weight:600;color:var(--text-secondary);margin:0;letter-spacing:.02em}
+.hotindex-more{font-size:.74rem;color:var(--text-dim);text-decoration:none;white-space:nowrap;transition:color .18s ease}
+.hotindex-more:hover{color:var(--accent-cyan)}
+.hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0}
+.hotindex-list li{margin:0}
+.hotindex-list a{display:inline-block;font-size:.75rem;line-height:1;padding:7px 12px;border-radius:8px;color:var(--text-secondary);text-decoration:none;border:1px solid var(--border-glow-strong,rgba(15,26,46,.16));background:var(--bg-card,rgba(255,255,255,.78));transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease}
+.hotindex-list a:hover{color:var(--accent-cyan);border-color:var(--accent-cyan);background:var(--bg-secondary,#eef2f9);transform:translateY(-1px)}
+@media(max-width:600px){.hotindex-list{gap:6px}.hotindex-list a{font-size:.72rem;padding:6px 10px}}
+</style><link rel="preconnect" href="https://cdn.bootcdn.net/" crossorigin="">
 <link rel="preconnect" href="https://cdn.jsdelivr.net/" crossorigin="">
 <link rel="preconnect" href="https://qqcxtfayjxyvswblmdpw.supabase.co/" crossorigin="">
 <link rel="dns-prefetch" href="https://registry.npmmirror.com/">
@@ -1122,16 +1187,6 @@ body.ls-locked{overflow:hidden !important}
 [data-theme="fresh"] .hero::after{content:'';position:absolute;right:4%;top:-6px;width:104px;height:104px;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%20viewBox%3D%220%200%20120%20120%22%3E%20%3Cg%20stroke%3D%22%2312b886%22%20stroke-width%3D%223.5%22%20fill%3D%22none%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M40%20100c0-30%2020-52%2048-56%22%2F%3E%3C%2Fg%3E%20%3Cg%20fill%3D%22%234ade80%22%3E%3Cpath%20d%3D%22M88%2044c14-6%2026%204%2024%2018-14%206-26-4-24-18z%22%2F%3E%3Cpath%20d%3D%22M62%2066c12-8%2026-2%2028%2012-12%208-26%202-28-12z%22%2F%3E%3Cpath%20d%3D%22M46%2090c10-8%2024-4%2027%209-10%208-24%204-27-9z%22%2F%3E%3C%2Fg%3E%20%3Ccircle%20cx%3D%2234%22%20cy%3D%2238%22%20r%3D%226%22%20fill%3D%22%2338bdf8%22%20opacity%3D%220.7%22%2F%3E%3Ccircle%20cx%3D%22102%22%20cy%3D%2288%22%20r%3D%224%22%20fill%3D%22%23a7f3d0%22%2F%3E%20%3C%2Fsvg%3E") center/contain no-repeat;opacity:.85;pointer-events:none;z-index:-1}
 @media (max-width:768px){[data-theme="doraemon"] .hero::after,[data-theme="shinchan"] .hero::after,[data-theme="cartoon"] .hero::after,[data-theme="fresh"] .hero::after{width:118px;height:118px;right:-6px;top:auto;bottom:4px;opacity:.8;z-index:-1}}
 /* ==== 卡通主题装饰层结束 ==== */
-.hotindex{margin-top:26px;padding-top:16px;border-top:1px solid var(--border-glow,rgba(0,136,255,.12))}
-.hotindex-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
-.hotindex-title{font-size:.86rem;font-weight:600;color:var(--text-secondary);margin:0;letter-spacing:.02em}
-.hotindex-more{font-size:.74rem;color:var(--text-dim);text-decoration:none;white-space:nowrap;transition:color .18s ease}
-.hotindex-more:hover{color:var(--accent-cyan)}
-.hotindex-list{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0}
-.hotindex-list li{margin:0}
-.hotindex-list a{display:inline-block;font-size:.75rem;line-height:1;padding:7px 12px;border-radius:8px;color:var(--text-secondary);text-decoration:none;border:1px solid var(--border-glow-strong,rgba(15,26,46,.16));background:var(--bg-card,rgba(255,255,255,.78));transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease}
-.hotindex-list a:hover{color:var(--accent-cyan);border-color:var(--accent-cyan);background:var(--bg-secondary,#eef2f9);transform:translateY(-1px)}
-@media(max-width:600px){.hotindex-list{gap:6px}.hotindex-list a{font-size:.72rem;padding:6px 10px}}
 </style>
 </head>
 <body class="">
@@ -1143,10 +1198,10 @@ body.ls-locked{overflow:hidden !important}
 <div class="sidebar-trigger" id="sidebarTrigger"><span class="trigger-text">分类</span></div>
 <aside class="sidebar-categories" id="sidebarCategories">
 <div class="sidebar-header"><span class="title"><i class="fas fa-th-list"></i> 分类导航</span><button class="sidebar-lock-btn" id="sidebarLockBtn"><i class="fas fa-thumbtack"></i></button></div>
-<div class="category-list" id="categoryList"><div class="category-item-all active" data-cat="all"><span class="icon">◇</span><span class="name">全部</span><span class="count">158</span></div><div class="category-group"><div class="group-header" data-group="creative"><span class="group-icon">🎨</span><span class="group-name">创意设计</span><span class="group-badge">1</span><span class="toggle-icon ">▶</span></div><div class="group-items "><a class="category-item-side " data-cat="媒体工具" href="/cat/meiti-gongju.html"><span class="icon">🎬</span><span class="name">媒体工具</span><span class="count">12</span></a></div></div><div class="category-group"><div class="group-header" data-group="dev"><span class="group-icon">💻</span><span class="group-name">开发编程</span><span class="group-badge">1</span><span class="toggle-icon ">▶</span></div><div class="group-items "><a class="category-item-side " data-cat="开发工具" href="/cat/kaifa-gongju.html"><span class="icon">⚙</span><span class="name">开发工具</span><span class="count">16</span></a></div></div><div class="category-group"><div class="group-header" data-group="office"><span class="group-icon">📋</span><span class="group-name">办公效率</span><span class="group-badge">2</span><span class="toggle-icon ">▶</span></div><div class="group-items "><a class="category-item-side " data-cat="办公软件" href="/cat/bangong-ruanjian.html"><span class="icon">📋</span><span class="name">办公软件</span><span class="count">5</span></a><a class="category-item-side " data-cat="实用工具" href="/cat/shiyong-gongju.html"><span class="icon">🔧</span><span class="name">实用工具</span><span class="count">45</span></a></div></div><div class="category-group"><div class="group-header" data-group="other"><span class="group-icon">📁</span><span class="group-name">其他分类</span><span class="group-badge">10</span><span class="toggle-icon ">▶</span></div><div class="group-items "><a class="category-item-side " data-cat="Adobe系列" href="/cat/adobe.html"><span class="icon">📦</span><span class="name">Adobe系列</span><span class="count">17</span></a><a class="category-item-side " data-cat="模型制作" href="/cat/moxing-zhizuo.html"><span class="icon">📦</span><span class="name">模型制作</span><span class="count">4</span></a><a class="category-item-side " data-cat="三维设计" href="/cat/sanwei-sheji.html"><span class="icon">📦</span><span class="name">三维设计</span><span class="count">10</span></a><a class="category-item-side " data-cat="图像设计" href="/cat/tuxiang-sheji.html"><span class="icon">📦</span><span class="name">图像设计</span><span class="count">6</span></a><a class="category-item-side " data-cat="系统镜像" href="/cat/xitong-jingxiang.html"><span class="icon">📦</span><span class="name">系统镜像</span><span class="count">7</span></a><a class="category-item-side " data-cat="图像处理" href="/cat/tuxiang-chuli.html"><span class="icon">📦</span><span class="name">图像处理</span><span class="count">13</span></a><a class="category-item-side " data-cat="压缩工具" href="/cat/yasuo-gongju.html"><span class="icon">📦</span><span class="name">压缩工具</span><span class="count">4</span></a><a class="category-item-side " data-cat="插件管理" href="/cat/chajian-guanli.html"><span class="icon">📦</span><span class="name">插件管理</span><span class="count">6</span></a><a class="category-item-side " data-cat="虚拟机模拟器" href="/cat/xuniji-moniqi.html"><span class="icon">📦</span><span class="name">虚拟机模拟器</span><span class="count">6</span></a><a class="category-item-side " data-cat="安卓软件" href="/cat/anzhuo-ruanjian.html"><span class="icon">📦</span><span class="name">安卓软件</span><span class="count">7</span></a></div></div></div>
+<div class="category-list" id="categoryList"><div class="category-item-all active" data-cat="all"><span class="icon">◇</span><span class="name">全部</span><span class="count">159</span></div><div class="category-group"><div class="group-header" data-group="creative"><span class="group-icon">🎨</span><span class="group-name">创意设计</span><span class="group-badge">1</span><span class="toggle-icon ">▶</span></div><div class="group-items "><a class="category-item-side " data-cat="媒体工具" href="/cat/meiti-gongju.html"><span class="icon">🎬</span><span class="name">媒体工具</span><span class="count">12</span></a></div></div><div class="category-group"><div class="group-header" data-group="dev"><span class="group-icon">💻</span><span class="group-name">开发编程</span><span class="group-badge">1</span><span class="toggle-icon ">▶</span></div><div class="group-items "><a class="category-item-side " data-cat="开发工具" href="/cat/kaifa-gongju.html"><span class="icon">⚙</span><span class="name">开发工具</span><span class="count">16</span></a></div></div><div class="category-group"><div class="group-header" data-group="office"><span class="group-icon">📋</span><span class="group-name">办公效率</span><span class="group-badge">2</span><span class="toggle-icon ">▶</span></div><div class="group-items "><a class="category-item-side " data-cat="办公软件" href="/cat/bangong-ruanjian.html"><span class="icon">📋</span><span class="name">办公软件</span><span class="count">5</span></a><a class="category-item-side " data-cat="实用工具" href="/cat/shiyong-gongju.html"><span class="icon">🔧</span><span class="name">实用工具</span><span class="count">46</span></a></div></div><div class="category-group"><div class="group-header" data-group="other"><span class="group-icon">📁</span><span class="group-name">其他分类</span><span class="group-badge">10</span><span class="toggle-icon ">▶</span></div><div class="group-items "><a class="category-item-side " data-cat="Adobe系列" href="/cat/adobe.html"><span class="icon">📦</span><span class="name">Adobe系列</span><span class="count">17</span></a><a class="category-item-side " data-cat="模型制作" href="/cat/moxing-zhizuo.html"><span class="icon">📦</span><span class="name">模型制作</span><span class="count">4</span></a><a class="category-item-side " data-cat="三维设计" href="/cat/sanwei-sheji.html"><span class="icon">📦</span><span class="name">三维设计</span><span class="count">10</span></a><a class="category-item-side " data-cat="图像设计" href="/cat/tuxiang-sheji.html"><span class="icon">📦</span><span class="name">图像设计</span><span class="count">6</span></a><a class="category-item-side " data-cat="系统镜像" href="/cat/xitong-jingxiang.html"><span class="icon">📦</span><span class="name">系统镜像</span><span class="count">7</span></a><a class="category-item-side " data-cat="图像处理" href="/cat/tuxiang-chuli.html"><span class="icon">📦</span><span class="name">图像处理</span><span class="count">13</span></a><a class="category-item-side " data-cat="压缩工具" href="/cat/yasuo-gongju.html"><span class="icon">📦</span><span class="name">压缩工具</span><span class="count">4</span></a><a class="category-item-side " data-cat="插件管理" href="/cat/chajian-guanli.html"><span class="icon">📦</span><span class="name">插件管理</span><span class="count">6</span></a><a class="category-item-side " data-cat="虚拟机模拟器" href="/cat/xuniji-moniqi.html"><span class="icon">📦</span><span class="name">虚拟机模拟器</span><span class="count">6</span></a><a class="category-item-side " data-cat="安卓软件" href="/cat/anzhuo-ruanjian.html"><span class="icon">📦</span><span class="name">安卓软件</span><span class="count">7</span></a></div></div></div>
 <div class="sidebar-bottom">
 <div class="sidebar-search" id="sidebarSearchWrapper"><div class="search-box-side"><input type="text" id="sidebarSearchInput" placeholder="搜索软件..." autocomplete="off"><button id="sidebarSearchBtn"><i class="fas fa-search"></i></button></div></div>
-<div class="sidebar-stats" id="sidebarStats" style="display: block;"><span id="sidebarTotalCount">共 158 款软件</span></div>
+<div class="sidebar-stats" id="sidebarStats" style="display: block;"><span id="sidebarTotalCount">共 159 款软件</span></div>
 <div class="sidebar-theme-toggle" id="themeToggle"><span class="theme-label"><i class="fas fa-moon"></i> <span id="themeLabel">白天</span></span><span class="toggle-track"><span class="toggle-thumb"></span></span></div>
 </div>
 </aside>
@@ -1160,12 +1215,13 @@ body.ls-locked{overflow:hidden !important}
 <li><a href="#" data-page="list"><i class="fas fa-th-list"></i> 软件库</a></li>
 <li><a href="#" data-page="tutorials"><i class="fas fa-book"></i> 教程</a></li>
 <li><a href="#" data-page="qa"><i class="fas fa-comments"></i> 问答</a></li>
-<li><a href="#" data-page="checkin"><i class="fas fa-calendar-check"></i> 签到</a></li>
-<li><a href="#" data-page="ranking"><i class="fas fa-trophy"></i> 排行榜</a></li>
-<li><a href="#" data-page="mall"><i class="fas fa-gift"></i> 商城</a></li>
-<li><a href="#" onclick="openDonateModal();return false;"><i class="fas fa-heart" style="color:#e74c3c;"></i> 打赏</a></li>
-<li><a href="#" id="authNav" style="display: inline-flex; align-items: center; gap: 6px;"><span id="authAvatar" class="auth-avatar" style="display:none;"></span><span id="authNavText">登录</span></a></li>
-</ul>
+<li><a href="/ai/index.html" class="nav-ai"><i class="fas fa-robot"></i> AI工具集</a></li>
+
+
+
+
+<li class="nav-more" id="navMoreLi"><a href="#" id="navMoreBtn"><i class="fas fa-ellipsis-h"></i> 更多 <i class="fas fa-chevron-down nav-caret"></i></a><div class="nav-more-panel" id="navMorePanel"><a href="#" data-page="checkin"><i class="fas fa-calendar-check"></i> 签到</a><a href="#" data-page="ranking"><i class="fas fa-trophy"></i> 排行榜</a><a href="#" data-page="mall"><i class="fas fa-gift"></i> 商城</a></div></li>
+<script>(function(){var li=document.getElementById('navMoreLi');if(!li)return;document.getElementById('navMoreBtn').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();li.classList.toggle('open');});document.addEventListener('click',function(e){if(!li.contains(e.target))li.classList.remove('open');});document.getElementById('navMorePanel').addEventListener('click',function(){li.classList.remove('open');});})();</script></ul><div class="nav-actions"><a href="#" id="navDonateLi" class="nav-donate-btn" title="打赏支持" onclick="openDonateModal();return false;"><i class="fas fa-heart"></i><span class="nav-donate-text">打赏</span></a><a href="#" id="authNav" style="display: inline-flex; align-items: center; gap: 6px;"><span id="authAvatar" class="auth-avatar" style="display:none;"></span><span id="authNavText">登录</span></a></div>
 <div style="display:flex;align-items:center;gap:4px;"><button class="header-bell-btn" id="headerBellBtn" aria-label="通知"><i class="fas fa-bell"></i><span class="bell-badge hidden" id="bellBadge">0</span></button><button class="header-theme-btn" id="headerThemeBtn"><i class="fas fa-moon"></i></button><button class="mobile-toggle" id="mobileToggle"><i class="fas fa-bars"></i></button></div>
 </div>
 </header>
@@ -1204,7 +1260,7 @@ body.ls-locked{overflow:hidden !important}
 <div style="margin-top:24px;text-align:center;">
 <button class="btn btn-primary" id="openSubmitSoftwareBtn" style="padding:10px 28px;"><i class="fas fa-rocket"></i> 开发者入驻 · 提交软件</button>
 </div>
-<section class="hotindex" id="hotSoftIndex" aria-labelledby="hotSoftTitle"><div class="hotindex-head"><h2 class="hotindex-title" id="hotSoftTitle">🔥 热门软件</h2><a class="hotindex-more" href="/sitemap.html">全部 158 款索引 <i class="fas fa-angle-right"></i></a></div><ul class="hotindex-list"><li><a href="/soft/mrjyswit178r.html">Adobe Photoshop</a></li><li><a href="/soft/48cd558217de59137171e7f2.html">FilmCraft 跨平台非线性视频编辑器</a></li><li><a href="/soft/mryowri0r74x.html">Eagle  图像管理查看</a></li><li><a href="/soft/msft1pau5r3f.html">PS全套插件一键安装</a></li><li><a href="/soft/mrmxq3cqxuos.html">GenP Adobe软件一键激活工具</a></li><li><a href="/soft/mrk0guac155a.html">Autodesk Maya</a></li><li><a href="/soft/mto1tkxt44mh.html">VMware Workstation PRO 安装版</a></li><li><a href="/soft/54b8e3b9ca96b783dab47584.html">AdGuard - 多平台广告拦截软件</a></li><li><a href="/soft/mrk0mazwphee.html">Permute 4 - Mac图片音视频格式转换工具</a></li><li><a href="/soft/mrjzr6p10va7.html">Autodesk CAD</a></li><li><a href="/soft/885152adfc253fb7d419f841.html">CleanMyMac 苹果电脑清理工具软件</a></li><li><a href="/soft/ff9eab61a6cf4b5c1e38fab3.html">MuMuPlayer Pro 网易MuMu安卓模拟器</a></li><li><a href="/soft/mrjziyjpeide.html">Rhino</a></li><li><a href="/soft/8822c22760962f14a2d77b8c.html">CorelDRAW Graphics Suite</a></li><li><a href="/soft/0fd1ab6dc420242e821d5a79.html">Parallels Desktop 27 - Mac 虚拟机管理软件</a></li><li><a href="/soft/dcde42df23c322326dc8e07b.html">傲梅轻松备份AOMEI Backupper Technician Plus系统数据备份恢复</a></li><li><a href="/soft/mrjz2xrx56es.html">Adobe Bridge</a></li><li><a href="/soft/mrjykkdxpfux.html">Adobe Illustrator</a></li><li><a href="/soft/mrjyx1s5dgkq.html">Adobe InDesign</a></li><li><a href="/soft/mt9t22qe9vjx.html">Moom 软件窗口管理</a></li><li><a href="/soft/d05e874d28573342261a189c.html">Windows 11 - 正版 PC 电脑操作系统 专业版家庭版</a></li><li><a href="/soft/8c015e5b843cc728a188aabd.html">豆包电脑版 - 智能AI助手,随时唤起,高效提问</a></li><li><a href="/soft/mrkafvi766wb.html">2345看图王</a></li><li><a href="/soft/mrjyupf9xumx.html">Adobe Premiere Pro</a></li></ul></section><!--/hotindex-->
+<section class="hotindex" id="hotSoftIndex" aria-labelledby="hotSoftTitle"><div class="hotindex-head"><h2 class="hotindex-title" id="hotSoftTitle">🔥 热门软件</h2><a class="hotindex-more" href="/sitemap.html">全部 159 款索引 <i class="fas fa-angle-right"></i></a></div><ul class="hotindex-list"><li><a href="/soft/mrjyswit178r.html">Adobe Photoshop</a></li><li><a href="/soft/48cd558217de59137171e7f2.html">FilmCraft 跨平台非线性视频编辑器</a></li><li><a href="/soft/mryowri0r74x.html">Eagle  图像管理查看</a></li><li><a href="/soft/msft1pau5r3f.html">PS全套插件一键安装</a></li><li><a href="/soft/mrmxq3cqxuos.html">GenP Adobe软件一键激活工具</a></li><li><a href="/soft/mrk0guac155a.html">Autodesk Maya</a></li><li><a href="/soft/mto1tkxt44mh.html">VMware Workstation PRO 安装版</a></li><li><a href="/soft/54b8e3b9ca96b783dab47584.html">AdGuard - 多平台广告拦截软件</a></li><li><a href="/soft/mrk0mazwphee.html">Permute 4 - Mac图片音视频格式转换工具</a></li><li><a href="/soft/mrjzr6p10va7.html">Autodesk CAD</a></li><li><a href="/soft/885152adfc253fb7d419f841.html">CleanMyMac 苹果电脑清理工具软件</a></li><li><a href="/soft/ff9eab61a6cf4b5c1e38fab3.html">MuMuPlayer Pro 网易MuMu安卓模拟器</a></li><li><a href="/soft/mrjziyjpeide.html">Rhino</a></li><li><a href="/soft/8822c22760962f14a2d77b8c.html">CorelDRAW Graphics Suite</a></li><li><a href="/soft/0fd1ab6dc420242e821d5a79.html">Parallels Desktop 27 - Mac 虚拟机管理软件</a></li><li><a href="/soft/dcde42df23c322326dc8e07b.html">傲梅轻松备份AOMEI Backupper Technician Plus系统数据备份恢复</a></li><li><a href="/soft/mrjz2xrx56es.html">Adobe Bridge</a></li><li><a href="/soft/mrjykkdxpfux.html">Adobe Illustrator</a></li><li><a href="/soft/mrjyx1s5dgkq.html">Adobe InDesign</a></li><li><a href="/soft/mt9t22qe9vjx.html">Moom 软件窗口管理</a></li><li><a href="/soft/d05e874d28573342261a189c.html">Windows 11 - 正版 PC 电脑操作系统 专业版家庭版</a></li><li><a href="/soft/8c015e5b843cc728a188aabd.html">豆包电脑版 - 智能AI助手,随时唤起,高效提问</a></li><li><a href="/soft/mrkafvi766wb.html">2345看图王</a></li><li><a href="/soft/mrjyupf9xumx.html">Adobe Premiere Pro</a></li><li><a href="https://www.lezhesoft.cn/ai/index.html">AI 工具导航</a></li></ul></section><!--/hotindex-->
 </section>
 <section id="pageList" class="hidden">
 <div style="padding:12px 0 4px;"><h2 class="section-title">✦ 软件库</h2><p class="section-sub" id="listSub">全部资源</p></div>

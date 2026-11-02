@@ -17,8 +17,10 @@ import {
   catSlug,
   catUrl,
   platformLabel,
+  SITE,
 } from "./render.js";
 import { ensureCovers } from "./cover.mjs";
+import { buildAiSection } from "./ai-section.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -216,7 +218,7 @@ for (const [id, cat] of Object.entries(CATEGORY_OVERRIDES)) {
 console.log(`数据：software=${softs.length}，tutorials=${tutorials.length}`);
 
 // 清理旧产物，避免删除的软件留下死页
-for (const dir of ["soft", "cat", "tutorial"]) {
+for (const dir of ["soft", "cat", "tutorial", "ai"]) {
   await rm(join(ROOT, dir), { recursive: true, force: true });
   await mkdir(join(ROOT, dir), { recursive: true });
 }
@@ -373,6 +375,9 @@ for (const c of cats) {
 }
 console.log(`分类页：${cCount}`);
 
+// —— AI 工具板块（/ai/）：板块首页 + 分类页 + 工具详情页，数据源 seo/ai-tools.json ——
+const aiSection = await buildAiSection(ROOT, softs);
+
 // —— 首页侧栏分类导航静态化 ——
 // 目的是让爬虫在 index.html 原始 HTML 里就能拿到 15 条 /cat/ 真实链接（原先只有无 href 的 <div>）。
 // 用与前端完全相同的 class 结构输出，JS 初始化时 renderCategories() 会整体覆盖 #categoryList，
@@ -453,7 +458,7 @@ function buildHotIndex(all) {
     `<section class="hotindex" id="hotSoftIndex" aria-labelledby="hotSoftTitle">` +
     `<div class="hotindex-head"><h2 class="hotindex-title" id="hotSoftTitle">🔥 热门软件</h2>` +
     `<a class="hotindex-more" href="/sitemap.html">全部 ${all.length} 款索引 <i class="fas fa-angle-right"></i></a></div>` +
-    `<ul class="hotindex-list">${items}</ul>` +
+    `<ul class="hotindex-list">${items}<li><a href="${SITE}/ai/index.html">AI 工具导航</a></li></ul>` +
     `</section><!--/hotindex-->`
   );
 }
@@ -554,14 +559,16 @@ try {
   console.warn(`⚠ 首页侧栏静态导航未更新：${e.message}`);
 }
 
-await writeFile(join(ROOT, "sitemap.xml"), renderSitemapXml(softs, tutorials), "utf8");
-const sm = renderSitemapHtml(softs, tutorials);
+await writeFile(join(ROOT, "sitemap.xml"), renderSitemapXml(softs, tutorials, aiSection.urls), "utf8");
+const sm = renderSitemapHtml(softs, tutorials, aiSection);
 await writeFile(join(ROOT, "sitemap.html"), sm.html, "utf8");
-console.log(`sitemap.xml + sitemap.html 完成（共 ${softs.length + tutorials.length + cats.length + 1} 个 URL）`);
+console.log(
+  `sitemap.xml + sitemap.html 完成（共 ${softs.length + tutorials.length + cats.length + 1 + aiSection.urls.length} 个 URL，含 AI 板块 ${aiSection.urls.length}）`
+);
 
 // 404 兜底页：GitHub Pages 自动接管根目录 404.html，同时保持 404 状态码。
 // 数据完全由当次产物派生（热门排序、分类、搜索索引），不做手工维护，避免与首页漂移。
-const p404 = render404(softs, tutorials);
+const p404 = render404(softs, tutorials, aiSection.collections);
 await writeFile(join(ROOT, "404.html"), p404.html, "utf8");
 const idxN404 = (p404.html.split("var IDX = ")[1].split(";\n")[0].match(/\["/g) || []).length;
 console.log(`404.html 完成（热门 12 条 · 搜索索引 ${idxN404} 条 = 软件 ${softs.length} + 教程 ${tutorials.length}）`);

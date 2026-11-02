@@ -23,6 +23,7 @@ export const esc = (s) =>
 
 const softUrl = (id) => `${SITE}/soft/${encodeURIComponent(id)}.html`;
 const tutUrl = (id) => `${SITE}/tutorial/${encodeURIComponent(id)}.html`;
+export const aiHubUrl = () => `${SITE}/ai/index.html`;
 
 // 分类 ASCII slug：彻底规避 GitHub Pages / git / API 对非 ASCII 文件名的编码问题
 const CAT_SLUGS = {
@@ -88,7 +89,7 @@ export const platformLabel = (s) => {
   return p ? p.slice(0, 20) : "";
 };
 
-const head = (title, desc, canonical, extra = "", robots = "index,follow,max-image-preview:large") => `<!DOCTYPE html>
+export const head = (title, desc, canonical, extra = "", robots = "index,follow,max-image-preview:large") => `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -138,7 +139,7 @@ let footSeq = 0;
 export const resetFootSeq = () => {
   footSeq = 0;
 };
-const foot = (seed) => {
+export const foot = (seed) => {
   let n;
   if (seed) {
     n = 0;
@@ -147,11 +148,11 @@ const foot = (seed) => {
     n = footSeq++;
   }
   const anchor = BRAND_ANCHORS[n % BRAND_ANCHORS.length];
-  return `<footer><a href="${SITE}/">${esc(anchor)}</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="${SITE}/sitemap.html">网站地图</a> · <a href="${SITE}/copyright.html">版权声明</a></footer>
+  return `<footer><a href="${SITE}/">${esc(anchor)}</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="${SITE}/ai/index.html">AI 工具</a> · <a href="${SITE}/sitemap.html">网站地图</a> · <a href="${SITE}/copyright.html">版权声明</a></footer>
 </body></html>`;
 };
 
-const crumb = (items) =>
+export const crumb = (items) =>
   `<nav class="crumb">${items
     .map((it, i) =>
       it.url ? `<a href="${esc(it.url)}">${esc(it.name)}</a>${i < items.length - 1 ? " / " : ""}` : esc(it.name)
@@ -171,7 +172,7 @@ const relatedBlock = (title, list) =>
         .join("")}</div>`
     : "";
 
-const jsonLd = (obj) =>
+export const jsonLd = (obj) =>
   `<script type="application/ld+json">${JSON.stringify(obj)}</script>`;
 
 /* 教程正文里的图片多为采集来的截图，普遍没有 alt。
@@ -429,7 +430,7 @@ ${foot(canonical)}`;
 
 /* ---------------- Sitemap XML ---------------- */
 
-export function renderSitemapXml(softs = [], tutorials = []) {
+export function renderSitemapXml(softs = [], tutorials = [], extras = []) {
   const cats = [...new Set(softs.map((s) => s.category).filter(Boolean))];
   const today = new Date().toISOString().slice(0, 10);
   // lastmod：只有首页带 lastmod 时，搜索引擎无法判断其他页面的更新频率，
@@ -449,6 +450,7 @@ export function renderSitemapXml(softs = [], tutorials = []) {
     ...cats.map((c) => url(catUrl(c), catDate(c))),
     ...softs.map((s) => url(softUrl(pick(s, ["id"])), softDate(s))),
     ...tutorials.map((t) => url(tutUrl(pick(t, ["id"])), ymd(pick(t, ["created_at"])) || today)),
+    ...extras.map((e) => url(e.loc, e.lastmod)),
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join(
     "\n"
@@ -457,19 +459,31 @@ export function renderSitemapXml(softs = [], tutorials = []) {
 
 /* ---------------- HTML 网站地图（全量内链，蜘蛛可抓） ---------------- */
 
-export function renderSitemapHtml(softs = [], tutorials = []) {
+export function renderSitemapHtml(softs = [], tutorials = [], ai = null) {
   const cats = [...new Set(softs.map((s) => s.category).filter(Boolean))].sort();
   const byCat = {};
   for (const s of softs) {
     (byCat[s.category || "其他"] = byCat[s.category || "其他"] || []).push(s);
   }
+  // AI 工具集板块链接区（ai = { collections, byCollection }，由 generate.mjs 传入；无 AI 数据时为 null）
+  const aiLinkStyle = 'style="color:#0077ff;margin-right:12px"';
+  const aiBlockHtml =
+    ai && Array.isArray(ai.collections) && ai.collections.length
+      ? `<h2>AI 工具集板块（${ai.collections.length} 个工具集）</h2>
+<p><a href="${SITE}/ai/index.html" ${aiLinkStyle}>AI 工具集导航</a>${ai.collections
+          .map(
+            (c) =>
+              `<a href="${SITE}/ai/${c.slug}.html" ${aiLinkStyle}>${esc(c.name)}（${(ai.byCollection[c.slug] || []).length}）</a>`
+          )
+          .join("")}</p>`
+      : "";
   // 前端筛选：只操作已渲染的 DOM，不请求任何数据，也不依赖首页那套有状态搜索。
   // 静态页 header 的搜索框把 ?q= 带到这里，落地即筛出结果。
   const filterJs = `<script>
 (function(){
 var inp=document.getElementById('sf'),cnt=document.getElementById('sfc');
 if(!inp)return;
-function isItem(a){var h=a.getAttribute('href')||'';return h.indexOf('/soft/')>=0||h.indexOf('/tutorial/')>=0;}
+function isItem(a){var h=a.getAttribute('href')||'';return h.indexOf('/soft/')>=0||h.indexOf('/tutorial/')>=0||h.indexOf('/ai/')>=0;}
 var links=[].slice.call(document.querySelectorAll('main a')).filter(isItem);
 var paras=[].slice.call(document.querySelectorAll('main p')).filter(function(p){return [].some.call(p.querySelectorAll('a'),isItem);});
 var heads=[].slice.call(document.querySelectorAll('main h2'));
@@ -507,6 +521,7 @@ ${cats
       .join("")}</p>`
   )
   .join("")}
+${aiBlockHtml || ""}
 ${tutorials.length
   ? `<h2>教程文章</h2><p>${tutorials
       .map((t) => `<a href="${tutUrl(pick(t, ["id"]))}" style="color:#0077ff;margin-right:12px">${esc(pick(t, ["title"]))}</a>`)
@@ -526,7 +541,7 @@ ${foot("sitemap")}`;
  * ③ 仍返回 404 且 noindex，绝不参与索引。
  */
 
-export function render404(softs = [], tutorials = []) {
+export function render404(softs = [], tutorials = [], aiCollections = []) {
   const score = (s) => (Number(s.views) || 0) + (Number(s.downloads) || 0) * 3;
   const seen = new Set();
   const hot = [];
@@ -554,6 +569,9 @@ export function render404(softs = [], tutorials = []) {
     ...tutorials
       .filter((t) => String(pick(t, ["title"]) || "").trim())
       .map((t) => [String(pick(t, ["title"])).trim(), tutUrl(pick(t, ["id"]))]),
+    ...aiCollections
+      .filter((c) => String(c.slug || "").trim() && String(c.name || "").trim())
+      .map((c) => [String(c.name).trim(), `${SITE}/ai/${c.slug}.html`]),
   ];
   // 名称里可能有 </script> 之类的字符，把 < 转成 \u003c 防止提前闭合脚本
   const idxJson = JSON.stringify(index).replace(/</g, "\\u003c");
@@ -617,7 +635,7 @@ h2{font-size:17px;margin:32px 0 12px;padding-left:9px;border-left:3px solid #007
 <div class="tags">${catLinks}</div>
 
 <h2>全部内容</h2>
-<div class="tags"><a href="${SITE}/sitemap.html">全站索引（${softs.length} 款软件 · ${tutorials.length} 篇教程）</a><a href="${SITE}/">返回首页</a></div>
+<div class="tags"><a href="${SITE}/sitemap.html">全站索引（${softs.length} 款软件 · ${tutorials.length} 篇教程${aiCollections.length ? ` · ${aiCollections.length} 个AI工具集` : ""}）</a>${aiCollections.length ? `<a href="${SITE}/ai/index.html">AI 工具集</a>` : ""}<a href="${SITE}/">返回首页</a></div>
 </main>
 ${js}
 ${foot("404")}`;

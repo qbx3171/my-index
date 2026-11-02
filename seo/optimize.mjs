@@ -30,6 +30,7 @@ const files = [];
 for (const d of ["soft", "cat", "tutorial"]) {
   for (const f of await readdir(join(ROOT, d))) if (f.endsWith(".html")) files.push(`${d}/${f}`);
 }
+for (const f of await readdir(join(ROOT, "ai"))) if (f.endsWith(".html")) files.push(`ai/${f}`);
 for (const f of await readdir(ROOT)) {
   // 搜索引擎验证 token 文件不是真实页面（纯文本、无 head），排除避免误报
   if (!f.endsWith(".html")) continue;
