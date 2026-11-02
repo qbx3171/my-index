@@ -20,6 +20,10 @@ function supabaseCreds() {
   return { U, K };
 }
 
+const FFD = "\uFFFD";
+const ffdCount = (s) => String(s).split(FFD).length - 1;
+const hasFFD = (row) => Object.values(row).some((v) => typeof v === "string" && v.includes(FFD));
+
 async function fetchTable(U, K, table) {
   const r = await fetch(`${U}/rest/v1/${table}?select=*`, {
     headers: { apikey: K, Authorization: `Bearer ${K}` },
@@ -32,7 +36,30 @@ async function fetchTable(U, K, table) {
     }
     throw new Error(`拉取 ${table} 失败: ${r.status} ${t.slice(0, 200)}`);
   }
-  return r.json();
+  const rows = await r.json();
+  // 代理传输偶发截断多字节字符（U+FFFD，位置随机）：对损坏行按 id 单条重拉治愈
+  for (const row of rows.filter(hasFFD)) {
+    for (let i = 0; i < 5 && hasFFD(row); i++) {
+      try {
+        const rr = await fetch(`${U}/rest/v1/${table}?select=*&id=eq.${encodeURIComponent(row.id)}`, {
+          headers: { apikey: K, Authorization: `Bearer ${K}` },
+        });
+        const fresh = (await rr.json())[0];
+        if (!fresh) break;
+        for (const [k, v] of Object.entries(fresh)) {
+          if (typeof v !== "string") continue;
+          if (!v.includes(FFD)) row[k] = v;
+          else if (typeof row[k] === "string" && row[k].includes(FFD) && ffdCount(v) < ffdCount(row[k])) row[k] = v;
+        }
+      } catch {
+        /* 单条重拉失败不致命，下一轮再试 */
+      }
+      await new Promise((res) => setTimeout(res, 300));
+    }
+  }
+  const stillBad = rows.filter(hasFFD).map((x) => x.name || x.id);
+  if (stillBad.length) console.warn(`⚠ AI 表 ${table} 治愈后仍有乱码: ${stillBad.join(", ")}`);
+  return rows;
 }
 
 // —— 封面：有 logo 用图（懒加载），否则按名称生成稳定的渐变字母封面 ——
@@ -373,7 +400,7 @@ body main{max-width:none;margin:0 0 0 220px;padding:22px 32px 60px}
 main>*{max-width:1400px;margin-left:auto;margin-right:auto}
 body header{position:sticky;top:0;z-index:100}
 body footer{margin-left:220px}
-.ai-side{position:fixed;top:57px;bottom:0;left:0;width:220px;background:var(--bg-card-solid,#fff);border-right:1px solid var(--ai-border);display:flex;flex-direction:column;padding:14px 12px;overflow-y:auto;z-index:40}
+.ai-side{position:fixed;top:57px;bottom:0;left:0;width:220px;box-sizing:border-box;background:var(--bg-card-solid,#fff);border-right:1px solid var(--ai-border);display:flex;flex-direction:column;padding:14px 12px;overflow-y:auto;z-index:40}
 .ai-side-brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:1.05rem;color:var(--text-primary,#1a1f2b);text-decoration:none;padding:4px 10px 12px;border-bottom:1px solid var(--ai-border);margin-bottom:8px;white-space:nowrap}
 .ai-side-brand-ico{font-size:1.15rem;line-height:1}
 .ai-side-menu{display:flex;flex-direction:column;gap:2px;flex:1 0 auto}
@@ -415,8 +442,8 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-badge.once{color:#7a3ff2;background:rgba(122,63,242,.1)}
 .chip{font-size:.74rem;color:#41506b;background:#eef2f8;border-radius:6px;padding:2px 8px}
 /* 其余 */
-.ai-lead{color:var(--text-secondary,#5b6472);max-width:56em}
-.ai-note{margin-top:30px;padding-top:18px;border-top:1px solid var(--ai-border);color:var(--ai-dim);font-size:.9rem;line-height:1.8;max-width:900px}
+.ai-lead{color:var(--text-secondary,#5b6472);max-width:56em;margin:8px 0 0}
+.ai-note{margin:30px 0 0;padding-top:18px;border-top:1px solid var(--ai-border);color:var(--ai-dim);font-size:.9rem;line-height:1.8;max-width:900px}
 .ai-note h2{font-size:1.05rem;color:var(--text-primary,#1c2333)}
 .ai-empty{border:1px dashed var(--ai-border);border-radius:12px;padding:28px;color:var(--ai-dim);line-height:1.8}
 .ai-back{margin-top:18px;font-size:.9rem}
