@@ -192,7 +192,7 @@ export function renderAiHub(collections, byCollection) {
 ${crumb([{ name: "首页", url: `${SITE}/` }, { name: "AI 工具集" }])}
 <h1>AI 工具集</h1>
 <p class="ai-lead">按使用场景整理的 AI 工具合集，共 ${collections.length} 个工具集、${n} 款工具，持续增补更新。</p>
-${hasContent ? sideNav(collections, "") : `<style>main{margin-left:0}</style>`}
+${hasContent ? sideNav(collections, "") : `<style>body main{margin-left:0}</style>`}
 ${body}
 <section class="ai-note">
 <h2>关于本板块</h2>
@@ -366,12 +366,13 @@ function today() {
 
 const AI_STYLESHEET = `
 :root{--ai-border:#e5e9f0;--ai-dim:#5b6472}
-/* AI 板块专属布局：仿 ai-bot.cn 左侧固定导航（220px）+ 宽幅内容区 + 浅灰页底 */
+/* AI 板块专属布局：仿 ai-bot.cn 左侧固定导航（220px）+ 宽幅内容区 + 浅灰页底
+   注意：全站 <style> 在本文件之后加载，必须用 body 前缀提高优先级，否则 main/footer 会被全站 760px 规则覆盖 */
 body{background:var(--bg-secondary,#f5f6f8)}
-main{max-width:none;margin:0 0 0 220px;padding:22px 32px 60px}
+body main{max-width:none;margin:0 0 0 220px;padding:22px 32px 60px}
 main>*{max-width:1400px;margin-left:auto;margin-right:auto}
-header{position:sticky;top:0;z-index:100}
-footer{margin-left:220px}
+body header{position:sticky;top:0;z-index:100}
+body footer{margin-left:220px}
 .ai-side{position:fixed;top:57px;bottom:0;left:0;width:220px;background:var(--bg-card-solid,#fff);border-right:1px solid var(--ai-border);display:flex;flex-direction:column;padding:14px 12px;overflow-y:auto;z-index:40}
 .ai-side-brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:1.05rem;color:var(--text-primary,#1a1f2b);text-decoration:none;padding:4px 10px 12px;border-bottom:1px solid var(--ai-border);margin-bottom:8px;white-space:nowrap}
 .ai-side-brand-ico{font-size:1.15rem;line-height:1}
@@ -453,8 +454,8 @@ span.ai-detail-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-
 .ai-detail-sec p{color:var(--text-secondary,#41506b);line-height:1.85;margin:0 0 12px;font-size:.94rem}
 /* 移动端/窄屏：侧栏变顶部横向滚动条，内容区还原全宽 */
 @media (max-width:1100px){
-main{margin-left:0;padding:16px 16px 44px}
-footer{margin-left:0}
+body main{margin-left:0;padding:16px 16px 44px}
+body footer{margin-left:0}
 .ai-side{position:static;height:auto;width:auto;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--ai-border);padding:10px 14px;overflow-x:auto;overflow-y:hidden;gap:4px;scrollbar-width:none}
 .ai-side::-webkit-scrollbar{display:none}
 .ai-side-brand{border-bottom:0;margin:0 6px 0 0;padding:0 6px}
