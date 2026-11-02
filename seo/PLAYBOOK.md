@@ -32,6 +32,11 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 不要 `curl … | node` 直接查管道——分块边界会把多字节中文字符切断，产生 U+FFFD 假阳性
 （实测同页面落盘查为 0，管道查为 1）。死链/乱码以外的一致性断言同理。
 
+数据写入权限（2026-11-02 实测）：`tutorials` 表 anon key 可 INSERT/PATCH；
+`software` 表 **只能 SELECT**——PATCH 返回 204 但 `Prefer: return=representation` 回 `[]`（RLS 过滤，0 行受影响）。
+所以软件名/分类/描述的修正只能走 `generate.mjs` 的 `NAME_OVERRIDES` / `CATEGORY_OVERRIDES` / `DESC_OVERRIDES`，
+单次读取也别直接信：传输层会随机插 U+FFFD（同一记录连读两次坏在不同位置），判断数据好坏必须看生成器 5 轮合并后的结果。
+
 已知豁免（不算 BUG，不要「修」）：
 - `all.html`：有意的跳转存根（noindex + JS 跳 sitemap.html），canonical 指向 sitemap.html
 - `admin/manager/submanager.html`：后台 SPA，视图内是 h2，noindex，不补隐藏 h1
@@ -74,7 +79,7 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [x] 分类页补 CollectionPage/ItemList 结构化数据（2026-10-29）
 - [x] 分类页导语（解决 11 页薄内容，11→1）（2026-10-29）
 - [x] 59 个软件页入链 <3：在分类页/相关推荐增加交叉链接（2026-10-31 完成，59→1；做法：同分类相关推荐改「按热度排序 + 环形轮转取 8 条」，每页链接数不变但分布均匀，剩余 1 页为 admin.html 误报类页面）
-- [ ] 教程页仅 3 篇：内容增量优先级最高（百度/必应都吃内容量）——已转为每日自动化新增 1 篇（2026-10-30 起，现 6 篇）
+- [ ] 教程页仅 3 篇：内容增量优先级最高（百度/必应都吃内容量）——已转为每日自动化新增 1 篇（2026-10-30 起，现 7 篇）
 - [ ] 软件页正文深度：目前中位数 548 字，可补「最低配置/适用场景/常见问题」结构化段落（2026-10-30 已修复最后一个薄页 Keka，薄内容 1→0；optimize.mjs 标题统计已改为按解码后可见字符计数，&amp; 不再误报超长）
 - [ ] 移动端 CWV 实测（需真实设备数据，Pages 无字段数据时用 PSI API）
 - [x] 图片缺 alt（2026-10-31 完成，4 页 23 张 → 1 页 2 张；教程页正文图片在 render 层补「标题 + 序号」alt，剩余 admin.html 为 JS 模板字符串误报）
@@ -89,7 +94,7 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [ ] 首页 HTML 604KB、内联脚本 343KB：移动端 LCP 风险，评估外链拆包（拆错会白屏，需先在灰度页验证）
 - [x] 首页静态 /soft/ 链接（2026-10-31 完成，0 → 24 条；做法：generate.mjs `buildHotIndex()` 在 #pageHome 末尾输出「热门软件索引」块，按「浏览 + 下载×3」取前 24，同名多平台记录按去空格后名称去重；块内另有 /sitemap.html 全量索引链接。样式一次性注入 `.hotindex-*`，幂等替换靠 `<!--/hotindex-->` 标记）
 - [x] 教程/软件页互链（2026-10-31 完成；做法：按「教程标题包含完整软件名」双向匹配，软件页渲染「相关教程」、教程页渲染「相关软件下载」，无命中则整块不输出；教程页「分类」改为可点链接，仅在该分类确有分类页时输出，避免造 /cat/cat-xxxx 死链。现 6 篇教程命中 2 篇，随每日新增自动变密）
-- [ ] 数据质量：`驱动管理` 分类仅 1 条记录，且标题是促销文案「…限时 7 折特惠快入手！」（SERP 里会当标题展示，属低质信号）。建议后台改名为「Driver Booster 13 Pro」并归入 系统工具/实用工具，改名后自动获得同分类内链，该页入链 2→3 以上
+- [x] 数据质量：`驱动管理` 分类仅 1 条记录，且标题是促销文案「…限时 7 折特惠快入手！」（SERP 里会当标题展示，属低质信号）。**2026-11-02 已处理**：软件表对 anon key 只有 SELECT（PATCH 返回 204 但 0 行受影响），改不动数据库，改为在 generate.mjs 加 `NAME_OVERRIDES` / `CATEGORY_OVERRIDES` 定点重写——名称改为「Driver Booster 13 Pro 驱动更新工具」、分类并入「实用工具」、描述改事实性文案；1 条目的薄分类页 /cat/qudong-guanli.html 随之消失（cat 15→14），该页入链 2→10+（lowInboundCount 1→0）。**待有服务端权限时改数据库并删掉这两张覆盖表**，否则站内 SPA 仍显示旧名称。
 - [x] 404 兜底页（2026-10-31 完成；此前线上 404 是 GitHub 英文默认页、整页 0 处本站链接。做法：render.js `render404()` + generate.mjs 落盘 404.html，GitHub Pages 原生接管且保持 404 状态码；页面自带 164 条搜索索引（158 软件 + 6 教程，含 URL 中文关键词预填）+ 热门 12 + 分类 15 + 全站索引出口，noindex。audit.mjs 第 15 项永久检查。产物 22.5KB / gzip 8.3KB）
 - [ ] 教程封面 PNG→WebP：6 张各 294KB 共 1.76MB，但 cover 由 `ensureCovers()` 远端拉取重建、路径存数据库 `tutorials.cover`，且该 URL 兼作 og:image（微信对 webp 分享卡兼容存疑），改造需动 ensureCovers + render 双通道（img 用 webp、og:image 留 png），有设计成本，暂缓
 - [ ] 站内搜索（全站级）：404 页已验证「自带索引 JSON + 前端子串匹配」模式可行，可平移到 sitemap.html / 首页；158 软件索引 JSON 仅 ~11KB

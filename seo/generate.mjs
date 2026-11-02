@@ -157,6 +157,9 @@ const CONTENT_MASTERS = [
   { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", file: "content-master-acd18f73.txt" },
   { id: "ab616030-0d0e-4462-be04-847abc6e9de5", field: "content", file: "content-master-ab616030.txt" },
   { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "summary", file: "summary-master-acd18f73.txt" },
+  // AnyDesk 教程（2026-11-02 新增）：长中文正文写库后稳定残留 U+FFFD，母本兜底
+  { id: "c298b689-3b34-4e3e-aff2-7d4da3e0ae8a", field: "content", file: "content-master-c298b689.txt" },
+  { id: "c298b689-3b34-4e3e-aff2-7d4da3e0ae8a", field: "summary", file: "summary-master-c298b689.txt" },
 ];
 for (const m of CONTENT_MASTERS) {
   const row = tutorials.find((t) => t.id === m.id);
@@ -171,12 +174,42 @@ const DESC_OVERRIDES = {
   // 含提取码噪声且正文仅 265 字，按软件公开功能重写
   mrt05wkthp9y:
     "Keka 是 macOS 平台免费好用的解压缩工具，支持 7z、Zip、Tar、Gzip 等常见压缩格式的创建与解压，也可解压 RAR 分卷压缩包，支持设置密码保护与分卷压缩，把文件拖到程序图标即可开始处理，适合日常压缩传输与接收解压场景。",
+  // Driver Booster：源描述是「新设备无法正常使用？…」营销问答体，按软件公开功能重写为事实性描述
+  "847f51b9ebfb78661faf5bde":
+    "Driver Booster 13 Pro 是 IObit 出品的 Windows 驱动更新工具，可自动扫描显卡、声卡、网卡、主板等硬件的过时或缺失驱动并一键更新，支持驱动备份与还原、离线驱动包安装，适合系统更新后出现无声、断网、蓝屏或游戏卡顿的设备快速排查修复。",
 };
 for (const [id, desc] of Object.entries(DESC_OVERRIDES)) {
   const row = softs.find((s) => s.id === id);
   if (row) {
     row.description = desc;
     console.log(`已重写 ${id} 的 description（源描述噪声/过短）`);
+  }
+}
+
+// 标题/分类定点重写（2026-11-02）：软件表对 anon key 只开了 SELECT，
+// PATCH 返回 204 但 0 行受影响，后台改不动，只能在生成层改写。
+// 待有后台/服务端权限时改数据库并删除这里的条目，避免两处维护不一致。
+const NAME_OVERRIDES = {
+  // 源名称是促销文案「电脑驱动更新工具 Driver Booster 13 Pro，限时 7 折特惠快入手！」，
+  // 会被直接当成 SERP 标题展示，属低质信号；版本字段里也有品牌名，去掉促销词后由标题模板自动省略版本号
+  "847f51b9ebfb78661faf5bde": "Driver Booster 13 Pro 驱动更新工具",
+};
+const CATEGORY_OVERRIDES = {
+  // 原分类「驱动管理」只有这 1 条记录，生成的是 1 条目的薄分类页（入链仅 2）
+  "847f51b9ebfb78661faf5bde": "实用工具",
+};
+for (const [id, name] of Object.entries(NAME_OVERRIDES)) {
+  const row = softs.find((s) => s.id === id);
+  if (row) {
+    row.name = name;
+    console.log(`已重写 ${id} 的 name（源名称含促销文案）`);
+  }
+}
+for (const [id, cat] of Object.entries(CATEGORY_OVERRIDES)) {
+  const row = softs.find((s) => s.id === id);
+  if (row) {
+    row.category = cat;
+    console.log(`已重写 ${id} 的 category（原分类仅 1 条，薄分类页）`);
   }
 }
 
