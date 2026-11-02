@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { head, foot, crumb, jsonLd, SITE } from "./render.js";
 
 const AI_CSS = `
-<link rel="stylesheet" href="${SITE}/ai/ai.css?v=${new Date().toISOString().slice(0, 13).replace(/\D/g, "")}">
+<link rel="stylesheet" href="${SITE}/ai/ai.css?v=${new Date().toISOString().replace(/\D/g, "").slice(0, 12)}">
 `;
 
 // —— Supabase 连接信息从仓库 index.html 提取 ——
