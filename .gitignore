@@ -9,3 +9,10 @@ seo/baidu-pushed.json
 seo/cf-token.txt
 seo/bing-api-key.txt
 seo/bing-batched.json
+
+# Node 依赖与测试产物（本地 UI 测试用，不入库）
+node_modules/
+package.json
+package-lock.json
+seo/.*.mjs
+seo/.*.png

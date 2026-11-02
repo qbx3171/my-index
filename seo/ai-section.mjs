@@ -5,12 +5,20 @@
 // 表不存在或为空时优雅降级：仍生成 /ai/index.html 导航首页（导航入口的落点），其余跳过。
 import { mkdir, writeFile, rm } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { head, foot, crumb, jsonLd, SITE } from "./render.js";
 
-const AI_CSS = `
-<link rel="stylesheet" href="${SITE}/ai/ai.css?v=${new Date().toISOString().replace(/\D/g, "").slice(0, 12)}">
-`;
+// CSS 版本号 = 样式内容哈希（而非构建时间）：定时任务重跑时样式没变则版本号不变，
+// 产物逐字节稳定（幂等），避免 CI 空提交；样式真变了 CDN 缓存也会自动失效。
+let _aiCssCache = "";
+function aiCss() {
+  if (!_aiCssCache) {
+    const ver = createHash("md5").update(AI_STYLESHEET).digest("hex").slice(0, 8);
+    _aiCssCache = `\n<link rel="stylesheet" href="${SITE}/ai/ai.css?v=${ver}">`;
+  }
+  return _aiCssCache;
+}
 
 // —— Supabase 连接信息从仓库 index.html 提取 ——
 function supabaseCreds() {
@@ -114,7 +122,7 @@ export function renderAiToolDetail(t, col, collections, siblings) {
   const logo = String(t.logo || "").trim();
 
   const html =
-    head(title4Tool(t, col), desc, canonical, `<meta property="og:image" content="${esc(logo || `${SITE}/og-cover.png`)}">` + AI_CSS) +
+    head(title4Tool(t, col), desc, canonical, `<meta property="og:image" content="${esc(logo || `${SITE}/og-cover.png`)}">` + aiCss()) +
     `
 <main>
 ${crumb([
@@ -213,7 +221,7 @@ export function renderAiHub(collections, byCollection) {
     : `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p><p>计划方向：AI 对话助手、AI 写作、AI 绘画图像、AI 视频音频、AI 编程开发、AI 办公效率等，每个方向一个独立工具集。</p></div>`;
 
   const html =
-    head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + AI_CSS) +
+    head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
     `
 <main>
 ${crumb([{ name: "首页", url: `${SITE}/` }, { name: "AI 工具集" }])}
@@ -239,14 +247,19 @@ ${foot("aihub")}`;
 }
 
 export function renderAiCollection(col, tools, collections = []) {
-  const title = `${col.name} - ${tools.length}款AI工具精选 | 乐哲软件`;
+  const title = tools.length
+    ? `${col.name} - ${tools.length}款AI工具精选 | 乐哲软件`
+    : `${col.name} - AI工具集 | 乐哲软件`;
   const desc =
     (col.description || `${col.name} 工具集`).slice(0, 90) +
     `，共精选 ${tools.length} 款工具，附一句话说明与收费模式标注，持续更新。`;
   const canonical = `${SITE}/ai/${col.slug}.html`;
+  const toolsBlock = tools.length
+    ? `<div class="ai-cards">\n${tools.map(toolCard).join("\n")}\n</div>`
+    : `<div class="ai-empty">📦 本工具集正在整理中，工具马上就来 —— 你也可以先逛逛<a href="${SITE}/ai/index.html" style="color:#0077ff">其他工具集</a>。</div>`;
 
   const html =
-    head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + AI_CSS) +
+    head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
     `
 <main>
 ${crumb([
@@ -260,9 +273,7 @@ ${sideNav(collections, col.slug)}
   <div><h1>${esc(col.name)}</h1>
   <p class="ai-lead">${esc(col.description || `精选 ${tools.length} 款${col.name}，逐个标注收费模式，持续更新。`)}</p></div>
 </div>
-<div class="ai-cards">
-${tools.map(toolCard).join("\n")}
-</div>
+${toolsBlock}
 <p class="ai-back"><a href="${SITE}/ai/index.html" style="color:#0077ff">← 返回全部工具集</a></p>
 </main>
 ${jsonLd({
@@ -339,8 +350,9 @@ export async function buildAiSection(ROOT, softs = []) {
     if (c) byCollection[c.slug].push(t);
   }
   for (const c of collections) byCollection[c.slug].sort((a, b) => (a.sort || 0) - (b.sort || 0));
-  // 只有非空工具集才有独立页；侧栏/导航只列这些，避免站内死链
-  for (const c of collections) c._hasPage = (byCollection[c.slug] || []).length > 0;
+  // 所有已发布工具集都生成独立页（空工具集显示"整理中"占位，站长一上传即可见）；
+  // _hasPage 保留恒真语义，兼容 sitemap 过滤逻辑
+  for (const c of collections) c._hasPage = true;
 
   // 清空重建 /ai/
   const aiDir = join(ROOT, "ai");
@@ -369,7 +381,6 @@ export async function buildAiSection(ROOT, softs = []) {
   let toolPageCount = 0;
   for (const c of collections) {
     const list = byCollection[c.slug];
-    if (!list.length) continue; // 空工具集不上线独立页，避免薄内容
     const page = renderAiCollection(c, list, collections);
     await writeFile(join(aiDir, `${c.slug}.html`), page.html, "utf8");
     urls.push({ loc: `${SITE}/ai/${c.slug}.html`, lastmod: today() });
@@ -447,6 +458,7 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-note h2{font-size:1.05rem;color:var(--text-primary,#1c2333)}
 .ai-empty{border:1px dashed var(--ai-border);border-radius:12px;padding:28px;color:var(--ai-dim);line-height:1.8}
 .ai-back{margin-top:18px;font-size:.9rem}
+.ai-empty{padding:38px 20px;text-align:center;color:#5b6472;background:var(--bg-card-solid,#fff);border:1px dashed #d5dbe6;border-radius:12px;font-size:.95rem;line-height:1.8}
 /* 主题适配 */
 [data-theme="dark"] .ai-side{background:#242938;border-right-color:#333a48}
 [data-theme="dark"] .ai-card,[data-theme="dark"] .ai-col-hero{background:rgba(255,255,255,.04)}

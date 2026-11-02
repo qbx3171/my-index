@@ -54,6 +54,7 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-note h2{font-size:1.05rem;color:var(--text-primary,#1c2333)}
 .ai-empty{border:1px dashed var(--ai-border);border-radius:12px;padding:28px;color:var(--ai-dim);line-height:1.8}
 .ai-back{margin-top:18px;font-size:.9rem}
+.ai-empty{padding:38px 20px;text-align:center;color:#5b6472;background:var(--bg-card-solid,#fff);border:1px dashed #d5dbe6;border-radius:12px;font-size:.95rem;line-height:1.8}
 /* 主题适配 */
 [data-theme="dark"] .ai-side{background:#242938;border-right-color:#333a48}
 [data-theme="dark"] .ai-card,[data-theme="dark"] .ai-col-hero{background:rgba(255,255,255,.04)}
