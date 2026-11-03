@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch();
+const url = 'file:///C:/Users/Adminstor/Documents/GitHub/my-index/index.html';
+const p = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+await p.goto(url, { waitUntil: 'domcontentloaded' });
+await p.waitForTimeout(2000);
+await p.screenshot({ path: 'C:/Users/Adminstor/AppData/Local/Temp/mobile-header.png', clip: { x: 0, y: 0, width: 180, height: 130 } });
+const d = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
+await d.goto(url, { waitUntil: 'domcontentloaded' });
+await d.waitForTimeout(2000);
+await d.screenshot({ path: 'C:/Users/Adminstor/AppData/Local/Temp/desktop-header.png', clip: { x: 0, y: 0, width: 420, height: 70 } });
+await browser.close();
