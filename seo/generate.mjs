@@ -162,6 +162,9 @@ const CONTENT_MASTERS = [
   // AnyDesk 教程（2026-11-02 新增）：长中文正文写库后稳定残留 U+FFFD，母本兜底
   { id: "c298b689-3b34-4e3e-aff2-7d4da3e0ae8a", field: "content", file: "content-master-c298b689.txt" },
   { id: "c298b689-3b34-4e3e-aff2-7d4da3e0ae8a", field: "summary", file: "summary-master-c298b689.txt" },
+  // 2345看图王 教程（2026-11-03 新增）：写库即带 U+FFFD，母本兜底
+  { id: "6058916d-f0d0-44e7-a336-443916ca8aab", field: "content", file: "content-master-6058916d.txt" },
+  { id: "6058916d-f0d0-44e7-a336-443916ca8aab", field: "summary", file: "summary-master-6058916d.txt" },
 ];
 for (const m of CONTENT_MASTERS) {
   const row = tutorials.find((t) => t.id === m.id);

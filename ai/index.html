@@ -15,16 +15,37 @@
 <meta property="og:description" content="乐哲软件 AI 工具集：按使用场景整理的 AI 工具合集，每个工具集独立成页，涵盖 AI 对话、写作、绘画图像、视频音频、编程开发、办公效率等方向，逐个标注收费模式与适用人群，持续增补更新，找 AI 工具收藏这一页就够了。">
 <meta property="og:url" content="https://www.lezhesoft.cn/ai/index.html">
 <meta property="og:image" content="https://www.lezhesoft.cn/og-cover.png">
-<link rel="stylesheet" href="https://www.lezhesoft.cn/ai/ai.css?v=54baabc4">
+<link rel="stylesheet" href="https://www.lezhesoft.cn/ai/ai.css?v=78692bb1">
 <style>
 body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
-header{background:#0077ff;color:#fff;padding:14px 20px;font-size:17px;font-weight:500;display:flex;align-items:center;gap:14px}
-header a{color:#fff;text-decoration:none;flex:0 0 auto}
-header form{margin:0 0 0 auto;display:flex;gap:6px}
-header input{width:150px;padding:6px 10px;border:0;border-radius:6px;font-size:14px;background:rgba(255,255,255,.95);color:#1a1a1a;outline:none;font-family:inherit}
-header button{padding:6px 12px;border:0;border-radius:6px;background:rgba(255,255,255,.22);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
-header button:hover{background:rgba(255,255,255,.34)}
-@media(max-width:480px){header input{width:96px}}
+/* 内页导航（与首页方案B胶囊导航同款视觉） */
+header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e8edf4;padding:10px 20px}
+.hd-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto}
+.hd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.hd-brand{font-weight:800;font-size:1.02rem;color:#1c2333}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:#f2f5fa;border:1px solid #e5eaf2;border-radius:50px;padding:3px;margin:0 auto}
+.nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
+.nav-links a:hover{color:#1c2333;background:#fff}
+.nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:700}
+.nav-links a.nav-ai:hover{opacity:.85}
+.nav-links a.nav-ai.active{background:#fff;color:#0088ff}
+.hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
+.hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
+.hd-search input:focus{border-color:#0077ff;background:#fff}
+.hd-search button{padding:7px 13px;border:0;border-radius:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+/* 中屏：搜索收紧 */
+@media(max-width:1000px){.hd-search input{width:110px}.nav-links a{padding:6px 11px;font-size:.8rem}}
+/* 移动端：导航条变全宽横向滑动，搜索隐藏（进入搜索页用） */
+@media(max-width:768px){
+.hd-in{flex-wrap:wrap;gap:10px}
+.hd-search{display:none}
+.nav-links{order:3;width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;padding:3px;margin:0;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{padding:7px 13px;font-size:.82rem}
+}
+@media(max-width:380px){.hd-brand{font-size:.92rem}.hd-mark{width:26px;height:26px;font-size:13px}}
 main{max-width:760px;margin:0 auto;padding:24px 20px}
 .meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
 .btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
@@ -40,7 +61,19 @@ h1{font-size:24px;margin:8px 0}
 </style>
 </head>
 <body>
-<header><a href="https://www.lezhesoft.cn/">乐哲软件</a><form action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form></header>
+<header>
+<div class="hd-in">
+<a class="hd-logo" href="https://www.lezhesoft.cn/"><span class="hd-mark">乐</span><span class="hd-brand">乐哲软件</span></a>
+<ul class="nav-links">
+<li><a href="https://www.lezhesoft.cn/">首页</a></li>
+<li><a href="https://www.lezhesoft.cn/all.html">软件库</a></li>
+<li><a href="https://www.lezhesoft.cn/ai/index.html" class="nav-ai">🤖 AI工具集</a></li>
+<li><a href="https://www.lezhesoft.cn/sitemap.html">搜索</a></li>
+</ul>
+<form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
+</div>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if(h==="/"&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+</header>
 <main>
 <nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / AI 工具集</nav>
 <h1>AI 工具集</h1>
@@ -56,6 +89,7 @@ h1{font-size:24px;margin:8px 0}
   <div class="ai-sec-head"><img class="ai-sec-logo" src="https://i.imgs.ovh/2026/11/02/840c0d9893df4684dfac37a2394cb364.png" alt="">
   <h2>Ai写作工具</h2><span class="ai-sec-count">2 款</span>
   <a class="ai-sec-more" href="https://www.lezhesoft.cn/ai/ai-xiezuo.html">查看更多 &gt;&gt;</a></div>
+  <p class="ai-sec-lead">Ai写作工具方向目前收录 2 款：蛙蛙写作、Loomy，收费模式均为免费额度，点工具名可看功能拆解与官网入口。</p>
   <div class="ai-cards"><a class="ai-card" href="https://www.lezhesoft.cn/ai/tool/wawa.html" title="Ai小说和内容创作工具">
   <img class="ai-cover" src="https://i.imgs.ovh/2026/11/02/a6304e3974f467aa4dbeefe125b0fba0.png" alt="蛙蛙写作 封面" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=aiFallback('蛙蛙写作','ai-cover')">
   <span class="ai-card-main"><span class="ai-card-name">蛙蛙写作</span><span class="ai-card-summary">Ai小说和内容创作工具</span></span>
@@ -69,6 +103,7 @@ h1{font-size:24px;margin:8px 0}
   <div class="ai-sec-head"><img class="ai-sec-logo" src="https://i.imgs.ovh/2026/11/02/a62c46c6144db3c0f418700de56b8818.png" alt="">
   <h2>Ai图像工具</h2><span class="ai-sec-count">1 款</span>
   <a class="ai-sec-more" href="https://www.lezhesoft.cn/ai/photo.html">查看更多 &gt;&gt;</a></div>
+  <p class="ai-sec-lead">Ai图像工具方向目前收录 1 款：即梦AI，收费模式均为免费，点工具名可看功能拆解与官网入口。</p>
   <div class="ai-cards"><a class="ai-card" href="https://www.lezhesoft.cn/ai/tool/t-daeb6249.html" title="一站式AI视频、图片、数字人创作工具">
   <img class="ai-cover" src="https://i.imgs.ovh/2026/11/02/427cbf48b7456b2b8212d8792b11f492.png" alt="即梦AI 封面" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=aiFallback('即梦AI','ai-cover')">
   <span class="ai-card-main"><span class="ai-card-name">即梦AI</span><span class="ai-card-summary">一站式AI视频、图片、数字人创作工具</span></span>

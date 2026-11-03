@@ -17,13 +17,34 @@
 <meta property="og:image" content="https://www.lezhesoft.cn/tutorial/cover/ab616030-0d0e-4462-be04-847abc6e9de5.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Adobe Creative Cloud 使用教程：退出团队、加入组织与账号配置文件切换","image":"https://www.lezhesoft.cn/tutorial/cover/ab616030-0d0e-4462-be04-847abc6e9de5.png","datePublished":"2026-10-31T00:10:23.857695+00:00","dateModified":"2026-10-31T00:10:23.857695+00:00","author":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"},"publisher":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"}}</script>
 <style>
 body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
-header{background:#0077ff;color:#fff;padding:14px 20px;font-size:17px;font-weight:500;display:flex;align-items:center;gap:14px}
-header a{color:#fff;text-decoration:none;flex:0 0 auto}
-header form{margin:0 0 0 auto;display:flex;gap:6px}
-header input{width:150px;padding:6px 10px;border:0;border-radius:6px;font-size:14px;background:rgba(255,255,255,.95);color:#1a1a1a;outline:none;font-family:inherit}
-header button{padding:6px 12px;border:0;border-radius:6px;background:rgba(255,255,255,.22);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
-header button:hover{background:rgba(255,255,255,.34)}
-@media(max-width:480px){header input{width:96px}}
+/* 内页导航（与首页方案B胶囊导航同款视觉） */
+header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e8edf4;padding:10px 20px}
+.hd-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto}
+.hd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.hd-brand{font-weight:800;font-size:1.02rem;color:#1c2333}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:#f2f5fa;border:1px solid #e5eaf2;border-radius:50px;padding:3px;margin:0 auto}
+.nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
+.nav-links a:hover{color:#1c2333;background:#fff}
+.nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:700}
+.nav-links a.nav-ai:hover{opacity:.85}
+.nav-links a.nav-ai.active{background:#fff;color:#0088ff}
+.hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
+.hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
+.hd-search input:focus{border-color:#0077ff;background:#fff}
+.hd-search button{padding:7px 13px;border:0;border-radius:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+/* 中屏：搜索收紧 */
+@media(max-width:1000px){.hd-search input{width:110px}.nav-links a{padding:6px 11px;font-size:.8rem}}
+/* 移动端：导航条变全宽横向滑动，搜索隐藏（进入搜索页用） */
+@media(max-width:768px){
+.hd-in{flex-wrap:wrap;gap:10px}
+.hd-search{display:none}
+.nav-links{order:3;width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;padding:3px;margin:0;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{padding:7px 13px;font-size:.82rem}
+}
+@media(max-width:380px){.hd-brand{font-size:.92rem}.hd-mark{width:26px;height:26px;font-size:13px}}
 main{max-width:760px;margin:0 auto;padding:24px 20px}
 .meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
 .btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
@@ -39,7 +60,19 @@ h1{font-size:24px;margin:8px 0}
 </style>
 </head>
 <body>
-<header><a href="https://www.lezhesoft.cn/">乐哲软件</a><form action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form></header>
+<header>
+<div class="hd-in">
+<a class="hd-logo" href="https://www.lezhesoft.cn/"><span class="hd-mark">乐</span><span class="hd-brand">乐哲软件</span></a>
+<ul class="nav-links">
+<li><a href="https://www.lezhesoft.cn/">首页</a></li>
+<li><a href="https://www.lezhesoft.cn/all.html">软件库</a></li>
+<li><a href="https://www.lezhesoft.cn/ai/index.html" class="nav-ai">🤖 AI工具集</a></li>
+<li><a href="https://www.lezhesoft.cn/sitemap.html">搜索</a></li>
+</ul>
+<form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
+</div>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if(h==="/"&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+</header>
 <main>
 <nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / Adobe系列教程</nav>
 <h1>Adobe Creative Cloud 使用教程：退出团队、加入组织与账号配置文件切换</h1>
@@ -68,7 +101,7 @@ h1{font-size:24px;margin:8px 0}
 <p><strong>Q4：退出后重新登录仍显示旧团队？</strong><br>先注销并结束所有 Adobe 进程，重登选个人配置文件；仍不生效就用 Ctrl+Alt+R / Cmd+Opt+R 重置桌面端，并确认组织已不在账号列表里。</p>
 </article>
 <div class="cta"><strong>教程里的软件去哪下载？</strong>本站全部软件免费下载，注册登录后即可获取下载地址，完全免费，无需付费开通。<a href="https://www.lezhesoft.cn/">免费注册 →</a></div>
-<div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/91e1887a-ebb6-4171-a588-99866f62aca2.html">MacOS 提示「已损坏，无法打开」怎么办？</a><a href="https://www.lezhesoft.cn/tutorial/7aa79aaa-b1ba-4f8a-9056-20b0a731afb3.html">0xc000007b应用程序错误</a><a href="https://www.lezhesoft.cn/tutorial/ca626bf2-5874-41f5-ad12-8bb4c1309499.html">关于Adobe Genuine Service Alert盗版提示的解决方法</a><a href="https://www.lezhesoft.cn/tutorial/f8337a6e-7a42-432b-9b0d-b4b939333f47.html">AdGuard - 多平台广告拦截软件使用教程：从安装到过滤器配置的入门指南</a><a href="https://www.lezhesoft.cn/tutorial/c298b689-3b34-4e3e-aff2-7d4da3e0ae8a.html">免费远程工具AnyDesk 便携版使用教程：远程连接、无人值守与文件传输入门</a><a href="https://www.lezhesoft.cn/tutorial/acd18f73-4840-4e8c-b6c2-d38d7625f0e8.html">Adobe Photoshop使用教程：新手从安装到出图的完整入门指南</a></div>
+<div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/91e1887a-ebb6-4171-a588-99866f62aca2.html">MacOS 提示「已损坏，无法打开」怎么办？</a><a href="https://www.lezhesoft.cn/tutorial/7aa79aaa-b1ba-4f8a-9056-20b0a731afb3.html">0xc000007b应用程序错误</a><a href="https://www.lezhesoft.cn/tutorial/ca626bf2-5874-41f5-ad12-8bb4c1309499.html">关于Adobe Genuine Service Alert盗版提示的解决方法</a><a href="https://www.lezhesoft.cn/tutorial/f8337a6e-7a42-432b-9b0d-b4b939333f47.html">AdGuard - 多平台广告拦截软件使用教程：从安装到过滤器配置的入门指南</a><a href="https://www.lezhesoft.cn/tutorial/6058916d-f0d0-44e7-a336-443916ca8aab.html">2345看图王使用教程：看图设置、批量处理与关闭弹窗广告</a><a href="https://www.lezhesoft.cn/tutorial/c298b689-3b34-4e3e-aff2-7d4da3e0ae8a.html">免费远程工具AnyDesk 便携版使用教程：远程连接、无人值守与文件传输入门</a></div>
 </main>
 <footer><a href="https://www.lezhesoft.cn/">乐哲软件官网</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具</a> · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
 </body></html>

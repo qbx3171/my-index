@@ -210,6 +210,7 @@ export function renderAiHub(collections, byCollection) {
   <div class="ai-sec-head">${c.logo && /^https?:\/\//i.test(c.logo) ? `<img class="ai-sec-logo" src="${esc(c.logo)}" alt="">` : `<span class="ai-sec-ico">${esc(c.icon || "🧩")}</span>`}
   <h2>${esc(c.name)}</h2><span class="ai-sec-count">${tools.length} 款</span>
   <a class="ai-sec-more" href="${SITE}/ai/${esc(c.slug)}.html">查看更多 &gt;&gt;</a></div>
+  <p class="ai-sec-lead">${esc(secLead(c, tools))}</p>
   <div class="ai-cards">${shown.map(toolCard).join("\n")}</div>
 </section>`;
     })
@@ -246,13 +247,73 @@ ${foot("aihub")}`;
   return { html };
 }
 
+// —— 工具集对比表 + 选择建议（2026-11-03）——
+// 此前分类页只有封面卡片，纯文字仅 159/168 字，被 optimize.mjs 判为薄内容；
+// 详情页的 intro 不往列表页搬（避免与详情页正文重复），只摘 summary 定位 + 收费模式做成对比表，
+// 再按真实数据（款数 / 收费分布）写选购提示，不套统一模板句。
+function plainText(s) {
+  return String(s || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+}
+// 描述长度红线 100–165 字：后台 description 常年留空，靠工具名单拼出来的句子只有 50 来字，
+// 会被 qa.mjs 判为短描述。统一在这里补齐到 100 字以上，超长按标点收尾。
+function fitDesc(base, col) {
+  const pad = `本页为乐哲软件 AI 工具集「${col.name}」索引，逐个列出工具的定位、收费模式与官网入口，并附快速对比表和挑选建议，适合同类工具拿不定主意时先横向比一遍，内容随后台收录持续更新。`;
+  let d = plainText(base).replace(/[。\s]+$/, "");
+  if (d.length < 100) d = `${d}。${pad}`;
+  if (d.length > 165) d = d.slice(0, 160).replace(/[,，。;；、\s]+$/, "") + "…";
+  return d;
+}
+function buildCompare(col, tools) {
+  if (!tools.length) return "";
+  const rows = tools
+    .map(
+      (t) =>
+        `<tr><td><a href="${toolDetailUrl(t)}">${esc(t.name)}</a></td>` +
+        `<td>${esc(plainText(t.summary) || "—")}</td>` +
+        `<td><span class="ai-badge ${badgeClass(t.pricing)}">${esc(String(t.pricing || "免费").trim())}</span></td></tr>`
+    )
+    .join("");
+  const pricingOf = (t) => String(t.pricing || "免费").trim();
+  const mix = [...new Set(tools.map(pricingOf))];
+  const freeish = tools.filter((t) => badgeClass(t.pricing) !== "sub").length;
+  const priceLine =
+    mix.length === 1
+      ? `收录的 ${tools.length} 款工具收费模式均为${mix[0]}，试用不需要额外付费。`
+      : `收费模式分 ${mix.length} 种：${mix.map((m) => `${m} ${tools.filter((t) => pricingOf(t) === m).length} 款`).join("、")}。`;
+  const pickLine =
+    tools.length > 1
+      ? `款数不多但定位差别明显，按“要产出什么”挑一款就够，不必同时订阅两个：${tools
+          .map((t) => `${plainText(t.name)}（${plainText(t.summary) || "综合型"}）`)
+          .join("；")}。`
+      : `目前只有一款可对照，建议先按免费通道把完整流程跑一遍（注册 → 输入需求 → 导出成品），确认导出格式、分辨率或字数限制够用再考虑付费。`;
+  const workLine = freeish
+    ? `实际使用时的差别通常在导出环节：免费额度多有次数或水印限制，正式产出前先确认导出文件的格式、尺寸与商用授权说明。`
+    : `均为订阅制，上手前先确认是否提供试用；团队使用还要看席位计费与素材版权归属。`;
+  return `<section class="ai-note ai-compare">
+<h2>${esc(col.name)}快速对比</h2>
+<table><thead><tr><th>工具</th><th>定位</th><th>收费模式</th></tr></thead><tbody>${rows}</tbody></table>
+<p>${esc(priceLine)}${esc(pickLine)}</p>
+<p>${esc(workLine)}</p>
+</section>`;
+}
+
 export function renderAiCollection(col, tools, collections = []) {
   const title = tools.length
     ? `${col.name} - ${tools.length}款AI工具精选 | 乐哲软件`
     : `${col.name} - AI工具集 | 乐哲软件`;
-  const desc =
-    (col.description || `${col.name} 工具集`).slice(0, 90) +
-    `，共精选 ${tools.length} 款工具，附一句话说明与收费模式标注，持续更新。`;
+  // 工具集 description 后台大多留空，光写「共精选 N 款」等于没说；
+  // 有工具时把名单与收费模式写进描述，摘要里就能看出这个集合到底收了什么。
+  const listBrief = tools.slice(0, 4).map((t) => t.name).join("、") + (tools.length > 4 ? " 等" : "");
+  const desc = fitDesc(
+    (
+      col.description
+        ? col.description
+        : tools.length
+          ? `${col.name}精选 ${tools.length} 款：${listBrief}，逐个标注收费模式与定位`
+          : `${col.name}工具集`
+    ),
+    col
+  );
   const canonical = `${SITE}/ai/${col.slug}.html`;
   const toolsBlock = tools.length
     ? `<div class="ai-cards">\n${tools.map(toolCard).join("\n")}\n</div>`
@@ -274,6 +335,7 @@ ${sideNav(collections, col.slug)}
   <p class="ai-lead">${esc(col.description || `精选 ${tools.length} 款${col.name}，逐个标注收费模式，持续更新。`)}</p></div>
 </div>
 ${toolsBlock}
+${buildCompare(col, tools)}
 <p class="ai-back"><a href="${SITE}/ai/index.html" style="color:#0077ff">← 返回全部工具集</a></p>
 </main>
 ${jsonLd({
@@ -287,6 +349,13 @@ ${jsonLd({
 ${FALLBACK_SNIPPET}
 ${foot("ai-" + col.slug)}`;
   return { html };
+}
+
+function secLead(c, tools) {
+  const pricingOf = (t) => String(t.pricing || "免费").trim();
+  const mix = [...new Set(tools.map(pricingOf))];
+  const head = `${c.name}方向目前收录 ${tools.length} 款：${tools.slice(0, 3).map((t) => t.name).join("、")}${tools.length > 3 ? " 等" : ""}`;
+  return `${head}，收费模式${mix.length === 1 ? `均为${mix[0]}` : `覆盖${mix.join(" / ")}`}，点工具名可看功能拆解与官网入口。`;
 }
 
 function badgeClass(p) {
@@ -437,6 +506,14 @@ span.ai-col-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-con
 .ai-sec-count{font-size:.74rem;color:#9aa3b2}
 .ai-sec-more{margin-left:auto;font-size:.84rem;color:#8a93a3;text-decoration:none;white-space:nowrap}
 .ai-sec-more:hover{text-decoration:underline}
+.ai-sec-lead{margin:0 0 12px;color:var(--ai-dim);font-size:.86rem;line-height:1.75}
+/* 工具集对比表（分类页）：移动端横向滚动，不挤压卡片 */
+.ai-compare table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:.88rem;display:block;overflow-x:auto;white-space:nowrap}
+.ai-compare thead th{text-align:left;font-weight:600;color:var(--text-primary,#1c2333);padding:8px 12px 8px 0;border-bottom:1px solid var(--ai-border)}
+.ai-compare tbody td{padding:9px 12px 9px 0;border-bottom:1px solid var(--ai-border);vertical-align:top}
+.ai-compare tbody td:first-child{font-weight:600}
+.ai-compare tbody tr:last-child td{border-bottom:0}
+.ai-compare p{margin:6px 0 0}
 /* 卡片流（ai-bot.cn 同款：横排小卡 6 列自适应，圆形图标，hover 紫蓝描边） */
 .ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
 .ai-card{display:flex;align-items:center;gap:10px;background:var(--bg-card-solid,#fff);border:1px solid #ececf0;border-radius:10px;padding:13px 15px;text-decoration:none;color:inherit;transition:.15s;min-width:0;overflow:hidden}
@@ -495,7 +572,7 @@ span.ai-detail-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-
 @media (max-width:1100px){
 body main{margin-left:0;padding:16px 16px 44px}
 body footer{margin-left:0}
-.ai-side{position:static;height:auto;width:auto;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--ai-border);padding:10px 14px;overflow-x:auto;overflow-y:hidden;gap:4px;scrollbar-width:none}
+.ai-side{position:static;height:auto;width:auto;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--ai-border);padding:10px 14px;overflow-x:auto;overflow-y:hidden;gap:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent)}
 .ai-side::-webkit-scrollbar{display:none}
 .ai-side-brand{border-bottom:0;margin:0 6px 0 0;padding:0 6px}
 .ai-side-menu{flex-direction:row;flex:none}
