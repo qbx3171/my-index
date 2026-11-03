@@ -4,6 +4,7 @@
 # 百度主动推送 token（本机私有）
 seo/baidu-token.txt
 seo/baidu-pushed.json
+seo/.indexnow-state.json
 
 # Cloudflare API token（本机私有）
 seo/cf-token.txt
