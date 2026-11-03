@@ -354,7 +354,7 @@ export function renderAiCollection(col, tools, collections = []) {
   const toolsBlock = tools.length
     ? `<div class="ai-cards" id="aiColCards">\n${tools.map(toolCard).join("\n")}\n</div>`
     : `<div class="ai-empty" id="aiColCards">📦 本工具集正在整理中，工具马上就来 —— 你也可以先逛逛<a href="${SITE}/ai/index.html" style="color:#0077ff">其他工具集</a>。
-<p>这里将收录与「${esc(col.name)}」相关的 AI 工具：逐个标注收费模式、核心定位与适用人群，附官网入口与快速对比表。正在找这类工具的话，可以先收藏本页，上架后会第一时间出现在这里。</p></div>`;
+<p>这里将收录与「${esc(col.name)}」相关的 AI 工具：逐个标注收费模式、核心定位与适用人群，附官网入口与快速对比表。正在找这类工具的话，可以先收藏本页，上架后会第一时间出现在这里。上架节奏以实用为先：先把每个方向最常用的两三款补齐并逐一试用核对，再逐步扩充长尾工具，避免一次塞满却没有筛选。</p></div>`;
 
   const html =
     head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
