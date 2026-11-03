@@ -55,6 +55,15 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 | `meta.h1NotOne` | H1≠1 | 模板 | 分类页 H1 用「X下载大全」，H2 用「X列表（N 款）」，避免「软件软件」重复 |
 | `technical.imgMissingAltPages` | 图片缺 alt | 模板 | 内容图写描述性 alt，装饰图保留 `alt=""` |
 
+## AI 工具集「保存即上屏」机制（2026-11-03 上线，commit f67cfbe2）
+
+后台保存 AI 工具/工具集后，前端不用再等静态生成：
+
+- **前端实时层**：`seo/ai-live.js`（构建时复制为 `ai/live.js`）在 /ai/ 页面加载后拉一次库，与页面快照 `window.__AI_LIVE__`（含结构指纹 sig、已生成详情页清单 pages/tools）比对；一致就跳过（sessionStorage 记录后同会话零请求），不一致才重绘侧栏/分区/卡片/对比表。**新增工具立刻出现**；其详情页未生成前，卡片点击走页内浮层（aiLiveModal），避免 404。
+- **自动重建**：后台保存/删除后会自动 dispatch `ai-sync.yml`（需在「同步到前端」里配过一次 token；未配则跳过，仅实时层生效），详情静态页约 1 分钟到位；另有每 5 分钟的 auto-sync 守卫兜底。
+- **红线**：①指纹只认结构字段（id/slug/sort/is_published/pricing），`aiSig()`（Node）与 `sig()`（浏览器）必须同步改，否则永远判「变了」；②列表查询**不许加 intro/screenshots 长文本字段**——代理对长文本会间歇性截断出 U+FFFD，且坏响应会被缓存（加 `_cb=` 自定义参数会被 400，不能穿透）；脏数据一律不上屏（详情页按需单行取 intro，脏则跳过）；③AI 页 meta 描述一律走 `fitDesc()`（垫句循环补齐到 ≥100 字）。
+- 空工具集占位页有固定导语模板（防薄内容 <300 字），改文案时别删。
+
 ## 第三步：固定红线（任何改动都不能破）
 
 - `seo/qa.mjs`：重复标题 0、重复描述 0、短描述 0、FFFD 0、死链 0
