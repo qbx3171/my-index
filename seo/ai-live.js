@@ -31,16 +31,25 @@
     for (var i = 0; i < s.length; i++) if (s.charCodeAt(i) === 0xfffd) n++;
     return n;
   }
+  // 实测（2026-11-03）：intro 等长文本偶尔会拿到带 U+FFFD 的响应，且同一 URL 反复请求结果一致
+  // ——是「带乱码的响应被代理缓存了」，不是库里数据坏。带上一次性 cache-buster 重取即干净，
+  // 所以第一发走正常 URL（吃缓存），发现乱码才穿透缓存重取。
   function pull(sql, tries) {
-    var best = null, bestBad = Infinity, n = tries || 3;
+    var best = null, bestBad = Infinity, n = tries || 5;
     function attempt(i) {
+      (window.__AI_PULL__ = window.__AI_PULL__ || []).push('enter#' + i + ' n=' + n);
       if (i >= n) return Promise.resolve(best);
-      return raw(API + sql).then(function (t) {
+      var url = API + sql + (i === 0 ? '' : '&_cb=' + Date.now().toString(36) + i);
+      (window.__AI_PULL__).push('url#' + i + ':' + url.slice(-50));
+      try { return raw(url).then(function (t) {
         var b = badCount(t);
+        (window.__AI_PULL__ = window.__AI_PULL__ || []).push(sql.slice(0,12) + '#' + i + ':' + b + '/' + t.length);
         if (b < bestBad) { best = t; bestBad = b; }
         if (bestBad === 0) return best;
         return attempt(i + 1);
-      }).catch(function () { return attempt(i + 1); });
+      }); } catch (e) { (window.__AI_PULL__).push('sync-err#' + i + ':' + e.message); return attempt(i + 1); }
+      // eslint-disable-next-line
+      return null && attempt(i + 1);
     }
     return attempt(0).then(function (t) {
       if (!t) return null;
@@ -135,7 +144,7 @@
     var workLine = freeish
       ? '实际使用时的差别通常在导出环节：免费额度多有次数或水印限制，正式产出前先确认导出文件的格式、尺寸与商用授权说明。'
       : '均为订阅制，上手前先确认是否提供试用；团队使用还要看席位计费与素材版权归属。';
-    return '<section class="ai-note ai-compare"><h2>' + esc(col.name) + '快速对比</h2>' +
+    return '<section class="ai-note ai-compare" id="aiCompare"><h2>' + esc(col.name) + '快速对比</h2>' +
       '<table><thead><tr><th>工具</th><th>定位</th><th>收费模式</th></tr></thead><tbody>' + rows + '</tbody></table>' +
       '<p>' + esc(priceLine) + esc(pickLine) + '</p><p>' + esc(workLine) + '</p></section>';
   }
@@ -189,22 +198,37 @@
   var state = { cols: [], tools: [], byCol: {} };
 
   // —— 详情页：内容改了（简介/一句话说明/收费模式）就地打补丁，不必等重新生成 ——
-  function patchDetail(slug) {
+  // onlyIfChanged=true 时先比对文本，一致就不动 DOM（避免无谓重排）
+  function patchDetail(slug, onlyIfChanged) {
     var id = CFG.tools && CFG.tools[slug];
     if (!id) return false;
     var t = null;
     for (var i = 0; i < state.tools.length; i++) if (state.tools[i].id === id) { t = state.tools[i]; break; }
     if (!t) return false;
     var sm = document.querySelector('.ai-detail-info .ai-card-summary');
-    if (sm && t.summary !== undefined) sm.textContent = t.summary || '';
+    if (sm && t.summary) {
+      var cur = sm.textContent.replace(/\s+/g, ' ').trim();
+      var nxt = String(t.summary).replace(/\s+/g, ' ').trim();
+      if (!onlyIfChanged || cur !== nxt) sm.textContent = t.summary;
+    }
     var badge = document.querySelector('.ai-detail-title .ai-badge');
-    if (badge) { badge.textContent = pricingOf(t); badge.className = 'ai-badge ' + badgeClass(t.pricing); }
+    if (badge) {
+      var bTxt = pricingOf(t);
+      if (!onlyIfChanged || badge.textContent.trim() !== bTxt) {
+        badge.textContent = bTxt;
+        badge.className = 'ai-badge ' + badgeClass(t.pricing);
+      }
+    }
     var intro = String(t.intro || '').split(/\n\s*\n/).map(function (p) { return p.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
     var secs = document.querySelectorAll('.ai-detail-sec');
     for (var j = 0; j < secs.length; j++) {
       var h = secs[j].querySelector('h2');
       if (h && h.textContent.indexOf('是什么') > 0) {
-        secs[j].innerHTML = '<h2>' + esc(t.name) + ' 是什么</h2>' + intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+        var curIntro = (secs[j].textContent || '').replace(/\s+/g, '');
+        var nxtIntro = (t.name + ' 是什么' + intro.join('')).replace(/\s+/g, '');
+        if (!onlyIfChanged || curIntro !== nxtIntro) {
+          secs[j].innerHTML = '<h2>' + esc(t.name) + ' 是什么</h2>' + intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+        }
         return true;
       }
     }
@@ -218,11 +242,15 @@
     }
     return true;
   }
+  function patchDetailIfTextChanged() {
+    var m = location.pathname.match(/^\/ai\/tool\/([a-z0-9-]+)\.html$/);
+    if (m) patchDetail(m[1], true);
+  }
 
   function render() {
     var path = location.pathname;
     var m = path.match(/^\/ai\/tool\/([a-z0-9-]+)\.html$/);
-    if (m) { patchDetail(m[1]); return; }
+    if (m) { patchDetail(m[1], false); return; }
     var active = (path.match(/^\/ai\/([a-z0-9-]+)\.html$/) || [])[1] || '';
     var aside = document.querySelector('.ai-side');
     if (aside) aside.innerHTML = sideList(state.cols, active === 'index' ? '' : active);
@@ -294,8 +322,17 @@
     cols.forEach(function (c) { state.byCol[c.slug].sort(function (a, b) { return (a.sort || 0) - (b.sort || 0); }); });
 
     var now = sig(cols, tools);
-    window.__AI_LIVE_SIG__ = now; // 便于自检：与页面快照 CFG.sig 相等即说明静态页是最新的
-    if (CFG.sig && now === CFG.sig) { sessionStorage.setItem('ai-live-sig', now); return; }
+    window.__AI_LIVE_SIG__ = now; // 便于自检：与页面快照 CFG.sig 相等即说明静态页结构是最新的
+    var clean = !r[0].dirty && !r[1].dirty;
+    window.__AI_LIVE_CLEAN__ = clean; // 自检用：拉到的数据是否干净
+    window.__AI_LIVE_CLEAN__ = clean; // 自检用：拉到的数据是否干净
+    if (CFG.sig && now === CFG.sig) {
+      sessionStorage.setItem('ai-live-sig', now);
+      // 结构没变但文案可能改过：只在「拉到的是干净数据」时给详情页打补丁，
+      // 免得把传输截断的文本盖到干净的静态页上（列表文案则由下次生成统一刷新）
+      if (clean) patchDetailIfTextChanged();
+      return;
+    }
     render();
   });
 })();
