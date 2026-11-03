@@ -1,13 +1,20 @@
 /**
  * /ai/ 板块前端实时层（2026-11-03）
  *
- * 问题：AI 工具/工具集是纯静态页，后台保存后要等 generate.mjs 重跑 + Pages 构建才可见，
- *      而「上传软件」是前端直接读库，秒级生效——两者体验不一致。
- * 做法：静态页仍由 generate.mjs 生成（给搜索引擎和分享用），本脚本在页面加载后再拉一次
- *      Supabase，与页面里的快照（window.__AI_LIVE__）比对；数据一致就什么都不做（零开销），
- *      不一致才用本地数据重绘侧栏 / 卡片列表 / 对比表，让新上传的工具立刻出现。
- * 尚未生成静态详情页的工具：卡片点开走页内浮层展示完整介绍，避免 404。
- * 注意：卡片、分区、对比表的 class 名必须与 seo/ai-section.mjs 保持一致（同一套 CSS）。
+ * 为什么需要它：AI 工具/工具集是纯静态页，后台保存后要等 generate.mjs 重跑 + Pages 构建才可见；
+ * 而「上传软件」是前端直接读库、秒级生效。这里补上同样的实时性，同时不动静态页（SEO 靠它）。
+ *
+ * 机制：静态页里带一份「生成时的结构指纹 + 已生成详情页清单」（window.__AI_LIVE__）。
+ * 页面加载后再拉一次库，指纹一致就什么都不做（正常浏览零成本）；不一致才用实时数据重绘
+ * 侧栏 / 分区 / 卡片列表 / 对比表，新上传的工具立刻出现。
+ * 尚未生成静态详情页的工具：卡片点开走页内浮层看完整介绍，避免 404。
+ *
+ * 两个坑（2026-11-03 实测）：
+ * 1) CloudBase 代理对 intro 这类长文本会间歇性截断多字节汉字（返回 U+FFFD，每次坏的位置不同），
+ *    所以列表查询刻意不带 intro/screenshots，只在详情页按需单独取，且取到脏数据就不上屏。
+ * 2) 给 URL 加 _cb= 之类的自定义参数会被代理直接 400，不能靠它穿透缓存。
+ *
+ * 维护约定：卡片 / 分区 / 对比表的 class 名必须与 seo/ai-section.mjs 一致（同一套 CSS）。
  */
 (function () {
   'use strict';
@@ -16,33 +23,31 @@
 
   var H = { apikey: CFG.key, Authorization: 'Bearer ' + CFG.key };
   var API = CFG.api.replace(/\/$/, '') + '/rest/v1/';
+  var state = { cols: [], tools: [], byCol: {} };
 
-  // 单次 REST 请求：同一份数据经代理传输时会随机把汉字截断成 U+FFFD（生成器侧已用「5 轮合并」治），
-  // 浏览器这边同样会遇到，所以拉 3 次取「乱码最少」的一份；仍有残留就把 U+FFFD 剔除后再渲染，
-  // 宁可少一个字也不要把「�」显示给用户（下次重新生成会整体修正）。
-  function raw(url) {
-    return fetch(url, { headers: H }).then(function (r) {
-      if (!r.ok) throw new Error(r.status);
-      return r.text();
-    });
+  /* ---------------- 工具函数 ---------------- */
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function plain(s) {
+    return String(s == null ? '' : s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
   }
   function badCount(s) {
     var n = 0;
     for (var i = 0; i < s.length; i++) if (s.charCodeAt(i) === 0xfffd) n++;
     return n;
   }
-  // 实测（2026-11-03）：intro 等长文本偶尔会拿到带 U+FFFD 的响应，且同一 URL 反复请求结果一致
-  // ——是「带乱码的响应被代理缓存了」，不是库里数据坏。带上一次性 cache-buster 重取即干净，
-  // 所以第一发走正常 URL（吃缓存），发现乱码才穿透缓存重取。
+  // 拉 JSON：长文本可能带 U+FFFD，重试几次取「最干净」的一份；仍脏就把坏字符剔掉（宁可少字不显示乱码）
   function pull(sql, tries) {
-    var best = null, bestBad = Infinity, n = tries || 5;
+    var best = null, bestBad = Infinity, n = tries || 3;
     function attempt(i) {
-      (window.__AI_PULL__ = window.__AI_PULL__ || []).push('enter#' + i + ' n=' + n);
       if (i >= n) return Promise.resolve(best);
-      var url = API + sql + (i === 0 ? '' : '&_cb=' + Date.now().toString(36) + i);
-      return raw(url).then(function (t) {
+      return fetch(API + sql, { headers: H }).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.text();
+      }).then(function (t) {
         var b = badCount(t);
-        (window.__AI_PULL__ = window.__AI_PULL__ || []).push(sql.slice(0,12) + '#' + i + ':' + b + '/' + t.length);
         if (b < bestBad) { best = t; bestBad = b; }
         if (bestBad === 0) return best;
         return attempt(i + 1);
@@ -55,21 +60,15 @@
       catch (e) { return null; }
     });
   }
-  function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-  function plain(s) {
-    return String(s == null ? '' : s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
-  }
   function slugOf(t) {
     var s = String(t.slug || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '');
     return s || 't-' + String(t.id || '').replace(/-/g, '').slice(0, 8);
   }
+  // CFG.tools 里登记过的 slug 才有静态详情页，其余走页内浮层
   function detailUrl(t) {
-    var live = CFG.tools && CFG.tools[slugOf(t)] === t.id;
-    return live ? '/ai/tool/' + slugOf(t) + '.html' : '';
+    return CFG.tools && CFG.tools[slugOf(t)] ? '/ai/tool/' + slugOf(t) + '.html' : '';
   }
+  function pricingOf(t) { return String(t.pricing || '免费').trim(); }
   function badgeClass(p) {
     var s = String(p || '');
     if (s.indexOf('免费') >= 0 && s.indexOf('额度') < 0) return 'free';
@@ -77,14 +76,22 @@
     if (s.indexOf('买断') >= 0) return 'once';
     return 'freemium';
   }
+  function mixOf(tools) {
+    var seen = {}, out = [];
+    tools.forEach(function (t) { var p = pricingOf(t); if (!seen[p]) { seen[p] = 1; out.push(p); } });
+    return out;
+  }
   function cover(item, cls) {
     var logo = String(item.logo || '').trim();
     if (/^https?:\/\//i.test(logo)) {
       return '<img class="' + cls + '" src="' + esc(logo) + '" alt="' + esc(item.name) + ' 封面" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=aiFallback(' +
         JSON.stringify(String(item.name || 'AI')).replace(/"/g, '&quot;') + ',\'' + cls + '\')">';
     }
-    return window.aiFallback ? window.aiFallback(item.name, cls) : '<span class="' + cls + ' ai-cover-fb">' + esc((item.name || 'A').slice(0, 1)) + '</span>';
+    return window.aiFallback ? window.aiFallback(item.name, cls)
+      : '<span class="' + cls + ' ai-cover-fb">' + esc(String(item.name || 'A').slice(0, 1)) + '</span>';
   }
+
+  /* ---------------- 渲染（与静态页同结构） ---------------- */
   function card(t) {
     var href = detailUrl(t);
     var attrs = href ? ' href="' + href + '"' : ' href="#" data-ai-live="' + esc(t.id) + '"';
@@ -92,12 +99,6 @@
       cover(t, 'ai-cover') +
       '<span class="ai-card-main"><span class="ai-card-name">' + esc(t.name) + '</span>' +
       '<span class="ai-card-summary">' + esc(t.summary || '') + '</span></span></a>';
-  }
-  function pricingOf(t) { return String(t.pricing || '免费').trim(); }
-  function mixOf(tools) {
-    var seen = {}, out = [];
-    tools.forEach(function (t) { var p = pricingOf(t); if (!seen[p]) { seen[p] = 1; out.push(p); } });
-    return out;
   }
   function secLead(c, tools) {
     var mix = mixOf(tools);
@@ -115,7 +116,8 @@
     return '<section class="ai-sec" id="' + esc(c.slug) + '">' +
       '<div class="ai-sec-head">' + logo + '<h2>' + esc(c.name) + '</h2>' +
       '<span class="ai-sec-count">' + tools.length + ' 款</span>' +
-      (hasPage ? '<a class="ai-sec-more" href="/ai/' + esc(c.slug) + '.html">查看更多 &gt;&gt;</a>' : '<span class="ai-sec-count" style="margin-left:auto">尚未生成独立页</span>') +
+      (hasPage ? '<a class="ai-sec-more" href="/ai/' + esc(c.slug) + '.html">查看更多 &gt;&gt;</a>'
+               : '<span class="ai-sec-count" style="margin-left:auto">独立页生成中</span>') +
       '</div><p class="ai-sec-lead">' + esc(secLead(c, tools)) + '</p>' +
       '<div class="ai-cards">' + shown.map(card).join('') + '</div></section>';
   }
@@ -123,8 +125,9 @@
     if (!tools.length) return '';
     var rows = tools.map(function (t) {
       var href = detailUrl(t);
-      return '<tr><td>' + (href ? '<a href="' + href + '">' + esc(t.name) + '</a>' : '<a href="#" data-ai-live="' + esc(t.id) + '">' + esc(t.name) + '</a>') +
-        '</td><td>' + esc(plain(t.summary) || '—') + '</td>' +
+      var name = href ? '<a href="' + href + '">' + esc(t.name) + '</a>'
+                      : '<a href="#" data-ai-live="' + esc(t.id) + '">' + esc(t.name) + '</a>';
+      return '<tr><td>' + name + '</td><td>' + esc(plain(t.summary) || '—') + '</td>' +
         '<td><span class="ai-badge ' + badgeClass(t.pricing) + '">' + esc(pricingOf(t)) + '</span></td></tr>';
     }).join('');
     var mix = mixOf(tools);
@@ -135,7 +138,7 @@
           return m + ' ' + tools.filter(function (t) { return pricingOf(t) === m; }).length + ' 款';
         }).join('、') + '。';
     var pickLine = tools.length > 1
-      ? '款数不多但定位差别明显，按“要产出什么”挑一款就够，不必同时订阅两个：' +
+      ? '款数不多但定位差别明显，按「要产出什么」挑一款就够，不必同时订阅两个：' +
         tools.map(function (t) { return plain(t.name) + '（' + (plain(t.summary) || '综合型') + '）'; }).join('；') + '。'
       : '目前只有一款可对照，建议先按免费通道把完整流程跑一遍（注册 → 输入需求 → 导出成品），确认导出格式、分辨率或字数限制够用再考虑付费。';
     var workLine = freeish
@@ -156,16 +159,15 @@
           '<span class="ai-side-txt">' + esc(c.name) + '</span><span class="ai-side-arr">›</span></a>';
       }).join('') + '</nav>';
   }
+  function findTool(id) {
+    for (var i = 0; i < state.tools.length; i++) if (state.tools[i].id === id) return state.tools[i];
+    return null;
+  }
 
-  // —— 尚未生成静态页的工具：页内浮层看详情（含简介、截图、官网入口）——
+  /* ---------------- 未生成静态详情页的工具：页内浮层 ---------------- */
   function openLive(id) {
-    var t = null;
-    for (var i = 0; i < state.tools.length; i++) if (state.tools[i].id === id) { t = state.tools[i]; break; }
+    var t = findTool(id);
     if (!t) return;
-    var shots = String(t.screenshots || '').split(/[\n,，]/).map(function (u) { return u.trim(); })
-      .filter(function (u) { return /^https?:\/\//i.test(u); }).slice(0, 6);
-    var intro = String(t.intro || '').split(/\n\s*\n/).map(function (p) { return p.replace(/\s+/g, ' ').trim(); })
-      .filter(Boolean).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
     var box = document.getElementById('aiLiveModal');
     if (!box) {
       box = document.createElement('div');
@@ -178,30 +180,34 @@
       });
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') box.classList.remove('on'); });
     }
-    box.querySelector('.ai-live-body').innerHTML =
-      '<div class="ai-detail-head">' + cover(t, 'ai-detail-cover') +
+    var body = box.querySelector('.ai-live-body');
+    body.innerHTML = '<div class="ai-detail-head">' + cover(t, 'ai-detail-cover') +
       '<div class="ai-detail-info"><div class="ai-detail-title"><h2>' + esc(t.name) + '</h2>' +
       '<span class="ai-badge ' + badgeClass(t.pricing) + '">' + esc(pricingOf(t)) + '</span></div>' +
       '<p class="ai-card-summary">' + esc(t.summary || '') + '</p>' +
       '<div class="ai-detail-actions"><a class="ai-site-btn" rel="nofollow noopener" target="_blank" href="' + esc(t.url) + '">访问官网 ↗</a></div></div></div>' +
-      (intro ? '<section class="ai-detail-sec"><h3>' + esc(t.name) + ' 是什么</h3>' + intro + '</section>' : '') +
-      (shots.length ? '<div class="ai-shots">' + shots.map(function (u, i) {
-        return '<a class="ai-shot" href="' + esc(u) + '" target="_blank" rel="noopener"><img src="' + esc(u) + '" alt="' + esc(t.name) + ' 截图' + (i + 1) + '" loading="lazy" referrerpolicy="no-referrer"></a>';
-      }).join('') + '</div>' : '') +
-      '<p class="ai-live-tip">详情页正在生成（约 1 分钟），本窗口为即时预览。</p>';
+      '<p class="ai-live-tip">详情页正在生成（约 1 分钟），这里先给出录入的内容。</p>';
     box.classList.add('on');
+    // 简介单独取：干净才插入，脏的就先不显示（宁缺不糊）
+    pull('ai_tools?select=intro&id=eq.' + encodeURIComponent(id)).then(function (r) {
+      if (!r || r.dirty || !r.rows[0]) return;
+      var intro = String(r.rows[0].intro || '').split(/\n\s*\n/)
+        .map(function (p) { return p.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
+      if (!intro.length) return;
+      var sec = document.createElement('section');
+      sec.className = 'ai-detail-sec';
+      sec.innerHTML = '<h3>' + esc(t.name) + ' 是什么</h3>' +
+        intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+      body.insertBefore(sec, body.querySelector('.ai-live-tip') || null);
+    });
   }
 
-  var state = { cols: [], tools: [], byCol: {} };
-
-  // —— 详情页：内容改了（简介/一句话说明/收费模式）就地打补丁，不必等重新生成 ——
-  // onlyIfChanged=true 时先比对文本，一致就不动 DOM（避免无谓重排）
+  /* ---------------- 详情页：文案改了就地打补丁 ---------------- */
   function patchDetail(slug, onlyIfChanged) {
     var id = CFG.tools && CFG.tools[slug];
-    if (!id) return false;
-    var t = null;
-    for (var i = 0; i < state.tools.length; i++) if (state.tools[i].id === id) { t = state.tools[i]; break; }
-    if (!t) return false;
+    if (!id) return;
+    var t = findTool(id);
+    if (!t) return;
     var sm = document.querySelector('.ai-detail-info .ai-card-summary');
     if (sm && t.summary) {
       var cur = sm.textContent.replace(/\s+/g, ' ').trim();
@@ -210,38 +216,57 @@
     }
     var badge = document.querySelector('.ai-detail-title .ai-badge');
     if (badge) {
-      var bTxt = pricingOf(t);
-      if (!onlyIfChanged || badge.textContent.trim() !== bTxt) {
-        badge.textContent = bTxt;
+      var bt = pricingOf(t);
+      if (!onlyIfChanged || badge.textContent.trim() !== bt) {
+        badge.textContent = bt;
         badge.className = 'ai-badge ' + badgeClass(t.pricing);
       }
     }
-    var intro = String(t.intro || '').split(/\n\s*\n/).map(function (p) { return p.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
-    var secs = document.querySelectorAll('.ai-detail-sec');
-    for (var j = 0; j < secs.length; j++) {
-      var h = secs[j].querySelector('h2');
-      if (h && h.textContent.indexOf('是什么') > 0) {
-        var curIntro = (secs[j].textContent || '').replace(/\s+/g, '');
-        var nxtIntro = (t.name + ' 是什么' + intro.join('')).replace(/\s+/g, '');
-        if (!onlyIfChanged || curIntro !== nxtIntro) {
-          secs[j].innerHTML = '<h2>' + esc(t.name) + ' 是什么</h2>' + intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+    pull('ai_tools?select=intro&id=eq.' + encodeURIComponent(id)).then(function (r) {
+      if (!r || r.dirty || !r.rows[0]) return;
+      var intro = String(r.rows[0].intro || '').split(/\n\s*\n/)
+        .map(function (p) { return p.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
+      var secs = document.querySelectorAll('.ai-detail-sec');
+      for (var j = 0; j < secs.length; j++) {
+        var h = secs[j].querySelector('h2');
+        if (h && h.textContent.indexOf('是什么') > 0) {
+          var curIntro = secs[j].textContent.replace(/\s+/g, '');
+          var nxtIntro = (t.name + ' 是什么' + intro.join('')).replace(/\s+/g, '');
+          if (curIntro !== nxtIntro) {
+            secs[j].innerHTML = '<h2>' + esc(t.name) + ' 是什么</h2>' +
+              intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+          }
+          return;
         }
-        return true;
       }
-    }
-    if (intro.length) {
+      if (!intro.length) return;
       var main = document.querySelector('main');
+      if (!main) return;
       var sec = document.createElement('section');
       sec.className = 'ai-detail-sec';
-      sec.innerHTML = '<h2>' + esc(t.name) + ' 是什么</h2>' + intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
-      var back = main && main.querySelector('.ai-back');
-      if (main) main.insertBefore(sec, back || null);
-    }
-    return true;
+      sec.innerHTML = '<h2>' + esc(t.name) + ' 是什么</h2>' +
+        intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+      main.insertBefore(sec, main.querySelector('.ai-back') || null);
+    });
   }
-  function patchDetailIfTextChanged() {
-    var m = location.pathname.match(/^\/ai\/tool\/([a-z0-9-]+)\.html$/);
-    if (m) patchDetail(m[1], true);
+
+  /* ---------------- 主流程 ---------------- */
+  // 指纹只认结构字段（新增/删除/排序/上下架/收费模式），与 seo/ai-section.mjs 的 aiSig() 一致。
+  // 刻意不含文本：传输抖动会让文本每次不一样，一旦参与指纹就永远判「变了」。
+  function sig(cols, tools) {
+    function cmp(x, y) {
+      var a = x.sort || 0, b = y.sort || 0;
+      if (a !== b) return a - b;
+      return String(x.id) < String(y.id) ? -1 : String(x.id) > String(y.id) ? 1 : 0;
+    }
+    var s = cols.slice().sort(cmp).map(function (c) {
+      return [c.id, c.slug, c.sort, c.is_published].join('|');
+    }).join('~') + '#' + tools.slice().sort(cmp).map(function (t) {
+      return [t.id, t.collection_id, t.sort, t.is_published, t.pricing, t.slug].join('|');
+    }).join('~');
+    var h = 5381;
+    for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+    return h.toString(36) + '-' + s.length;
   }
 
   function render() {
@@ -249,24 +274,25 @@
     var m = path.match(/^\/ai\/tool\/([a-z0-9-]+)\.html$/);
     if (m) { patchDetail(m[1], false); return; }
     var active = (path.match(/^\/ai\/([a-z0-9-]+)\.html$/) || [])[1] || '';
+
     var aside = document.querySelector('.ai-side');
     if (aside) aside.innerHTML = sideList(state.cols, active === 'index' ? '' : active);
 
     var hub = document.getElementById('aiHubBody');
-    if (hub) {
-      hub.innerHTML = state.cols.map(function (c) { return section(c, state.byCol[c.slug] || []); }).join('');
-    }
+    if (hub) hub.innerHTML = state.cols.map(function (c) { return section(c, state.byCol[c.slug] || []); }).join('');
+
     var cards = document.getElementById('aiColCards');
     if (cards) {
       var col = null;
       for (var i = 0; i < state.cols.length; i++) if (state.cols[i].slug === active) col = state.cols[i];
       if (col) {
         var list = state.byCol[col.slug] || [];
-        cards.innerHTML = list.length ? list.map(card).join('') : cards.innerHTML;
+        if (list.length) {
+          cards.className = 'ai-cards';
+          cards.innerHTML = list.map(card).join('');
+        }
         var cmp = document.getElementById('aiCompare');
-        if (cmp) cmp.outerHTML = compare(col, list) || '<div id="aiCompare"></div>';
-        var cnt = document.querySelector('.ai-col-hero .ai-lead');
-        if (cnt && !list.length) cnt.textContent = col.description || cnt.textContent;
+        if (cmp && list.length) cmp.outerHTML = compare(col, list);
       }
     }
     document.addEventListener('click', function (e) {
@@ -275,59 +301,37 @@
     });
   }
 
-  // 指纹算法必须与 seo/ai-section.mjs 的 aiSig() 保持一致（含排序键与 djb2 算法）。
-  // 万一哪天两边漂移，最坏结果只是「每次访问都重绘」，DOM 相同、用户看不出差别。
-  // 指纹只认结构字段（新增/删除/排序/上下架/收费模式），与 seo/ai-section.mjs 的 aiSig() 一致。
-  // 刻意不含文本字段：传输抖动会把汉字随机截成 U+FFFD，文本一旦参与指纹，两端就永远不相等。
-  function sig(cols, tools) {
-    function cmp(x, y, k) {
-      var a = x.sort || 0, b = y.sort || 0;
-      if (a !== b) return a - b;
-      var xs = String(x[k]), ys = String(y[k]);
-      return xs < ys ? -1 : xs > ys ? 1 : 0;
-    }
-    var cs = cols.slice().sort(function (a, b) { return cmp(a, b, 'id'); });
-    var ts = tools.slice().sort(function (a, b) { return cmp(a, b, 'id'); });
-    var s = cs.map(function (c) {
-      return [c.id, c.slug, c.sort, c.is_published].join('|');
-    }).join('~') + '#' + ts.map(function (t) {
-      return [t.id, t.collection_id, t.sort, t.is_published, t.pricing, t.slug].join('|');
-    }).join('~');
-    var h = 5381;
-    for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
-    return h.toString(36) + '-' + s.length;
-  }
-
-  // 静态快照已经是当前数据：直接跳过，不发多余请求（正常浏览零成本）
   if (CFG.sig && sessionStorage.getItem('ai-live-sig') === CFG.sig) return;
 
+  // 列表只取卡片要用的短字段；intro/screenshots 这类长文本按需单独取（见文件头注释）
   Promise.all([
-    pull('ai_collections?select=*&order=sort.asc,created_at.asc'),
-    pull('ai_tools?select=*&order=sort.asc,created_at.asc')
+    pull('ai_collections?select=id,slug,name,description,logo,icon,sort,is_published&order=sort.asc,created_at.asc'),
+    pull('ai_tools?select=id,collection_id,name,url,summary,tags,pricing,sort,slug,is_published,logo,icon&order=sort.asc,created_at.asc')
   ]).then(function (r) {
-    if (!r[0] || !r[1]) return; // 三次都拉不回干净数据就保留静态页，不影响阅读
+    if (!r[0] || !r[1]) return; // 拉不动就保留静态页，不影响阅读
     var cols = r[0].rows.filter(function (c) { return c.is_published !== false && c.slug && c.name; })
       .sort(function (a, b) { return (a.sort || 0) - (b.sort || 0); });
     var tools = r[1].rows.filter(function (t) { return t.is_published !== false && t.name && t.url; });
-    state.cols = cols; state.tools = tools;
+    state.cols = cols;
+    state.tools = tools;
     state.byCol = {};
     cols.forEach(function (c) { state.byCol[c.slug] = []; });
     tools.forEach(function (t) {
-      var c = cols.filter(function (x) { return x.id === t.collection_id; })[0];
-      if (c) state.byCol[c.slug].push(t);
+      for (var i = 0; i < cols.length; i++) {
+        if (cols[i].id === t.collection_id) { state.byCol[cols[i].slug].push(t); break; }
+      }
     });
-    cols.forEach(function (c) { state.byCol[c.slug].sort(function (a, b) { return (a.sort || 0) - (b.sort || 0); }); });
+    cols.forEach(function (c) {
+      state.byCol[c.slug].sort(function (a, b) { return (a.sort || 0) - (b.sort || 0); });
+    });
 
     var now = sig(cols, tools);
-    window.__AI_LIVE_SIG__ = now; // 便于自检：与页面快照 CFG.sig 相等即说明静态页结构是最新的
-    var clean = !r[0].dirty && !r[1].dirty;
-    window.__AI_LIVE_CLEAN__ = clean; // 自检用：拉到的数据是否干净
-    window.__AI_LIVE_CLEAN__ = clean; // 自检用：拉到的数据是否干净
+    window.__AI_LIVE_SIG__ = now; // 自检：与页面 CFG.sig 相等说明静态页已是最新
+    window.__AI_LIVE_CLEAN__ = !r[0].dirty && !r[1].dirty;
     if (CFG.sig && now === CFG.sig) {
       sessionStorage.setItem('ai-live-sig', now);
-      // 结构没变但文案可能改过：只在「拉到的是干净数据」时给详情页打补丁，
-      // 免得把传输截断的文本盖到干净的静态页上（列表文案则由下次生成统一刷新）
-      if (clean) patchDetailIfTextChanged();
+      var m = location.pathname.match(/^\/ai\/tool\/([a-z0-9-]+)\.html$/);
+      if (m) patchDetail(m[1], true);
       return;
     }
     render();

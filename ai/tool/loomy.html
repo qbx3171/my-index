@@ -28,9 +28,9 @@ header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdro
 .nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
 .nav-links a:hover{color:#1c2333;background:#fff}
 .nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
-.nav-links a.nav-ai{background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:700}
-.nav-links a.nav-ai:hover{opacity:.85}
-.nav-links a.nav-ai.active{background:#fff;color:#0088ff}
+.nav-links a.nav-ai{color:#41506b;font-weight:700;background-image:linear-gradient(135deg,#0077ff,#6c5ce7);background-repeat:no-repeat;background-size:0% 100%;background-position:left center;transition:background-size .3s,color .3s}
+.nav-links a.nav-ai:hover{background-size:100% 100%;color:#fff}
+.nav-links a.nav-ai.active{background-size:100% 100%;color:#fff}
 .hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
 .hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
 .hd-search input:focus{border-color:#0077ff;background:#fff}
@@ -72,7 +72,7 @@ h1{font-size:24px;margin:8px 0}
 </ul>
 <form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
 </div>
-<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if(h==="/"&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.pathname||a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if((h==="/"||h==="/index.html")&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
 </header>
 <main>
 <nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具集</a> / <a href="https://www.lezhesoft.cn/ai/ai-xiezuo.html">Ai写作工具</a> / Loomy</nav>
@@ -113,6 +113,6 @@ h1{font-size:24px;margin:8px 0}
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Loomy","url":"https://loomy.xunfei.cn","description":"Loomy怎么样？Loomy 是科大讯飞推出的桌面级 AI 工作搭子，面向真实办公场景，强调低门槛、高安全、适配与主动协作。Loomy 深度适配飞书、钉钉、微信等国内办公环境，能像同事一样围绕目标主动拆解任务、串联多种工具、执行多步骤流程，在使用中逐步理解用户习惯。安全方面采用目录级授权机制，文件留在本地，AI…","applicationCategory":"AI Tool","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"}}</script>
 <script>function aiFallback(n,c){var s=String(n||'AI'),ch=[...s][0]||'A',h=0;for(var i=0;i<s.length;i++)h=(h*31+s.codePointAt(i))>>>0;var hue=h%360;return '<span class="'+c+' ai-cover-fb" style="background:linear-gradient(135deg,hsl('+hue+',72%,52%),hsl('+((hue+46)%360)+',72%,42%))">'+ch+'</span>';}</script>
 <script>window.__AI_LIVE__={"api":"https://lezhesoft-d0g80z4vb0ac03c39-1300972301.ap-shanghai.app.tcloudbase.com/supabase-proxy","key":"sb_publishable__KOJGRcvoRGC3QiHNg7_qA_-9yGsnCW","sig":"u6ltsh-655","pages":{"ai-xiezuo":1,"photo":1,"ai-shiping":1,"ai-bangong":1},"tools":{"wawa":"109ac896-c7c5-4724-b3f2-be8861ce1c3b","t-eac1cb5a":"eac1cb5a-9c5d-4948-ba3c-8e520e97f614","t-906af699":"906af699-e996-4c0b-b8ac-3a9f93d8f8d9","loomy":"165afe7d-b6e6-4d41-8874-bf42cbcf69fd","t-daeb6249":"daeb6249-6439-4457-bf85-db9ed69db7de"}}</script>
-<script src="/ai/live.js?v=e3f32f63" defer></script>
+<script src="/ai/live.js?v=2ec8abab" defer></script>
 <footer><a href="https://www.lezhesoft.cn/">lezhesoft.cn</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具</a> · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
 </body></html>

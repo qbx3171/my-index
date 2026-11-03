@@ -1983,7 +1983,7 @@ if(t==='qa'){this.renderQA(m);return;}
 if(t==='sub-accounts'){this.renderSubAccounts(m);return;}
 },
 renderAI:function(c){var self=this;
- c.innerHTML='<h2 class="page-title">🤖 AI 工具集管理</h2><p class="page-sub">管理 /ai/ 工具集板块：先建工具集（每个工具集上线后是一个独立页面），再往里添加 AI 工具。保存后等每日静态生成（或手动运行 generate.mjs）更新线上页面。</p>'
+ c.innerHTML='<h2 class="page-title">🤖 AI 工具集管理</h2><p class="page-sub">管理 /ai/ 工具集板块：先建工具集（每个工具集上线后是一个独立页面），再往里添加 AI 工具。保存后前端列表<b>即时更新</b>；详情静态页随后自动重建（约 1 分钟）。</p>'
  +'<div style="display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap;">'
  +'<button id="aiTabCol" class="btn btn-sm btn-primary" type="button">工具集管理</button>'
  +'<button id="aiTabTool" class="btn btn-sm btn-outline" type="button">工具管理</button>'
@@ -2074,7 +2074,15 @@ aiColSave:function(){var self=this;
  if(!payload.name||!payload.slug){toast('名称和 slug 必填','warning');return;}
  if(!/^[a-z0-9][a-z0-9-]*$/.test(payload.slug)){toast('slug 只能用小写英文、数字和横线','warning');return;}
  var q=id?supabaseClient.from('ai_collections').update(payload).eq('id',id):supabaseClient.from('ai_collections').insert(payload);
- q.then(function(r){if(r.error){toast('保存失败：'+r.error.message,'error');return;}toast('已保存 ✓');self._aiEditCol=null;return self.aiLoadCols().then(function(){self.aiRenderCols();});});
+ q.then(function(r){if(r.error){toast('保存失败：'+r.error.message,'error');return;}toast('已保存 ✓ 前端列表即时可见');self._aiEditCol=null;self.aiAutoSync();return self.aiLoadCols().then(function(){self.aiRenderCols();});});
+},
+// 保存/删除后自动触发一次静态页重建（配过令牌才生效；前端列表本来就已实时更新）
+aiAutoSync:function(){
+ var token=localStorage.getItem('lezhe_gh_token');
+ if(!token)return;
+ fetch('https://api.github.com/repos/qbx3171/my-index/actions/workflows/ai-sync.yml/dispatches',{method:'POST',headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'},body:JSON.stringify({ref:'main'})}).then(function(r){
+  if(r.status===204)toast('静态详情页更新中，约 1 分钟后可直达','info');
+ }).catch(function(){});
 },
 aiColDel:function(id){var self=this;var c=this._aiCols.find(function(x){return x.id===id;});if(!c)return;
  uiConfirm('删除工具集「'+c.name+'」？其下所有工具会一并删除，对应页面下次生成时移除。',{title:'删除工具集',icon:'🗑',danger:true,okText:'删除'}).then(function(ok){
@@ -2082,6 +2090,7 @@ aiColDel:function(id){var self=this;var c=this._aiCols.find(function(x){return x
   supabaseClient.from('ai_collections').delete().eq('id',id).then(function(r){
    if(r.error){toast('删除失败：'+r.error.message,'error');return;}
    toast('已删除');if(self._aiEditCol&&self._aiEditCol.id===id)self._aiEditCol=null;
+   self.aiAutoSync();
    self.aiLoadCols().then(function(){self.aiRenderCols();});
   });
  });
@@ -2145,14 +2154,14 @@ aiToolSave:function(){var self=this;
  ['logo','slug','intro','screenshots'].forEach(function(k){if(!payload[k])delete payload[k];});if(!payload.name||!payload.url){toast('工具名和官网地址必填','warning');return;}
  if(!/^https?:\/\//i.test(payload.url)){toast('官网地址需以 http(s):// 开头','warning');return;}
  var q=id?supabaseClient.from('ai_tools').update(payload).eq('id',id):supabaseClient.from('ai_tools').insert(payload);
- q.then(function(r){if(r.error){toast('保存失败：'+r.error.message,'error');return;}toast('已保存 ✓');self._aiEditTool=null;self.aiToolLoad(cid);});
+ q.then(function(r){if(r.error){toast('保存失败：'+r.error.message,'error');return;}toast('已保存 ✓ 前端列表即时可见');self._aiEditTool=null;self.aiAutoSync();self.aiToolLoad(cid);});
 },
 aiToolDel:function(id,cid){var self=this;
  uiConfirm('确定删除这个工具吗？删除后不可恢复。',{title:'删除工具',icon:'🗑',danger:true,okText:'删除'}).then(function(ok){
   if(!ok)return;
   supabaseClient.from('ai_tools').delete().eq('id',id).then(function(r){
    if(r.error){toast('删除失败：'+r.error.message,'error');return;}
-   toast('已删除');self._aiEditTool=null;self.aiToolLoad(cid);
+   toast('已删除');self._aiEditTool=null;self.aiAutoSync();self.aiToolLoad(cid);
   });
  });
 },renderMessages:function(c){

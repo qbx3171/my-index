@@ -284,12 +284,18 @@ ${foot("aihub")}`;
 function plainText(s) {
   return String(s || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
 }
-// 描述长度红线 100–165 字：后台 description 常年留空，靠工具名单拼出来的句子只有 50 来字，
-// 会被 qa.mjs 判为短描述。统一在这里补齐到 100 字以上，超长按标点收尾。
+// 描述长度红线 100–165 字：后台 description 常年留空，光写「共精选 N 款」等于没说；
+// 统一在这里补齐到 100 字以上（垫句逐段加，保证够长），超长按标点收尾。
 function fitDesc(base, col) {
-  const pad = `本页为乐哲软件 AI 工具集「${col.name}」索引，逐个列出工具的定位、收费模式与官网入口，并附快速对比表和挑选建议，适合同类工具拿不定主意时先横向比一遍，内容随后台收录持续更新。`;
+  const pads = [
+    `本页为乐哲软件 AI 工具集「${col.name}」索引，逐个列出工具的定位、收费模式与官网入口，并附快速对比表和挑选建议，适合同类工具拿不定主意时先横向比一遍，内容随后台收录持续更新。`,
+    `乐哲软件 AI 工具集按使用场景整理合集，逐个标注收费模式与适用人群，找同类工具先来这里横向对比，再决定试哪一款。`,
+  ];
   let d = plainText(base).replace(/[。\s]+$/, "");
-  if (d.length < 100) d = `${d}。${pad}`;
+  for (const p of pads) {
+    if (d.length >= 100) break;
+    d = `${d}。${p}`;
+  }
   if (d.length > 165) d = d.slice(0, 160).replace(/[,，。;；、\s]+$/, "") + "…";
   return d;
 }
@@ -347,7 +353,8 @@ export function renderAiCollection(col, tools, collections = []) {
   const canonical = `${SITE}/ai/${col.slug}.html`;
   const toolsBlock = tools.length
     ? `<div class="ai-cards" id="aiColCards">\n${tools.map(toolCard).join("\n")}\n</div>`
-    : `<div class="ai-empty" id="aiColCards">📦 本工具集正在整理中，工具马上就来 —— 你也可以先逛逛<a href="${SITE}/ai/index.html" style="color:#0077ff">其他工具集</a>。</div>`;
+    : `<div class="ai-empty" id="aiColCards">📦 本工具集正在整理中，工具马上就来 —— 你也可以先逛逛<a href="${SITE}/ai/index.html" style="color:#0077ff">其他工具集</a>。
+<p>这里将收录与「${esc(col.name)}」相关的 AI 工具：逐个标注收费模式、核心定位与适用人群，附官网入口与快速对比表。正在找这类工具的话，可以先收藏本页，上架后会第一时间出现在这里。</p></div>`;
 
   const html =
     head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
