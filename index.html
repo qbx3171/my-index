@@ -672,30 +672,64 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .donate-qr-inner img{width:100%;height:100%;object-fit:contain;border-radius:8px}
 .donate-qr-tag{margin-top:12px;font-size:.8rem;font-weight:600;color:#07c160;display:flex;align-items:center;justify-content:center;gap:6px}
 .donate-footer-note{font-size:.72rem;color:var(--text-dim);margin:0;padding-top:16px;border-top:1px solid var(--border-glow)}
-.profile-wrap{display:flex;flex-direction:column;gap:16px}
+.profile-wrap{display:grid;grid-template-columns:292px 1fr;gap:20px;align-items:start}
+.pf-main{display:flex;flex-direction:column;gap:18px;min-width:0}
 .profile-card{background:var(--bg-card);border-radius:var(--radius-lg);border:1px solid var(--border-glow);padding:22px}
-.profile-header-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-.profile-avatar{width:68px;height:68px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:700;flex-shrink:0;overflow:hidden}
-.profile-info{flex:1;min-width:160px}
-.profile-info h3{font-size:1.1rem;word-break:break-all;margin:0 0 2px}
-.profile-info .email{color:var(--text-secondary);font-size:.8rem;margin:0}
-.profile-info .bio{color:var(--text-dim);font-size:.85rem;margin:4px 0 0}
-.profile-info .meta-time{color:var(--text-dim);font-size:.7rem;margin:4px 0 0}
-.profile-actions{display:flex;flex-direction:column;gap:6px}
-.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.profile-stats>div{background:var(--bg-card);border-radius:var(--radius-md);padding:14px;border:1px solid var(--border-glow);text-align:center}
-.profile-stats .num{font-size:1.8rem;font-weight:700;color:var(--accent-cyan)}
-.profile-stats .label{font-size:.72rem;color:var(--text-dim);margin-top:2px}
-.profile-two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.profile-list-box{background:var(--bg-card);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-glow)}
-.profile-list-box .box-header{display:flex;justify-content:space-between;align-items:center;margin:0 0 8px}
-.profile-list-box .box-header h4{font-size:.9rem;margin:0}
-.profile-list-box .list-content{max-height:220px;overflow-y:auto;font-size:.85rem}
-.profile-list-box .list-content .list-row{padding:5px 0;border-bottom:1px solid var(--border-glow)}
-.profile-list-box .list-content .list-row:last-child{border-bottom:none}
-.profile-list-box .list-content .profile-link{color:var(--accent-cyan);text-decoration:none}
-.profile-list-box .list-content .empty-tip{color:var(--text-dim);font-size:.8rem;margin:0}
-.profile-recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:10px}
+/* —— 左侧身份卡：Banner 封面 + 头像压边 + 统计磁贴 + 垂直菜单（参考 B 站/知乎个人中心） —— */
+.pf-side{padding:0;overflow:hidden;position:sticky;top:88px;box-shadow:0 8px 28px rgba(0,30,80,.07)}
+.pf-cover{position:relative;height:96px;overflow:hidden;background:linear-gradient(118deg,#0077ff 0%,#3f8dff 42%,#6c5ce7 100%)}
+.pf-cover::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.30) 1px,transparent 1.6px);background-size:14px 14px;opacity:.32}
+.pf-cover::after{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.15);top:-118px;right:-56px}
+.pf-orb{position:absolute;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);bottom:-70px;left:-34px}
+.pf-id{position:relative;padding:0 20px 20px;text-align:center}
+.pf-ava{width:86px;height:86px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.1rem;font-weight:700;overflow:hidden;margin:-44px auto 10px;position:relative;box-shadow:0 0 0 4px var(--bg-card-solid),0 12px 26px rgba(0,119,255,.30);border:2px solid rgba(255,255,255,.7)}
+.pf-id h3{font-size:1.18rem;font-weight:800;margin:0 0 5px;word-break:break-all;letter-spacing:.01em}
+.pf-id .email{color:var(--text-secondary);font-size:.76rem;margin:0;display:inline-flex;align-items:center;gap:5px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-id .bio{color:var(--text-secondary);font-size:.8rem;margin:9px 0 0;line-height:1.55}
+.ph-chips{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap;justify-content:center}
+.ph-chip{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:500;color:var(--text-secondary);background:var(--bg-secondary);border:1px solid var(--border-glow);padding:4px 11px;border-radius:50px}
+.pf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.pf-stat{background:var(--bg-secondary);border:1px solid var(--border-glow);border-radius:13px;padding:11px 4px 9px;text-align:center;transition:var(--transition)}
+.pf-stat:hover{border-color:rgba(0,119,255,.35);transform:translateY(-1px)}
+.pf-num{font-size:1.22rem;font-weight:800;color:var(--text-primary);line-height:1.1}
+.pf-lab{font-size:.64rem;color:var(--text-dim);margin-top:3px}
+.pf-menu{display:flex;flex-direction:column;gap:3px;margin-top:16px;border-top:1px solid var(--border-glow);padding-top:14px}
+.pf-mi{display:flex;align-items:center;gap:11px;width:100%;padding:8px 9px;border:none;background:none;border-radius:11px;color:var(--text-secondary);font-family:inherit;font-size:.84rem;font-weight:600;cursor:pointer;text-align:left;transition:background .18s,color .18s}
+.pf-mi:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.pf-mi .mi-ico{width:31px;height:31px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.pf-mi .mi-arrow{margin-left:auto;font-size:.62rem;color:var(--text-dim);transition:transform .18s,color .18s}
+.pf-mi:hover .mi-arrow{transform:translateX(2px);color:var(--accent-cyan)}
+.pf-mi.hot{color:var(--text-primary)}
+.ph-btn{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;font-weight:600;font-family:inherit;color:var(--text-secondary);background:var(--bg-card-solid);border:1px solid var(--border-glow);border-radius:50px;padding:7px 14px;cursor:pointer;transition:var(--transition);white-space:nowrap}
+.ph-btn:hover{color:var(--accent-cyan);border-color:rgba(0,119,255,.45);box-shadow:0 4px 12px rgba(0,119,255,.10)}
+.ico-danger{background:rgba(231,76,60,.10);color:#e74c3c}
+.ico-cyan{background:rgba(0,119,255,.10);color:#0077ff}
+.ico-purple{background:rgba(108,92,231,.12);color:#6c5ce7}
+.ico-gold{background:rgba(243,156,18,.13);color:#f39c12}
+/* —— 收藏 / 历史 —— */
+.profile-two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.profile-list-box{background:var(--bg-card);border-radius:var(--radius-lg);padding:18px;border:1px solid var(--border-glow);box-shadow:var(--shadow-sm)}
+.plb-head{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+.plb-head h4{font-size:.92rem;font-weight:700;margin:0;flex:1;min-width:0}
+.plb-ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.plb-count{font-size:.7rem;font-weight:600;color:var(--accent-cyan);background:rgba(0,119,255,.08);padding:3px 10px;border-radius:50px;flex-shrink:0}
+.profile-list-box .list-content{max-height:240px;overflow-y:auto;font-size:.85rem;padding:0 2px}
+.profile-list-box .list-content .list-row{padding:7px 10px;border-bottom:none;border-radius:9px;transition:background .18s}
+.profile-list-box .list-content .list-row:hover{background:var(--bg-secondary)}
+.profile-list-box .list-content .profile-link{color:var(--text-primary);text-decoration:none;display:flex;align-items:center;gap:9px;min-width:0}
+.profile-list-box .list-content .profile-link:hover .row-name{color:var(--accent-cyan)}
+.row-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .18s}
+.row-idx{width:20px;height:20px;border-radius:6px;background:var(--bg-secondary);color:var(--text-dim);font-size:.62rem;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.row-new{font-size:.6rem;font-weight:700;color:#e74c3c;background:rgba(231,76,60,.10);padding:2px 7px;border-radius:50px;flex-shrink:0}
+.plb-foot{margin-top:12px;padding-top:10px;border-top:1px solid var(--border-glow);display:flex;justify-content:flex-end}
+.plb-foot .ph-btn{font-size:.72rem;padding:5px 13px;color:var(--danger);border-color:rgba(231,76,60,.30)}
+.plb-foot .ph-btn:hover{color:var(--danger);border-color:var(--danger);background:rgba(231,76,60,.06);box-shadow:none}
+.empty-tip{display:flex;flex-direction:column;align-items:center;gap:7px;padding:28px 10px;color:var(--text-dim);text-align:center}
+.empty-tip i{font-size:1.7rem;opacity:.45}
+.empty-tip p{margin:0;font-size:.8rem}
+.empty-cta{font-size:.75rem;font-weight:600;color:var(--accent-cyan);text-decoration:none;border:1px solid rgba(0,119,255,.35);padding:5px 15px;border-radius:50px;margin-top:3px;transition:var(--transition)}
+.empty-cta:hover{background:rgba(0,119,255,.08);transform:translateY(-1px)}
+.profile-recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:2px}
 .profile-mini-card{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-primary);border:1px solid var(--border-glow);border-radius:var(--radius-sm);cursor:pointer;transition:all .25s cubic-bezier(.2,0,0,1);text-decoration:none;color:inherit;min-width:0}
 .profile-mini-card:hover{border-color:var(--accent-cyan);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,119,255,.08)}
 .profile-mini-card .mini-icon{width:36px;height:36px;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:rgba(0,119,255,.06);font-size:18px;flex-shrink:0;border:1px solid rgba(0,119,255,.08);aspect-ratio:1/1}
@@ -703,17 +737,29 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .profile-mini-card .mini-info{flex:1;min-width:0;overflow:hidden}
 .profile-mini-card .mini-name{font-size:.82rem;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2}
 .profile-mini-card .mini-meta{font-size:.65rem;color:var(--text-dim);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:900px){
+.profile-wrap{grid-template-columns:1fr}
+.pf-side{position:static}
+.pf-id{padding:0 16px 18px}
+.pf-ava{margin-top:-40px;width:78px;height:78px;font-size:1.9rem}
+.pf-menu{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pf-mi{padding:9px 10px}
+.pf-mi .mi-arrow{display:none}
+}
 @media (max-width:640px){
 .profile-card{padding:16px;border-radius:var(--radius-md)}
-.profile-avatar{width:54px;height:54px;font-size:1.5rem}
-.profile-info h3{font-size:.95rem}
-.profile-actions{flex-direction:row;flex-wrap:wrap;width:100%}
-.profile-actions .btn{flex:1;font-size:.72rem;padding:6px 10px}
-.profile-stats{gap:8px}
-.profile-stats>div{padding:10px 6px}
-.profile-stats .num{font-size:1.3rem}
-.profile-stats .label{font-size:.62rem}
-.profile-two-col{grid-template-columns:1fr}
+.pf-cover{height:76px}
+.pf-id{padding:0 12px 16px}
+.pf-id h3{font-size:1.02rem}
+.pf-ava{width:70px;height:70px;font-size:1.6rem;margin-top:-36px}
+.pf-stats{gap:6px;margin-top:14px}
+.pf-num{font-size:1.05rem}
+.pf-lab{font-size:.6rem}
+.pf-menu{gap:5px;padding-top:12px}
+.pf-mi{font-size:.76rem;gap:8px;padding:8px}
+.pf-mi .mi-ico{width:28px;height:28px;font-size:.72rem}
+.profile-two-col{grid-template-columns:1fr;gap:14px}
+.profile-list-box{padding:15px}
 .profile-recent-grid{grid-template-columns:1fr 1fr;gap:8px}
 .profile-mini-card{padding:8px 10px;gap:8px}
 .profile-mini-card .mini-icon{width:30px;height:30px;font-size:15px}
@@ -4672,44 +4718,52 @@ var emailInitial=escapeHTML(getEmailInitial(currentUser));
 var avatarHtml=avatarUrl?'<img src="'+escapeAttr(avatarUrl)+'" alt="avatar" width="68" height="68" style="width:100%;height:100%;object-fit:cover;" data-fallback="'+escapeAttr(getEmailInitial(currentUser))+'" onerror="this.parentElement.textContent=this.dataset.fallback;">':emailInitial;
 var createdAt=currentUser.created_at||new Date().toISOString();
 container.innerHTML='<div class="profile-wrap">'+
-'<div class="profile-card"><div class="profile-header-row">'+
-'<div class="profile-avatar">'+avatarHtml+'</div>'+
-'<div class="profile-info">'+
+'<div class="profile-card pf-side">'+
+'<div class="pf-cover"><span class="pf-orb"></span></div>'+
+'<div class="pf-id">'+
+'<div class="pf-ava">'+avatarHtml+'</div>'+
 '<h3>'+escapeHTML(displayName)+'</h3>'+
-'<p class="email">'+escapeHTML(emailStr||'未绑定邮箱')+'</p>'+
+'<p class="email"><i class="far fa-envelope"></i> '+escapeHTML(emailStr||'未绑定邮箱')+'</p>'+
 (bio?'<p class="bio">'+escapeHTML(bio)+'</p>':'')+
-'<p class="meta-time">注册于 '+new Date(createdAt).toLocaleDateString()+'</p>'+
+'<div class="ph-chips"><span class="ph-chip"><i class="far fa-calendar-alt"></i> 注册于 '+new Date(createdAt).toLocaleDateString()+'</span></div>'+
+'<div class="pf-stats">'+
+'<div class="pf-stat"><div class="pf-num">'+favSoft.length+'</div><div class="pf-lab">收藏</div></div>'+
+'<div class="pf-stat"><div class="pf-num">'+histSoft.length+'</div><div class="pf-lab">浏览记录</div></div>'+
+'<div class="pf-stat"><div class="pf-num">'+totalDownloads+'</div><div class="pf-lab">总下载</div></div>'+
 '</div>'+
-'<div class="profile-actions">'+
-'<button class="btn btn-outline" id="editProfileBtn" style="font-size:0.78rem;padding:6px 14px;"><i class="fas fa-edit"></i> 编辑资料</button>'+
-'<button class="btn btn-outline" id="changePasswordNavBtn" style="font-size:0.78rem;padding:6px 14px;"><i class="fas fa-key"></i> 修改密码</button>'+
-'<button class="btn btn-outline" id="myRedeemsBtn" style="font-size:0.78rem;padding:6px 14px;"><i class="fas fa-box-open"></i> 我的兑换</button>'+
-'<button class="btn btn-outline" id="exportDataBtn" style="font-size:0.78rem;padding:6px 14px;"><i class="fas fa-download"></i> 导出数据</button>'+
-'<button class="btn btn-outline" id="importDataBtn" style="font-size:0.78rem;padding:6px 14px;"><i class="fas fa-upload"></i> 导入数据</button>'+
+'<div class="pf-menu">'+
+'<button class="pf-mi hot" id="editProfileBtn"><span class="mi-ico ico-cyan"><i class="fas fa-user-edit"></i></span><span>编辑资料</span><i class="fas fa-chevron-right mi-arrow"></i></button>'+
+'<button class="pf-mi" id="changePasswordNavBtn"><span class="mi-ico ico-gold"><i class="fas fa-key"></i></span><span>修改密码</span><i class="fas fa-chevron-right mi-arrow"></i></button>'+
+'<button class="pf-mi" id="myRedeemsBtn"><span class="mi-ico ico-purple"><i class="fas fa-box-open"></i></span><span>我的兑换</span><i class="fas fa-chevron-right mi-arrow"></i></button>'+
+'<button class="pf-mi" id="exportDataBtn"><span class="mi-ico ico-danger"><i class="fas fa-download"></i></span><span>导出数据</span><i class="fas fa-chevron-right mi-arrow"></i></button>'+
+'<button class="pf-mi" id="importDataBtn"><span class="mi-ico ico-cyan"><i class="fas fa-upload"></i></span><span>导入数据</span><i class="fas fa-chevron-right mi-arrow"></i></button>'+
 '<input type="file" id="importDataInput" accept=".json,application/json" style="display:none;">'+
 '</div>'+
 '</div></div>'+
-'<div class="profile-stats">'+
-'<div><div class="num">'+favSoft.length+'</div><div class="label">收藏</div></div>'+
-'<div><div class="num">'+histSoft.length+'</div><div class="label">浏览记录</div></div>'+
-'<div><div class="num">'+totalDownloads+'</div><div class="label">总下载</div></div>'+
-'</div>'+
+'<div class="pf-main">'+
 '<div class="profile-two-col">'+
 '<div class="profile-list-box">'+
-'<div class="box-header"><h4><i class="fas fa-heart" style="color:var(--danger);"></i> 我的收藏</h4></div>'+
-'<div class="list-content">'+(favSoft.length?favSoft.map(function(s){return '<div class="list-row"><a href="#" data-id="'+escapeAttr(s.id)+'" class="profile-link">'+(isSoftUpdated(s)?'🆕 ':'')+escapeHTML(s.name)+'</a></div>';}).join(''):'<p class="empty-tip">还没有收藏的软件</p>')+'</div>'+
+'<div class="plb-head"><span class="plb-ico ico-danger"><i class="fas fa-heart"></i></span><h4>我的收藏</h4><span class="plb-count">'+favSoft.length+' 款</span></div>'+
+'<div class="list-content">'+(favSoft.length?favSoft.map(function(s,idx){return '<div class="list-row"><a href="#" data-id="'+escapeAttr(s.id)+'" class="profile-link"><span class="row-idx">'+(idx+1)+'</span>'+(isSoftUpdated(s)?'<span class="row-new">NEW</span>':'')+'<span class="row-name">'+escapeHTML(s.name)+'</span></a></div>';}).join(''):'<div class="empty-tip"><i class="far fa-heart"></i><p>还没有收藏的软件</p><a href="#" class="empty-cta" data-goto="list">去发现好软件</a></div>')+'</div>'+
 '</div>'+
 '<div class="profile-list-box">'+
-'<div class="box-header"><h4><i class="fas fa-history"></i> 浏览历史</h4><button class="btn btn-sm btn-outline" id="clearHistoryBtn" style="font-size:0.65rem;padding:2px 10px;color:var(--danger);border-color:var(--danger);">清空</button></div>'+
-'<div class="list-content">'+(histSoft.length?histSoft.map(function(s){return '<div class="list-row"><a href="#" data-id="'+escapeAttr(s.id)+'" class="profile-link">'+escapeHTML(s.name)+'</a></div>';}).join(''):'<p class="empty-tip">暂无浏览记录</p>')+'</div>'+
+'<div class="plb-head"><span class="plb-ico ico-cyan"><i class="fas fa-history"></i></span><h4>浏览历史</h4><span class="plb-count">'+histSoft.length+' 条</span></div>'+
+'<div class="list-content">'+(histSoft.length?histSoft.map(function(s,idx){return '<div class="list-row"><a href="#" data-id="'+escapeAttr(s.id)+'" class="profile-link"><span class="row-idx">'+(idx+1)+'</span><span class="row-name">'+escapeHTML(s.name)+'</span></a></div>';}).join(''):'<div class="empty-tip"><i class="fas fa-history"></i><p>暂无浏览记录</p><a href="#" class="empty-cta" data-goto="list">去逛逛软件库</a></div>')+'</div>'+
+(histSoft.length?'<div class="plb-foot"><button class="ph-btn" id="clearHistoryBtn"><i class="fas fa-trash-alt"></i> 清空历史</button></div>':'')+
 '</div>'+
 '</div>'+
-'<div class="profile-card"><div class="box-header" style="display:flex;justify-content:space-between;margin-bottom:10px;"><h4 style="font-size:.9rem;margin:0;"><i class="fas fa-medal" style="color:#f39c12;"></i> 我的成就</h4></div><div id="profileAchievements"></div></div>'+
+'<div class="profile-card"><div class="plb-head"><span class="plb-ico ico-gold"><i class="fas fa-medal"></i></span><h4>我的成就</h4><span class="plb-count" id="achCount"></span></div><div id="profileAchievements"></div></div>'+
 '<div class="profile-card hidden" id="profileRecentSection">'+
-'<div class="box-header" style="display:flex;justify-content:space-between;align-items:center;margin:0 0 8px;"><h4 style="font-size:.9rem;margin:0;"><i class="fas fa-clock" style="color:var(--accent-cyan);"></i> 最近浏览</h4></div>'+
+'<div class="plb-head"><span class="plb-ico ico-cyan"><i class="fas fa-clock"></i></span><h4>最近浏览</h4></div>'+
 '<div class="profile-recent-grid" id="profileRecentGrid"></div>'+
 '</div>'+
+'</div>'+
 '</div>';
+document.querySelectorAll('.empty-cta').forEach(function(a){
+a.addEventListener('click',function(e){e.preventDefault();App.goList();});
+});
+var _achCount=document.getElementById('achCount');
+if(_achCount)_achCount.textContent=Achievement.getUnlocked().length+' / '+ACHIEVEMENTS.length;
 document.querySelectorAll('.profile-link').forEach(function(a){
 a.addEventListener('click',function(e){
 e.preventDefault();
@@ -4733,7 +4787,8 @@ document.getElementById('newPassword').value='';
 document.getElementById('newPasswordConfirm').value='';
 });
 document.getElementById('myRedeemsBtn').addEventListener('click',function(){App.goMyRedeems();});
-document.getElementById('clearHistoryBtn').addEventListener('click',async function(){
+var _clearHisBtn=document.getElementById('clearHistoryBtn');
+_clearHisBtn&&_clearHisBtn.addEventListener('click',async function(){
 var ok=await window.liquidConfirm({type:'warning',title:'清空浏览历史？',desc:'所有浏览记录将被删除，此操作不可恢复。',confirmText:'清空',confirmIcon:'fa-trash-alt',cancelText:'取消'});
 if(!ok)return;
 try{localStorage.setItem('lezhe_view_history',JSON.stringify([]));}catch(e){}

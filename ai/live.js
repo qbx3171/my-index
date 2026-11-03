@@ -148,17 +148,6 @@
       '<table><thead><tr><th>工具</th><th>定位</th><th>收费模式</th></tr></thead><tbody>' + rows + '</tbody></table>' +
       '<p>' + esc(priceLine) + esc(pickLine) + '</p><p>' + esc(workLine) + '</p></section>';
   }
-  function sideList(cols, active) {
-    return '<a class="ai-side-brand" href="/ai/index.html"><span class="ai-side-brand-ico">🤖</span>乐哲Ai工具集</a><nav class="ai-side-menu">' +
-      cols.map(function (c) {
-        var ico = /^https?:\/\//i.test(String(c.logo || ''))
-          ? '<img class="ai-side-logo" src="' + esc(c.logo) + '" alt="" loading="lazy">'
-          : '<span class="ai-side-ico">' + esc(c.icon || '🧩') + '</span>';
-        var href = CFG.pages && CFG.pages[c.slug] ? '/ai/' + esc(c.slug) + '.html' : '/ai/index.html';
-        return '<a class="ai-side-item' + (c.slug === active ? ' on' : '') + '" href="' + href + '">' + ico +
-          '<span class="ai-side-txt">' + esc(c.name) + '</span><span class="ai-side-arr">›</span></a>';
-      }).join('') + '</nav>';
-  }
   function findTool(id) {
     for (var i = 0; i < state.tools.length; i++) if (state.tools[i].id === id) return state.tools[i];
     return null;
@@ -189,7 +178,7 @@
       '<p class="ai-live-tip">详情页正在生成（约 1 分钟），这里先给出录入的内容。</p>';
     box.classList.add('on');
     // 简介单独取：干净才插入，脏的就先不显示（宁缺不糊）
-    pull('ai_tools?select=intro&id=eq.' + encodeURIComponent(id)).then(function (r) {
+    pullIntro(id).then(function (r) {
       if (!r || r.dirty || !r.rows[0]) return;
       var intro = String(r.rows[0].intro || '').split(/\n\s*\n/)
         .map(function (p) { return p.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
@@ -200,6 +189,13 @@
         intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
       body.insertBefore(sec, body.querySelector('.ai-live-tip') || null);
     });
+  }
+
+  // intro 单字段按需取。坑（2026-11-03 实测，Node/浏览器一致复现）：
+  // 代理对 select=intro 这类小投影响应会「稳定」截断出 U+FFFD（重试、换参数顺序都救不回来），
+  // 而 select=* 的整行响应反而干净 —— 单行详情统一拉整行，只取需要的字段。
+  function pullIntro(id) {
+    return pull('ai_tools?select=*&id=eq.' + encodeURIComponent(id), 2);
   }
 
   /* ---------------- 详情页：文案改了就地打补丁 ---------------- */
@@ -222,31 +218,38 @@
         badge.className = 'ai-badge ' + badgeClass(t.pricing);
       }
     }
-    pull('ai_tools?select=intro&id=eq.' + encodeURIComponent(id)).then(function (r) {
+    // 详细介绍：intro 段落直接打在左侧介绍卡里（h1/meta 之后、截图之前）
+    pullIntro(id).then(function (r) {
       if (!r || r.dirty || !r.rows[0]) return;
       var intro = String(r.rows[0].intro || '').split(/\n\s*\n/)
         .map(function (p) { return p.replace(/\s+/g, ' ').trim(); }).filter(Boolean);
-      var secs = document.querySelectorAll('.ai-detail-sec');
-      for (var j = 0; j < secs.length; j++) {
-        var h = secs[j].querySelector('h2');
-        if (h && h.textContent.indexOf('是什么') > 0) {
-          var curIntro = secs[j].textContent.replace(/\s+/g, '');
-          var nxtIntro = (t.name + ' 是什么' + intro.join('')).replace(/\s+/g, '');
-          if (curIntro !== nxtIntro) {
-            secs[j].innerHTML = '<h2>' + esc(t.name) + ' 是什么</h2>' +
-              intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
-          }
-          return;
-        }
+      var card = document.querySelector('.ai-intro-card');
+      if (!card) return;
+      var oldPs = [];
+      for (var k = 0; k < card.children.length; k++) {
+        var ch = card.children[k];
+        if (ch.tagName === 'P' && !ch.className) oldPs.push(ch);
       }
+      var curIntro = '';
+      oldPs.forEach(function (p) { curIntro += p.textContent.replace(/\s+/g, ''); });
+      var nxtIntro = intro.join('').replace(/\s+/g, '');
+      if (onlyIfChanged && curIntro === nxtIntro) return;
+      if (!intro.length && !oldPs.length) return;
       if (!intro.length) return;
-      var main = document.querySelector('main');
-      if (!main) return;
-      var sec = document.createElement('section');
-      sec.className = 'ai-detail-sec';
-      sec.innerHTML = '<h2>' + esc(t.name) + ' 是什么</h2>' +
-        intro.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
-      main.insertBefore(sec, main.querySelector('.ai-back') || null);
+      oldPs.forEach(function (p) { p.parentNode.removeChild(p); });
+      var frag = document.createDocumentFragment();
+      intro.forEach(function (p) {
+        var el = document.createElement('p');
+        el.textContent = p;
+        frag.appendChild(el);
+      });
+      var anchor = card.querySelector('.ai-detail-meta, .ai-shots');
+      if (anchor) card.insertBefore(frag, anchor);
+      else {
+        var h1 = card.querySelector('h1');
+        if (h1 && h1.nextSibling) card.insertBefore(frag, h1.nextSibling);
+        else card.appendChild(frag);
+      }
     });
   }
 
@@ -274,9 +277,6 @@
     var m = path.match(/^\/ai\/tool\/([a-z0-9-]+)\.html$/);
     if (m) { patchDetail(m[1], false); return; }
     var active = (path.match(/^\/ai\/([a-z0-9-]+)\.html$/) || [])[1] || '';
-
-    var aside = document.querySelector('.ai-side');
-    if (aside) aside.innerHTML = sideList(state.cols, active === 'index' ? '' : active);
 
     var hub = document.getElementById('aiHubBody');
     if (hub) hub.innerHTML = state.cols.map(function (c) { return section(c, state.byCol[c.slug] || []); }).join('');

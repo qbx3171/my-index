@@ -135,7 +135,7 @@ function toolDetailUrl(t) {
   return `${SITE}/ai/tool/${slug}.html`;
 }
 
-// —— 详情页：封面/截图 + 详细介绍 + 访问官网 + 同类工具 ——
+// —— 详情页：左侧详细介绍大卡 + 右侧悬浮操作栏（仿 ai.bemcss.com 工具详情） ——
 export function renderAiToolDetail(t, col, collections, siblings) {
   const desc = detailDesc(t, col);
   const canonical = toolDetailUrl(t);
@@ -148,6 +148,7 @@ export function renderAiToolDetail(t, col, collections, siblings) {
     .map((p) => `<p>${esc(p)}</p>`)
     .join("\n");
   const logo = String(t.logo || "").trim();
+  const reportMail = `mailto:LeZheSoft@outlook.com?subject=${encodeURIComponent(`工具举报：${t.name}`)}&body=${encodeURIComponent(`页面：${canonical}\n问题：`)}`;
 
   const html =
     head(title4Tool(t, col), desc, canonical, `<meta property="og:image" content="${esc(logo || `${SITE}/og-cover.png`)}">` + aiCss()) +
@@ -159,21 +160,42 @@ ${crumb([
     { name: col.name, url: `${SITE}/ai/${esc(col.slug)}.html` },
     { name: t.name },
   ])}
-${sideNav(collections, col.slug)}
-<div class="ai-detail-head">
-  ${coverHtml(t, "ai-detail-cover")}
-  <div class="ai-detail-info">
-    <div class="ai-detail-title"><h1>${esc(t.name)}</h1><span class="ai-badge ${badgeClass(t.pricing)}">${esc(t.pricing || "免费")}</span></div>
-    ${tags.length ? `<div class="ai-detail-meta">${tags.map((g) => `<span class="chip">${esc(g)}</span>`).join("")}</div>` : ""}
+<div class="ai-detail-grid">
+<article class="ai-intro-card">
+  <span class="ai-intro-tag">📋 详细介绍</span>
+  <h1>${esc(t.name)}</h1>
+  ${tags.length ? `<div class="ai-detail-meta">${tags.map((g) => `<span class="chip">${esc(g)}</span>`).join("")}</div>` : ""}
+  ${introParas || `<p>${esc(t.summary || `${t.name} 的功能介绍整理中。`)}</p>`}
+  ${shots.length ? `<div class="ai-shots">${shots.map((u, i) => `<a class="ai-shot" href="${esc(u)}" target="_blank" rel="noopener" title="查看大图"><img src="${esc(u)}" alt="${esc(t.name)} 截图${i + 1}" loading="lazy" referrerpolicy="no-referrer"></a>`).join("")}</div>` : ""}
+</article>
+<aside class="ai-aside">
+  <div class="ai-aside-card ai-detail-info">
+    <div class="ai-detail-title"><h2>${esc(t.name)}</h2><span class="ai-badge ${badgeClass(t.pricing)}">${esc(t.pricing || "免费")}</span></div>
     <p class="ai-card-summary">${esc(t.summary || "")}</p>
-    <div class="ai-detail-actions"><a class="ai-site-btn" rel="nofollow noopener" target="_blank" href="${esc(t.url)}">访问官网 ↗</a><a class="ai-ghost-btn" href="${SITE}/ai/${esc(col.slug)}.html">← ${esc(col.name)}</a></div>
+    <a class="ai-site-btn" rel="nofollow noopener" target="_blank" href="${esc(t.url)}">🔗 访问官网</a>
+    <button class="ai-fav-btn" id="aiFavBtn" type="button" data-tid="${esc(t.id)}">☆ 收藏工具</button>
+    <a class="ai-report-btn" href="${reportMail}">⚠ 举报工具</a>
   </div>
+  <div class="ai-aside-card">
+    <div class="ai-aside-cap">👤 作者信息</div>
+    <a class="ai-author" href="${SITE}/"><span class="ai-author-logo">乐</span><span class="ai-author-txt"><b>乐哲软件</b><i>官方收录 · 持续更新</i></span></a>
+    <a class="ai-author-more" href="${SITE}/ai/${esc(col.slug)}.html">查看同类工具</a>
+  </div>
+</aside>
 </div>
-${shots.length ? `<div class="ai-shots">${shots.map((u, i) => `<a class="ai-shot" href="${esc(u)}" target="_blank" rel="noopener" title="查看大图"><img src="${esc(u)}" alt="${esc(t.name)} 截图${i + 1}" loading="lazy" referrerpolicy="no-referrer"></a>`).join("")}</div>` : ""}
-${introParas ? `<section class="ai-detail-sec"><h2>${esc(t.name)} 是什么</h2>${introParas}</section>` : ""}
 ${siblings.length ? `<section class="ai-detail-sec"><h2>同类工具推荐</h2><div class="ai-cards">${siblings.map(toolCard).join("\n")}</div></section>` : ""}
 <p class="ai-back"><a href="${SITE}/ai/index.html" style="color:#0077ff">← 全部工具集</a></p>
 </main>
+<script>
+(function(){
+var id=document.getElementById('aiFavBtn');if(!id)return;
+var tid=id.getAttribute('data-tid'),K='lezhe_ai_favs';
+function favs(){try{var v=JSON.parse(localStorage.getItem(K)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}}
+function draw(){var on=favs().indexOf(tid)>=0;id.innerHTML=on?'★ 已收藏':'☆ 收藏工具';id.className='ai-fav-btn'+(on?' on':'')}
+id.addEventListener('click',function(){var f=favs(),i=f.indexOf(tid);if(i>=0)f.splice(i,1);else f.push(tid);try{localStorage.setItem(K,JSON.stringify(f))}catch(e){}draw()});
+draw();
+})();
+</script>
 ${jsonLd({
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -202,21 +224,6 @@ function detailDesc(t, col) {
   if (d.length < 100) d += pad;
   if (d.length > 165) d = d.slice(0, 157).replace(/[,，。;；\s]+$/, "") + "…";
   return d;
-}
-
-// —— 左侧工具集导航（两个页面共用）——
-function sideNav(collections, activeSlug) {
-  const listed = collections.filter((c) => c._hasPage !== false);
-  return `<aside class="ai-side">
-  <a class="ai-side-brand" href="${SITE}/ai/index.html"><span class="ai-side-brand-ico">🤖</span>乐哲Ai工具集</a>
-  <nav class="ai-side-menu">
-  ${listed
-    .map(
-      (c) => `<a class="ai-side-item${c.slug === activeSlug ? " on" : ""}" href="${SITE}/ai/${esc(c.slug)}.html">${c.logo && /^https?:\/\//i.test(c.logo) ? `<img class="ai-side-logo" src="${esc(c.logo)}" alt="" loading="lazy">` : `<span class="ai-side-ico">${esc(c.icon || "🧩")}</span>`}<span class="ai-side-txt">${esc(c.name)}</span><span class="ai-side-arr">›</span></a>`
-    )
-    .join("\n")}
-  </nav>
-</aside>`;
 }
 
 // —— 页面渲染 ——
@@ -255,9 +262,8 @@ export function renderAiHub(collections, byCollection) {
     `
 <main>
 ${crumb([{ name: "首页", url: `${SITE}/` }, { name: "AI 工具集" }])}
-<h1>AI 工具集</h1>
-<p class="ai-lead">按使用场景整理的 AI 工具合集，共 ${collections.length} 个工具集、${n} 款工具，持续增补更新。</p>
-${hasContent ? sideNav(collections, "") : `<style>body main{margin-left:0}</style>`}
+<h1 class="ai-h1"><span class="ai-h1-ico">🤖</span>AI 工具集</h1>
+<p class="ai-hub-lead">按使用场景整理的 AI 工具合集，共 ${collections.length} 个工具集、${n} 款工具，持续增补更新。</p>
 ${body}
 <section class="ai-note">
 <h2>关于本板块</h2>
@@ -365,7 +371,6 @@ ${crumb([
     { name: "AI 工具集", url: `${SITE}/ai/index.html` },
     { name: col.name },
   ])}
-${sideNav(collections, col.slug)}
 <div class="ai-col-hero">
   ${coverHtml(col, "ai-col-cover")}
   <div><h1>${esc(col.name)}</h1>
@@ -531,40 +536,31 @@ function today() {
 
 const AI_STYLESHEET = `
 :root{--ai-border:#e5e9f0;--ai-dim:#5b6472}
-/* AI 板块专属布局：仿 ai-bot.cn 左侧固定导航（220px）+ 宽幅内容区 + 浅灰页底
+/* AI 板块专属布局：仿 tool.caie.ai 简洁风 —— 无侧栏、1200px 居中内容区、紧凑卡片网格
    注意：全站 <style> 在本文件之后加载，必须用 body 前缀提高优先级，否则 main/footer 会被全站 760px 规则覆盖 */
 body{background:var(--bg-secondary,#f5f6f8)}
-body main{max-width:none;margin:0 0 0 220px;padding:22px 32px 60px}
-main>*{max-width:1400px;margin-left:auto;margin-right:auto}
+body main{max-width:1200px;margin:0 auto;padding:20px 24px 60px}
+body footer{max-width:1200px}
 body header{position:sticky;top:0;z-index:100}
-body footer{margin-left:220px}
-.ai-side{position:fixed;top:57px;bottom:0;left:0;width:220px;box-sizing:border-box;background:var(--bg-card-solid,#fff);border-right:1px solid var(--ai-border);display:flex;flex-direction:column;padding:14px 12px;overflow-y:auto;z-index:40}
-.ai-side-brand{display:flex;align-items:center;gap:7px;font-weight:800;font-size:1.05rem;color:var(--text-primary,#1a1f2b);text-decoration:none;padding:4px 10px 12px;border-bottom:1px solid var(--ai-border);margin-bottom:8px;white-space:nowrap}
-.ai-side-brand-ico{font-size:1.15rem;line-height:1}
-.ai-side-menu{display:flex;flex-direction:column;gap:2px;flex:1 0 auto}
-.ai-side-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;color:#4b5563;text-decoration:none;font-size:.9rem;transition:.15s}
-.ai-side-item:hover{background:#f3f5f9;color:#1c2333}
-.ai-side-item.on{background:#eef3ff;color:#0b66f0;font-weight:700}
-.ai-side-item.on .ai-side-arr{opacity:1;color:#0b66f0}
-.ai-side-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ai-side-arr{margin-left:auto;opacity:.3;font-size:1.05rem;line-height:1}
-.ai-side-ico{font-size:1.05rem;width:22px;text-align:center;flex-shrink:0}
-.ai-side-logo{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0}
+/* 板块首页头部（居中大标题） */
+.ai-h1{display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.85rem;margin:16px 0 4px;text-align:center}
+.ai-h1-ico{font-size:1.5rem;line-height:1}
+.ai-hub-lead{text-align:center;color:var(--ai-dim);font-size:.88rem;margin:0 0 6px}
 /* 工具集头部（独立页） */
 .ai-col-hero{display:flex;align-items:center;gap:16px;margin:6px 0 14px}
-.ai-col-hero h1{margin:0}
+.ai-col-hero h1{margin:0;font-size:1.5rem}
 .ai-col-cover{width:64px;height:64px;border-radius:14px;object-fit:cover;box-shadow:0 2px 8px rgba(20,40,80,.12);flex-shrink:0}
 span.ai-col-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.6rem}
-/* 分区头（板块首页） */
-.ai-sec{margin:30px 0}
-.ai-sec-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.ai-sec-ico{font-size:1.3rem}
-.ai-sec-logo{width:26px;height:26px;border-radius:7px;object-fit:cover}
-.ai-sec-head h2{margin:0;font-size:1.15rem}
+/* 分区头（板块首页）：小图标 + 名称 + 款数 + 更多 */
+.ai-sec{margin:28px 0}
+.ai-sec-head{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.ai-sec-ico{font-size:1.15rem}
+.ai-sec-logo{width:24px;height:24px;border-radius:7px;object-fit:cover}
+.ai-sec-head h2{margin:0;font-size:1.12rem}
 .ai-sec-count{font-size:.74rem;color:#9aa3b2}
-.ai-sec-more{margin-left:auto;font-size:.84rem;color:#8a93a3;text-decoration:none;white-space:nowrap}
-.ai-sec-more:hover{text-decoration:underline}
-.ai-sec-lead{margin:0 0 12px;color:var(--ai-dim);font-size:.86rem;line-height:1.75}
+.ai-sec-more{margin-left:auto;font-size:.83rem;color:#8a93a3;text-decoration:none;white-space:nowrap}
+.ai-sec-more:hover{color:#0b66f0;text-decoration:underline}
+.ai-sec-lead{margin:0 0 12px;color:var(--ai-dim);font-size:.82rem;line-height:1.7}
 /* 工具集对比表（分类页）：移动端横向滚动，不挤压卡片 */
 .ai-compare table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:.88rem;display:block;overflow-x:auto;white-space:nowrap}
 .ai-compare thead th{text-align:left;font-weight:600;color:var(--text-primary,#1c2333);padding:8px 12px 8px 0;border-bottom:1px solid var(--ai-border)}
@@ -572,16 +568,16 @@ span.ai-col-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-con
 .ai-compare tbody td:first-child{font-weight:600}
 .ai-compare tbody tr:last-child td{border-bottom:0}
 .ai-compare p{margin:6px 0 0}
-/* 卡片流（ai-bot.cn 同款：横排小卡 6 列自适应，圆形图标，hover 紫蓝描边） */
-.ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
-.ai-card{display:flex;align-items:center;gap:10px;background:var(--bg-card-solid,#fff);border:1px solid #ececf0;border-radius:10px;padding:13px 15px;text-decoration:none;color:inherit;transition:.15s;min-width:0;overflow:hidden}
-.ai-card:hover{border-color:#5961f9;box-shadow:0 4px 14px rgba(89,97,249,.13)}
+/* 卡片流（tool.caie.ai 同款：方圆角图标 + 名称 + 一句话简介，6 列自适应） */
+.ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:12px}
+.ai-card{display:flex;align-items:center;gap:10px;background:var(--bg-card-solid,#fff);border:1px solid #ececf0;border-radius:12px;padding:12px 13px;text-decoration:none;color:inherit;transition:.15s;min-width:0;overflow:hidden}
+.ai-card:hover{border-color:#5961f9;box-shadow:0 5px 16px rgba(89,97,249,.14);transform:translateY(-2px)}
 .ai-card-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;max-width:100%}
-.ai-card-name{font-weight:700;font-size:.9rem;color:#1f2733;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.ai-card-name{font-weight:700;font-size:.88rem;color:#1f2733;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .ai-badge{margin-left:auto;font-size:.68rem;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.ai-cover{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:0 1px 4px rgba(20,40,80,.12)}
+.ai-cover{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;box-shadow:0 1px 4px rgba(20,40,80,.12)}
 span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem}
-.ai-card-summary{margin:0;font-size:.76rem;color:#a6adba;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.ai-card-summary{margin:0;font-size:.74rem;color:#a6adba;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .ai-badge.free{color:#0a8f4d;background:rgba(16,163,74,.1)}
 .ai-badge.freemium{color:#b07000;background:rgba(240,180,0,.12)}
 .ai-badge.sub{color:#0066cc;background:rgba(0,119,255,.1)}
@@ -591,56 +587,74 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-lead{color:var(--text-secondary,#5b6472);max-width:56em;margin:8px 0 0}
 .ai-note{margin:30px 0 0;padding-top:18px;border-top:1px solid var(--ai-border);color:var(--ai-dim);font-size:.9rem;line-height:1.8;max-width:900px}
 .ai-note h2{font-size:1.05rem;color:var(--text-primary,#1c2333)}
-.ai-empty{border:1px dashed var(--ai-border);border-radius:12px;padding:28px;color:var(--ai-dim);line-height:1.8}
 .ai-back{margin-top:18px;font-size:.9rem}
 .ai-empty{padding:38px 20px;text-align:center;color:#5b6472;background:var(--bg-card-solid,#fff);border:1px dashed #d5dbe6;border-radius:12px;font-size:.95rem;line-height:1.8}
 /* 主题适配 */
-[data-theme="dark"] .ai-side{background:#242938;border-right-color:#333a48}
-[data-theme="dark"] .ai-card,[data-theme="dark"] .ai-col-hero{background:rgba(255,255,255,.04)}
+[data-theme="dark"] .ai-card,[data-theme="dark"] .ai-col-hero,[data-theme="dark"] .ai-intro-card,[data-theme="dark"] .ai-aside-card{background:rgba(255,255,255,.04)}
 [data-theme="dark"] .ai-card{border-color:rgba(255,255,255,.1)}
-[data-theme="dark"] .ai-side-item:hover{background:rgba(255,255,255,.06);color:#e6ebf5}
-[data-theme="dark"] .ai-side-brand{color:#e6ebf5}
 [data-theme="dark"] .chip{background:rgba(255,255,255,.08);color:#b8c4d8}
-[data-theme="dark"] .ai-side-item.on{background:rgba(11,102,240,.18);color:#7eb8ff}
-[data-theme="glass"] .ai-side,[data-theme="glass"] .ai-card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);box-shadow:var(--shadow-sm,none)}
-[data-theme="glass"] .ai-side-item:hover{background:rgba(255,255,255,.08)}
-[data-theme="glass"] .ai-side-item.on{background:rgba(94,184,255,.14);color:#8ccaff}
-/* 详情页 */
-.ai-detail-head{display:flex;align-items:flex-start;gap:20px;margin:8px 0 16px;padding:18px;background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:16px;box-shadow:0 1px 4px rgba(20,40,80,.05)}
-.ai-detail-head h1{margin:0 0 8px}
-.ai-detail-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.ai-detail-title h1{margin:0}
-.ai-detail-cover{width:96px;height:96px;border-radius:18px;object-fit:cover;box-shadow:0 3px 12px rgba(20,40,80,.16);flex-shrink:0}
-span.ai-detail-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:2.2rem}
-.ai-detail-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-bottom:8px}
-.ai-detail-info .ai-card-summary{margin:0;white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-.ai-detail-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-.ai-site-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;text-decoration:none;font-weight:700;font-size:.92rem;padding:10px 22px;border-radius:50px;box-shadow:0 3px 12px rgba(0,119,255,.3);transition:.16s}
+[data-theme="glass"] .ai-card,[data-theme="glass"] .ai-intro-card,[data-theme="glass"] .ai-aside-card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);box-shadow:var(--shadow-sm,none)}
+/* 详情页：左介绍大卡 + 右悬浮操作栏（仿 ai.bemcss.com 工具详情） */
+.ai-detail-grid{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:18px;align-items:start;margin:10px 0 18px}
+.ai-intro-card{background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:16px;padding:22px 26px;box-shadow:0 1px 4px rgba(20,40,80,.05);min-width:0}
+.ai-intro-tag{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;color:#0b66f0;background:rgba(11,102,240,.08);border-radius:8px;padding:4px 11px;margin-bottom:12px}
+.ai-intro-card h1{font-size:1.45rem;margin:0 0 10px}
+.ai-intro-card>p{color:var(--text-secondary,#41506b);line-height:1.9;margin:0 0 12px;font-size:.94rem}
+.ai-detail-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin:0 0 12px}
+.ai-aside{position:sticky;top:76px;display:flex;flex-direction:column;gap:14px}
+.ai-aside-card{background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:16px;padding:18px;box-shadow:0 1px 4px rgba(20,40,80,.05)}
+.ai-detail-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.ai-detail-title h2{margin:0;font-size:1.12rem}
+.ai-aside-card .ai-card-summary{white-space:normal;font-size:.83rem;line-height:1.6;margin:0 0 14px}
+.ai-site-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;text-decoration:none;font-weight:700;font-size:.92rem;padding:11px 16px;border-radius:50px;box-shadow:0 3px 12px rgba(0,119,255,.3);transition:.16s}
 .ai-site-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,119,255,.4)}
-.ai-ghost-btn{display:inline-flex;align-items:center;color:var(--text-secondary,#41506b);text-decoration:none;font-size:.88rem;padding:10px 16px;border:1px solid var(--border-glow,var(--ai-border));border-radius:50px;transition:.16s}
-.ai-ghost-btn:hover{color:var(--text-primary,#1c2333);background:var(--bg-secondary,#eef2f8)}
-.ai-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:14px 0 6px}
+.ai-fav-btn,.ai-report-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;font-family:inherit;font-size:.87rem;font-weight:600;padding:10px 16px;border-radius:50px;cursor:pointer;transition:.16s;margin-top:9px;background:transparent}
+.ai-fav-btn{border:1px solid rgba(240,160,0,.45);color:#d98b00;background:rgba(240,160,0,.05)}
+.ai-fav-btn:hover{background:rgba(240,160,0,.13)}
+.ai-fav-btn.on{border-color:transparent;color:#fff;background:linear-gradient(135deg,#f5b942,#f0980f)}
+.ai-report-btn{border:1px solid rgba(231,76,60,.4);color:#d64541;background:rgba(231,76,60,.05);text-decoration:none}
+.ai-report-btn:hover{background:rgba(231,76,60,.12)}
+.ai-aside-cap{font-size:.8rem;font-weight:700;color:var(--text-primary,#1c2333);margin-bottom:10px}
+.ai-author{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:7px 8px;border-radius:12px;transition:.15s}
+.ai-author:hover{background:var(--bg-secondary,#f3f5f9)}
+.ai-author-logo{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.ai-author-txt{display:flex;flex-direction:column;min-width:0}
+.ai-author-txt b{font-size:.9rem}
+.ai-author-txt i{font-style:normal;font-size:.72rem;color:#9aa3b2;margin-top:2px}
+.ai-author-more{display:flex;align-items:center;justify-content:center;width:100%;box-sizing:border-box;margin-top:10px;border:1px solid var(--border-glow,var(--ai-border));border-radius:50px;padding:9px;font-size:.84rem;color:var(--text-secondary,#41506b);text-decoration:none;transition:.16s}
+.ai-author-more:hover{color:#0b66f0;border-color:rgba(11,102,240,.4)}
+.ai-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:6px 0 4px}
 .ai-shot{display:block;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid var(--border-glow,var(--ai-border));background:var(--bg-secondary,#f4f7fb)}
 .ai-shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
 .ai-shot:hover img{transform:scale(1.03)}
 .ai-detail-sec{margin:22px 0}
 .ai-detail-sec h2{font-size:1.15rem;margin:0 0 12px;padding-left:12px;border-left:4px solid #0077ff;line-height:1.3}
 .ai-detail-sec p{color:var(--text-secondary,#41506b);line-height:1.85;margin:0 0 12px;font-size:.94rem}
-/* 移动端/窄屏：侧栏变顶部横向滚动条，内容区还原全宽 */
-@media (max-width:1100px){
-body main{margin-left:0;padding:16px 16px 44px}
-body footer{margin-left:0}
-.ai-side{position:static;height:auto;width:auto;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid var(--ai-border);padding:10px 14px;overflow-x:auto;overflow-y:hidden;gap:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent)}
-.ai-side::-webkit-scrollbar{display:none}
-.ai-side-brand{border-bottom:0;margin:0 6px 0 0;padding:0 6px}
-.ai-side-menu{flex-direction:row;flex:none}
-.ai-side-item{flex-shrink:0}
-.ai-side-arr{display:none}
+/* 实时预览浮层沿用旧详情头部样式 */
+.ai-detail-head{display:flex;align-items:flex-start;gap:20px;margin:8px 0 16px;padding:18px;background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:16px;box-shadow:0 1px 4px rgba(20,40,80,.05)}
+.ai-detail-head h1{margin:0 0 8px}
+.ai-detail-cover{width:96px;height:96px;border-radius:18px;object-fit:cover;box-shadow:0 3px 12px rgba(20,40,80,.16);flex-shrink:0}
+span.ai-detail-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:2.2rem}
+.ai-detail-info .ai-card-summary{margin:0;white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+.ai-detail-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+/* 移动端/窄屏 */
+@media (max-width:960px){
+.ai-detail-grid{grid-template-columns:1fr}
+.ai-aside{position:static;order:-1}
+}
+@media (max-width:640px){
+body main{padding:14px 14px 44px}
+.ai-h1{font-size:1.4rem}
+.ai-cards{grid-template-columns:repeat(2,1fr);gap:9px}
+.ai-card{padding:10px;gap:9px;border-radius:11px}
+.ai-cover{width:36px;height:36px}
+.ai-card-name{font-size:.8rem}
+.ai-card-summary{font-size:.66rem}
 .ai-col-hero{gap:12px}
 .ai-col-cover{width:52px;height:52px}
-.ai-detail-head{flex-direction:column;gap:14px}
-.ai-detail-cover{width:72px;height:72px}
-span.ai-detail-cover.ai-cover-fb{font-size:1.7rem}
+.ai-intro-card{padding:18px 16px}
+.ai-aside-card{padding:16px}
+.ai-detail-sec h2{font-size:1.05rem}
 }
 /* 实时预览浮层（新增工具尚未生成静态详情页时，点卡片就地查看） */
 .ai-live-mask{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.55)}
