@@ -57,9 +57,34 @@ const baseTreeFull = await api(`git/trees/${baseCommit.tree.sha}?recursive=1`);
 const remotePaths = new Set(baseTreeFull.tree.filter((e) => e.type === "blob").map((e) => e.path));
 console.log(`远程 HEAD: ${ref.object.sha.slice(0, 7)} ${baseCommit.message.slice(0, 40)}（远程文件 ${remotePaths.size}）`);
 
+// 2.5 内容级去重：本地索引长期落后远程，status 清单远大于真实变更。
+// 计算本地文件 git blob sha（sha1("blob <size>\\0" + content)），与远程 blob sha 相同的跳过，
+// 使定时任务重复调用时只推送真正变更的文件。
+const crypto = await import("node:crypto");
+const remoteSha = new Map(baseTreeFull.tree.filter((e) => e.type === "blob").map((e) => [e.path, e.sha]));
+const localSha = (p) => {
+  const buf = readFileSync(join(ROOT, p));
+  return crypto.createHash("sha1").update(`blob ${buf.length}\0`).update(buf).digest("hex");
+};
+const skipped = [];
+const realItems = [];
+for (const it of items) {
+  if (it.st === "D") { realItems.push(it); continue; }
+  let ls;
+  try { ls = localSha(it.path); } catch { continue; } // 文件已被删除/不可读，跳过
+  if (remoteSha.get(it.path) === ls) { skipped.push(it.path); continue; }
+  realItems.push(it);
+}
+if (skipped.length) console.log(`内容未变跳过 ${skipped.length} 个`);
+if (!realItems.length) {
+  console.log("✅ 与远程完全一致，无需推送");
+  process.exit(0);
+}
+console.log(`真实变更 ${realItems.length} 个文件（删除 ${realItems.filter((i) => i.st === "D").length} 个）`);
+
 // 3. 批量建 blob（本地 HEAD 落后于远程时，status 里的 D 可能远程已删，跳过不存在的删除项）
 const tree = [];
-for (const it of items) {
+for (const it of realItems) {
   if (it.st === "D") {
     if (remotePaths.has(it.path)) tree.push({ path: it.path, mode: "100644", type: "blob", sha: null });
     continue;
@@ -73,6 +98,10 @@ for (const it of items) {
   tree.push({ path: it.path, mode: "100644", type: "blob", sha: blob.sha });
   process.stdout.write(`  blob ${it.path}\n`);
 }
+if (!tree.length) {
+  console.log("✅ 过滤后无实际变更（删除项远程均已不存在），无需推送");
+  process.exit(0);
+}
 
 // 4. 建 tree → commit → 更新 ref
 const newTree = await api("git/trees", { base_tree: baseCommit.tree.sha, tree }, "POST");
@@ -82,4 +111,4 @@ const commit = await api(
   "POST"
 );
 await api(`git/refs/heads/${BRANCH}`, { sha: commit.sha, force: false }, "PATCH");
-console.log(`✅ 已提交并推送: ${commit.sha.slice(0, 7)}（${items.length} 个文件）`);
+console.log(`✅ 已提交并推送: ${commit.sha.slice(0, 7)}（${realItems.length} 个文件）`);

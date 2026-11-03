@@ -102,6 +102,39 @@ function toolSlug(t) {
   return s || `t-${String(t.id || "").replace(/-/g, "").slice(0, 8)}`;
 }
 let SLUG_MAP = new Map(); // id → 最终落盘 slug（防冲突后缀在这里生效）
+
+// —— 前端实时层配置（2026-11-03）——
+// 后台保存后 /ai/ 页面要能立刻反映，不能等 generate.mjs 重跑。做法：页面里带一份
+// 「生成时的数据指纹 + 已生成详情页清单」，浏览器加载后再拉一次库比对，不一致才重绘。
+let LIVE_CFG = null;
+let LIVE_VER = "";
+function liveTag() {
+  if (!LIVE_CFG) return "";
+  const json = JSON.stringify(LIVE_CFG).replace(/</g, "\\u003c");
+  return `<script>window.__AI_LIVE__=${json}</script>\n<script src="${SITE}/ai/live.js?v=${LIVE_VER}" defer></script>`;
+}
+// 指纹算法必须与 seo/ai-live.js 的 sig() 完全一致（排序键也一致，否则永远判为「变了」）
+// 排序刻意不用 localeCompare：Node 与浏览器的 ICU 排序规则可能不同，会导致指纹永远不相等
+function aiSig(cols, tools) {
+  const cmp = (x, y, k) =>
+    (x.sort || 0) - (y.sort || 0) ||
+    (String(x[k]) < String(y[k]) ? -1 : String(x[k]) > String(y[k]) ? 1 : 0);
+  const cs = [...cols].sort((a, b) => cmp(a, b, "slug"));
+  const ts = [...tools].sort((a, b) => cmp(a, b, "id"));
+  const s =
+    cs
+      .map((c) => [c.slug, c.name, c.sort, c.is_published, c.logo, c.icon, c.description].join("|"))
+      .join("~") +
+    "#" +
+    ts
+      .map((t) =>
+        [t.id, t.collection_id, t.name, t.summary, t.pricing, t.sort, t.slug, t.is_published, String(t.intro || "").length, t.logo].join("|")
+      )
+      .join("~");
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return h.toString(36) + "-" + s.length;
+}
 function toolDetailUrl(t) {
   const slug = SLUG_MAP.get(t.id) || toolSlug(t);
   return `${SITE}/ai/tool/${slug}.html`;
@@ -218,7 +251,7 @@ export function renderAiHub(collections, byCollection) {
     .join("\n");
 
   const body = hasContent
-    ? sections || `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p></div>`
+    ? `<div id="aiHubBody">${sections || `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p></div>`}</div>`
     : `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p><p>计划方向：AI 对话助手、AI 写作、AI 绘画图像、AI 视频音频、AI 编程开发、AI 办公效率等，每个方向一个独立工具集。</p></div>`;
 
   const html =
@@ -243,6 +276,7 @@ ${jsonLd({
     url: canonical,
   })}
 ${FALLBACK_SNIPPET}
+${liveTag()}
 ${foot("aihub")}`;
   return { html };
 }
@@ -289,7 +323,7 @@ function buildCompare(col, tools) {
   const workLine = freeish
     ? `实际使用时的差别通常在导出环节：免费额度多有次数或水印限制，正式产出前先确认导出文件的格式、尺寸与商用授权说明。`
     : `均为订阅制，上手前先确认是否提供试用；团队使用还要看席位计费与素材版权归属。`;
-  return `<section class="ai-note ai-compare">
+  return `<section class="ai-note ai-compare" id="aiCompare">
 <h2>${esc(col.name)}快速对比</h2>
 <table><thead><tr><th>工具</th><th>定位</th><th>收费模式</th></tr></thead><tbody>${rows}</tbody></table>
 <p>${esc(priceLine)}${esc(pickLine)}</p>
@@ -316,8 +350,8 @@ export function renderAiCollection(col, tools, collections = []) {
   );
   const canonical = `${SITE}/ai/${col.slug}.html`;
   const toolsBlock = tools.length
-    ? `<div class="ai-cards">\n${tools.map(toolCard).join("\n")}\n</div>`
-    : `<div class="ai-empty">📦 本工具集正在整理中，工具马上就来 —— 你也可以先逛逛<a href="${SITE}/ai/index.html" style="color:#0077ff">其他工具集</a>。</div>`;
+    ? `<div class="ai-cards" id="aiColCards">\n${tools.map(toolCard).join("\n")}\n</div>`
+    : `<div class="ai-empty" id="aiColCards">📦 本工具集正在整理中，工具马上就来 —— 你也可以先逛逛<a href="${SITE}/ai/index.html" style="color:#0077ff">其他工具集</a>。</div>`;
 
   const html =
     head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
@@ -347,6 +381,7 @@ ${jsonLd({
     numberOfItems: tools.length,
   })}
 ${FALLBACK_SNIPPET}
+${liveTag()}
 ${foot("ai-" + col.slug)}`;
   return { html };
 }
@@ -431,11 +466,8 @@ export async function buildAiSection(ROOT, softs = []) {
   await writeFile(join(aiDir, "ai.css"), AI_STYLESHEET, "utf8");
 
   const urls = [];
-  const hub = renderAiHub(collections, byCollection);
-  await writeFile(join(aiDir, "index.html"), hub.html, "utf8");
-  urls.push({ loc: `${SITE}/ai/index.html` });
 
-  // 详情页 slug 防冲突：渲染前先确定每个工具的最终 slug
+  // 详情页 slug 防冲突：渲染前先确定每个工具的最终 slug（前端实时层要据此判断哪些工具已有静态页）
   const usedSlugs = new Set(["index"]);
   SLUG_MAP = new Map();
   for (const c of collections) {
@@ -447,6 +479,29 @@ export async function buildAiSection(ROOT, softs = []) {
       SLUG_MAP.set(t.id, slug);
     }
   }
+
+  // —— 前端实时层（2026-11-03）：后台保存后不必等重新生成，页面加载时自行拉库比对 ——
+  // 快照 sig 由 Node 与浏览器各算一遍（算法必须一致），不一致或缺失就重绘；
+  // 真出现算法漂移的最坏结果是「每次访问都重绘一遍」，DOM 相同、用户无感。
+  const livePages = {};
+  for (const c of collections) livePages[c.slug] = 1;
+  const liveTools = {};
+  for (const t of allTools) liveTools[SLUG_MAP.get(t.id)] = t.id;
+  LIVE_CFG = {
+    api: U,
+    key: K,
+    sig: aiSig(collections, allTools),
+    pages: livePages,
+    tools: liveTools,
+  };
+  const liveJs = readFileSync(join(ROOT, "seo", "ai-live.js"), "utf8");
+  await writeFile(join(aiDir, "live.js"), liveJs, "utf8");
+  LIVE_VER = createHash("md5").update(liveJs).digest("hex").slice(0, 8);
+
+  const hub = renderAiHub(collections, byCollection);
+  await writeFile(join(aiDir, "index.html"), hub.html, "utf8");
+  urls.push({ loc: `${SITE}/ai/index.html` });
+
   let toolPageCount = 0;
   for (const c of collections) {
     const list = byCollection[c.slug];
@@ -584,4 +639,12 @@ body footer{margin-left:0}
 .ai-detail-cover{width:72px;height:72px}
 span.ai-detail-cover.ai-cover-fb{font-size:1.7rem}
 }
+/* 实时预览浮层（新增工具尚未生成静态详情页时，点卡片就地查看） */
+.ai-live-mask{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.55)}
+.ai-live-mask.on{display:flex}
+.ai-live-box{position:relative;width:100%;max-width:760px;max-height:86vh;overflow:auto;background:#fff;border-radius:16px;padding:24px 24px 26px;box-shadow:0 24px 60px rgba(15,23,42,.28)}
+.ai-live-x{position:absolute;top:10px;right:14px;border:0;background:transparent;font-size:26px;line-height:1;color:#8a93a3;cursor:pointer}
+.ai-live-x:hover{color:#1c2333}
+.ai-live-tip{margin:16px 0 0;font-size:.82rem;color:#8a93a3}
+@media(max-width:640px){.ai-live-box{padding:18px 16px 22px;max-height:90vh}}
 `;

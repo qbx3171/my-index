@@ -111,3 +111,11 @@ body footer{margin-left:0}
 .ai-detail-cover{width:72px;height:72px}
 span.ai-detail-cover.ai-cover-fb{font-size:1.7rem}
 }
+/* 实时预览浮层（新增工具尚未生成静态详情页时，点卡片就地查看） */
+.ai-live-mask{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.55)}
+.ai-live-mask.on{display:flex}
+.ai-live-box{position:relative;width:100%;max-width:760px;max-height:86vh;overflow:auto;background:#fff;border-radius:16px;padding:24px 24px 26px;box-shadow:0 24px 60px rgba(15,23,42,.28)}
+.ai-live-x{position:absolute;top:10px;right:14px;border:0;background:transparent;font-size:26px;line-height:1;color:#8a93a3;cursor:pointer}
+.ai-live-x:hover{color:#1c2333}
+.ai-live-tip{margin:16px 0 0;font-size:.82rem;color:#8a93a3}
+@media(max-width:640px){.ai-live-box{padding:18px 16px 22px;max-height:90vh}}
