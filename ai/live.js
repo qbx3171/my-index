@@ -17,10 +17,37 @@
   var H = { apikey: CFG.key, Authorization: 'Bearer ' + CFG.key };
   var API = CFG.api.replace(/\/$/, '') + '/rest/v1/';
 
-  function q(sql) {
-    return fetch(API + sql, { headers: H })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .catch(function () { return null; });
+  // 单次 REST 请求：同一份数据经代理传输时会随机把汉字截断成 U+FFFD（生成器侧已用「5 轮合并」治），
+  // 浏览器这边同样会遇到，所以拉 3 次取「乱码最少」的一份；仍有残留就把 U+FFFD 剔除后再渲染，
+  // 宁可少一个字也不要把「�」显示给用户（下次重新生成会整体修正）。
+  function raw(url) {
+    return fetch(url, { headers: H }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    });
+  }
+  function badCount(s) {
+    var n = 0;
+    for (var i = 0; i < s.length; i++) if (s.charCodeAt(i) === 0xfffd) n++;
+    return n;
+  }
+  function pull(sql, tries) {
+    var best = null, bestBad = Infinity, n = tries || 3;
+    function attempt(i) {
+      if (i >= n) return Promise.resolve(best);
+      return raw(API + sql).then(function (t) {
+        var b = badCount(t);
+        if (b < bestBad) { best = t; bestBad = b; }
+        if (bestBad === 0) return best;
+        return attempt(i + 1);
+      }).catch(function () { return attempt(i + 1); });
+    }
+    return attempt(0).then(function (t) {
+      if (!t) return null;
+      var dirty = bestBad > 0;
+      try { return { rows: JSON.parse(dirty ? t.replace(/\uFFFD+/g, '') : t), dirty: dirty }; }
+      catch (e) { return null; }
+    });
   }
   function esc(s) {
     return String(s == null ? '' : s)
@@ -240,6 +267,8 @@
       return [t.id, t.collection_id, t.name, t.summary, t.pricing, t.sort, t.slug, t.is_published,
         String(t.intro || '').length, t.logo].join('|');
     }).join('~');
+    window.__AI_LIVE_STR__ = s;
+    window.__AI_LIVE_STR__ = s;
     var h = 5381;
     for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
     return h.toString(36) + '-' + s.length;
@@ -249,13 +278,13 @@
   if (CFG.sig && sessionStorage.getItem('ai-live-sig') === CFG.sig) return;
 
   Promise.all([
-    q('ai_collections?select=*&order=sort.asc,created_at.asc'),
-    q('ai_tools?select=*&order=sort.asc,created_at.asc')
+    pull('ai_collections?select=*&order=sort.asc,created_at.asc'),
+    pull('ai_tools?select=*&order=sort.asc,created_at.asc')
   ]).then(function (r) {
-    if (!r[0] || !r[1]) return; // 拉不动就保留静态页，不影响阅读
-    var cols = r[0].filter(function (c) { return c.is_published !== false && c.slug && c.name; })
+    if (!r[0] || !r[1]) return; // 三次都拉不回干净数据就保留静态页，不影响阅读
+    var cols = r[0].rows.filter(function (c) { return c.is_published !== false && c.slug && c.name; })
       .sort(function (a, b) { return (a.sort || 0) - (b.sort || 0); });
-    var tools = r[1].filter(function (t) { return t.is_published !== false && t.name && t.url; });
+    var tools = r[1].rows.filter(function (t) { return t.is_published !== false && t.name && t.url; });
     state.cols = cols; state.tools = tools;
     state.byCol = {};
     cols.forEach(function (c) { state.byCol[c.slug] = []; });
@@ -266,6 +295,7 @@
     cols.forEach(function (c) { state.byCol[c.slug].sort(function (a, b) { return (a.sort || 0) - (b.sort || 0); }); });
 
     var now = sig(cols, tools);
+    window.__AI_LIVE_SIG__ = now; // 便于自检：与页面快照 CFG.sig 相等即说明静态页是最新的
     if (CFG.sig && now === CFG.sig) { sessionStorage.setItem('ai-live-sig', now); return; }
     render();
   });

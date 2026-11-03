@@ -111,26 +111,21 @@ let LIVE_VER = "";
 function liveTag() {
   if (!LIVE_CFG) return "";
   const json = JSON.stringify(LIVE_CFG).replace(/</g, "\\u003c");
-  return `<script>window.__AI_LIVE__=${json}</script>\n<script src="${SITE}/ai/live.js?v=${LIVE_VER}" defer></script>`;
+  return `<script>window.__AI_LIVE__=${json}</script>\n<script src="/ai/live.js?v=${LIVE_VER}" defer></script>`;
 }
-// 指纹算法必须与 seo/ai-live.js 的 sig() 完全一致（排序键也一致，否则永远判为「变了」）
-// 排序刻意不用 localeCompare：Node 与浏览器的 ICU 排序规则可能不同，会导致指纹永远不相等
+// 指纹只认「结构字段」：新增/删除/排序/上下架/收费模式变化才重绘。
+// 刻意不含 name/summary/intro——代理传输会把汉字随机截成 U+FFFD，文本参与指纹会导致
+// 两端永远不相等、每次访问都白重绘一次；文本改动交给详情页的容错补丁和下一次生成。
 function aiSig(cols, tools) {
   const cmp = (x, y, k) =>
     (x.sort || 0) - (y.sort || 0) ||
     (String(x[k]) < String(y[k]) ? -1 : String(x[k]) > String(y[k]) ? 1 : 0);
-  const cs = [...cols].sort((a, b) => cmp(a, b, "slug"));
+  const cs = [...cols].sort((a, b) => cmp(a, b, "id"));
   const ts = [...tools].sort((a, b) => cmp(a, b, "id"));
   const s =
-    cs
-      .map((c) => [c.slug, c.name, c.sort, c.is_published, c.logo, c.icon, c.description].join("|"))
-      .join("~") +
+    cs.map((c) => [c.id, c.slug, c.sort, c.is_published].join("|")).join("~") +
     "#" +
-    ts
-      .map((t) =>
-        [t.id, t.collection_id, t.name, t.summary, t.pricing, t.sort, t.slug, t.is_published, String(t.intro || "").length, t.logo].join("|")
-      )
-      .join("~");
+    ts.map((t) => [t.id, t.collection_id, t.sort, t.is_published, t.pricing, t.slug].join("|")).join("~");
   let h = 5381;
   for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
   return h.toString(36) + "-" + s.length;
@@ -189,6 +184,7 @@ ${jsonLd({
     offers: { "@type": "Offer", price: "0", priceCurrency: "CNY" },
   })}
 ${FALLBACK_SNIPPET}
+${liveTag()}
 ${foot("ai-tool-" + toolSlug(t))}`;
   return { html };
 }

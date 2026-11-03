@@ -3708,7 +3708,10 @@ var sidebarSearchInput=document.getElementById('sidebarSearchInput'),sidebarSear
 if(sidebarSearchBtn){sidebarSearchBtn.addEventListener('click',function(){closeSearchSuggestions();self.doSearch(sidebarSearchInput.value.trim());});}
 if(sidebarSearchInput){sidebarSearchInput.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.isComposing){closeSearchSuggestions();self.doSearch(this.value.trim());}});}
 document.getElementById('logoHome').addEventListener('click',function(e){e.preventDefault();self.goHome();});
-document.getElementById('mobileToggle').addEventListener('click',function(){document.getElementById('navLinks').classList.toggle('open');});
+document.getElementById('mobileToggle').addEventListener('click',function(e){e.stopPropagation();document.getElementById('navLinks').classList.toggle('open');});
+/* 移动端导航下拉：点击页面空白处自动收起 */
+document.addEventListener('click',function(e){var nl=document.getElementById('navLinks'),mt=document.getElementById('mobileToggle');if(nl&&nl.classList.contains('open')&&!nl.contains(e.target)&&!(mt&&mt.contains(e.target))){nl.classList.remove('open');}});
+document.addEventListener('touchstart',function(e){var nl=document.getElementById('navLinks'),mt=document.getElementById('mobileToggle');if(nl&&nl.classList.contains('open')&&!nl.contains(e.target)&&!(mt&&mt.contains(e.target))){nl.classList.remove('open');}},{passive:true});
 document.getElementById('prevPageBtn').addEventListener('click',function(){if(currentPage>1){currentPage--;self.renderListPage();}});
 document.getElementById('nextPageBtn').addEventListener('click',function(){var total=Math.ceil(currentFilteredList.length/PAGE_SIZE);if(currentPage<total){currentPage++;self.renderListPage();}});
 document.getElementById('sortSelect').addEventListener('change',function(){self.sortBy=this.value;try{localStorage.setItem('lezhe_sort_by',self.sortBy);}catch(e){}currentPage=1;self.refreshListWithFilters();});
