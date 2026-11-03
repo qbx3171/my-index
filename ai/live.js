@@ -252,6 +252,8 @@
 
   // 指纹算法必须与 seo/ai-section.mjs 的 aiSig() 保持一致（含排序键与 djb2 算法）。
   // 万一哪天两边漂移，最坏结果只是「每次访问都重绘」，DOM 相同、用户看不出差别。
+  // 指纹只认结构字段（新增/删除/排序/上下架/收费模式），与 seo/ai-section.mjs 的 aiSig() 一致。
+  // 刻意不含文本字段：传输抖动会把汉字随机截成 U+FFFD，文本一旦参与指纹，两端就永远不相等。
   function sig(cols, tools) {
     function cmp(x, y, k) {
       var a = x.sort || 0, b = y.sort || 0;
@@ -259,16 +261,13 @@
       var xs = String(x[k]), ys = String(y[k]);
       return xs < ys ? -1 : xs > ys ? 1 : 0;
     }
-    var cs = cols.slice().sort(function (a, b) { return cmp(a, b, 'slug'); });
+    var cs = cols.slice().sort(function (a, b) { return cmp(a, b, 'id'); });
     var ts = tools.slice().sort(function (a, b) { return cmp(a, b, 'id'); });
     var s = cs.map(function (c) {
-      return [c.slug, c.name, c.sort, c.is_published, c.logo, c.icon, c.description].join('|');
+      return [c.id, c.slug, c.sort, c.is_published].join('|');
     }).join('~') + '#' + ts.map(function (t) {
-      return [t.id, t.collection_id, t.name, t.summary, t.pricing, t.sort, t.slug, t.is_published,
-        String(t.intro || '').length, t.logo].join('|');
+      return [t.id, t.collection_id, t.sort, t.is_published, t.pricing, t.slug].join('|');
     }).join('~');
-    window.__AI_LIVE_STR__ = s;
-    window.__AI_LIVE_STR__ = s;
     var h = 5381;
     for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
     return h.toString(36) + '-' + s.length;
