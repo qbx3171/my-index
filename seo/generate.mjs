@@ -54,6 +54,9 @@ async function fetchOnce(query) {
   return JSON.parse(Buffer.from(await res.arrayBuffer()).toString("utf8"));
 }
 
+// 治愈后仍残留的乱码字段先记录、不立即告警 —— 其中一部分会被下方母本兜底覆盖，
+// 真正需要人工关注的是「母本兜底后仍残留」的（见 DATA_MASTERS 应用后的汇报）。
+const HEALING_LEFTOVER = [];
 async function sb(query, copies = 8) {
   const parsed = [];
   let lastErr;
@@ -117,11 +120,9 @@ async function sb(query, copies = 8) {
     }
     await new Promise((r) => setTimeout(r, 400));
   }
-  const bad = [];
   for (const row of rows)
     for (const [k, v] of Object.entries(row))
-      if (typeof v === "string" && v.includes(FFD)) bad.push(`${row.id ?? "?"}/${k}`);
-  if (bad.length) console.warn(`⚠ 治愈 ${5} 轮后仍有乱码字段（源数据可能真的损坏）: ${bad.join(", ")}`);
+      if (typeof v === "string" && v.includes(FFD)) HEALING_LEFTOVER.push(`${row.id ?? "?"}/${k}`);
   return rows;
 }
 
@@ -139,6 +140,8 @@ const TEXT_FIXUPS = [
   { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", from: /「改哪里」\uFFFD矩形/, to: "「改哪里」。矩形" },
   { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", from: /1–2\s*\uFFFD*像素/, to: "1–2 像素" },
   { id: "ba65264357f25999f28052c1", field: "description", from: /镜头品牌与\uFFFD+号/, to: "镜头品牌与型号" },
+  // Windows 11：代理对这篇描述有两个稳定损坏点（8 副本合并 + 单条重拉后仍残留）
+  { id: "d05e874d28573342261a189c", field: "description", from: /进\uFFFD+了全面升级/, to: "进行了全面升级" },
 ];
 function applyFixups(rows) {
   for (const row of rows) {
@@ -153,24 +156,44 @@ function applyFixups(rows) {
 
 const softs = applyFixups(await sb("software?select=*&limit=1000"));
 const tutorials = applyFixups(await sb("tutorials?select=*&limit=500"));
-// 母本兜底：长正文（>2KB）经代理传输损坏位置随机，定点修复覆盖不全。
-// 对配置了母本的记录，若合并后正文仍残留乱码，直接用本地母本整体覆盖。
-const CONTENT_MASTERS = [
-  { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", file: "content-master-acd18f73.txt" },
-  { id: "ab616030-0d0e-4462-be04-847abc6e9de5", field: "content", file: "content-master-ab616030.txt" },
-  { id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "summary", file: "summary-master-acd18f73.txt" },
-  // AnyDesk 教程（2026-11-02 新增）：长中文正文写库后稳定残留 U+FFFD，母本兜底
-  { id: "c298b689-3b34-4e3e-aff2-7d4da3e0ae8a", field: "content", file: "content-master-c298b689.txt" },
-  { id: "c298b689-3b34-4e3e-aff2-7d4da3e0ae8a", field: "summary", file: "summary-master-c298b689.txt" },
-  // 2345看图王 教程（2026-11-03 新增）：写库即带 U+FFFD，母本兜底
-  { id: "6058916d-f0d0-44e7-a336-443916ca8aab", field: "content", file: "content-master-6058916d.txt" },
-  { id: "6058916d-f0d0-44e7-a336-443916ca8aab", field: "summary", file: "summary-master-6058916d.txt" },
+// 母本兜底：长正文/长描述经代理传输损坏位置随机，定点修复覆盖不全。
+// 对配置了母本的记录，若合并后字段仍残留乱码，直接用本地母本整体覆盖。
+// （6058916d / c298b689 的存储层数据已于 2026-11-03 经服务端探测确认干净，
+//   残留 FFD 纯属传输噪声，母本用于中和传输层损坏，不是源数据损坏。）
+const DATA_MASTERS = [
+  { table: "tutorials", id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", file: "content-master-acd18f73.txt" },
+  { table: "tutorials", id: "ab616030-0d0e-4462-be04-847abc6e9de5", field: "content", file: "content-master-ab616030.txt" },
+  { table: "tutorials", id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "summary", file: "summary-master-acd18f73.txt" },
+  // AnyDesk 教程（2026-11-02 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "c298b689-3b34-4e3e-aff2-7d4da3e0ae8a", field: "content", file: "content-master-c298b689.txt" },
+  { table: "tutorials", id: "c298b689-3b34-4e3e-aff2-7d4da3e0ae8a", field: "summary", file: "summary-master-c298b689.txt" },
+  // 2345看图王 教程（2026-11-03 新增）：传输易损坏，母本兜底
+  { table: "tutorials", id: "6058916d-f0d0-44e7-a336-443916ca8aab", field: "content", file: "content-master-6058916d.txt" },
+  { table: "tutorials", id: "6058916d-f0d0-44e7-a336-443916ca8aab", field: "summary", file: "summary-master-6058916d.txt" },
+  // Windows 11（software 表对 anon key 只读，改不了库）：描述传输易损坏，母本兜底
+  { table: "software", id: "d05e874d28573342261a189c", field: "description", file: "desc-master-d05e874d.txt" },
 ];
-for (const m of CONTENT_MASTERS) {
-  const row = tutorials.find((t) => t.id === m.id);
+const coveredByMaster = new Set();
+for (const m of DATA_MASTERS) {
+  const rows = m.table === "software" ? softs : tutorials;
+  const row = rows.find((t) => t.id === m.id);
   if (row && typeof row[m.field] === "string" && row[m.field].includes(FFD)) {
     row[m.field] = await readFile(join(ROOT, "seo", m.file), "utf8");
+    coveredByMaster.add(`${m.id}/${m.field}`);
     console.log(`已用母本覆盖 ${m.id}.${m.field}（传输乱码兜底）`);
+  }
+}
+// 汇报：母本兜底后仍残留的才是真问题（产物会带乱码，末尾自检会 exit 2）
+{
+  const stillBad = new Set();
+  for (const row of [...softs, ...tutorials])
+    for (const [k, v] of Object.entries(row))
+      if (typeof v === "string" && v.includes(FFD)) stillBad.add(`${row.id}/${k}`);
+  const uncovered = [...stillBad].filter((x) => !coveredByMaster.has(x));
+  if (uncovered.length) {
+    console.warn(`⚠ 母本兜底后仍残留乱码字段（源数据可能损坏，需补母本）: ${uncovered.join(", ")}`);
+  } else if (HEALING_LEFTOVER.length) {
+    console.log(`传输乱码 ${HEALING_LEFTOVER.length} 处，已全部由母本兜底覆盖 ✓`);
   }
 }
 // 描述定点重写：个别记录源描述含采集噪声且过短（触发薄内容/描述告警），用真实信息整体重写
