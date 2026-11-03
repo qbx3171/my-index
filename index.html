@@ -285,7 +285,7 @@ input,select,textarea{font-family:inherit;border:none;outline:none;background:no
 .main-content.sidebar-open{margin-left:calc(var(--sidebar-width) + 4px)}
 /* 移动端内边距 16px：必须写在基础规则之后（上方 820px 块因顺序被 24px 基础规则覆盖，导致移动端顶栏左侧留白） */
 @media (max-width:820px){.main-content{padding:0 16px 40px}}
-.header{position:sticky;top:0;z-index:70;background:rgba(246,248,252,.85);border-bottom:1px solid var(--border-glow);height:var(--header-height);box-shadow:0 2px 12px rgba(15,26,46,.02);margin:0 -24px 0 0;padding:0 24px;contain:layout style}
+.header{position:sticky;top:0;z-index:70;background:rgba(246,248,252,.85);border-bottom:1px solid var(--border-glow);height:var(--header-height);box-shadow:0 2px 12px rgba(15,26,46,.02);margin:0 -24px;padding:0 24px;contain:layout style}
 [data-theme="dark"] .header{background:rgba(13,20,36,.85)}
 [data-theme="glass"] .header{background:linear-gradient(180deg,rgba(18,26,44,.65) 0%,rgba(12,20,38,.75) 100%);border-bottom:1px solid rgba(255,255,255,.12);box-shadow:0 4px 24px rgba(0,10,30,.4),inset 0 -1px 0 rgba(255,255,255,.05)}
 @media (max-width:820px){.header{margin:0 -16px;padding:0 16px}}
