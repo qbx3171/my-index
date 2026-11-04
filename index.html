@@ -1726,7 +1726,7 @@ var light=cache.software.map(function(s){return{id:s.id,name:s.name,category:s.c
 localStorage.setItem(CACHE_KEY,JSON.stringify({software:light,categories:cache.categories,timestamp:Date.now()}));
 }catch(e2){}
 }
-function getCachedData(){if(cache.loaded&&cache.software.length>0)return{software:cache.software,categories:cache.categories};var s=localStorage.getItem(CACHE_KEY);if(s){try{var d=JSON.parse(s);if(d&&Array.isArray(d.software)&&Array.isArray(d.categories)){cache.software=d.software;cache.categories=d.categories;cache.loaded=true;cache.lastFetch=d.timestamp||0;return{software:cache.software,categories:cache.categories};}}catch(e){}}return null;}
+function getCachedData(freshOnly){if(cache.loaded&&cache.software.length>0)return{software:cache.software,categories:cache.categories};var s=localStorage.getItem(CACHE_KEY);if(s){try{var d=JSON.parse(s);if(d&&Array.isArray(d.software)&&Array.isArray(d.categories)){if(freshOnly&&Date.now()-(d.timestamp||0)>=600000)return null;cache.software=d.software;cache.categories=d.categories;cache.loaded=true;cache.lastFetch=d.timestamp||0;return{software:cache.software,categories:cache.categories};}}catch(e){}}return null;}
 var DB={
 _loadRetryCount:0,
 _loadMaxRetries:5,
@@ -3725,7 +3725,7 @@ applyTheme(savedTheme);
 if(window.matchMedia){try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(e){var stored='';try{stored=localStorage.getItem('theme')||'';}catch(err){}if(!stored)applyTheme(e.matches?'dark':'light');});}catch(err){}}
 if(themeToggle)themeToggle.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openThemePicker();});
 if(headerThemeBtn)headerThemeBtn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();openThemePicker();});
-var cached=getCachedData();
+var cached=getCachedData(true);/* 首屏只吃 10 分钟内的新缓存：过期缓存不上屏（避免先旧后新），仅作断网兜底 */
 var _idle=window.requestIdleCallback||function(cb){return setTimeout(cb,200);};
 var _todayBox=document.getElementById('todayStackContainer');
 if(_todayBox){
@@ -3747,6 +3747,8 @@ renderQuestions();
 if(!handleUrlParams())App.goHome();
 });
 }).catch(function(){
+var _stale=getCachedData();/* 拉新失败才回退旧缓存（断网兜底） */
+if(_stale&&!window._lezheLoadFailed)self.refreshAll({skipToday:true});
 window.dispatchEvent(new Event('lezhe:ready'));
 });
 document.querySelectorAll('.nav-links a[data-page]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var page=this.dataset.page;if(page==='home')self.goHome();else if(page==='list')self.goList();else if(page==='tutorials')self.goTutorials();else if(page==='qa')self.goQA();else if(page==='checkin')self.goCheckin();else if(page==='ranking')self.goRanking();else if(page==='mall')self.goMall();});});
