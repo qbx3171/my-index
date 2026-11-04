@@ -163,7 +163,15 @@ export function renderAiToolDetail(t, col, collections, siblings) {
     .map((p) => `<p>${esc(p)}</p>`)
     .join("\n");
   const logo = String(t.logo || "").trim();
-  const reportMail = `mailto:LeZheSoft@outlook.com?subject=${encodeURIComponent(`工具举报：${t.name}`)}&body=${encodeURIComponent(`页面：${canonical}\n问题：`)}`;
+  let domain = "";
+  try {
+    domain = new URL(t.url).hostname.replace(/^www\./, "");
+  } catch {
+    domain = String(t.url || "").replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  }
+  const createdAt = t.created_at
+    ? new Date(t.created_at).toLocaleDateString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" })
+    : "持续更新";
 
   const html =
     head(title4Tool(t, col), desc, canonical, `<meta property="og:image" content="${esc(logo || `${SITE}/og-cover.png`)}">` + aiCss()) +
@@ -188,8 +196,13 @@ ${crumb([
     <div class="ai-detail-title"><h2>${esc(t.name)}</h2><span class="ai-badge ${badgeClass(t.pricing)}">${esc(t.pricing || "免费")}</span></div>
     <p class="ai-card-summary">${esc(t.summary || "")}</p>
     <a class="ai-site-btn" rel="nofollow noopener" target="_blank" href="${esc(t.url)}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>访问官网</a>
-    <button class="ai-fav-btn" id="aiFavBtn" type="button" data-tid="${esc(t.id)}"></button>
-    <a class="ai-report-btn" href="${reportMail}"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1Z"/><path d="M4 22v-7"/></svg>举报工具</a>
+    <div class="ai-aside-cap">工具信息</div>
+    <dl class="ai-info">
+      <div class="ai-info-row"><dt>收费模式</dt><dd>${esc(t.pricing || "免费")}</dd></div>
+      <div class="ai-info-row"><dt>所属工具集</dt><dd><a href="${SITE}/ai/${esc(col.slug)}.html">${esc(col.name)} ›</a></dd></div>
+      <div class="ai-info-row"><dt>官网域名</dt><dd><a rel="nofollow noopener" target="_blank" href="${esc(t.url)}">${esc(domain)}</a></dd></div>
+      <div class="ai-info-row"><dt>收录时间</dt><dd>${createdAt}</dd></div>
+    </dl>
     <div class="ai-aside-cap">作者信息</div>
     <a class="ai-author" href="${SITE}/"><span class="ai-author-logo">乐</span><span class="ai-author-txt"><b>乐哲软件</b><i>官方收录 · 持续更新</i></span><span class="ai-side-arr">›</span></a>
     <a class="ai-author-more" href="${SITE}/ai/${esc(col.slug)}.html">查看同类工具<span class="arr">›</span></a>
@@ -199,16 +212,6 @@ ${crumb([
 ${siblings.length ? `<section class="ai-detail-sec"><h2>同类工具推荐</h2><div class="ai-cards">${siblings.map(toolCard).join("\n")}</div></section>` : ""}
 <p class="ai-back"><a href="${SITE}/ai/index.html" style="color:#0077ff">← 全部工具集</a></p>
 </main>
-<script>
-(function(){
-var id=document.getElementById('aiFavBtn');if(!id)return;
-var tid=id.getAttribute('data-tid'),K='lezhe_ai_favs';
-function favs(){try{var v=JSON.parse(localStorage.getItem(K)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}}
-function draw(){var on=favs().indexOf(tid)>=0;var st='<svg viewBox="0 0 24 24" width="14" height="14" fill="'+(on?'currentColor':'none')+'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01Z"/></svg>';id.innerHTML=st+'<span>'+(on?'已收藏':'收藏工具')+'</span>';id.className='ai-fav-btn'+(on?' on':'')}
-id.addEventListener('click',function(){var f=favs(),i=f.indexOf(tid);if(i>=0)f.splice(i,1);else f.push(tid);try{localStorage.setItem(K,JSON.stringify(f))}catch(e){}draw()});
-draw();
-})();
-</script>
 ${jsonLd({
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -241,12 +244,29 @@ function detailDesc(t, col) {
 
 // —— 页面渲染 ——
 
+// —— hub 每节导语（2026-11-04）：光有卡片纯文字过短，按真实数据写一行
+// 「款数 + 名单 + 收费分布」，不搬详情页 intro，避免与详情页正文重复。
+function secLead(col, tools) {
+  const pricingOf = (t) => String(t.pricing || "免费").trim();
+  const mix = [...new Set(tools.map(pricingOf))];
+  const priceLine =
+    mix.length === 1 ? `收费模式均为${mix[0]}` : `收费模式分 ${mix.length} 种（${mix.join("、")}）`;
+  const names = tools.slice(0, 6).map((t) => plainText(t.name)).join("、");
+  return `本方向共收录 ${tools.length} 款：${names}${tools.length > 6 ? " 等" : ""}；${priceLine}。点「查看更多」进工具集页可看快速对比表与挑选建议。`;
+}
+
 export function renderAiHub(collections, byCollection) {
   const title = "AI工具集 - 精选AI工具合集导航 | 乐哲软件";
   const desc =
     "乐哲软件 AI 工具集：按使用场景整理的 AI 工具合集，每个工具集独立成页，涵盖 AI 对话、写作、绘画图像、视频音频、编程开发、办公效率等方向，逐个标注收费模式与适用人群，持续增补更新，找 AI 工具收藏这一页就够了。";
   const canonical = `${SITE}/ai/index.html`;
   const hasContent = collections.length > 0;
+  const toolCount = (c) => (byCollection[c.slug] || []).length;
+  const hubIntro = hasContent
+    ? `<p class="ai-lead">目前已整理 ${collections.length} 个方向：${collections
+        .map((c) => `${esc(c.name)} ${toolCount(c)} 款`)
+        .join("、")}。每个方向独立成页，页内附真实数据对比表与挑选建议；工具随后台收录持续增补，先把每个方向最常用的两三款跑通再考虑付费。</p>`
+    : "";
 
   const sections = collections
     .map((c) => {
@@ -258,6 +278,7 @@ export function renderAiHub(collections, byCollection) {
   <div class="ai-sec-head">${secIcon(c.slug)}
   <h2>${esc(c.name)}</h2>
   <a class="ai-sec-more" href="${SITE}/ai/${esc(c.slug)}.html">查看更多 ›</a></div>
+  <p class="ai-lead">${esc(secLead(c, tools))}</p>
   <div class="ai-cards">${shown.map(toolCard).join("\n")}</div>
 </section>`;
     })
@@ -265,7 +286,7 @@ export function renderAiHub(collections, byCollection) {
     .join("\n");
 
   const body = hasContent
-    ? `<div id="aiHubBody">${sections || `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p></div>`}</div>`
+    ? `<div id="aiHubBody">${hubIntro}${sections || `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p></div>`}</div>`
     : `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p><p>计划方向：AI 对话助手、AI 写作、AI 绘画图像、AI 视频音频、AI 编程开发、AI 办公效率等，每个方向一个独立工具集。</p></div>`;
 
   const html =
@@ -365,7 +386,7 @@ export function renderAiCollection(col, tools, collections = []) {
   const toolsBlock = tools.length
     ? `<div class="ai-cards" id="aiColCards">\n${tools.map(toolCard).join("\n")}\n</div>`
     : `<div class="ai-empty" id="aiColCards">📦 本工具集正在整理中，工具马上就来 —— 你也可以先逛逛<a href="${SITE}/ai/index.html" style="color:#0077ff">其他工具集</a>。
-<p>这里将收录与「${esc(col.name)}」相关的 AI 工具：逐个标注收费模式、核心定位与适用人群，附官网入口与快速对比表。正在找这类工具的话，可以先收藏本页，上架后会第一时间出现在这里。上架节奏以实用为先：先把每个方向最常用的两三款补齐并逐一试用核对，再逐步扩充长尾工具，避免一次塞满却没有筛选。</p></div>`;
+<p>这里将收录与「${esc(col.name)}」相关的 AI 工具：逐个标注收费模式、核心定位与适用人群，附官网入口与快速对比表。正在找这类工具的话，可以先收藏本页，上架后会第一时间出现在这里。上架节奏以实用为先：先把每个方向最常用的两三款补齐并逐一试用核对，再逐步扩充长尾工具，避免一次塞满却没有筛选。收录标准同样以日常可用性为先：注册门槛低、中文支持好、免费额度够跑通完整流程的优先收录，纯套壳或长期无法访问的不收。</p></div>`;
 
   const html =
     head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
@@ -609,11 +630,14 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-aside-card .ai-card-summary{white-space:normal;font-size:.82rem;line-height:1.65;color:#8a93a3;margin:0 0 16px}
 .ai-site-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,#0b66f0,#6c5ce7);color:#fff;text-decoration:none;font-weight:600;font-size:.9rem;padding:12px 16px;border-radius:10px;transition:.16s}
 .ai-site-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(11,102,240,.32)}
-.ai-fav-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;font-family:inherit;font-size:.87rem;font-weight:500;padding:11px 16px;border-radius:10px;cursor:pointer;margin-top:9px;background:transparent;border:1px solid #e2e6ee;color:#41506b;transition:.16s}
-.ai-fav-btn:hover{border-color:rgba(11,102,240,.55);color:#0b66f0;background:rgba(11,102,240,.04)}
-.ai-fav-btn.on{border-color:transparent;background:#0b66f0;color:#fff}
-.ai-report-btn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;box-sizing:border-box;margin-top:12px;padding:2px;font-size:.76rem;color:#a6adba;text-decoration:none;transition:.15s}
-.ai-report-btn:hover{color:#d64541}
+.ai-fav-btn{display:none}
+.ai-info{margin:10px 0 0}
+.ai-info-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed #eceff4}
+.ai-info-row:last-child{border-bottom:0;padding-bottom:2px}
+.ai-info-row dt{font-size:.78rem;color:#9aa3b2;flex-shrink:0}
+.ai-info-row dd{margin:0;font-size:.8rem;color:#3d4657;font-weight:600;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62%}
+.ai-info-row dd a{color:#0b66f0;text-decoration:none;font-weight:600}
+.ai-info-row dd a:hover{text-decoration:underline}
 .ai-aside-cap{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;letter-spacing:.12em;color:#9aa3b2;border-top:1px solid var(--ai-border);margin-top:18px;padding-top:16px}
 .ai-author{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:12px 2px 4px}
 .ai-author:hover .ai-side-arr{color:#0b66f0}
