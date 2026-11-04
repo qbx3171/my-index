@@ -76,13 +76,14 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-site-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,#0b66f0,#6c5ce7);color:#fff;text-decoration:none;font-weight:600;font-size:.9rem;padding:12px 16px;border-radius:10px;transition:.16s}
 .ai-site-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(11,102,240,.32)}
 .ai-fav-btn{display:none}
-.ai-info{margin:10px 0 0}
-.ai-info-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed #eceff4}
-.ai-info-row:last-child{border-bottom:0;padding-bottom:2px}
-.ai-info-row dt{font-size:.78rem;color:#9aa3b2;flex-shrink:0}
-.ai-info-row dd{margin:0;font-size:.8rem;color:#3d4657;font-weight:600;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62%}
-.ai-info-row dd a{color:#0b66f0;text-decoration:none;font-weight:600}
-.ai-info-row dd a:hover{text-decoration:underline}
+.ai-info{margin:12px 0 0;display:flex;flex-direction:column;gap:7px}
+.ai-info-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 13px;background:var(--bg-secondary,#f5f7fa);border-radius:9px}
+.ai-info-row dt{font-size:.76rem;color:#8a93a3;flex-shrink:0}
+.ai-info-row dd{margin:0;font-size:.8rem;color:#2b3444;font-weight:600;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%}
+body .ai-info-row dd a{color:#0b66f0;text-decoration:none;font-weight:600}
+body .ai-info-row dd a:hover{text-decoration:underline}
+[data-theme="dark"] .ai-info-row{background:rgba(255,255,255,.05)}
+[data-theme="dark"] .ai-info-row dd{color:#dbe3ef}
 .ai-aside-cap{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;letter-spacing:.12em;color:#9aa3b2;border-top:1px solid var(--ai-border);margin-top:18px;padding-top:16px}
 .ai-author{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:12px 2px 4px}
 .ai-author:hover .ai-side-arr{color:#0b66f0}

@@ -244,16 +244,8 @@ function detailDesc(t, col) {
 
 // —— 页面渲染 ——
 
-// —— hub 每节导语（2026-11-04）：光有卡片纯文字过短，按真实数据写一行
-// 「款数 + 名单 + 收费分布」，不搬详情页 intro，避免与详情页正文重复。
-function secLead(col, tools) {
-  const pricingOf = (t) => String(t.pricing || "免费").trim();
-  const mix = [...new Set(tools.map(pricingOf))];
-  const priceLine =
-    mix.length === 1 ? `收费模式均为${mix[0]}` : `收费模式分 ${mix.length} 种（${mix.join("、")}）`;
-  const names = tools.slice(0, 6).map((t) => plainText(t.name)).join("、");
-  return `本方向共收录 ${tools.length} 款：${names}${tools.length > 6 ? " 等" : ""}；${priceLine}。点「查看更多」进工具集页可看快速对比表与挑选建议。`;
-}
+// —— 页面渲染 ——
+// 注意：hub 列表页不要加任何描述导语/段落（用户 2026-11-04 明确要求，靠卡片+分类页对比表保文字量）。
 
 export function renderAiHub(collections, byCollection) {
   const title = "AI工具集 - 精选AI工具合集导航 | 乐哲软件";
@@ -261,12 +253,6 @@ export function renderAiHub(collections, byCollection) {
     "乐哲软件 AI 工具集：按使用场景整理的 AI 工具合集，每个工具集独立成页，涵盖 AI 对话、写作、绘画图像、视频音频、编程开发、办公效率等方向，逐个标注收费模式与适用人群，持续增补更新，找 AI 工具收藏这一页就够了。";
   const canonical = `${SITE}/ai/index.html`;
   const hasContent = collections.length > 0;
-  const toolCount = (c) => (byCollection[c.slug] || []).length;
-  const hubIntro = hasContent
-    ? `<p class="ai-lead">目前已整理 ${collections.length} 个方向：${collections
-        .map((c) => `${esc(c.name)} ${toolCount(c)} 款`)
-        .join("、")}。每个方向独立成页，页内附真实数据对比表与挑选建议；工具随后台收录持续增补，先把每个方向最常用的两三款跑通再考虑付费。</p>`
-    : "";
 
   const sections = collections
     .map((c) => {
@@ -278,7 +264,6 @@ export function renderAiHub(collections, byCollection) {
   <div class="ai-sec-head">${secIcon(c.slug)}
   <h2>${esc(c.name)}</h2>
   <a class="ai-sec-more" href="${SITE}/ai/${esc(c.slug)}.html">查看更多 ›</a></div>
-  <p class="ai-lead">${esc(secLead(c, tools))}</p>
   <div class="ai-cards">${shown.map(toolCard).join("\n")}</div>
 </section>`;
     })
@@ -286,7 +271,7 @@ export function renderAiHub(collections, byCollection) {
     .join("\n");
 
   const body = hasContent
-    ? `<div id="aiHubBody">${hubIntro}${sections || `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p></div>`}</div>`
+    ? `<div id="aiHubBody">${sections || `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p></div>`}</div>`
     : `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p><p>计划方向：AI 对话助手、AI 写作、AI 绘画图像、AI 视频音频、AI 编程开发、AI 办公效率等，每个方向一个独立工具集。</p></div>`;
 
   const html =
@@ -631,13 +616,14 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-site-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,#0b66f0,#6c5ce7);color:#fff;text-decoration:none;font-weight:600;font-size:.9rem;padding:12px 16px;border-radius:10px;transition:.16s}
 .ai-site-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(11,102,240,.32)}
 .ai-fav-btn{display:none}
-.ai-info{margin:10px 0 0}
-.ai-info-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed #eceff4}
-.ai-info-row:last-child{border-bottom:0;padding-bottom:2px}
-.ai-info-row dt{font-size:.78rem;color:#9aa3b2;flex-shrink:0}
-.ai-info-row dd{margin:0;font-size:.8rem;color:#3d4657;font-weight:600;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62%}
-.ai-info-row dd a{color:#0b66f0;text-decoration:none;font-weight:600}
-.ai-info-row dd a:hover{text-decoration:underline}
+.ai-info{margin:12px 0 0;display:flex;flex-direction:column;gap:7px}
+.ai-info-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 13px;background:var(--bg-secondary,#f5f7fa);border-radius:9px}
+.ai-info-row dt{font-size:.76rem;color:#8a93a3;flex-shrink:0}
+.ai-info-row dd{margin:0;font-size:.8rem;color:#2b3444;font-weight:600;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%}
+body .ai-info-row dd a{color:#0b66f0;text-decoration:none;font-weight:600}
+body .ai-info-row dd a:hover{text-decoration:underline}
+[data-theme="dark"] .ai-info-row{background:rgba(255,255,255,.05)}
+[data-theme="dark"] .ai-info-row dd{color:#dbe3ef}
 .ai-aside-cap{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;letter-spacing:.12em;color:#9aa3b2;border-top:1px solid var(--ai-border);margin-top:18px;padding-top:16px}
 .ai-author{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:12px 2px 4px}
 .ai-author:hover .ai-side-arr{color:#0b66f0}
