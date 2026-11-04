@@ -114,3 +114,9 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [x] 统计「零第三方」（2026-10-31：前端已改成三层取值 —— ①自家 Supabase `site_hit/site_get` ②abacus 兜底 ③localStorage 上次值；自家通道探测失败后本会话不再重试。SQL 见 `seo/site-stats.sql`）
 - [x] Supabase 建表 + RPC（2026-10-31 已执行：`site_stats` 表 + `site_hit/site_get`；表无 policy、anon 直接 select 返回空数组，只能走函数。实测预检 200、自增正常、非法 key 返回 P0001。线上端到端验证：3 个请求全打自家 RPC，abacus 零调用。自检命令 `node seo/stat-check.mjs`）
 - [x] AI 工具集板块（/ai/）上线收尾（2026-11-02 已上线，commit aeebb22e）：站长需执行 seo/ai-schema.sql 末尾的升级段（logo/slug/intro/screenshots 五个 ALTER），再到 admin.html「🤖AI工具集」上传工具集与工具（支持封面图URL、详细介绍、多张截图；无封面自动生成字母封面）
+
+## ⛔ 用户明确禁改项（2026-11-04，优化时不得违反）
+- AI 工具集列表页（/ai/ 首页与所有页面）**禁止出现任何描述导语/段落**：hub 标题下不加 lead 段、每个分区标题下不加「本方向共收录…」之类导语。薄内容问题靠分类页的对比表与选择建议解决，不要往列表页加字。
+- AI 板块内禁止使用 emoji 图标（标题、分区、按钮一律用内联 SVG 或纯文字）。
+- 详情页右卡不放「收藏工具」「举报工具」按钮（已按用户要求移除，勿加回）。
+- 违反以上任一项 = 用户投诉级别 BUG，上线前自检时发现必须回退。
