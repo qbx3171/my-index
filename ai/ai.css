@@ -75,11 +75,14 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 .ai-aside-card .ai-card-summary{white-space:normal;font-size:.82rem;line-height:1.65;color:#8a93a3;margin:0 0 16px}
 .ai-site-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,#0b66f0,#6c5ce7);color:#fff;text-decoration:none;font-weight:600;font-size:.9rem;padding:12px 16px;border-radius:10px;transition:.16s}
 .ai-site-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(11,102,240,.32)}
-.ai-fav-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;font-family:inherit;font-size:.87rem;font-weight:500;padding:11px 16px;border-radius:10px;cursor:pointer;margin-top:9px;background:transparent;border:1px solid #e2e6ee;color:#41506b;transition:.16s}
-.ai-fav-btn:hover{border-color:rgba(11,102,240,.55);color:#0b66f0;background:rgba(11,102,240,.04)}
-.ai-fav-btn.on{border-color:transparent;background:#0b66f0;color:#fff}
-.ai-report-btn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;box-sizing:border-box;margin-top:12px;padding:2px;font-size:.76rem;color:#a6adba;text-decoration:none;transition:.15s}
-.ai-report-btn:hover{color:#d64541}
+.ai-fav-btn{display:none}
+.ai-info{margin:10px 0 0}
+.ai-info-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed #eceff4}
+.ai-info-row:last-child{border-bottom:0;padding-bottom:2px}
+.ai-info-row dt{font-size:.78rem;color:#9aa3b2;flex-shrink:0}
+.ai-info-row dd{margin:0;font-size:.8rem;color:#3d4657;font-weight:600;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:62%}
+.ai-info-row dd a{color:#0b66f0;text-decoration:none;font-weight:600}
+.ai-info-row dd a:hover{text-decoration:underline}
 .ai-aside-cap{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;letter-spacing:.12em;color:#9aa3b2;border-top:1px solid var(--ai-border);margin-top:18px;padding-top:16px}
 .ai-author{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:12px 2px 4px}
 .ai-author:hover .ai-side-arr{color:#0b66f0}

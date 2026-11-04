@@ -17,3 +17,4 @@ package.json
 package-lock.json
 seo/.*.mjs
 seo/.*.png
+seo/.*.json
