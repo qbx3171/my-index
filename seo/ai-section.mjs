@@ -78,15 +78,30 @@ function coverHtml(item, cls) {
   }
   return aiFallback(item.name, cls);
 }
+// —— 分区图标：统一线性 SVG（替代 emoji / emoji 风图片），按 slug 关键词配色 ——
+const SEC_ICONS = [
+  [/xiezuo|write|写作/, { c: "#0b66f0", bg: "rgba(11,102,240,.09)", d: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>' }],
+  [/photo|tuxiang|pic|image|huihua|图像|绘画/, { c: "#7a3ff2", bg: "rgba(122,63,242,.09)", d: '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>' }],
+  [/shipin|video|视频/, { c: "#e74c3c", bg: "rgba(231,76,60,.09)", d: '<rect x="2" y="4" width="20" height="16" rx="3"/><path d="m10 9 5 3-5 3Z"/>' }],
+  [/yinyue|yinpin|music|audio/, { c: "#e67e22", bg: "rgba(230,126,34,.10)", d: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>' }],
+  [/duihua|chat|bot|zhushou|对话|助手/, { c: "#0a8f4d", bg: "rgba(16,163,74,.10)", d: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8Z"/>' }],
+  [/code|dev|biancheng|kaifa|编程|开发/, { c: "#16a085", bg: "rgba(22,160,133,.10)", d: '<path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/>' }],
+  [/bangong|office|xiaolv|办公|效率/, { c: "#d98b00", bg: "rgba(240,160,0,.10)", d: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' }],
+];
+const SEC_ICON_DEFAULT = { c: "#0b66f0", bg: "rgba(11,102,240,.09)", d: '<path d="m12 3 1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3Z"/>' };
+function secIcon(slug, lg) {
+  const s = String(slug || "").toLowerCase();
+  const hit = SEC_ICONS.find(([re]) => re.test(s)) || [null, SEC_ICON_DEFAULT];
+  const ico = hit[1];
+  return `<span class="ai-sec-ico${lg ? " lg" : ""}" style="color:${ico.c};background:${ico.bg}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ico.d}</svg></span>`;
+}
+
 function aiFallback(name, cls) {
   const s = String(name || "AI");
   const ch = [...s][0] || "A";
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.codePointAt(i)) >>> 0;
-  const hue = h % 360;
-  return `<span class="${cls} ai-cover-fb" style="background:linear-gradient(135deg,hsl(${hue},72%,52%),hsl(${(hue + 46) % 360},72%,42%))">${esc(ch)}</span>`;
+  return `<span class="${cls} ai-cover-fb" style="background:linear-gradient(135deg,#0b66f0,#6c5ce7)">${esc(ch)}</span>`;
 }
-const FALLBACK_SNIPPET = `<script>function aiFallback(n,c){var s=String(n||'AI'),ch=[...s][0]||'A',h=0;for(var i=0;i<s.length;i++)h=(h*31+s.codePointAt(i))>>>0;var hue=h%360;return '<span class="'+c+' ai-cover-fb" style="background:linear-gradient(135deg,hsl('+hue+',72%,52%),hsl('+((hue+46)%360)+',72%,42%))">'+ch+'</span>';}</script>`;
+const FALLBACK_SNIPPET = `<script>function aiFallback(n,c){var s=String(n||'AI'),ch=[...s][0]||'A';return '<span class="'+c+' ai-cover-fb" style="background:linear-gradient(135deg,#0b66f0,#6c5ce7)">'+ch+'</span>';}</script>`;
 
 // —— 工具卡片（ai-bot.cn 同款：圆形图标 + 名称/一句话简介，无角标；点击进站内详情页）——
 function toolCard(t) {
@@ -162,24 +177,22 @@ ${crumb([
   ])}
 <div class="ai-detail-grid">
 <article class="ai-intro-card">
-  <span class="ai-intro-tag">📋 详细介绍</span>
+  <div class="ai-overline">详细介绍</div>
   <h1>${esc(t.name)}</h1>
   ${tags.length ? `<div class="ai-detail-meta">${tags.map((g) => `<span class="chip">${esc(g)}</span>`).join("")}</div>` : ""}
   ${introParas || `<p>${esc(t.summary || `${t.name} 的功能介绍整理中。`)}</p>`}
-  ${shots.length ? `<div class="ai-shots">${shots.map((u, i) => `<a class="ai-shot" href="${esc(u)}" target="_blank" rel="noopener" title="查看大图"><img src="${esc(u)}" alt="${esc(t.name)} 截图${i + 1}" loading="lazy" referrerpolicy="no-referrer"></a>`).join("")}</div>` : ""}
+  ${shots.length ? `<div class="ai-intro-sub">产品截图</div><div class="ai-shots">${shots.map((u, i) => `<a class="ai-shot" href="${esc(u)}" target="_blank" rel="noopener" title="查看大图"><img src="${esc(u)}" alt="${esc(t.name)} 截图${i + 1}" loading="lazy" referrerpolicy="no-referrer"></a>`).join("")}</div>` : ""}
 </article>
 <aside class="ai-aside">
   <div class="ai-aside-card ai-detail-info">
     <div class="ai-detail-title"><h2>${esc(t.name)}</h2><span class="ai-badge ${badgeClass(t.pricing)}">${esc(t.pricing || "免费")}</span></div>
     <p class="ai-card-summary">${esc(t.summary || "")}</p>
-    <a class="ai-site-btn" rel="nofollow noopener" target="_blank" href="${esc(t.url)}">🔗 访问官网</a>
-    <button class="ai-fav-btn" id="aiFavBtn" type="button" data-tid="${esc(t.id)}">☆ 收藏工具</button>
-    <a class="ai-report-btn" href="${reportMail}">⚠ 举报工具</a>
-  </div>
-  <div class="ai-aside-card">
-    <div class="ai-aside-cap">👤 作者信息</div>
-    <a class="ai-author" href="${SITE}/"><span class="ai-author-logo">乐</span><span class="ai-author-txt"><b>乐哲软件</b><i>官方收录 · 持续更新</i></span></a>
-    <a class="ai-author-more" href="${SITE}/ai/${esc(col.slug)}.html">查看同类工具</a>
+    <a class="ai-site-btn" rel="nofollow noopener" target="_blank" href="${esc(t.url)}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>访问官网</a>
+    <button class="ai-fav-btn" id="aiFavBtn" type="button" data-tid="${esc(t.id)}"></button>
+    <a class="ai-report-btn" href="${reportMail}"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1Z"/><path d="M4 22v-7"/></svg>举报工具</a>
+    <div class="ai-aside-cap">作者信息</div>
+    <a class="ai-author" href="${SITE}/"><span class="ai-author-logo">乐</span><span class="ai-author-txt"><b>乐哲软件</b><i>官方收录 · 持续更新</i></span><span class="ai-side-arr">›</span></a>
+    <a class="ai-author-more" href="${SITE}/ai/${esc(col.slug)}.html">查看同类工具<span class="arr">›</span></a>
   </div>
 </aside>
 </div>
@@ -191,7 +204,7 @@ ${siblings.length ? `<section class="ai-detail-sec"><h2>同类工具推荐</h2><
 var id=document.getElementById('aiFavBtn');if(!id)return;
 var tid=id.getAttribute('data-tid'),K='lezhe_ai_favs';
 function favs(){try{var v=JSON.parse(localStorage.getItem(K)||'[]');return Array.isArray(v)?v:[]}catch(e){return[]}}
-function draw(){var on=favs().indexOf(tid)>=0;id.innerHTML=on?'★ 已收藏':'☆ 收藏工具';id.className='ai-fav-btn'+(on?' on':'')}
+function draw(){var on=favs().indexOf(tid)>=0;var st='<svg viewBox="0 0 24 24" width="14" height="14" fill="'+(on?'currentColor':'none')+'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01Z"/></svg>';id.innerHTML=st+'<span>'+(on?'已收藏':'收藏工具')+'</span>';id.className='ai-fav-btn'+(on?' on':'')}
 id.addEventListener('click',function(){var f=favs(),i=f.indexOf(tid);if(i>=0)f.splice(i,1);else f.push(tid);try{localStorage.setItem(K,JSON.stringify(f))}catch(e){}draw()});
 draw();
 })();
@@ -233,20 +246,18 @@ export function renderAiHub(collections, byCollection) {
   const desc =
     "乐哲软件 AI 工具集：按使用场景整理的 AI 工具合集，每个工具集独立成页，涵盖 AI 对话、写作、绘画图像、视频音频、编程开发、办公效率等方向，逐个标注收费模式与适用人群，持续增补更新，找 AI 工具收藏这一页就够了。";
   const canonical = `${SITE}/ai/index.html`;
-  const n = collections.reduce((a, c) => a + (byCollection[c.slug] || []).length, 0);
   const hasContent = collections.length > 0;
 
   const sections = collections
     .map((c) => {
       const tools = byCollection[c.slug] || [];
-      const CAP = 9;
+      const CAP = 12;
       const shown = tools.slice(0, CAP);
       if (!shown.length) return "";
       return `<section class="ai-sec" id="${esc(c.slug)}">
-  <div class="ai-sec-head">${c.logo && /^https?:\/\//i.test(c.logo) ? `<img class="ai-sec-logo" src="${esc(c.logo)}" alt="">` : `<span class="ai-sec-ico">${esc(c.icon || "🧩")}</span>`}
-  <h2>${esc(c.name)}</h2><span class="ai-sec-count">${tools.length} 款</span>
-  <a class="ai-sec-more" href="${SITE}/ai/${esc(c.slug)}.html">查看更多 &gt;&gt;</a></div>
-  <p class="ai-sec-lead">${esc(secLead(c, tools))}</p>
+  <div class="ai-sec-head">${secIcon(c.slug)}
+  <h2>${esc(c.name)}</h2>
+  <a class="ai-sec-more" href="${SITE}/ai/${esc(c.slug)}.html">查看更多 ›</a></div>
   <div class="ai-cards">${shown.map(toolCard).join("\n")}</div>
 </section>`;
     })
@@ -261,14 +272,8 @@ export function renderAiHub(collections, byCollection) {
     head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
     `
 <main>
-${crumb([{ name: "首页", url: `${SITE}/` }, { name: "AI 工具集" }])}
-<h1 class="ai-h1"><span class="ai-h1-ico">🤖</span>AI 工具集</h1>
-<p class="ai-hub-lead">按使用场景整理的 AI 工具合集，共 ${collections.length} 个工具集、${n} 款工具，持续增补更新。</p>
+<h1 class="ai-h1">AI 工具集</h1>
 ${body}
-<section class="ai-note">
-<h2>关于本板块</h2>
-<p>AI 工具更新快、同名产品多，这里不做大而全的清单，而是按「一个场景一个工具集」整理，每个工具集内只保留实际可用、有明确定位的工具，并标注收费模式（免费 / 免费额度 / 订阅 / 买断）。工具集内容会持续增补调整，本页是全部工具集的入口。</p>
-</section>
 </main>
 ${jsonLd({
     "@context": "https://schema.org",
@@ -372,7 +377,7 @@ ${crumb([
     { name: col.name },
   ])}
 <div class="ai-col-hero">
-  ${coverHtml(col, "ai-col-cover")}
+  ${secIcon(col.slug, true)}
   <div><h1>${esc(col.name)}</h1>
   <p class="ai-lead">${esc(col.description || `精选 ${tools.length} 款${col.name}，逐个标注收费模式，持续更新。`)}</p></div>
 </div>
@@ -392,13 +397,6 @@ ${FALLBACK_SNIPPET}
 ${liveTag()}
 ${foot("ai-" + col.slug)}`;
   return { html };
-}
-
-function secLead(c, tools) {
-  const pricingOf = (t) => String(t.pricing || "免费").trim();
-  const mix = [...new Set(tools.map(pricingOf))];
-  const head = `${c.name}方向目前收录 ${tools.length} 款：${tools.slice(0, 3).map((t) => t.name).join("、")}${tools.length > 3 ? " 等" : ""}`;
-  return `${head}，收费模式${mix.length === 1 ? `均为${mix[0]}` : `覆盖${mix.join(" / ")}`}，点工具名可看功能拆解与官网入口。`;
 }
 
 function badgeClass(p) {
@@ -539,28 +537,24 @@ const AI_STYLESHEET = `
 /* AI 板块专属布局：仿 tool.caie.ai 简洁风 —— 无侧栏、1200px 居中内容区、紧凑卡片网格
    注意：全站 <style> 在本文件之后加载，必须用 body 前缀提高优先级，否则 main/footer 会被全站 760px 规则覆盖 */
 body{background:var(--bg-secondary,#f5f6f8)}
-body main{max-width:1200px;margin:0 auto;padding:20px 24px 60px}
-body footer{max-width:1200px}
+body main{max-width:1400px;margin:0 auto;padding:26px 40px 60px}
+body footer{max-width:1400px}
 body header{position:sticky;top:0;z-index:100}
 /* 板块首页头部（居中大标题） */
-.ai-h1{display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.85rem;margin:16px 0 4px;text-align:center}
-.ai-h1-ico{font-size:1.5rem;line-height:1}
-.ai-hub-lead{text-align:center;color:var(--ai-dim);font-size:.88rem;margin:0 0 6px}
+.ai-h1{display:flex;align-items:center;justify-content:center;gap:12px;font-size:2rem;margin:14px 0 20px;text-align:center;letter-spacing:.01em}
 /* 工具集头部（独立页） */
 .ai-col-hero{display:flex;align-items:center;gap:16px;margin:6px 0 14px}
 .ai-col-hero h1{margin:0;font-size:1.5rem}
-.ai-col-cover{width:64px;height:64px;border-radius:14px;object-fit:cover;box-shadow:0 2px 8px rgba(20,40,80,.12);flex-shrink:0}
-span.ai-col-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.6rem}
-/* 分区头（板块首页）：小图标 + 名称 + 款数 + 更多 */
-.ai-sec{margin:28px 0}
-.ai-sec-head{display:flex;align-items:center;gap:9px;margin-bottom:11px}
-.ai-sec-ico{font-size:1.15rem}
-.ai-sec-logo{width:24px;height:24px;border-radius:7px;object-fit:cover}
-.ai-sec-head h2{margin:0;font-size:1.12rem}
-.ai-sec-count{font-size:.74rem;color:#9aa3b2}
-.ai-sec-more{margin-left:auto;font-size:.83rem;color:#8a93a3;text-decoration:none;white-space:nowrap}
-.ai-sec-more:hover{color:#0b66f0;text-decoration:underline}
-.ai-sec-lead{margin:0 0 12px;color:var(--ai-dim);font-size:.82rem;line-height:1.7}
+/* 分区头（板块首页）：线性 SVG 图标 + 名称，参考 tool.caie.ai 的极简分区 */
+.ai-sec{margin:30px 0}
+.ai-sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ai-sec-ico{width:28px;height:28px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ai-sec-ico svg{width:15px;height:15px;display:block}
+.ai-sec-ico.lg{width:60px;height:60px;border-radius:15px}
+.ai-sec-ico.lg svg{width:28px;height:28px}
+.ai-sec-head h2{margin:0;font-size:1.02rem;font-weight:600}
+.ai-sec-more{margin-left:auto;font-size:.8rem;color:#a6adba;text-decoration:none;white-space:nowrap}
+.ai-sec-more:hover{color:#0b66f0}
 /* 工具集对比表（分类页）：移动端横向滚动，不挤压卡片 */
 .ai-compare table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:.88rem;display:block;overflow-x:auto;white-space:nowrap}
 .ai-compare thead th{text-align:left;font-weight:600;color:var(--text-primary,#1c2333);padding:8px 12px 8px 0;border-bottom:1px solid var(--ai-border)}
@@ -568,14 +562,14 @@ span.ai-col-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-con
 .ai-compare tbody td:first-child{font-weight:600}
 .ai-compare tbody tr:last-child td{border-bottom:0}
 .ai-compare p{margin:6px 0 0}
-/* 卡片流（tool.caie.ai 同款：方圆角图标 + 名称 + 一句话简介，6 列自适应） */
-.ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:12px}
-.ai-card{display:flex;align-items:center;gap:10px;background:var(--bg-card-solid,#fff);border:1px solid #ececf0;border-radius:12px;padding:12px 13px;text-decoration:none;color:inherit;transition:.15s;min-width:0;overflow:hidden}
-.ai-card:hover{border-color:#5961f9;box-shadow:0 5px 16px rgba(89,97,249,.14);transform:translateY(-2px)}
+/* 卡片流（tool.caie.ai 同款：圆形图标 + 名称 + 一句话简介，6 列自适应，扁卡细边框） */
+.ai-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px 14px}
+.ai-card{display:flex;align-items:center;gap:11px;background:var(--bg-card-solid,#fff);border:1px solid #f0f1f4;border-radius:8px;padding:14px 15px;text-decoration:none;color:inherit;transition:.15s;min-width:0;overflow:hidden}
+.ai-card:hover{border-color:#5961f9;box-shadow:0 5px 16px rgba(89,97,249,.14)}
 .ai-card-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;max-width:100%}
-.ai-card-name{font-weight:700;font-size:.88rem;color:#1f2733;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.ai-card-name{font-weight:700;font-size:.9rem;color:#1f2733;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .ai-badge{margin-left:auto;font-size:.68rem;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.ai-cover{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;box-shadow:0 1px 4px rgba(20,40,80,.12)}
+.ai-cover{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;box-shadow:0 1px 4px rgba(20,40,80,.12)}
 span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem}
 .ai-card-summary{margin:0;font-size:.74rem;color:#a6adba;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .ai-badge.free{color:#0a8f4d;background:rgba(16,163,74,.1)}
@@ -594,39 +588,43 @@ span.ai-cover.ai-cover-fb{display:inline-flex;align-items:center;justify-content
 [data-theme="dark"] .ai-card{border-color:rgba(255,255,255,.1)}
 [data-theme="dark"] .chip{background:rgba(255,255,255,.08);color:#b8c4d8}
 [data-theme="glass"] .ai-card,[data-theme="glass"] .ai-intro-card,[data-theme="glass"] .ai-aside-card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);box-shadow:var(--shadow-sm,none)}
-/* 详情页：左介绍大卡 + 右悬浮操作栏（仿 ai.bemcss.com 工具详情） */
-.ai-detail-grid{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:18px;align-items:start;margin:10px 0 18px}
-.ai-intro-card{background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:16px;padding:22px 26px;box-shadow:0 1px 4px rgba(20,40,80,.05);min-width:0}
-.ai-intro-tag{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;color:#0b66f0;background:rgba(11,102,240,.08);border-radius:8px;padding:4px 11px;margin-bottom:12px}
-.ai-intro-card h1{font-size:1.45rem;margin:0 0 10px}
-.ai-intro-card>p{color:var(--text-secondary,#41506b);line-height:1.9;margin:0 0 12px;font-size:.94rem}
-.ai-detail-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin:0 0 12px}
-.ai-aside{position:sticky;top:76px;display:flex;flex-direction:column;gap:14px}
-.ai-aside-card{background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:16px;padding:18px;box-shadow:0 1px 4px rgba(20,40,80,.05)}
-.ai-detail-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-.ai-detail-title h2{margin:0;font-size:1.12rem}
-.ai-aside-card .ai-card-summary{white-space:normal;font-size:.83rem;line-height:1.6;margin:0 0 14px}
-.ai-site-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;text-decoration:none;font-weight:700;font-size:.92rem;padding:11px 16px;border-radius:50px;box-shadow:0 3px 12px rgba(0,119,255,.3);transition:.16s}
-.ai-site-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,119,255,.4)}
-.ai-fav-btn,.ai-report-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;box-sizing:border-box;font-family:inherit;font-size:.87rem;font-weight:600;padding:10px 16px;border-radius:50px;cursor:pointer;transition:.16s;margin-top:9px;background:transparent}
-.ai-fav-btn{border:1px solid rgba(240,160,0,.45);color:#d98b00;background:rgba(240,160,0,.05)}
-.ai-fav-btn:hover{background:rgba(240,160,0,.13)}
-.ai-fav-btn.on{border-color:transparent;color:#fff;background:linear-gradient(135deg,#f5b942,#f0980f)}
-.ai-report-btn{border:1px solid rgba(231,76,60,.4);color:#d64541;background:rgba(231,76,60,.05);text-decoration:none}
-.ai-report-btn:hover{background:rgba(231,76,60,.12)}
-.ai-aside-cap{font-size:.8rem;font-weight:700;color:var(--text-primary,#1c2333);margin-bottom:10px}
-.ai-author{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:7px 8px;border-radius:12px;transition:.15s}
-.ai-author:hover{background:var(--bg-secondary,#f3f5f9)}
-.ai-author-logo{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
-.ai-author-txt{display:flex;flex-direction:column;min-width:0}
-.ai-author-txt b{font-size:.9rem}
-.ai-author-txt i{font-style:normal;font-size:.72rem;color:#9aa3b2;margin-top:2px}
-.ai-author-more{display:flex;align-items:center;justify-content:center;width:100%;box-sizing:border-box;margin-top:10px;border:1px solid var(--border-glow,var(--ai-border));border-radius:50px;padding:9px;font-size:.84rem;color:var(--text-secondary,#41506b);text-decoration:none;transition:.16s}
-.ai-author-more:hover{color:#0b66f0;border-color:rgba(11,102,240,.4)}
-.ai-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:6px 0 4px}
-.ai-shot{display:block;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid var(--border-glow,var(--ai-border));background:var(--bg-secondary,#f4f7fb)}
+/* 详情页：左介绍大卡 + 右操作栏（仿 ai.bemcss.com 工具详情） */
+.ai-detail-grid{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:20px;align-items:start;margin:12px 0 18px}
+/* 左：介绍大卡 */
+.ai-intro-card{background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:14px;padding:26px 28px 28px;box-shadow:0 1px 3px rgba(20,40,80,.04);min-width:0}
+.ai-overline{font-size:.72rem;font-weight:600;letter-spacing:.16em;color:#9aa3b2;margin-bottom:10px}
+.ai-intro-card h1{font-size:1.4rem;font-weight:800;margin:0 0 12px;letter-spacing:.01em;line-height:1.35}
+.ai-intro-card>p{color:#3d4657;line-height:1.92;margin:0 0 12px;font-size:.93rem}
+.ai-detail-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.ai-intro-sub{font-size:.78rem;font-weight:600;letter-spacing:.12em;color:#9aa3b2;margin:22px 0 10px}
+.ai-shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin:0}
+.ai-shot{display:block;aspect-ratio:16/9;overflow:hidden;border-radius:10px;border:1px solid var(--ai-border);background:var(--bg-secondary,#f4f7fb)}
 .ai-shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .25s}
 .ai-shot:hover img{transform:scale(1.03)}
+/* 右：操作卡 */
+.ai-aside{position:sticky;top:76px}
+.ai-aside-card{background:var(--bg-card-solid,#fff);border:1px solid var(--border-glow,var(--ai-border));border-radius:14px;padding:22px 20px 18px;box-shadow:0 1px 3px rgba(20,40,80,.04)}
+.ai-detail-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.ai-detail-title h2{margin:0;font-size:1.08rem;font-weight:700;line-height:1.3}
+.ai-aside-card .ai-card-summary{white-space:normal;font-size:.82rem;line-height:1.65;color:#8a93a3;margin:0 0 16px}
+.ai-site-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;background:linear-gradient(135deg,#0b66f0,#6c5ce7);color:#fff;text-decoration:none;font-weight:600;font-size:.9rem;padding:12px 16px;border-radius:10px;transition:.16s}
+.ai-site-btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(11,102,240,.32)}
+.ai-fav-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;box-sizing:border-box;font-family:inherit;font-size:.87rem;font-weight:500;padding:11px 16px;border-radius:10px;cursor:pointer;margin-top:9px;background:transparent;border:1px solid #e2e6ee;color:#41506b;transition:.16s}
+.ai-fav-btn:hover{border-color:rgba(11,102,240,.55);color:#0b66f0;background:rgba(11,102,240,.04)}
+.ai-fav-btn.on{border-color:transparent;background:#0b66f0;color:#fff}
+.ai-report-btn{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;box-sizing:border-box;margin-top:12px;padding:2px;font-size:.76rem;color:#a6adba;text-decoration:none;transition:.15s}
+.ai-report-btn:hover{color:#d64541}
+.ai-aside-cap{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:600;letter-spacing:.12em;color:#9aa3b2;border-top:1px solid var(--ai-border);margin-top:18px;padding-top:16px}
+.ai-author{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;padding:12px 2px 4px}
+.ai-author:hover .ai-side-arr{color:#0b66f0}
+.ai-author-logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#0b66f0,#6c5ce7);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.ai-author-txt{display:flex;flex-direction:column;min-width:0;flex:1}
+.ai-author-txt b{font-size:.88rem;font-weight:700}
+.ai-author-txt i{font-style:normal;font-size:.72rem;color:#9aa3b2;margin-top:2px}
+.ai-side-arr{margin-left:auto;color:#c3cad6;font-size:1.1rem;line-height:1;flex-shrink:0;transition:.15s}
+.ai-author-more{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;box-sizing:border-box;margin-top:10px;border-top:1px solid var(--ai-border);padding:14px 0 2px;font-size:.83rem;color:#41506b;text-decoration:none;transition:.15s}
+.ai-author-more .arr{color:#c3cad6;font-size:1rem;line-height:1}
+.ai-author-more:hover{color:#0b66f0}
 .ai-detail-sec{margin:22px 0}
 .ai-detail-sec h2{font-size:1.15rem;margin:0 0 12px;padding-left:12px;border-left:4px solid #0077ff;line-height:1.3}
 .ai-detail-sec p{color:var(--text-secondary,#41506b);line-height:1.85;margin:0 0 12px;font-size:.94rem}
@@ -651,7 +649,8 @@ body main{padding:14px 14px 44px}
 .ai-card-name{font-size:.8rem}
 .ai-card-summary{font-size:.66rem}
 .ai-col-hero{gap:12px}
-.ai-col-cover{width:52px;height:52px}
+.ai-sec-ico.lg{width:48px;height:48px;border-radius:12px}
+.ai-sec-ico.lg svg{width:23px;height:23px}
 .ai-intro-card{padding:18px 16px}
 .ai-aside-card{padding:16px}
 .ai-detail-sec h2{font-size:1.05rem}

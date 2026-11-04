@@ -100,26 +100,32 @@
       '<span class="ai-card-main"><span class="ai-card-name">' + esc(t.name) + '</span>' +
       '<span class="ai-card-summary">' + esc(t.summary || '') + '</span></span></a>';
   }
-  function secLead(c, tools) {
-    var mix = mixOf(tools);
-    var names = tools.slice(0, 3).map(function (t) { return t.name; }).join('、') + (tools.length > 3 ? ' 等' : '');
-    return c.name + '方向目前收录 ' + tools.length + ' 款：' + names + '，收费模式' +
-      (mix.length === 1 ? '均为' + mix[0] : '覆盖' + mix.join(' / ')) + '，点工具名可看功能拆解与官网入口。';
+  /* 分区图标：与 ai-section.mjs 的 secIcon() 成对，线性 SVG + 淡色圆角底 */
+  var SEC_ICONS = [
+    [/xiezuo|write|写作/, ['#0b66f0', 'rgba(11,102,240,.09)', '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>']],
+    [/photo|tuxiang|pic|image|huihua|图像|绘画/, ['#7a3ff2', 'rgba(122,63,242,.09)', '<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>']],
+    [/shipin|video|视频/, ['#e74c3c', 'rgba(231,76,60,.09)', '<rect x="2" y="4" width="20" height="16" rx="3"/><path d="m10 9 5 3-5 3Z"/>']],
+    [/yinyue|yinpin|music|audio/, ['#e67e22', 'rgba(230,126,34,.10)', '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>']],
+    [/duihua|chat|bot|zhushou|对话|助手/, ['#0a8f4d', 'rgba(16,163,74,.10)', '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8Z"/>']],
+    [/code|dev|biancheng|kaifa|编程|开发/, ['#16a085', 'rgba(22,160,133,.10)', '<path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/>']],
+    [/bangong|office|xiaolv|办公|效率/, ['#d98b00', 'rgba(240,160,0,.10)', '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>']]
+  ];
+  var SEC_ICON_DEFAULT = ['#0b66f0', 'rgba(11,102,240,.09)', '<path d="m12 3 1.9 5.8a2 2 0 0 0 1.3 1.3L21 12l-5.8 1.9a2 2 0 0 0-1.3 1.3L12 21l-1.9-5.8a2 2 0 0 0-1.3-1.3L3 12l5.8-1.9a2 2 0 0 0 1.3-1.3Z"/>'];
+  function secIcon(slug) {
+    var s = String(slug || '').toLowerCase(), ico = null;
+    for (var i = 0; i < SEC_ICONS.length; i++) if (SEC_ICONS[i][0].test(s)) { ico = SEC_ICONS[i][1]; break; }
+    if (!ico) ico = SEC_ICON_DEFAULT;
+    return '<span class="ai-sec-ico" style="color:' + ico[0] + ';background:' + ico[1] + '">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ico[2] + '</svg></span>';
   }
   function section(c, tools) {
     if (!tools.length) return '';
     var hasPage = !!(CFG.pages && CFG.pages[c.slug]);
-    var shown = hasPage ? tools.slice(0, 9) : tools;
-    var logo = /^https?:\/\//i.test(String(c.logo || ''))
-      ? '<img class="ai-sec-logo" src="' + esc(c.logo) + '" alt="">'
-      : '<span class="ai-sec-ico">' + esc(c.icon || '🧩') + '</span>';
+    var shown = hasPage ? tools.slice(0, 12) : tools;
     return '<section class="ai-sec" id="' + esc(c.slug) + '">' +
-      '<div class="ai-sec-head">' + logo + '<h2>' + esc(c.name) + '</h2>' +
-      '<span class="ai-sec-count">' + tools.length + ' 款</span>' +
-      (hasPage ? '<a class="ai-sec-more" href="/ai/' + esc(c.slug) + '.html">查看更多 &gt;&gt;</a>'
-               : '<span class="ai-sec-count" style="margin-left:auto">独立页生成中</span>') +
-      '</div><p class="ai-sec-lead">' + esc(secLead(c, tools)) + '</p>' +
-      '<div class="ai-cards">' + shown.map(card).join('') + '</div></section>';
+      '<div class="ai-sec-head">' + secIcon(c.slug) + '<h2>' + esc(c.name) + '</h2>' +
+      (hasPage ? '<a class="ai-sec-more" href="/ai/' + esc(c.slug) + '.html">查看更多 ›</a>' : '') +
+      '</div><div class="ai-cards">' + shown.map(card).join('') + '</div></section>';
   }
   function compare(col, tools) {
     if (!tools.length) return '';
@@ -243,7 +249,7 @@
         el.textContent = p;
         frag.appendChild(el);
       });
-      var anchor = card.querySelector('.ai-detail-meta, .ai-shots');
+      var anchor = card.querySelector('.ai-detail-meta, .ai-intro-sub, .ai-shots');
       if (anchor) card.insertBefore(frag, anchor);
       else {
         var h1 = card.querySelector('h1');

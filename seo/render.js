@@ -157,7 +157,7 @@ h1{font-size:24px;margin:8px 0}
 <ul class="nav-links">
 <li><a href="${SITE}/">首页</a></li>
 <li><a href="${SITE}/all.html">软件库</a></li>
-<li><a href="${SITE}/ai/index.html" class="nav-ai">🤖 AI工具集</a></li>
+<li><a href="${SITE}/ai/index.html" class="nav-ai">AI工具集</a></li>
 <li><a href="${SITE}/sitemap.html">搜索</a></li>
 </ul>
 <form class="hd-search" action="${SITE}/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
