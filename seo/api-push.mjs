@@ -68,13 +68,18 @@ const localSha = (p) => {
 };
 const skipped = [];
 const realItems = [];
+let wfSkipped = [];
 for (const it of items) {
   if (it.st === "D") { realItems.push(it); continue; }
+  // GitHub 限制：工作流文件不能经 Git Data API 修改（base_tree 404）。令牌无 workflow
+  // 写权限时 Contents API 同样 404——跳过并警告，避免整个推送失败。
+  if (it.path.startsWith(".github/workflows/")) { wfSkipped.push(it.path); continue; }
   let ls;
   try { ls = localSha(it.path); } catch { continue; } // 文件已被删除/不可读，跳过
   if (remoteSha.get(it.path) === ls) { skipped.push(it.path); continue; }
   realItems.push(it);
 }
+if (wfSkipped.length) console.log(`⚠ 跳过工作流文件（需有 workflow 权限的令牌另行处理）: ${wfSkipped.join(", ")}`);
 if (skipped.length) console.log(`内容未变跳过 ${skipped.length} 个`);
 if (!realItems.length) {
   console.log("✅ 与远程完全一致，无需推送");

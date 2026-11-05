@@ -2076,10 +2076,10 @@ aiColSave:function(){var self=this;
  var q=id?supabaseClient.from('ai_collections').update(payload).eq('id',id):supabaseClient.from('ai_collections').insert(payload);
  q.then(function(r){if(r.error){toast('保存失败：'+r.error.message,'error');return;}toast('已保存 ✓ 前端列表即时可见');self._aiEditCol=null;self.aiAutoSync();return self.aiLoadCols().then(function(){self.aiRenderCols();});});
 },
-// 保存/删除后自动触发一次静态页重建（配过令牌才生效；前端列表本来就已实时更新）
+// 保存/删除后自动触发一次静态页重建（配过令牌立即生效；未配则由 GitHub 定时与本地守卫兜底，最迟约 1 小时）
 aiAutoSync:function(){
  var token=localStorage.getItem('lezhe_gh_token');
- if(!token)return;
+ if(!token){toast('详情页将在约 1 小时内自动生成（在「同步到前端」配置一次令牌可即时生成）','info');return;}
  fetch('https://api.github.com/repos/qbx3171/my-index/actions/workflows/ai-sync.yml/dispatches',{method:'POST',headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'},body:JSON.stringify({ref:'main'})}).then(function(r){
   if(r.status===204)toast('静态详情页更新中，约 1 分钟后可直达','info');
  }).catch(function(){});
