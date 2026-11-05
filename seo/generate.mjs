@@ -173,6 +173,9 @@ const DATA_MASTERS = [
   // CleanMyMac 教程（2026-11-04 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "d8c6c6f8-3ca9-4ba6-a7ea-b76094d997c9", field: "content", file: "content-master-d8c6c6f8.txt" },
   { table: "tutorials", id: "d8c6c6f8-3ca9-4ba6-a7ea-b76094d997c9", field: "summary", file: "summary-master-d8c6c6f8.txt" },
+  // 傲梅轻松备份 教程（2026-11-05 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "24929da4-ff46-46b3-b05f-11a39f79030d", field: "content", file: "content-master-24929da4.txt" },
+  { table: "tutorials", id: "24929da4-ff46-46b3-b05f-11a39f79030d", field: "summary", file: "summary-master-24929da4.txt" },
   // Windows 11（software 表对 anon key 只读，改不了库）：描述传输易损坏，母本兜底
   { table: "software", id: "d05e874d28573342261a189c", field: "description", file: "desc-master-d05e874d.txt" },
 ];
