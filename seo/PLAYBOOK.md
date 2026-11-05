@@ -120,3 +120,4 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - AI 板块内禁止使用 emoji 图标（标题、分区、按钮一律用内联 SVG 或纯文字）。
 - 详情页右卡不放「收藏工具」「举报工具」按钮（已按用户要求移除，勿加回）。
 - 违反以上任一项 = 用户投诉级别 BUG，上线前自检时发现必须回退。
+- **后果确认（2026-11-05）**：遵守禁改项后 `optimize.mjs` 的 thinCount 恒为 1（ai/index.html 229 字）——这是用户批准的设计现状，**不算 BUG、不要往列表页加字去「修」**；P3 缺 alt（admin.html 2 张）为 noindex 后台 SPA 的 JS 模板字符串误报，同样不要修。
