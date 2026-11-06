@@ -120,12 +120,14 @@ var o=document.querySelector('meta[property="og:url"]');if(o)o.setAttribute('con
 </style><link rel="preconnect" href="https://cdn.bootcdn.net/" crossorigin="">
 <link rel="preconnect" href="https://cdn.jsdelivr.net/" crossorigin="">
 <link rel="preconnect" href="https://lezhesoft-d0g80z4vb0ac03c39-1300972301.ap-shanghai.app.tcloudbase.com/" crossorigin="">
-<link rel="preload" as="fetch" href="/data/software.json" crossorigin="anonymous">
+<link rel="preload" as="fetch" href="/data/software.json" crossorigin="anonymous" fetchpriority="high">
 <script>/* 首屏快照：解析到这一行就发请求，与后面的 HTML 并行；DB.loadAll 消费一次。
    放在 head 而不是等 body 里的大脚本执行，是为了抢在解析完成之前拿到数据。 */
 /* 不显式指定 credentials：同源默认 same-origin，正好与上面 preload 的 crossorigin 对上，
    否则 Chrome 会判定「凭据模式不匹配」而丢弃 preload，等于白预加载一次。 */
-window.__SNAP__=fetch('/data/software.json').catch(function(){return null;});</script>
+/* priority:'high' 不能省：as=fetch 的 preload 与脚本里 fetch() 默认都是 Low 优先级，
+   实测会被首屏图片/字体挤到队尾（限速 4Mbps 下等了 4 秒才轮到），等于没提速。 */
+window.__SNAP__=fetch('/data/software.json',{priority:'high'}).catch(function(){return null;});</script>
 <link rel="dns-prefetch" href="https://registry.npmmirror.com/">
 <link rel="dns-prefetch" href="https://cdn.bootcdn.net/">
 <link rel="dns-prefetch" href="https://unpkg.com/">
@@ -1779,7 +1781,7 @@ window.__SNAP__=null;/* <head> 里已发起的首个请求，直接用，最省�
 }else{
 /* 后续（刷新按钮 / 5 分钟轮询 / 页面重新可见）用 no-cache：向 CDN 做条件请求，
    内容没变就是 304（几十字节），变了才回 200 全量 —— 既能拿到最新，又不会每 5 分钟拉 57KB。 */
-p=fetch(SNAP_URL,{cache:'no-cache'});
+p=fetch(SNAP_URL,{cache:'no-cache',priority:'high'});
 }
 var r=await p;
 if(!r||!r.ok)return null;
