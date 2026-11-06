@@ -141,6 +141,37 @@ Bing 眼里首页被稀释，品牌词入口落到内容干净的 AI 栏页上�
 搜完别指望立刻变：Bing 重排要重抓（小时级~数天），每次改完照常
 `node seo/indexnow-push.mjs --force <url>` + `node seo/bing-push.mjs` 催一次。
 
+## 教程封面全 404 的事故复盘（2026-11-06）
+
+现象：教程模块所有封面变空白，线上 `/tutorial/cover/*.png` 一律 404，页面本身 200。
+
+根因两条，叠在一起才致命：
+1. **CI 删图**：`ai-sync.yml` 每 5 分钟在 ubuntu runner 跑 `generate.mjs`，它 `rm -rf tutorial/`（含 `cover/`），
+   而 `ensureCovers()` 画封面要用 Edge/Chrome —— runner 上没有（`findBrowser()` 只找 Windows 路径），
+   于是「没浏览器 → 跳过生成」，随后 `git add -A` 把「封面全没了」提交上去。
+2. **推送脚本漏文件**：本地 git 比远程领先几百个提交（git push 被墙，只能走 `api-push.mjs`），
+   而它只按 `git status` 的变更清单发文件 —— 那些「早就 commit 过、但从没上传」的文件永远发不出去，
+   于是 5 张封面本地有、远程从来没有。
+
+修法：
+- `generate.mjs` 清目录时 **`tutorial/` 只删 `*.html`，保留 `cover/`**；
+- `api-push.mjs` 新增「补推本地已提交、远程缺失」步骤（`git ls-files` 与远程 tree 做差集），
+  顺带把长期漂移的隐患一起堵上；
+- 恢复 11 张封面并逐张验证 200。
+
+教训：**图片 404 这类问题以前的体检项全查不出来**（qa 只查 `<a>` 死链，不查 `<img>`）。现已新增
+`node seo/site-check.mjs`：逐板块扫标题/描述/canonical/H1/图片存在性/img alt/内链/JSON-LD/乱码/内联脚本语法，
+exit 2 = 有 BLOCKER。**每天发之前和 security-check 一起跑。**
+
+## 已知问题（非阻塞，记录备查）
+
+- **首页 WebSocket 连不上**：`wss://…tcloudbase.com/supabase-proxy/realtime/…` 握手失败。
+  CloudBase 代理不支持 WebSocket 升级，所以 Supabase realtime 在线上从来没通过。影响只有两处：
+  站内通知实时推送、在线人数 presence；内容本身走 REST，页面数据（127 张卡片/25 条热门）正常。
+  要修得改成轮询（例如 60s + 页面可见时刷新）或让 realtime 直连 Supabase 域名（国内可能被墙）。未改。
+- **sw.js 无人注册**：自注销版本，留着无害，也可删。
+- **tutorials 表 anon 可写**：见上「安全」段，需要 service_role key 才能真正收紧。
+
 ## 第四步：发布与提交
 
 0. `node seo/security-check.mjs --scan` 必须 exit 0（BLOCKER 0）才允许进入下面的发布动作
