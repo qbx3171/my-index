@@ -143,19 +143,48 @@ ok(cardsAfter > 0, `实时数据渲染出了卡片（${cardsAfter} 张）`);
 /* ── C. 已经开着的页面：收到广播自己换数据 ─────────────────────────────── */
 logs = [];
 restHits = 0;
-await page.evaluate((b) => {
+await page.evaluate(() => {
   // 模拟后台保存：先落 rev，再广播（BroadcastChannel 不会回投给发送方自身，
   // 页面里那个监听通道能收到）
-  localStorage.setItem("lezhe_data_rev", String(b + 7200000));
+  const at = Date.now();
+  localStorage.setItem("lezhe_data_rev", String(at));
   const bc = new BroadcastChannel("lezhe-sync");
-  bc.postMessage({ type: "data-rev", at: b + 7200000 });
+  bc.postMessage({ type: "data-rev", at });
   setTimeout(() => bc.close(), 500);
-}, build);
+});
 await page.waitForTimeout(4000);
 ok(restHits > 0, `收到 data-rev 广播后自动重取数据（REST 请求 ${restHits} 次，无需手动刷新）`);
 
 const stillCards = await page.evaluate(() => document.querySelectorAll(".software-card").length);
 ok(stillCards > 0, `广播刷新后列表仍然正常（${stillCards} 张卡片）`);
+
+/* ── D. 真实链路：后台页面里打点，前台标签页自己换数据 ───────────────────
+   前面几段是自己模拟事件，这段是真的把 admin.html 打开、调它自己的 bumpDataRev()，
+   验证「后台保存 → 已开着的首页自动更新」这条链路在真实页面上成立。 */
+{
+  logs = [];
+  restHits = 0;
+  await page.evaluate(() => sessionStorage.removeItem("lezhe_data_rev_synced"));
+  const adminPage = await ctx.newPage();
+  try {
+    await adminPage.goto(new URL("admin.html", URL_ARG).href, { waitUntil: "domcontentloaded" });
+    await adminPage.waitForTimeout(2000);
+    const hasFn = await adminPage.evaluate(() => typeof window.bumpDataRev);
+    ok(hasFn === "function", "后台页面里确有 bumpDataRev（写库成功时会调它）");
+    if (hasFn === "function") {
+      await adminPage.evaluate(() => window.bumpDataRev());
+      await page.waitForTimeout(5000);
+      ok(restHits > 0, `后台打点后首页标签页自动换数据（REST ${restHits} 次，没动前台）`);
+      const n2 = await page.evaluate(() => document.querySelectorAll(".software-card").length);
+      ok(n2 > 0, `后台打点后首页列表仍然正常（${n2} 张）`);
+    }
+  } catch (e) {
+    ok(false, `后台链路验证失败：${e.message}`);
+  } finally {
+    await adminPage.close();
+  }
+}
+
 ok(errors.length === 0, `无 JS 运行时异常${errors.length ? "：" + errors.slice(0, 2).join(" | ") : ""}`);
 
 await browser.close();
