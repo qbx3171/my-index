@@ -683,6 +683,43 @@ try {
   console.warn(`⚠ 首屏快照生成失败（前端会回落 REST）：${e.message}`);
 }
 
+// ── 后台修复数据 data/tutorials.json ────────────────────────────────────────────
+// 后台（admin.html）直接读库，同一代理同样会把长正文截断成 U+FFFD，且实测「多取几份合并」
+// 对部分教程不够（每次传输都坏，只是位置不同）。这里的 tutorials 是已经过 8 份合并 +
+// 母本兜底的干净版本，admin 发现库里字段带乱码时就用它按字段修复。
+// 只修「库里含 FFFD 且这里不含」的字段，静态数据不会覆盖后台新改的干净内容；
+// 记录的 updated_at 晚于本文件 build 时整个跳过，防止用户刚改完的正文被旧版回退。
+try {
+  const tutPayload = {
+    build: Date.now(),
+    tutorials: tutorials.map((t) => ({
+      id: t.id,
+      title: t.title,
+      summary: t.summary,
+      content: t.content,
+      updated_at: t.updated_at || null,
+    })),
+  };
+  const tutJson = JSON.stringify(tutPayload);
+  if (tutorials.length < 5) {
+    console.warn(`⚠ 教程仅 ${tutorials.length} 篇，疑似抓取残缺：跳过 data/tutorials.json`);
+  } else if (tutJson.includes(FFD)) {
+    console.warn("⚠ 教程修复数据含乱码：跳过 data/tutorials.json（后台保持多次合并兜底）");
+  } else {
+    const dir = join(ROOT, "data");
+    await mkdir(dir, { recursive: true });
+    const tmpT = join(dir, ".tutorials.json.tmp");
+    await writeFile(tmpT, tutJson, "utf8");
+    const { rename } = await import("node:fs/promises");
+    await rename(tmpT, join(ROOT, "data/tutorials.json"));
+    console.log(
+      `教程修复数据 data/tutorials.json：${tutorials.length} 篇 / ${(Buffer.byteLength(tutJson) / 1024).toFixed(1)}KB`
+    );
+  }
+} catch (e) {
+  console.warn(`⚠ 教程修复数据生成失败（后台保持多次合并兜底）：${e.message}`);
+}
+
 // 404 兜底页：GitHub Pages 自动接管根目录 404.html，同时保持 404 状态码。
 // 数据完全由当次产物派生（热门排序、分类、搜索索引），不做手工维护，避免与首页漂移。
 const p404 = render404(softs, tutorials, aiSection.collections);

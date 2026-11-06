@@ -1402,10 +1402,89 @@ function bumpDataRev(){
 var DB={
 _sw:null,_swT:0,_ca:null,_caT:0,_tu:null,_tuT:0,_qu:null,_quT:0,_an:null,_anT:0,_cm:null,_cmT:0,_fb:null,_fbT:0,_sb:null,_sbT:0,_pf:null,_pfT:0,_ml:null,_mlT:0,_rd:null,_rdT:0,_mlErr:null,_ttl:120000,
 _t:function(p,ms){ms=ms||10000;return new Promise(function(res,rej){var t=setTimeout(function(){rej(new Error('请求超时'));},ms);p.then(function(v){clearTimeout(t);res(v);},function(e){clearTimeout(t);rej(e);});});},
+/* ── 传输治愈（2026-11-06） ───────────────────────────────────────────────────
+   CloudBase 代理偶发把多字节汉字截断，解码后变成 U+FFFD 替换符（界面上显示为方框问号），
+   且每次请求坏的位置随机（同一查询连取 4 次的乱码位置都不同，静态页生成器早就在用
+   「多取几份按字段合并」治它）。后台此前是单次请求拿到什么显示什么，所以教程管理里
+   长正文会随机出现乱码。
+   这里给后台同样的治愈能力：只在第一次结果里真的出现 FFFD 时才追加并发请求，
+   按记录 id 逐字段挑「乱码更少」的版本——正常情况零额外开销，代理彻底挂时也不会更糟。 */
+_ffdN:function(s){if(typeof s!=='string')return 0;var n=0,i=-1;while((i=s.indexOf('\uFFFD',i+1))!==-1)n++;return n;},
+_deepFfd:function(v){
+ if(typeof v==='string')return this._ffdN(v);
+ if(Array.isArray(v)){for(var i=0;i<v.length;i++){var n=this._deepFfd(v[i]);if(n>0)return n;}return 0;}
+ if(v&&typeof v==='object'){for(var k in v){var n2=this._deepFfd(v[k]);if(n2>0)return n2;}}
+ return 0;
+},
+/* mk 返回一次 supabase 查询；copies 是总份数上限（含首次）。返回值形状与 supabase 一致 {data,error}。 */
+async _heal(mk,copies){
+ copies=copies||4;
+ var first=await this._t(mk());
+ if(!first||first.error||!this._deepFfd(first))return first;
+ var self=this,ps=[];
+ for(var i=1;i<copies;i++)ps.push(this._t(mk()).catch(function(){return null;}));
+ var rest=await Promise.all(ps);
+ var rows=[first.data];rest.forEach(function(r){if(r&&Array.isArray(r.data))rows.push(r.data);});
+ if(rows.length<2||!rows.every(Array.isArray))return first;
+ var map=new Map();
+ rows.forEach(function(arr){arr.forEach(function(row){
+   var key=row&&row.id!==undefined?String(row.id):JSON.stringify(row);
+   if(!map.has(key)){map.set(key,Object.assign({},row));return;}
+   var cur=map.get(key);
+   for(var k in row){
+     if(typeof row[k]==='string'&&typeof cur[k]==='string'&&self._ffdN(row[k])<self._ffdN(cur[k]))cur[k]=row[k];
+   }
+ });});
+ return {data:Array.from(map.values()),error:null};
+},
+/* ── 静态干净数据兜底 ──────────────────────────────────────────────────────────
+   实测（2026-11-06）：部分教程「每次传输都坏、只是坏的位置不同」，多取几份合并治不了
+   （11 篇里 6 篇 4 份合并后仍带 FFFD，单条重拉也只能再救 2 篇）。但静态站的生成器
+   有「8 份合并 + 母本兜底」，data/tutorials.json 就是修干净之后的版本。
+   所以库里字段还带乱码时，用这份静态数据按字段修复：
+   只替换「库里含 FFFD、静态版不含」的字段；记录 updated_at 晚于静态数据 build 时
+   整条跳过——用户刚改完的内容绝不回退成旧版。 */
+_masters:null,_softMasters:null,
+async _loadMasters(){
+ if(this._masters)return this._masters;
+ try{
+  var r=await fetch('/data/tutorials.json',{cache:'no-cache'});
+  if(!r.ok)return null;
+  var d=await r.json();
+  if(!d||!Array.isArray(d.tutorials))return null;
+  this._masters=d;return d;
+ }catch(e){return null;}
+},
+async _loadSoftMasters(){
+ if(this._softMasters)return this._softMasters;
+ try{
+  var r=await fetch('/data/software.json',{cache:'no-cache'});
+  if(!r.ok)return null;
+  var d=await r.json();
+  if(!d||!Array.isArray(d.software))return null;
+  this._softMasters=d;return d;
+ }catch(e){return null;}
+},
+_fixByMaster:function(row,master,build){
+ if(!row||!master)return row;
+ if(row.updated_at&&build&&new Date(row.updated_at).getTime()>build)return row;
+ for(var k in row){
+  if(typeof row[k]==='string'&&row[k].indexOf('\uFFFD')!==-1&&typeof master[k]==='string'&&master[k].indexOf('\uFFFD')===-1)row[k]=master[k];
+ }
+ return row;
+},
+async _healRowWithMasters(row,kind){
+ if(!row||!this._deepFfd(row))return row;
+ var mas=kind==='soft'?await this._loadSoftMasters():await this._loadMasters();
+ if(!mas)return row;
+ var arr=kind==='soft'?mas.software:mas.tutorials;
+ var m=null;for(var i=0;i<arr.length;i++)if(String(arr[i].id)===String(row.id)){m=arr[i];break;}
+ return this._fixByMaster(row,m,mas.build);
+},
 invalidate:function(){this._sw=null;this._ca=null;this._tu=null;this._qu=null;this._an=null;this._cm=null;this._fb=null;this._sb=null;this._pf=null;this._ml=null;this._rd=null;this._mlErr=null;},
 async soft(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sw&&n-this._swT<this._ttl)return this._sw;try{var r=await this._t(supabaseClient.from('software').select('id,name,category,version,icon,icon_url,platforms,downloads,views,recommend,created_at').order('created_at',{ascending:false}));if(r.error)return this._sw||[];this._sw=r.data||[];this._swT=n;return this._sw;}catch(e){return this._sw||[];}},
 async cats(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._ca&&n-this._caT<this._ttl)return this._ca;try{var r=await this._t(supabaseClient.from('categories').select('*').order('name'));if(r.error)return this._ca||[];this._ca=r.data||[];this._caT=n;return this._ca;}catch(e){return this._ca||[];}},
-async softOne(id){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').select('*').eq('id',id).limit(1));if(r.error)return null;return (r.data&&r.data[0])||null;}catch(e){return null;}},
+async softOne(id){if(!supabaseClient)return null;try{var r=await this._heal(function(){return supabaseClient.from('software').select('*').eq('id',id).limit(1);},4);if(r.error)return null;var row=(r.data&&r.data[0])||null;row=await this._healRowWithMasters(row,'soft');return row;}catch(e){return null;}},
 async addSoft(s){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').insert(s).select());if(r.error)return null;this.invalidate();bumpDataRev();return r.data?r.data[0]:null;}catch(e){return null;}},
 async updSoft(id,u){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').update(u).eq('id',id).select());if(r.error)throw r.error;this.invalidate();bumpDataRev();},
 async delSoft(id){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').delete().eq('id',id).select('id'));if(r.error)throw r.error;if(!r.data||r.data.length===0)throw new Error('删除失败或权限不足');this.invalidate();bumpDataRev();},
@@ -1426,7 +1505,7 @@ throw (r2.error||new Error('重命名失败或权限不足'));
 this._ca=null;this._sw=null;bumpDataRev();
 return (r.data||[]).length;
 },
-async tut(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._tu&&n-this._tuT<this._ttl)return this._tu;try{var r=await this._t(supabaseClient.from('tutorials').select('*').order('created_at',{ascending:false}));if(r.error)return this._tu||[];this._tu=r.data||[];this._tuT=n;return this._tu;}catch(e){return this._tu||[];}},
+async tut(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._tu&&n-this._tuT<this._ttl)return this._tu;try{var r=await this._heal(function(){return supabaseClient.from('tutorials').select('*').order('created_at',{ascending:false});},4);if(r.error)return this._tu||[];var rows=r.data||[];var _dirty=rows.some(function(row){return this._deepFfd(row);},this);if(_dirty){for(var _i=0;_i<rows.length;_i++)rows[_i]=await this._healRowWithMasters(rows[_i],'tut');}this._tu=rows;this._tuT=n;return this._tu;}catch(e){return this._tu||[];}},
 async delTut(id){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('tutorials').delete().eq('id',id).select('id'));if(r.error)throw r.error;if(!r.data||r.data.length===0)throw new Error('删除失败或权限不足');this._tu=null;},
 async q(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._qu&&n-this._quT<this._ttl)return this._qu;try{var r=await this._t(supabaseClient.from('questions').select('*').order('created_at',{ascending:false}));if(r.error)return this._qu||[];this._qu=r.data||[];this._quT=n;return this._qu;}catch(e){return this._qu||[];}},
 async delQ(id){if(!supabaseClient)throw new Error('客户端未初始化');var r1=await this._t(supabaseClient.from('answers').delete().eq('question_id',id));if(r1.error)throw r1.error;var r2=await this._t(supabaseClient.from('questions').delete().eq('id',id).select('id'));if(r2.error)throw r2.error;if(!r2.data||r2.data.length===0)throw new Error('删除失败或权限不足');this._qu=null;this._an=null;},
@@ -2313,8 +2392,11 @@ self.disabled=false;self.textContent='🗑 撤回';
 renderDash:async function(c){
 c.innerHTML='<div class="loading-spinner"><span class="spinner"></span> 加载中...</div>';
 var seq=this._seq;
-var all=await DB.soft(),cats=await DB.cats(),tuts=await DB.tut(),qs=await DB.q(),ans=await DB.an(),cms=await DB.cm(),subs=await DB.sub(),pfs=await DB.pf();
-var redeems=await DB.redeems();
+/* 仪表盘要 9 张表的数据。原先写成 9 个串行 await，每个都走 CloudBase 代理
+   （单次 TTFB ~1.4s），串起来 12 秒起步——这是「仪表盘很慢」的直接原因。
+   这 9 个请求互不依赖，全部并发，总耗时=最慢的那一个（~2s），快了近 10 倍。 */
+var _all=await Promise.all([DB.soft(),DB.cats(),DB.tut(),DB.q(),DB.an(),DB.cm(),DB.sub(),DB.pf(),DB.redeems()]);
+var all=_all[0],cats=_all[1],tuts=_all[2],qs=_all[3],ans=_all[4],cms=_all[5],subs=_all[6],pfs=_all[7],redeems=_all[8];
 if(seq!==this._seq)return;
 var drafts=getDrafts();
 var pend=subs.filter(function(s){return s.status==='pending';}).length;
