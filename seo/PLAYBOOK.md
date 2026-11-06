@@ -20,7 +20,18 @@ node seo/qa.mjs                  # 硬性红线：重复/短描述/乱码/死链
 ```bash
 node seo/audit.mjs          # 有 BLOCKER 时 exit 2
 node seo/audit.mjs --json   # 自动化取数用
+node seo/site-check.mjs     # 逐板块静态体检（2026-11-06 新增，图片存在性/img alt/内联脚本语法）
+node seo/live-assets.mjs    # 线上图片探活（2026-11-06 新增，抓「本地有、线上 404」的远程漂移）
 ```
+
+`site-check.mjs` 与 `audit.mjs` 的分工：audit 偏「结构与 SEO 规则」，site-check 偏「页面上真的能不能用」——
+它逐板块（站点页 / 分类页 / 软件详情 / 教程 / AI 工具集 / AI 详情）统计页面·图片·内链数，并抓：
+`<img>` 指向的本地文件不存在、img 缺 alt、canonical 与路径不匹配、H1 数量异常、JSON-LD 解析失败、
+内联 `<script>` 语法错误（VIP 页曾因多一个 `}` 整段脚本不执行，页面看着正常但功能全废）、U+FFFD 乱码。
+exit 2 = 有 BLOCKER。
+
+`live-assets.mjs` 补的是另一类盲区：**本地磁盘一切正常，线上却 404**（api-push 漏文件、CI 删文件都算）。
+它把 `tutorial/cover/` 与 `assets/ai-logos/` 逐个 HEAD 线上，非 200 就报，并提示用 api-push 补推。
 
 检查项：站内资源 404（img/script/link/poster）、canonical 是否自引用、H1 数量、
 JSON-LD 语法、og:image 缺失、工具页是否 noindex、页脚品牌回链、sitemap 与磁盘页面双向一致、
