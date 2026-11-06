@@ -22,6 +22,7 @@ node seo/audit.mjs          # 有 BLOCKER 时 exit 2
 node seo/audit.mjs --json   # 自动化取数用
 node seo/site-check.mjs     # 逐板块静态体检（2026-11-06 新增，图片存在性/img alt/内联脚本语法）
 node seo/live-assets.mjs    # 线上图片探活（2026-11-06 新增，抓「本地有、线上 404」的远程漂移）
+node seo/nav-race.mjs       # 启动期导航竞态（2026-11-06 新增，骨架屏期间点板块不能被弹回首页；需线上已部署本次改动）
 ```
 
 `site-check.mjs` 与 `audit.mjs` 的分工：audit 偏「结构与 SEO 规则」，site-check 偏「页面上真的能不能用」——
@@ -151,6 +152,72 @@ Bing 眼里首页被稀释，品牌词入口落到内容干净的 AI 栏页上�
 
 搜完别指望立刻变：Bing 重排要重抓（小时级~数天），每次改完照常
 `node seo/indexnow-push.mjs --force <url>` + `node seo/bing-push.mjs` 催一次。
+
+## 启动期导航竞态：「骨架屏期间点板块又被弹回首页」（2026-11-06）
+
+现象：冷启动首页等数据时是骨架屏（实测 13 张卡片，冷网 2.5~4s）；此时点「教程 / 问答 / 排行榜」，
+页面先正常切过去，数据一到又被弹回首页。
+
+根因：`App.init()` 里的启动收尾是
+
+```js
+DB.loadAll(...).then(() => {
+  refreshAll();
+  _idle(() => {                     // requestIdleCallback —— 时机不确定
+    renderTutorials(); renderQuestions();
+    if (!handleUrlParams()) App.goHome();   // ← 无条件抢回首页
+  });
+});
+```
+
+`handleUrlParams()` 只在 URL 带 `?soft=`/`?cat=`/`page=` 时返回 true，其余一律 `goHome()`。
+于是「用户在这 2~4 秒里点的任何页面」都会被这行代码覆盖。加重因素：`_idle` 是
+`requestIdleCallback`，主线程一忙就往后拖，反而更容易在用户操作之后才执行。
+
+修法（零依赖，用成熟路由库的通用模式，不引库）：
+1. 加一个单调递增的导航令牌 `_navSeq`：`goHome/goList/goTutorials/goQA/goCheckin/goRanking/
+   goMall/goProfile/goMyRedeems/doSearch` 在**用户主动跳转**时 `_bumpNav()`；
+   `isPop=true`（深链、popstate 回放）不递增；`popstate` 本身递增。
+2. 启动收尾先比对令牌：`if (_navStale(_bootSeq)) return;` —— 用户已经点走了就只补数据、不改当前页；
+   无干扰时才 `handleUrlParams() || goHome(true)`（传 true 顺便避免重新写 history）。
+3. `?soft=` / `#software/` 那条 200ms 后再 `Detail.open()` 的延时也纳入令牌，防止详情浮层压到用户已切走的页面上。
+
+### 为什么是「借模式」而不是「引库」
+
+按「先找成熟实现、不自己发明」的原则查了同领域项目（星数/许可/最近推送为 2026-11-06 实测）：
+
+| 项目 | 星 | 许可 | 最近推送 | 定位 | 结论 |
+|---|---|---|---|---|---|
+| remix-run/react-router | 56.6k | MIT | 2026-11-05 | React 数据路由 | 范式来源：每次导航用 AbortController abort 上一笔 |
+| barbajs/barba | 13.0k | MIT | 2024-12-02 | MPA 页面过渡 | 不适用（本站不是多页 HTML 切换） |
+| visionmedia/page.js | 7.7k | 仓库无 LICENSE 文件 | 2023-06-27 | History/hash 路由 | 不引入：3 年停更 + 许可文件缺失；借鉴其 `page.stop()`「停掉未完成跳转」 |
+| hotwired/turbo | 7.4k | MIT | 2026-10-30 | MPA 整页替换 | 不适用：需服务端渲染/整页 HTML 交换 |
+| instantpage/instant.page | 6.2k | MIT | 2026-09-29 | 悬停预取 | 与本站 SPA 内跳无关，后续可评估 |
+| swup/swup | 5.3k | MIT | 2026-11-03 | MPA 过渡 | 不适用 |
+| krasimir/navigo | 2.8k | MIT | 2023-08-04 | hash 路由 | 不引入：停更 3 年；其 `resolve()` 取消语义与令牌同构 |
+
+结论：本站是**手写 SPA**（5000+ 行内联脚本、页面切换全是 `goXxx()` 直接改 DOM），接一个路由库
+等于重写全部跳转与深链逻辑，风险远大于收益；但「过期导航不得提交 UI」这条被上述库反复验证，
+用 6 行令牌实现即可。**不复制任何第三方代码，只借设计。**
+
+### 回归脚本
+
+```bash
+node seo/nav-race.mjs                # 打线上（含 CDP 限速，把骨架屏窗口拉到 4s 级）
+node seo/nav-race.mjs --local-html   # 上线前用本地 index.html 顶替线上文档做 A/B
+```
+
+断言：骨架屏期间点「教程」→ 9 秒后仍停在教程页；教程页点「首页」能回；`?cat=` 深链仍生效。
+**上线前必须 PASS**（旧代码实测在这条断言上 FAIL，可用来验证脚本本身没空跑）。
+
+### 顺带修的加载问题
+
+`<link rel="preconnect">` 一直指向 `qqcxtfayjxyvswblmdpw.supabase.co`，而线上实际请求的是
+`lezhesoft-...ap-shanghai.app.tcloudbase.com/supabase-proxy` —— 预连接打在一个根本不会访问的主机上，
+真正要 TLS 握手的域反而没有提示。已改为实际主机，冷启动少一次握手等待。
+
+**注意**：HTML 走 Cloudflare，`Cache-Control: max-age=600`，发布后最长约 10 分钟才全网可见；
+验证线上是否生效要先比对 `last-modified` / 文件大小，别把 CDN 缓存当成「没推上去」。
 
 ## 教程封面全 404 的事故复盘（2026-11-06）
 
