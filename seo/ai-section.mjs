@@ -228,7 +228,10 @@ ${foot("ai-tool-" + toolSlug(t))}`;
 }
 
 function title4Tool(t, col) {
-  return `${t.name}怎么样 - ${col.name}工具详解 | 乐哲软件`.slice(0, 60);
+  // 工具集名若已以「工具」结尾（如「Ai办公工具」），再拼「工具详解」会变成「工具工具详解」
+  const cat = String(col?.name || "").trim();
+  const suffix = !cat ? "工具详解" : /工具$/.test(cat) ? "详解" : "工具详解";
+  return `${t.name}怎么样 - ${cat}${suffix} | 乐哲软件`.slice(0, 60);
 }
 function detailDesc(t, col) {
   const clean = (s) => String(s || "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
