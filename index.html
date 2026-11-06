@@ -119,7 +119,7 @@ var o=document.querySelector('meta[property="og:url"]');if(o)o.setAttribute('con
 @media(max-width:600px){.hotindex-list{gap:6px}.hotindex-list a{font-size:.72rem;padding:6px 10px}}
 </style><link rel="preconnect" href="https://cdn.bootcdn.net/" crossorigin="">
 <link rel="preconnect" href="https://cdn.jsdelivr.net/" crossorigin="">
-<link rel="preconnect" href="https://qqcxtfayjxyvswblmdpw.supabase.co/" crossorigin="">
+<link rel="preconnect" href="https://lezhesoft-d0g80z4vb0ac03c39-1300972301.ap-shanghai.app.tcloudbase.com/" crossorigin="">
 <link rel="dns-prefetch" href="https://registry.npmmirror.com/">
 <link rel="dns-prefetch" href="https://cdn.bootcdn.net/">
 <link rel="dns-prefetch" href="https://unpkg.com/">
@@ -2892,10 +2892,10 @@ if(hash&&hash.startsWith('#software/')){
 var softId=hash.replace('#software/','');
 var s0=cache.software.find(function(x){return x.id===softId;});
 _urlParamsHandled=true;
-if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0);},200);return true;}
+if(s0){var _seq0=_navSeq;App.goList(s0.category,true);setTimeout(function(){if(_navStale(_seq0))return;Detail.open(s0);},200);return true;}
 return false;
 }
-if(sc){var s0=cache.software.find(function(x){return x.id===sc;});_urlParamsHandled=true;if(s0){App.goList(s0.category,true);setTimeout(function(){Detail.open(s0);},200);return true;}return false;}
+if(sc){var s0=cache.software.find(function(x){return x.id===sc;});_urlParamsHandled=true;if(s0){var _seq0=_navSeq;App.goList(s0.category,true);setTimeout(function(){if(_navStale(_seq0))return;Detail.open(s0);},200);return true;}return false;}
 if(pg==='checkin'){_urlParamsHandled=true;App.goCheckin(true);return true;}
 if(pg==='ranking'){_urlParamsHandled=true;App.goRanking(true);return true;}
 if(pg==='profile'){_urlParamsHandled=true;App.goProfile(true);return true;}
@@ -2906,6 +2906,7 @@ if(kw){_urlParamsHandled=true;App.doSearch(kw,true);return true;}
 return false;
 }
 function handlePopState(){
+_bumpNav();
 var hash=window.location.hash||'';
 var p=new URLSearchParams(window.location.search);
 var sc=p.get('soft'),ct=p.get('cat'),kw=p.get('search'),pg=p.get('page');
@@ -3706,6 +3707,16 @@ return '<div class="achievement-item '+(on?'unlocked':'locked')+'">'+
 }).join('')+'</div>';
 }
 };
+/* ── 启动期导航令牌（防「骨架屏期间点了别的板块又被弹回首页」）─────────────
+   冷启动时首页数据走 REST，会有 1~3 秒骨架屏；旧逻辑在数据到达后的
+   requestIdleCallback 里无条件 App.goHome()，把用户已经点开的板块顶回首页。
+   设计取自成熟路由库的通用做法 —— page.js 的 page.stop()、React Router
+   （remix-run/react-router, MIT）「每次新导航 abort 上一笔」：给「用户最后一次
+   导航」打单调递增令牌，异步收尾发现令牌变了就放弃提交。纯令牌实现，零依赖。 */
+var _navSeq=0;
+function _bumpNav(){_navSeq++;}
+function _navStale(seq){return seq!==_navSeq;}
+
 var App={
 currentPage:'home',
 currentCategory:'all',
@@ -3738,13 +3749,16 @@ Render.renderSkeleton(document.getElementById('latestGrid'),6);
 }else{
 self.refreshAll({skipToday:true});
 }
+var _bootSeq=_navSeq;
 DB.loadAll(!!cached).then(function(){
 self.refreshAll();
 window.dispatchEvent(new Event('lezhe:ready'));
 _idle(function(){
 renderTutorials();
 renderQuestions();
-if(!handleUrlParams())App.goHome();
+/* 用户已经自己点进某个板块了 —— 启动收尾只补数据，不许再改当前页 */
+if(_navStale(_bootSeq))return;
+if(!handleUrlParams())App.goHome(true);
 });
 }).catch(function(){
 var _stale=getCachedData();/* 拉新失败才回退旧缓存（断网兜底） */
@@ -4053,6 +4067,7 @@ document.getElementById('subContact').value='';
 document.addEventListener('click',function(e){var searchWrapper=document.querySelector('.search-wrapper');if(!searchWrapper)return;if(!searchWrapper.contains(e.target))closeSearchSuggestions();});
 },
 goHome:function(isPop){
+if(!isPop)_bumpNav();
 closeSearchSuggestions();
 this.currentPage='home';this.currentCategory='all';this.searchKeyword='';
 document.getElementById('searchInput').value='';document.getElementById('sidebarSearchInput').value='';
@@ -4073,6 +4088,7 @@ if(isMobile()&&isOpen)closeSidebar();
 if(!isPop)window.history.replaceState(null,'',window.location.pathname);
 },
 goList:function(cat,isPop){
+if(!isPop)_bumpNav();
 closeSearchSuggestions();
 cat=cat||'all';
 this.currentPage='list';this.currentCategory=cat;this.searchKeyword='';
@@ -4096,6 +4112,7 @@ if(cat==='all'){var allBtn=ft.querySelector('button[data-cat="all"]');if(allBtn)
 if(!isPop)window.history.pushState(null,'',window.location.pathname+'?cat='+encodeURIComponent(cat));
 },
 goTutorials:function(){
+_bumpNav();
 closeSearchSuggestions();
 this.currentPage='tutorials';
 ['pageHome','pageList','pageQA','pageProfile','pageCheckin','pageRanking','pageMall','pageMyRedeems'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('hidden');});
@@ -4109,6 +4126,7 @@ if(isMobile()&&isOpen)closeSidebar();
 renderTutorials();
 },
 goQA:function(){
+_bumpNav();
 closeSearchSuggestions();
 this.currentPage='qa';
 ['pageHome','pageList','pageTutorials','pageProfile','pageCheckin','pageRanking','pageMall','pageMyRedeems'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('hidden');});
@@ -4134,6 +4152,7 @@ renderQuestions(cat==='all'?null:cat);
 renderQuestions();
 },
 goCheckin:function(isPop){
+if(!isPop)_bumpNav();
 closeSearchSuggestions();
 this.currentPage='checkin';
 ['pageHome','pageList','pageTutorials','pageQA','pageProfile','pageRanking','pageMall','pageMyRedeems'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('hidden');});
@@ -4148,6 +4167,7 @@ Checkin.load();
 if(!isPop)window.history.pushState(null,'',window.location.pathname+'?page=checkin');
 },
 goRanking:function(isPop){
+if(!isPop)_bumpNav();
 closeSearchSuggestions();
 this.currentPage='ranking';
 ['pageHome','pageList','pageTutorials','pageQA','pageProfile','pageCheckin','pageMall','pageMyRedeems'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('hidden');});
@@ -4162,6 +4182,7 @@ Ranking.load();
 if(!isPop)window.history.pushState(null,'',window.location.pathname+'?page=ranking');
 },
 goMall:function(isPop){
+if(!isPop)_bumpNav();
 closeSearchSuggestions();
 this.currentPage='mall';
 ['pageHome','pageList','pageTutorials','pageQA','pageProfile','pageCheckin','pageRanking','pageMyRedeems'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.add('hidden');});
@@ -4176,6 +4197,7 @@ Mall.load();
 if(!isPop)window.history.pushState(null,'',window.location.pathname+'?page=mall');
 },
 goMyRedeems:function(isPop){
+if(!isPop)_bumpNav();
 closeSearchSuggestions();
 if(!currentUser){toast('请先登录','warning');document.getElementById('loginModal').classList.add('open');return;}
 this.currentPage='myRedeems';
@@ -4188,6 +4210,7 @@ MyRedeems.load();
 if(!isPop)window.history.pushState(null,'',window.location.pathname+'?page=myRedeems');
 },
 goProfile:function(isPop){
+if(!isPop)_bumpNav();
 closeSearchSuggestions();
 var targetUrl=window.location.pathname+'?page=profile';
 if(!currentUser){
@@ -4236,6 +4259,7 @@ if(allEl2){allEl2.classList.add('active');requestAnimationFrame(function(){allEl
 }
 },
 doSearch:function(kw,isPop){
+if(!isPop)_bumpNav();
 var keyword=kw||document.getElementById('searchInput').value.trim()||document.getElementById('sidebarSearchInput').value.trim();
 if(!keyword){this.goHome();return;}
 closeSearchSuggestions();
