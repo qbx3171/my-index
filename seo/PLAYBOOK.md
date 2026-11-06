@@ -121,6 +121,26 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 4. 改完跑 `node seo/security-check.mjs`：`tutorials: anon 可写 ⚠` 应变成 `只读 ✓`；再跑一次 B1 写入流程确认服务端写入正常。
 5. 期间**不要**只把策略改成 insert-only：每日任务的封面回写走的是 PATCH，会立刻失败。
 
+## SEO：品牌词搜「乐哲软件」为什么首页不出现（2026-11-06 排查）
+
+现象：Bing 搜「乐哲软件」，第 1 位是 `/ai/index.html`、第 2 位是 `/cat/shiyong-gongju.html`，**首页 `/` 不进前 10**。
+
+根因（已修）：`index.html` 顶部「深度链接 canonical 同步」脚本里主机名写死
+`location.hostname!=='lezhesoft.cn'` —— 站点实际跑在 `www.` 子域上，判断恒为真直接 `return`，
+于是所有 `?soft=` / `?cat=` 深链的 canonical 都退化成默认的首页，**几千个重复变体全指回 `/`**，
+Bing 眼里首页被稀释，品牌词入口落到内容干净的 AI 栏页上。
+修法：改成 `!/(^|\.)lezhesoft\.cn$/.test(location.hostname)`（`preview.html`、`seo/patch-index.mjs` 同步改）。
+验证：Playwright 打开 `/?soft=<id>`、`/?cat=<slug>`，读 `link[rel=canonical]`，应分别指向
+`/soft/<id>.html`、`/cat/<slug>.html`，首页 `/` 指向自身。
+
+同批改动：
+- 首页 `<title>` 收敛为 `乐哲软件官网 - 软件下载与安装教程`（原来 4 段堆关键词，品牌词匹配反被摊薄）。
+- 首页 h1 下方补一句「乐哲软件官网 · 精选高效工具…」，给首屏正文一个品牌话术。
+- `/ai/index.html` 补 `BreadcrumbList`（乐哲软件官网 → AI 工具集），明确它是子栏目不是站点入口。
+
+搜完别指望立刻变：Bing 重排要重抓（小时级~数天），每次改完照常
+`node seo/indexnow-push.mjs --force <url>` + `node seo/bing-push.mjs` 催一次。
+
 ## 第四步：发布与提交
 
 0. `node seo/security-check.mjs --scan` 必须 exit 0（BLOCKER 0）才允许进入下面的发布动作
