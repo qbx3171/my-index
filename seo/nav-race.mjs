@@ -10,7 +10,7 @@
  *  3) 教程页上点「首页」能正常回首页（令牌不能把正常跳转也吃了）
  *
  * 用法：
- *   node seo/nav-race.mjs                 # 打线上
+ *   node seo/nav-race.mjs                 # 打线上（会把快照延迟 2.5s，人为拉长骨架屏窗口）
  *   node seo/nav-race.mjs --local-html    # 用本地 index.html 顶替线上文档（上线前验证）
  */
 import { chromium } from "playwright";
@@ -40,6 +40,13 @@ async function newPage() {
   await cdp.send("Network.emulateNetworkConditions", {
     offline: false, latency: 350,
     downloadThroughput: 400 * 1024, uploadThroughput: 400 * 1024,
+  });
+  /* 2026-11-06 首屏改走静态快照后，数据往往在 HTML 解析完之前就到了，
+     骨架屏窗口从 2.5s 缩到不足 100ms —— 竞争条件并没有消失（收尾仍是异步的），
+     只是难以自然出现。这里主动把快照延迟 2.5s，把窗口拉回原尺寸，稳定复现竞态场景。 */
+  await page.route("**/data/software.json*", async (route) => {
+    await new Promise((r) => setTimeout(r, 2500));
+    await route.continue();
   });
   if (USE_LOCAL_HTML) {
     const html = readFileSync(join(ROOT, "index.html"), "utf8");
