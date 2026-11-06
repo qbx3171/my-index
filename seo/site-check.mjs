@@ -148,6 +148,19 @@ for (const abs of files) {
     }
   }
 
+  // 8.5 内联脚本语法（VIP 页曾因多一个 '}' 整段脚本不执行）
+  for (const m of raw.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    const kind = (m[1].match(/type\s*=\s*"([^"]+)"/i) || [,""])[1].toLowerCase();
+    const code = m[2];
+    if (!code.trim() || kind.includes("ld+json") || kind.includes("json") || kind === "text/template") continue;
+    if (kind === "module" || /^\s*(import|export)\s/m.test(code)) continue; // 模块语法 new Function 不支持
+    try {
+      new Function(code);
+    } catch (e) {
+      push("blocker", "内联脚本语法错误", e.message.slice(0, 60));
+    }
+  }
+
   // 9. 乱码
   if (raw.includes("\uFFFD")) push("warn", "U+FFFD 乱码", `${(raw.match(/\uFFFD/g) || []).length} 处`);
 

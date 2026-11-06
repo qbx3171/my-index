@@ -149,6 +149,7 @@ export const head = (title, desc, canonical, extra = "", robots = "index,follow,
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${esc(canonical)}">
+${/property="og:image"/.test(extra) ? "" : `<meta property="og:image" content="${SITE}/og-cover.png">`}
 ${extra}
 <style>
 body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}

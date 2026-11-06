@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
 <title>全部免费下载 · 乐哲软件</title>
+<link rel="canonical" href="https://www.lezhesoft.cn/vip.html">
+<meta property="og:image" content="https://www.lezhesoft.cn/og-cover.png">
 <meta name="description" content="乐哲软件全部软件均可免费下载，无需付费开通任何会员。注册并登录账号后，即可在任意软件详情页获取下载地址，遇到问题可联系客服协助处理。">
 <meta name="robots" content="noindex,follow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -202,23 +204,15 @@ if(typeof supabase!=='undefined'&&supabase.createClient){
 try{supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);}catch(e){console.warn(e);}
 }
 function makeSafeDb(){
-return{
-from:function(){return{
-select:function(){return{
-maybeSingle:function(){return Promise.resolve({data:null,error:new Error('no supabase')});}
-}},
-insert:function(){return{
-select:function(){return{
-single:function(){return Promise.resolve({data:null,error:new Error('no supabase')});}
-}}
-}},
-update:function(){return{
-eq:function(){return Promise.resolve({error:new Error('no supabase')});}
-}},
-delete:function(){return{
-eq:function(){return Promise.resolve({error:new Error('no supabase')});}
-}}
-}};
+  var noDb=function(){return Promise.resolve({data:null,error:new Error('no supabase')});};
+  var q={ maybeSingle:noDb, single:noDb, order:function(){return this;}, limit:function(){return this;}, then:function(res,rej){return noDb().then(res,rej);} };
+  var chain={ eq:function(){return q;}, maybeSingle:noDb, single:noDb, order:function(){return this;}, limit:function(){return this;}, then:q.then };
+  return { from:function(){ return {
+    select:function(){ return chain; },
+    insert:function(){ return { select:function(){ return q; }, then:q.then }; },
+    update:function(){ return chain; },
+    delete:function(){ return chain; }
+  }; } };
 }
 var db=supabaseClient||makeSafeDb();
 function toast(msg,type){type=type||'success';var c=document.getElementById('toastContainer');var el=document.createElement('div');el.className='toast '+type;el.innerHTML='<span class="icon">'+(type==='success'?'◆':'✕')+'</span> '+msg;c.appendChild(el);setTimeout(function(){el.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){el.remove();},500);},2800);}
