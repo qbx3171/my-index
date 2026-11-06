@@ -46,6 +46,13 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 新增长教程后必须同时落 `content-master-<id前8位>.txt` 并登记，否则会出现「同一数据两次生成 md5 不同」（非幂等）。
 取干净母本的办法：`?select=<字段>,id&id=eq.<id>` 单字段小响应，通常一次就干净；若反复坏，换 `?select=id,<字段>` 顺序绕开坏响应缓存。
 
+**教程选题来源（2026-11-06 起）：`seo/XHS-PLAN.md`**
+站内教程与小红书「乐哲软件库」共用一份排期表：每天一行 = 小红书笔记标题 + 类型 + 站内教程选题软件 + 教程标题预设 + 状态。
+- 选题看 `node seo/tutorial-pick.mjs` 输出里的 `xhs_sync`：有值就写它指定的那款（同题同方向）；为 null 才按 `candidates` 常规挑。
+- 写完必须回写该行 `已写 YYYY-MM-DD · <教程id前8位>`，同一行不得写第二篇。
+- 排期用尽（剩余待写 <7 行）按表内「7 天方向轮换模板」续排 7 行；软件从「方向软件池」取同方向且未覆盖的。
+- 口径与小红书一致：只写正常安装/使用/优化/卸载/免费替代，**不写激活、破解、绕过正版验证、去广告版获取、站外导流**。
+
 已知豁免（不算 BUG，不要「修」）：
 - `all.html`：有意的跳转存根（noindex + JS 跳 sitemap.html），canonical 指向 sitemap.html
 - `admin/manager/submanager.html`：后台 SPA，视图内是 h2，noindex，不补隐藏 h1
