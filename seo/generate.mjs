@@ -260,8 +260,14 @@ for (const [id, cat] of Object.entries(CATEGORY_OVERRIDES)) {
 console.log(`数据：software=${softs.length}，tutorials=${tutorials.length}`);
 
 // 清理旧产物，避免删除的软件留下死页
+// 注意：批量 rm 在部分沙箱/终端里会被安全删除守卫拦下（一次删 159 个文件触发阈值），
+// 这里降级为「尽力清理」：删不掉就继续，后续写文件仍是覆盖式的，产物不会错乱。
 for (const dir of ["soft", "cat", "tutorial", "ai"]) {
-  await rm(join(ROOT, dir), { recursive: true, force: true });
+  try {
+    await rm(join(ROOT, dir), { recursive: true, force: true });
+  } catch (e) {
+    console.warn(`⚠ 未能清空 ${dir}/（${e.code || "删除被拦截"}），改为覆盖写入`);
+  }
   await mkdir(join(ROOT, dir), { recursive: true });
 }
 

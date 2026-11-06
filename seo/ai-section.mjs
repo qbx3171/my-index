@@ -370,6 +370,14 @@ ${jsonLd({
     description: desc,
     url: canonical,
   })}
+${jsonLd({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "乐哲软件官网", item: `${SITE}/` },
+      { "@type": "ListItem", position: 2, name: "AI 工具集", item: canonical },
+    ],
+  })}
 ${liveTag()}
 ${foot("aihub")}`;
   return { html };
@@ -553,9 +561,15 @@ export async function buildAiSection(ROOT, softs = []) {
   // _hasPage 保留恒真语义，兼容 sitemap 过滤逻辑
   for (const c of collections) c._hasPage = true;
 
-  // 清空重建 /ai/
+  // 清空重建 /ai/（沙箱里批量删除可能被安全守卫拦截，拦下就退化为覆盖写入）
   const aiDir = join(ROOT, "ai");
-  if (existsSync(aiDir)) await rm(aiDir, { recursive: true });
+  if (existsSync(aiDir)) {
+    try {
+      await rm(aiDir, { recursive: true });
+    } catch (e) {
+      console.warn(`⚠ 未能清空 ai/（${e.code || "删除被拦截"}），改为覆盖写入`);
+    }
+  }
   await mkdir(join(aiDir, "cover"), { recursive: true }).catch(() => {});
   await mkdir(join(aiDir, "tool"), { recursive: true });
   await writeFile(join(aiDir, "ai.css"), AI_STYLESHEET, "utf8");

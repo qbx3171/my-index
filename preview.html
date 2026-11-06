@@ -13,7 +13,7 @@
 /* 深度链接 canonical 同步：?soft= / ?cat= 页面指向自身，避免被搜索引擎当作首页重复页丢弃 */
 (function(){
 try{
-if(location.protocol==='file:'||location.hostname!=='lezhesoft.cn')return;
+if(location.protocol==='file:'||!/(^|\.)lezhesoft\.cn$/.test(location.hostname))return;
 var p=new URLSearchParams(location.search);
 var soft=p.get('soft'),cat=p.get('cat');
 var u=null;

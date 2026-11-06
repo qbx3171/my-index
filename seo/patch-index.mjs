@@ -26,7 +26,7 @@ const patches = [
   // 2. hostname 判断兼容 www（原脚本在 www 下直接 return，永不生效）
   [
     "if(location.protocol==='file:'||location.hostname!=='lezhesoft.cn')return;",
-    "if(location.protocol==='file:')return;",
+    "if(location.protocol==='file:'||!/(^|\\.)lezhesoft\\.cn$/.test(location.hostname))return;",
   ],
   // 3. JSON-LD / 分享 URL：?soft= → 静态详情页
   [

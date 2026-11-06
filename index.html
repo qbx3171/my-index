@@ -15,7 +15,7 @@
 /* 深度链接 canonical 同步：?soft= / ?cat= 页面指向自身，避免被搜索引擎当作首页重复页丢弃 */
 (function(){
 try{
-if(location.protocol==='file:'||location.hostname!=='lezhesoft.cn')return;
+if(location.protocol==='file:'||!/(^|\.)lezhesoft\.cn$/.test(location.hostname))return;
 var p=new URLSearchParams(location.search);
 var soft=p.get('soft'),cat=p.get('cat');
 var u=null;
@@ -1290,7 +1290,7 @@ body.ls-locked{overflow:hidden !important}
 <div class="service-item wechat-item" id="wechatContact2"><span class="icon wechat"><i class="fab fa-weixin"></i></span><div class="info"><span class="name">Adob_123</span><span class="desc">点击复制微信号</span></div><span class="badge-tag">联系客服</span></div>
 </div></div>
 <h1>探索 · <span class="highlight">乐哲软件</span></h1>
-<p>精选高效工具，赋能创作者生态。</p>
+<p>乐哲软件官网 · 精选高效工具，赋能创作者生态。</p>
 <div class="search-wrapper">
 <div class="search-box"><input type="text" id="searchInput" placeholder="搜索软件名称或描述..." autocomplete="off"><button id="searchBtn"><i class="fas fa-search"></i> 检索</button></div>
 <div id="searchSuggestions" class="search-suggestions"></div>
