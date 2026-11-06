@@ -90,8 +90,36 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - 工具页（vip / sitemap / copyright / preview / query / text1 / admin / manager / submanager）保持 noindex
 - 动模板前先看 `.workbuddy/memory/` 当日记录，避免重复做已完成的事
 
+## 安全（发布前门禁，2026-11-06 新增）
+
+**每天发之前必须先跑**：`node seo/security-check.mjs --scan`，exit 2 = 有 BLOCKER，**修完才能推送/发布**，不许先发后修。
+
+三道防线（已实现，别拆）：
+
+1. **正文消毒** `render.js → sanitizeHtml()`：教程 `content` 是要按 HTML 输出的，库里的内容却不可信（见下）。消毒去注释、整段删 `<script>/<style>`（连内容）、删 `iframe/object/embed/svg/form` 等危险标签、删 `on*= / srcdoc`、拦 `style` 里的 `expression()/url(javascript:)`、`href/src` 走协议白名单。
+2. **JSON-LD 转义** `render.js → jsonLd()`：原来直接 `JSON.stringify()` 塞进 `<script>`，标题里写 `</script><script>…` 就能闭合标签执行脚本。现在 `< > &` 与 U+2028/2029 全部转成 `\uXXXX`（JSON 合法，Google/Bing 照常解析）。
+3. **自检脚本**：构造恶意正文/标题渲染一遍，断言脚本数量不增加、正文区无可执行构造；再扫全站产物找 `onerror=/javascript:/外链 iframe`。
+
+**已知未根治风险：`tutorials` 表对公开 anon key 开放写权限**
+2026-11-06 实测：`PATCH tutorials?id=eq.<真实id>` + `Prefer:return=representation` 返回 1 行 = **匿名可改**；`software / ai_tools / ai_collections` 同法返回 0 行 = 已被 RLS 挡住。anon key 写在 index.html 里人人可见，所以「库里的内容可信」这个前提不成立 → 渲染层消毒是兜底，不是根治。
+
+根治办法（需要 `service_role` key，只有你能从 Supabase 控制台取）：
+1. Supabase → Project Settings → API → 复制 `service_role` key，存到 `seo/supabase-service-key.txt`（已在 .gitignore，不会推上仓库）。
+2. 把写库的脚本改成用 service key（B1 插入教程、`ensureCovers()` 回写 cover、后台管理写操作）。
+3. 然后在 SQL Editor 执行，把 anon 收紧成只读：
+   ```sql
+   -- 先看现有策略，确认要删的名字
+   select policyname, cmd, roles from pg_policies where tablename = 'tutorials';
+   -- 删掉匿名写策略（名字以实际为准），只留 select
+   drop policy if exists "<匿名写策略名>" on public.tutorials;
+   create policy "tutorials_public_read" on public.tutorials for select using (true);
+   ```
+4. 改完跑 `node seo/security-check.mjs`：`tutorials: anon 可写 ⚠` 应变成 `只读 ✓`；再跑一次 B1 写入流程确认服务端写入正常。
+5. 期间**不要**只把策略改成 insert-only：每日任务的封面回写走的是 PATCH，会立刻失败。
+
 ## 第四步：发布与提交
 
+0. `node seo/security-check.mjs --scan` 必须 exit 0（BLOCKER 0）才允许进入下面的发布动作
 1. `node seo/generate.mjs` → `node seo/qa.mjs` → `node seo/audit.mjs` → `node seo/optimize.mjs`（对比修改前后数字）
 2. `T=$(printf "protocol=https\nhost=github.com\n\n" | git credential fill | grep "^password=" | cut -d= -f2- | tr -d "\r\n") && GH_TOKEN="$T" node seo/api-push.mjs "提交信息"`（本地 push 被墙 502，必须走 API 脚本；清单自动来自 git status -uall，会话数据目录自动排除）
 3. 等 40s 后 curl 验证：sitemap loc 数、抽查 2 个改过的页面 200、抽查改动点已生效

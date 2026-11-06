@@ -14,6 +14,50 @@ export const pick = (row, keys, dflt = "") => {
   return dflt;
 };
 
+/* ---------------- 正文 HTML 消毒 ----------------
+
+  为什么必须做：`tutorials` 表对公开的 anon key 开放了写权限（2026-11-06 实测：
+    PATCH ?id=eq.<真实id> + Prefer:return=representation 返回 1 行 = 匿名可改；
+    software / ai_tools / ai_collections 同样的测试返回 0 行 = 被 RLS 挡住）。
+  anon key 就写在 index.html 里，人人可见，因此「库里内容可信」这个前提不成立。
+  正文又是要按 HTML 渲染的，一旦被写入 <script>/onerror，generate 会把它烘进静态页，
+  形成对全站访客的存储型 XSS，且会一直留在产物里。
+
+  这里做输出侧消毒（白名单式去危险构造，保留排版标签），即使数据库被投毒，
+  产物也不会带出可执行代码；真正的根治是收紧 RLS（需 service_role，见 PLAYBOOK）。 */
+const DANGEROUS_TAG =
+  /<\/?(script|style|iframe|frame|frameset|object|embed|applet|link|meta|base|form|input|button|textarea|select|option|svg|math|template)\b[^>]*>/gi;
+const BAD_PROTOCOL = /^(javascript|vbscript|data|file|blob):/i;
+
+export const sanitizeHtml = (html) => {
+  let out = String(html ?? "");
+  out = out.replace(/<!--[\s\S]*?-->/g, ""); // 注释可用来拆散危险标签
+  // 先整段删掉脚本/样式（连内部文本一起），避免只剩裸露的 alert(1) 文本
+  out = out.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "");
+  out = out.replace(DANGEROUS_TAG, "");
+  // 事件处理器 / srcdoc / formaction
+  out = out.replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+  out = out.replace(/\ssrcdoc\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+  // style 里藏 expression() / url(javascript:)
+  out = out.replace(/\sstyle\s*=\s*("([^"]*)"|'([^']*)')/gi, (m, _q, d1, d2) => {
+    const v = String(d1 ?? d2 ?? "").toLowerCase();
+    return /expression\s*\(|javascript:|url\s*\(\s*['"]?\s*(javascript|data):/.test(v) ? "" : m;
+  });
+  // 链接协议白名单：允许 http(s)/mailto/tel/相对路径/锚点，其余置空
+  out = out.replace(
+    /\s(href|src|xlink:href)\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/gi,
+    (m, attr, _q, d1, d2, d3) => {
+      const v = String(d1 ?? d2 ?? d3 ?? "").trim();
+      if (!v) return ` ${attr}="#"`;
+      const ok =
+        /^(https?:\/\/|mailto:|tel:|\/|#|\.{0,2}\/)/i.test(v) ||
+        /^[\w\-.]+(\.html?|\.php)?(\?|#|$)/i.test(v); // 站内相对路径
+      return ok && !BAD_PROTOCOL.test(v) ? m : ` ${attr}="#"`;
+    }
+  );
+  return out;
+};
+
 export const esc = (s) =>
   String(s ?? "")
     .replace(/&/g, "&amp;")
@@ -206,7 +250,14 @@ const relatedBlock = (title, list) =>
     : "";
 
 export const jsonLd = (obj) =>
-  `<script type="application/ld+json">${JSON.stringify(obj)}</script>`;
+  // 内联 JSON-LD 里出现 </script> 会提前闭合标签 → 标题含该串即可注入脚本。
+  // 用 JSON 合法的 \u 转义挡住（Google/Bing 解析不受影响）。
+  `<script type="application/ld+json">${JSON.stringify(obj)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029")}</script>`;
 
 /* 教程正文里的图片多为采集来的截图，普遍没有 alt。
    在渲染层统一补上「标题 + 序号」的描述性 alt，避免无障碍/图片搜索扣分。 */
@@ -417,7 +468,7 @@ export function renderTutorialPage(t, related = [], opts = {}) {
   const summary = pick(t, ["summary"], `「${title0}」- 乐哲软件图文教程。`);
   const cover = pick(t, ["cover"]);
   const createdAt = pick(t, ["created_at"]);
-  const content = addImgAlt(t.content || "", title0);
+  const content = addImgAlt(sanitizeHtml(t.content || ""), title0);
   const canonical = tutUrl(id);
   const title = `${title0}_乐哲软件教程`;
 

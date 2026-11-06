@@ -18,3 +18,6 @@ package-lock.json
 seo/.*.mjs
 seo/.*.png
 seo/.*.json
+
+# Supabase service_role key（本机私有，仅用于收紧 RLS 后的写库）
+seo/supabase-service-key.txt
