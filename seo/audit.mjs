@@ -231,6 +231,18 @@ const report = {
   warnings: warn.slice(0, 40),
 };
 
+/* 护栏：启动期导航守卫（2026-11-06 事故）——
+   首页数据加载完的收尾逻辑若又变回无条件 goHome()，用户在骨架屏期间点开的板块会被弹回首页。 */
+{
+  const home = await readFile(join(ROOT, "index.html"), "utf8");
+  if (!/function\s+_bumpNav\s*\(/.test(home) || !/function\s+_navStale\s*\(/.test(home)) {
+    add(blocker, "启动期导航令牌缺失", "index.html", "_bumpNav/_navStale 被删，骨架屏期间点板块会被弹回首页");
+  }
+  if (!/_bootSeq\s*=\s*_navSeq/.test(home) || !/_navStale\(_bootSeq\)/.test(home)) {
+    add(blocker, "启动收尾未做导航比对", "index.html", "DB.loadAll 之后的收尾必须 if(_navStale(_bootSeq))return; 后才 handleUrlParams()/goHome()");
+  }
+}
+
 if (JSON_OUT) {
   console.log(JSON.stringify(report, null, 2));
 } else {
