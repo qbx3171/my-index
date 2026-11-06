@@ -4,7 +4,7 @@
  * 产物：/soft/*.html  /cat/*.html  /tutorial/*.html  sitemap.xml  sitemap.html
  * 运行：node seo/generate.mjs
  */
-import { mkdir, writeFile, rm, readFile } from "node:fs/promises";
+import { mkdir, writeFile, rm, readFile, readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import {
@@ -260,15 +260,28 @@ for (const [id, cat] of Object.entries(CATEGORY_OVERRIDES)) {
 console.log(`数据：software=${softs.length}，tutorials=${tutorials.length}`);
 
 // 清理旧产物，避免删除的软件留下死页
-// 注意：批量 rm 在部分沙箱/终端里会被安全删除守卫拦下（一次删 159 个文件触发阈值），
-// 这里降级为「尽力清理」：删不掉就继续，后续写文件仍是覆盖式的，产物不会错乱。
-for (const dir of ["soft", "cat", "tutorial", "ai"]) {
+// 注意 1：批量 rm 在部分沙箱/终端里会被安全删除守卫拦下（一次删 159 个文件触发阈值），
+//         这里降级为「尽力清理」：删不掉就继续，后续写文件仍是覆盖式的，产物不会错乱。
+// 注意 2：tutorial/ 只清 HTML，**保留 cover/**。CI（GitHub Actions 的 ubuntu runner）没有
+//         Edge/Chrome，ensureCovers() 画不出封面，一旦连 cover/ 一起删，提交上去就是全站教程
+//         封面 404（2026-11-06 就是这么丢的）。保留 PNG 后，缺页时仍会按需重建，两不误。
+for (const dir of ["soft", "cat", "ai"]) {
   try {
     await rm(join(ROOT, dir), { recursive: true, force: true });
   } catch (e) {
     console.warn(`⚠ 未能清空 ${dir}/（${e.code || "删除被拦截"}），改为覆盖写入`);
   }
   await mkdir(join(ROOT, dir), { recursive: true });
+}
+// tutorial/：删旧页，留封面图
+try {
+  const tutDir = join(ROOT, "tutorial");
+  await mkdir(tutDir, { recursive: true });
+  for (const f of await readdir(tutDir)) {
+    if (f.endsWith(".html")) await rm(join(tutDir, f), { force: true });
+  }
+} catch (e) {
+  console.warn(`⚠ 未能清理 tutorial/*.html（${e.code || "删除被拦截"}），改为覆盖写入`);
 }
 
 // 教程封面：必须在目录清理之后生成（清理会连 tutorial/cover/ 一起删掉）
