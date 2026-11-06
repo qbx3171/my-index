@@ -120,6 +120,12 @@ var o=document.querySelector('meta[property="og:url"]');if(o)o.setAttribute('con
 </style><link rel="preconnect" href="https://cdn.bootcdn.net/" crossorigin="">
 <link rel="preconnect" href="https://cdn.jsdelivr.net/" crossorigin="">
 <link rel="preconnect" href="https://lezhesoft-d0g80z4vb0ac03c39-1300972301.ap-shanghai.app.tcloudbase.com/" crossorigin="">
+<link rel="preload" as="fetch" href="/data/software.json" crossorigin="anonymous">
+<script>/* 首屏快照：解析到这一行就发请求，与后面的 HTML 并行；DB.loadAll 消费一次。
+   放在 head 而不是等 body 里的大脚本执行，是为了抢在解析完成之前拿到数据。 */
+/* 不显式指定 credentials：同源默认 same-origin，正好与上面 preload 的 crossorigin 对上，
+   否则 Chrome 会判定「凭据模式不匹配」而丢弃 preload，等于白预加载一次。 */
+window.__SNAP__=fetch('/data/software.json').catch(function(){return null;});</script>
 <link rel="dns-prefetch" href="https://registry.npmmirror.com/">
 <link rel="dns-prefetch" href="https://cdn.bootcdn.net/">
 <link rel="dns-prefetch" href="https://unpkg.com/">
@@ -1727,6 +1733,64 @@ localStorage.setItem(CACHE_KEY,JSON.stringify({software:light,categories:cache.c
 }catch(e2){}
 }
 function getCachedData(freshOnly){if(cache.loaded&&cache.software.length>0)return{software:cache.software,categories:cache.categories};var s=localStorage.getItem(CACHE_KEY);if(s){try{var d=JSON.parse(s);if(d&&Array.isArray(d.software)&&Array.isArray(d.categories)){if(freshOnly&&Date.now()-(d.timestamp||0)>=600000)return null;cache.software=d.software;cache.categories=d.categories;cache.loaded=true;cache.lastFetch=d.timestamp||0;return{software:cache.software,categories:cache.categories};}}catch(e){}}return null;}
+/* ── 首屏数据：静态快照优先（2026-11-06） ────────────────────────────────────────
+   改造前的加载链是四段串行：HTML(CDN 0.3s) → 解析 → init supabase-js → 经 CloudBase
+   代理查 159 条（实测 TTFB 1.4s，偶发 Bad Gateway）。冷启动骨架屏 2.5s 主要耗在最后一段，
+   而这一段是纯等待、无法与前一段并行。
+   现在把同一批数据随站点生成成同源静态 JSON（seo/generate.mjs 产出 data/software.json），
+   浏览器解析 HTML 时就能并行取到，实测首屏不再等代理。
+   三级降级，任何一级挂了都不会白屏：
+     ① data/software.json（同源同 CDN）           ← 新访客走这里
+     ② Supabase REST（原路径）                    ← 快照没生成 / CDN 挡掉时兜底
+     ③ localStorage 上次结果（10 分钟内）          ← 断网兜底
+   快照与 REST 同为 select('*') 同字段，详情弹层不会缺字段。 */
+var SNAP_URL='/data/software.json';
+function normalizeSoft(s){
+if(typeof s.screenshots==='string'){try{s.screenshots=JSON.parse(s.screenshots);}catch(e){s.screenshots=s.screenshots.split(',').map(function(x){return x.trim();}).filter(Boolean);}}
+	s.screenshots=safeArray(s.screenshots);
+if(!s.changelog)s.changelog='';
+if(!s.requirements)s.requirements='';
+if(typeof s.platforms==='string')s.platforms=s.platforms.split(',').map(function(p){return p.trim();}).filter(Boolean);
+s.platforms=safeArray(s.platforms);
+if(!s.name||s.name.trim()==='')s.name='未命名软件';
+if(!s.description)s.description='';
+if(!s.icon)s.icon='📦';
+if(!s.version)s.version='1.0';
+if(!s.category)s.category='未分类';
+if(!s.size)s.size='—';
+}
+/* 归一化 + 落地到 cache 并持久化。快照与 REST 共用，保证两条路径的数据形状完全一致。 */
+function commitSnapshot(d){
+cache.software=Array.isArray(d.software)?d.software:[];
+cache.software.forEach(normalizeSoft);
+cache.categories=(Array.isArray(d.categories)&&d.categories.length)?d.categories.slice():['设计工具','开发工具','办公软件','媒体工具','实用工具'];
+cache.loaded=true;
+cache.lastFetch=Date.now();
+window._lezheLoadFailed=false;
+saveCacheToStorage();
+}
+/* 取静态快照。<head> 里的 window.__SNAP__ 只能消费一次，用掉即置空；
+   之后再调用就重新 fetch（走 HTTP 缓存，代价很小）。 */
+async function fetchSnapshot(){
+try{
+var p=window.__SNAP__;
+if(p){
+window.__SNAP__=null;/* <head> 里已发起的首个请求，直接用，最省时间 */
+}else{
+/* 后续（刷新按钮 / 5 分钟轮询 / 页面重新可见）用 no-cache：向 CDN 做条件请求，
+   内容没变就是 304（几十字节），变了才回 200 全量 —— 既能拿到最新，又不会每 5 分钟拉 57KB。 */
+p=fetch(SNAP_URL,{cache:'no-cache'});
+}
+var r=await p;
+if(!r||!r.ok)return null;
+var d=await r.json();
+if(!d||!Array.isArray(d.software)||d.software.length===0)return null;
+return d;
+}catch(e){
+console.warn('[DB] 静态快照不可用，回落 REST：',e&&e.message);
+return null;
+}
+}
 var DB={
 _loadRetryCount:0,
 _loadMaxRetries:5,
@@ -1750,6 +1814,20 @@ cache.categories=['设计工具','开发工具','办公软件','媒体工具','�
 cache.software=[];cache.loaded=true;cache.lastFetch=Date.now();
 return{software:cache.software,categories:cache.categories};
 }
+/* 快照路径不需要 supabase 就能出首屏，但登录/收藏等功能依赖 client，这里先初始化 */
+if(!supabaseClient)initSupabase();
+if(cache.loaded&&!force&&(Date.now()-cache.lastFetch<600000))return{software:cache.software,categories:cache.categories};
+/* ① 静态快照：随 HTML 并行取到（同源 CDN），通常 0.3s 级，不等代理 */
+var snap=await fetchSnapshot();
+if(snap){
+commitSnapshot(snap);
+console.info('[DB] 首屏数据来自静态快照 '+cache.software.length+' 条');
+/* 这里不再额外打 REST 对账：站内有个 5 分钟轮询器（_poll）会反复调 loadAll(true)，
+   每次都补一发代理请求会白等 1.4s 且触发全量重渲。时效由快照的 no-cache 条件请求保证——
+   快照由 CI 每 5 分钟重建，内容一变，条件请求立刻拿到 200 新版本。 */
+return{software:cache.software,categories:cache.categories};
+}
+console.info('[DB] 静态快照不可用，改用 REST');
 if(!supabaseClient){
 var ready=await this.waitForSupabase();
 if(!ready){
@@ -1760,35 +1838,10 @@ window._lezheLoadFailed=true;
 return{software:[],categories:['设计工具','开发工具','办公软件','媒体工具','实用工具']};
 }
 }
-if(cache.loaded&&!force&&(Date.now()-cache.lastFetch<600000))return{software:cache.software,categories:cache.categories};
 var lastErr=null;
 for(var attempt=0;attempt<=this._loadMaxRetries;attempt++){
 try{
-var[softRes,catRes]=await Promise.all([supabaseClient.from('software').select('*').order('created_at',{ascending:false}),supabaseClient.from('categories').select('name').order('name')]);
-if(softRes.error)throw softRes.error;
-if(catRes.error)throw catRes.error;
-cache.software=Array.isArray(softRes.data)?softRes.data:[];
-cache.categories=(catRes.data&&catRes.data.length)?catRes.data.map(function(item){return item.name;}):['设计工具','开发工具','办公软件','媒体工具','实用工具'];
-this._loadRetryCount=0;
-cache.software.forEach(function(s){
-if(typeof s.screenshots==='string'){try{s.screenshots=JSON.parse(s.screenshots);}catch(e){s.screenshots=s.screenshots.split(',').map(function(x){return x.trim();}).filter(Boolean);}}
-	s.screenshots=safeArray(s.screenshots);
-if(!s.changelog)s.changelog='';
-if(!s.requirements)s.requirements='';
-if(typeof s.platforms==='string')s.platforms=s.platforms.split(',').map(function(p){return p.trim();}).filter(Boolean);
-s.platforms=safeArray(s.platforms);
-if(!s.name||s.name.trim()==='')s.name='未命名软件';
-if(!s.description)s.description='';
-if(!s.icon)s.icon='📦';
-if(!s.version)s.version='1.0';
-if(!s.category)s.category='未分类';
-if(!s.size)s.size='—';
-});
-cache.loaded=true;
-cache.lastFetch=Date.now();
-window._lezheLoadFailed=false;
-saveCacheToStorage();
-return{software:cache.software,categories:cache.categories};
+return await this.fetchFromRest();
 }catch(e){
 lastErr=e;
 console.error('[DB] 加载失败 (尝试 '+(attempt+1)+'/'+(this._loadMaxRetries+1)+'):',e);
@@ -1804,6 +1857,15 @@ var cached=getCachedData();
 if(cached)return cached;
 window._lezheLoadFailed=true;
 return{software:[],categories:['设计工具','开发工具','办公软件','媒体工具','实用工具']};
+},
+/* REST 取数（② 路径）：两张表并发查，成功后统一走 commitSnapshot，形状与快照完全一致 */
+async fetchFromRest(){
+var[softRes,catRes]=await Promise.all([supabaseClient.from('software').select('*').order('created_at',{ascending:false}),supabaseClient.from('categories').select('name').order('name')]);
+if(softRes.error)throw softRes.error;
+if(catRes.error)throw catRes.error;
+this._loadRetryCount=0;
+commitSnapshot({software:Array.isArray(softRes.data)?softRes.data:[],categories:(catRes.data&&catRes.data.length)?catRes.data.map(function(item){return item.name;}):['设计工具','开发工具','办公软件','媒体工具','实用工具']});
+return{software:cache.software,categories:cache.categories};
 },
 getSoftware:function(){return cache.software;},
 getCategories:function(){return cache.categories;},

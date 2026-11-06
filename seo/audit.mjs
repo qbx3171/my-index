@@ -221,6 +221,28 @@ if (!(await exists(join(ROOT, "404.html")))) {
   if (!/noindex/i.test(h404)) add(warn, "404 页未 noindex", "404.html", "不应参与索引");
 }
 
+/* 护栏：首屏静态快照（2026-11-06）——
+   data/software.json 是新访客首屏唯一的快路径。它缺失/损坏时页面不会报错，只会静默退回
+   经代理的 REST（慢一倍），从界面上完全看不出来，属于最难自己发现的退化。这里守三件事：
+   ① 文件在、能解析、条数合理；② 前端仍优先读它；③ 前端仍保留 REST 兜底（快照挂了不许白屏）。 */
+{
+  try {
+    const snap = JSON.parse(await readFile(join(ROOT, "data", "software.json"), "utf8"));
+    const n = Array.isArray(snap.software) ? snap.software.length : 0;
+    if (n < 50) add(blocker, "首屏快照条数异常", "data/software.json", `${n} 条（正常 150+），疑似抓取残缺`);
+    if (!Array.isArray(snap.categories) || !snap.categories.length) add(warn, "首屏快照缺分类", "data/software.json", "categories 为空");
+  } catch (e) {
+    add(blocker, "首屏快照缺失/不可解析", "data/software.json", `${e.code || e.message} —— 新访客首屏会静默退化到 REST`);
+  }
+  const home = await readFile(join(ROOT, "index.html"), "utf8");
+  if (!/SNAP_URL\s*=\s*['"]\/data\/software\.json['"]/.test(home) || !/async function fetchSnapshot\(/.test(home)) {
+    add(blocker, "首屏快照优先逻辑缺失", "index.html", "fetchSnapshot/SNAP_URL 被删，首屏回到经代理的 REST");
+  }
+  if (!/async fetchFromRest\(/.test(home)) {
+    add(blocker, "首屏 REST 兜底缺失", "index.html", "快照拉不到时没有 REST 兜底 → 白屏");
+  }
+}
+
 const report = {
   generatedAt: new Date().toISOString(),
   pages: files.length,

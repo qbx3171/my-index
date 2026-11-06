@@ -33,16 +33,39 @@ const ffdCount = (s) => String(s).split(FFD).length - 1;
 const hasFFD = (row) => Object.values(row).some((v) => typeof v === "string" && v.includes(FFD));
 
 async function fetchTable(U, K, table) {
-  const r = await fetch(`${U}/rest/v1/${table}?select=*`, {
-    headers: { apikey: K, Authorization: `Bearer ${K}` },
-  });
-  if (!r.ok) {
-    const t = await r.text();
-    if (r.status === 404 || /does not exist|relation/i.test(t)) {
-      console.log(`AI 板块：表 ${table} 尚未创建，跳过（请先在 Supabase 执行 seo/ai-schema.sql）`);
-      return null;
+  const url = `${U}/rest/v1/${table}?select=*`;
+  const H = { apikey: K, Authorization: `Bearer ${K}` };
+  // 代理（腾讯云 CloudBase）偶发 502 Bad Gateway / timeout，实测几十秒到几分钟内自愈。
+  // 这里以前不重试，一次抖动就让整站生成中断（CI 三次都撞上 = 站点 5 分钟不更新）。
+  // 只对 5xx 与网络错误重试；4xx 是逻辑问题，重试无意义。
+  let r = null;
+  let lastErr = "";
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      r = await fetch(url, { headers: H });
+    } catch (e) {
+      r = null;
+      lastErr = e.message;
     }
-    throw new Error(`拉取 ${table} 失败: ${r.status} ${t.slice(0, 200)}`);
+    if (r && r.ok) break;
+    if (r && r.status < 500) break;
+    if (r) lastErr = `HTTP ${r.status}`;
+    if (attempt < 2) {
+      const wait = 700 * (attempt + 1);
+      console.warn(`⚠ 拉取 ${table} 第 ${attempt + 1} 次失败（${lastErr.slice(0, 60)}），${wait}ms 后重试`);
+      await new Promise((s) => setTimeout(s, wait));
+    }
+  }
+  if (!r || !r.ok) {
+    if (r && r.status === 404) {
+      const body = await r.text().catch(() => "");
+      if (/does not exist|relation/i.test(body)) {
+        console.log(`AI 板块：表 ${table} 尚未创建，跳过（请先在 Supabase 执行 seo/ai-schema.sql）`);
+        return null;
+      }
+    }
+    const detail = r && r.status >= 500 ? (await r.text().catch(() => "")).slice(0, 200) : lastErr;
+    throw new Error(`拉取 ${table} 失败: ${r ? r.status : "network"} ${detail}`);
   }
   const rows = await r.json();
   // 代理传输偶发截断多字节字符（U+FFFD，位置随机）：对损坏行按 id 单条重拉治愈

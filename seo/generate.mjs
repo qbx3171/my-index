@@ -627,6 +627,43 @@ console.log(
   `sitemap.xml + sitemap.html 完成（共 ${softs.length + tutorials.length + cats.length + 1 + aiSection.urls.length} 个 URL，含 AI 板块 ${aiSection.urls.length}）`
 );
 
+// ── 首屏静态快照 data/software.json ─────────────────────────────────────────────
+// 为什么要它：首页当前的加载链是「HTML(CDN 0.3s) → 解析 → init supabase-js → 经 CloudBase
+// 代理查 159 条（实测 TTFB 1.4s）」，四段串行，冷启动骨架屏 2.5s 主要耗在最后一段。
+// 把同一批数据随站点生成成同源 JSON，浏览器能在解析 HTML 时就并行取它（同 CDN、同为 0.3s 级），
+// 首屏不再等代理；代理偶发 Bad Gateway / timeout 也不再让首页空着。
+// 三道保护，宁可保留上一版也不写坏文件：
+//   ① 记录数 < 50 视为抓取残缺（正常 159 条），跳过；
+//   ② 含 U+FFFD 乱码，跳过（前端渲染乱码比数据旧更糟）；
+//   ③ 先写 .tmp 再 rename，避免中断留下半截 JSON。
+const SNAP_REL = "data/software.json";
+try {
+  const snapSoft = [...softs].sort((a, b) =>
+    String(b.created_at || "").localeCompare(String(a.created_at || ""))
+  );
+  const payload = { v: 1, count: snapSoft.length, categories: cats, software: snapSoft };
+  const json = JSON.stringify(payload);
+  if (snapSoft.length < 50) {
+    console.warn(`⚠ 软件仅 ${snapSoft.length} 条（正常 159），疑似抓取残缺：跳过 ${SNAP_REL}，保留上一版`);
+  } else if (json.includes(FFD)) {
+    console.warn(`⚠ 首屏快照含乱码：跳过 ${SNAP_REL}，保留上一版（前端会回落 REST）`);
+  } else {
+    const dir = join(ROOT, "data");
+    await mkdir(dir, { recursive: true });
+    const target = join(ROOT, SNAP_REL);
+    const tmp = join(dir, ".software.json.tmp");
+    await writeFile(tmp, json, "utf8");
+    const { rename } = await import("node:fs/promises");
+    await rename(tmp, target);
+    const gz = (await import("node:zlib")).gzipSync(Buffer.from(json)).length;
+    console.log(
+      `首屏快照 ${SNAP_REL}：${snapSoft.length} 条 / ${(Buffer.byteLength(json) / 1024).toFixed(1)}KB（gzip ${(gz / 1024).toFixed(1)}KB）`
+    );
+  }
+} catch (e) {
+  console.warn(`⚠ 首屏快照生成失败（前端会回落 REST）：${e.message}`);
+}
+
 // 404 兜底页：GitHub Pages 自动接管根目录 404.html，同时保持 404 状态码。
 // 数据完全由当次产物派生（热门排序、分类、搜索索引），不做手工维护，避免与首页漂移。
 const p404 = render404(softs, tutorials, aiSection.collections);

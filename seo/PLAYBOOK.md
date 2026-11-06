@@ -23,6 +23,7 @@ node seo/audit.mjs --json   # 自动化取数用
 node seo/site-check.mjs     # 逐板块静态体检（2026-11-06 新增，图片存在性/img alt/内联脚本语法）
 node seo/live-assets.mjs    # 线上图片探活（2026-11-06 新增，抓「本地有、线上 404」的远程漂移）
 node seo/nav-race.mjs       # 启动期导航竞态（2026-11-06 新增，骨架屏期间点板块不能被弹回首页；需线上已部署本次改动）
+node seo/firstpaint.mjs     # 首屏耗时 + 取数降级（2026-11-06 新增，改加载链路时必跑）
 ```
 
 `site-check.mjs` 与 `audit.mjs` 的分工：audit 偏「结构与 SEO 规则」，site-check 偏「页面上真的能不能用」——
@@ -249,6 +250,75 @@ exit 2 = 有 BLOCKER。**每天发之前和 security-check 一起跑。**
   要修得改成轮询（例如 60s + 页面可见时刷新）或让 realtime 直连 Supabase 域名（国内可能被墙）。未改。
 - **sw.js 无人注册**：自注销版本，留着无害，也可删。
 - **tutorials 表 anon 可写**：见上「安全」段，需要 service_role key 才能真正收紧。
+
+## 首屏提速：静态快照 data/software.json（2026-11-06）
+
+### 改之前实测到的瓶颈
+
+| 环节 | 实测 |
+|---|---|
+| 首页 HTML 首字节（CDN） | 0.28s 暖 / 0.89s 冷 |
+| Supabase 查询（经 CloudBase 代理） | **1.42s TTFB**，179KB / gzip 57KB |
+| 冷启动骨架屏总时长 | **2.48s**（不限速）；代理偶发 `502 Bad Gateway / timeout` |
+
+四段是**串行**的：HTML → 解析 → init supabase-js → 才发查询。最后一段纯等待，无法与前一段并行，
+而它恰恰是最慢的一段。
+
+### 做法
+
+`generate.mjs` 顺带把同一批数据（`select('*')` 全字段，与 REST 完全同形状）写成
+`data/software.json`，于是它和 HTML 同源同 CDN，浏览器解析 HTML 时就能并行取到：
+
+```html
+<link rel="preload" as="fetch" href="/data/software.json" crossorigin="anonymous">
+<script>window.__SNAP__=fetch('/data/software.json').catch(function(){return null;});</script>
+```
+
+`DB.loadAll()` 变成三级降级，任何一级挂了都不白屏：
+
+1. `data/software.json`（同源 CDN）→ 新访客走这里
+2. Supabase REST（原路径 `fetchFromRest()`）→ 快照没生成 / 被 CDN 挡掉时兜底
+3. localStorage 上次结果（10 分钟内）→ 断网兜底
+
+回访用户仍是「先用本地缓存秒开、再拿快照校准」，这条以前就有（`App.init` 里 `getCachedData(true)`），
+没有改动。
+
+### 快照生成的三道保护（宁可保留上一版，也不写坏文件）
+
+1. 记录数 < 50（正常 159）视为抓取残缺 → 跳过，保留上一版；
+2. 内容含 U+FFFD 乱码 → 跳过（渲染乱码比数据旧更糟）；
+3. 先写 `.software.json.tmp` 再 `rename`，中断不会留下半截 JSON。
+
+### 两个踩过的坑
+
+- **preload 白预加载**：`<link rel=preload as=fetch crossorigin>` 的凭据模式是 `same-origin`，
+  而 `fetch(url,{credentials:'omit'})` 是 `omit`，Chrome 判定「credentials mode 不匹配」直接丢弃 preload，
+  控制台报 *A preload ... is found, but is not used*。fetch 不要显式写 credentials，同源默认就是 `same-origin`。
+- **别在 loadAll 里自动打 REST 对账**：站内有个 5 分钟轮询器（`_poll` → `loadAll(true)`）和一个
+  `visibilitychange` 触发点，如果 `force` 时就补一发 REST，等于每 5 分钟白等 1.4s 代理 + 全量重渲。
+  时效改由快照的 `cache:'no-cache'` 条件请求保证：内容没变是 304（几十字节），变了才回 200 全量。
+
+### 代价（明说，不藏着）
+
+后台改完数据 → CI 每 5 分钟重建快照 → 用户下一次取数拿到新版本。**最坏滞后一个 CI 周期（5 分钟）**，
+不再是「改完刷新立刻可见」。要立刻生效只能人工触发 workflow 或等下一轮。
+
+### 回归
+
+```bash
+node seo/firstpaint.mjs                                   # 线上：断言走快照 + 详情字段完整
+node seo/firstpaint.mjs --no-snapshot                     # 拦掉 JSON：断言自动回落 REST 且不白屏
+node seo/firstpaint.mjs --url http://www.lezhesoft.test:8931/ --map www.lezhesoft.test
+                                                          # 本地联调：本地文件 + 非 localhost 身份
+```
+
+本地必须用 `--map`：页面里的 `IS_LOCAL_PREVIEW` 会把 localhost/127.0.0.1 判成本地预览，
+直接跳过快照与 REST，永远空数据。另外 http 会被浏览器「HTTPS 优先」升级，
+所以用 `.test` 域名而不是 `.cn`（后者有 HSTS，升级后连不上本地服务器）。
+
+`audit.mjs` 已加护栏：`data/software.json` 缺失/不可解析/条数异常，或 `index.html` 里
+`fetchSnapshot`/`fetchFromRest` 被删，都直接 BLOCKER。`live-assets.mjs` 也把快照纳入线上探活
+（它 404 时页面不报错，只静默退回 REST，属于最难自己发现的退化）。
 
 ## 第四步：发布与提交
 
