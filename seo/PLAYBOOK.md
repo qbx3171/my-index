@@ -298,26 +298,60 @@ exit 2 = 有 BLOCKER。**每天发之前和 security-check 一起跑。**
   `visibilitychange` 触发点，如果 `force` 时就补一发 REST，等于每 5 分钟白等 1.4s 代理 + 全量重渲。
   时效改由快照的 `cache:'no-cache'` 条件请求保证：内容没变是 304（几十字节），变了才回 200 全量。
 
-### 代价（明说，不藏着）
+### 代价（2026-11-06 当天已补掉「改完要等 5 分钟」）
 
-后台改完数据 → CI 每 5 分钟重建快照 → 用户下一次取数拿到新版本。**最坏滞后一个 CI 周期（5 分钟）**，
-不再是「改完刷新立刻可见」。要立刻生效只能人工触发 workflow 或等下一轮。
+快照方案的固有代价是：后台改完 → CI 每 5 分钟重建 → 用户下次取数才有新版本，最坏滞后一个 CI 周期。
+当天补了一层 **rev（后台数据版本戳）**，把「后台改完、前台刷新即见」做回来了：
+
+1. `admin.html` 每次写库成功（软件增/删/改/批量、分类增/删/改名）调 `bumpDataRev()`：
+   - `localStorage.lezhe_data_rev = Date.now()`
+   - `BroadcastChannel('lezhe-sync')` 广播 `data-rev`
+   - 顺手节流（60s）触发一次 workflow，让别的设备/访客也能在 ~3 分钟内看到
+2. `index.html` 的 `loadAll` 拿快照后比较 `rev` 与 `snap.build`：`rev > build` 说明「后台改过、这版快照还没跟上」，
+   直接改查 Supabase 实时数据（`fetchFromRest`），绕开整条 CI。
+3. 同标签页用 `sessionStorage.lezhe_data_rev_synced` 记住已同步到哪个 rev，改完第一次刷新走实时，
+   之后回到快照快路径 —— 不会每次都白等 1.4s 代理。
+
+`data/software.json` 的 `build` 由 `generate.mjs` 写入，**内容没变就沿用上一版 build**，
+否则每 5 分钟生成都会产生 diff、白提交一个 commit（这点和幂等门禁是同一条红线）。
+
+实测证据（`seo/freshness.mjs`，本地文件 + 正式域名身份）：
+
+| 场景 | 结果 |
+| --- | --- |
+| 没有 rev（普通访客） | 走静态快照，REST 请求 **0** 次 |
+| rev 比 build 新（后台刚改） | 判定「后台有更新」，REST 请求 2 次（software + categories），卡片正常 |
+| 已打开页面收到 data-rev 广播 | 自动重取（REST 1 次），无需手动刷新，列表不坏 |
+
+**为什么不做「发布后清 CDN」**：本机 Cloudflare Token 只有读权限，`purge_cache` 直接 401；
+且 `data/software.json` / HTML 都是 `Cache-Control: max-age=600`、`cf-cache-status: DYNAMIC`，
+瓶颈根本不在 CDN 边缘，而在「CI 什么时候重新生成」。所以走的是「前台改数据源」而不是「清缓存」。
+
+**仍然存在的边界（要知道，别误判）**：
+- 只对**同一个浏览器**立刻生效。换设备（比如电脑改、手机看）靠保存后自动 dispatch 的 CI，约 3 分钟。
+- 教程/软件详情这类**静态 HTML** 不在这条链上，仍需 CI 重建，约 1~3 分钟。
+- 老访客浏览器里还是旧 HTML（`max-age=600`），要等一次缓存过期或硬刷，才能拿到带 rev 判定的新版。
 
 ### 回归
 
 ```bash
+node seo/freshness.mjs --local . --no-throttle             # 本地：三种场景全过才算数
+node seo/freshness.mjs                                     # 线上：部署后复验
 node seo/firstpaint.mjs                                   # 线上：断言走快照 + 详情字段完整
 node seo/firstpaint.mjs --no-snapshot                     # 拦掉 JSON：断言自动回落 REST 且不白屏
-node seo/firstpaint.mjs --url http://www.lezhesoft.test:8931/ --map www.lezhesoft.test
-                                                          # 本地联调：本地文件 + 非 localhost 身份
 ```
 
-本地必须用 `--map`：页面里的 `IS_LOCAL_PREVIEW` 会把 localhost/127.0.0.1 判成本地预览，
-直接跳过快照与 REST，永远空数据。另外 http 会被浏览器「HTTPS 优先」升级，
-所以用 `.test` 域名而不是 `.cn`（后者有 HSTS，升级后连不上本地服务器）。
+`freshness.mjs` 的 `--local` 是**用 `ctx.route` 把正式域名的请求原地映射到磁盘**，不是起本地服务器 +
+host-resolver。原因：本机开着系统代理，Chrome 会把 `www.lezhesoft.cn` 交给代理，host-resolver 直接失效
+（报 `ERR_PROXY_CONNECTION_FAILED`）；而且站点开了 Always Use HTTPS，route 若只写 `http://` 前缀，
+请求 301 之后就不再被拦截，会悄悄打到真实线上，测出来的其实是旧版（这个坑实际踩过：`build` 一直读到 0）。
 
-`audit.mjs` 已加护栏：`data/software.json` 缺失/不可解析/条数异常，或 `index.html` 里
-`fetchSnapshot`/`fetchFromRest` 被删，都直接 BLOCKER。`live-assets.mjs` 也把快照纳入线上探活
+本地必须用正式域名：页面里的 `IS_LOCAL_PREVIEW` 会把 localhost/127.0.0.1 判成本地预览，
+直接跳过快照与 REST，永远空数据。
+
+`audit.mjs` 已加护栏：`data/software.json` 缺失/不可解析/条数异常/**缺 build**，或 `index.html` 里
+`fetchSnapshot`/`fetchFromRest`/`revIsNewer`/`lezhe-sync` 广播被删、`admin.html` 的 `bumpDataRev`
+调用少于 6 处（说明有写操作漏接），都直接 BLOCKER。`live-assets.mjs` 也把快照纳入线上探活
 （它 404 时页面不报错，只静默退回 REST，属于最难自己发现的退化）。
 
 ## 第四步：发布与提交

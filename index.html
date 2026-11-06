@@ -1747,6 +1747,21 @@ function getCachedData(freshOnly){if(cache.loaded&&cache.software.length>0)retur
      ③ localStorage 上次结果（10 分钟内）          ← 断网兜底
    快照与 REST 同为 select('*') 同字段，详情弹层不会缺字段。 */
 var SNAP_URL='/data/software.json';
+/* ── 后台即时可见（2026-11-06） ────────────────────────────────────────────────
+   问题：后台点保存写的是 Supabase，线上列表读的是 CI 每 5 分钟重建的静态快照，
+   一条改动最坏要等「cron 命中 + 生成 1~2 分钟 + Pages 构建」约 9 分钟才上线。
+   做法：后台每次写库成功都给 localStorage 打一个 rev（毫秒时间戳），并广播给同源页面；
+   前台发现 rev 比快照的 build 新，就改查 Supabase 实时数据，绕开整条 CI 链路。
+   这一层只在「真改过数据」时生效：平时 rev 不动，首屏照旧走静态快照，速度不受影响；
+   同一个 HTML 里 sessionStorage 记下已同步到哪个 rev，改完后第一次刷新走实时，
+   之后回到快照快路径。 */
+var REV_KEY='lezhe_data_rev';
+var REV_SYNC_KEY='lezhe_data_rev_synced';
+function getDataRev(){try{var v=parseInt(localStorage.getItem(REV_KEY),10);return isFinite(v)&&v>0?v:0;}catch(e){return 0;}}
+function getRevSynced(){try{return parseInt(sessionStorage.getItem(REV_SYNC_KEY),10)||0;}catch(e){return 0;}}
+function markRevSynced(v){try{sessionStorage.setItem(REV_SYNC_KEY,String(v));}catch(e){}}
+/* rev 比 build 新即代表快照落后。上限 3 天：本地时钟若严重超前，不至于永久卡在慢路径。 */
+function revIsNewer(rev,build){return !!(rev&&build&&rev>build&&rev-build<259200000);}
 function normalizeSoft(s){
 if(typeof s.screenshots==='string'){try{s.screenshots=JSON.parse(s.screenshots);}catch(e){s.screenshots=s.screenshots.split(',').map(function(x){return x.trim();}).filter(Boolean);}}
 	s.screenshots=safeArray(s.screenshots);
@@ -1822,9 +1837,25 @@ if(cache.loaded&&!force&&(Date.now()-cache.lastFetch<600000))return{software:cac
 /* ① 静态快照：随 HTML 并行取到（同源 CDN），通常 0.3s 级，不等代理 */
 var snap=await fetchSnapshot();
 if(snap){
+/* 后台刚改过数据 → 快照是旧的 → 直接走实时库，保证「后台保存完，前台刷新就可见」 */
+var _build=Number(snap.build)||0,_rev=getDataRev();
+if(revIsNewer(_rev,_build)&&_rev>getRevSynced()){
+console.info('[DB] 后台有更新（rev '+_rev+' > build '+_build+'），改取实时数据');
+if(!supabaseClient){
+await Promise.race([this.waitForSupabase(),new Promise(function(r){setTimeout(r,3000);})]);
+}
+try{
+var fresh=await this.fetchFromRest();
+markRevSynced(_rev);
+console.info('[DB] 实时数据已就绪 '+fresh.software.length+' 条');
+return fresh;
+}catch(e){
+console.warn('[DB] 实时数据取失败，先用静态快照顶住：',e&&e.message);
+}
+}
 commitSnapshot(snap);
 console.info('[DB] 首屏数据来自静态快照 '+cache.software.length+' 条');
-/* 这里不再额外打 REST 对账：站内有个 5 分钟轮询器（_poll）会反复调 loadAll(true)，
+/* 常规路径不再额外打 REST 对账：站内有个 5 分钟轮询器（_poll）会反复调 loadAll(true)，
    每次都补一发代理请求会白等 1.4s 且触发全量重渲。时效由快照的 no-cache 条件请求保证——
    快照由 CI 每 5 分钟重建，内容一变，条件请求立刻拿到 200 新版本。 */
 return{software:cache.software,categories:cache.categories};
@@ -1882,6 +1913,22 @@ saveCacheToStorage();
 }catch(e){console.error('更新失败:',e);}
 }
 };
+/* 后台（admin.html）保存成功后广播 data-rev：已经开着的首页据此静默换数据，不必手动刷新。
+   详情浮层打开时不打断，关掉后由 5 分钟轮询补齐。 */
+function applyDataRevUpdate(){
+if(document.querySelector('.detail-overlay.open'))return;
+DB.loadAll(true).then(function(){
+try{App.refreshAll();}catch(e){console.warn('[DB] 刷新视图失败：',e&&e.message);}
+}).catch(function(){});
+}
+(function watchDataRev(){
+if(window.__lezheRevWatch)return;window.__lezheRevWatch=true;
+window.addEventListener('storage',function(e){if(e.key===REV_KEY)applyDataRevUpdate();});
+try{
+var bc=new BroadcastChannel('lezhe-sync');
+bc.onmessage=function(e){if(e&&e.data&&e.data.type==='data-rev')applyDataRevUpdate();};
+}catch(e){}
+})();
 function lezheRetryLoad(){
 toast('正在重新加载数据...','success');
 DB.loadAll(true).then(function(){window._lezheLoadFailed=false;App.refreshAll();toast('加载完成','success');}).catch(function(){toast('加载失败，请稍后再试','error');});

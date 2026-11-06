@@ -230,6 +230,10 @@ if (!(await exists(join(ROOT, "404.html")))) {
     const snap = JSON.parse(await readFile(join(ROOT, "data", "software.json"), "utf8"));
     const n = Array.isArray(snap.software) ? snap.software.length : 0;
     if (n < 50) add(blocker, "首屏快照条数异常", "data/software.json", `${n} 条（正常 150+），疑似抓取残缺`);
+    /* build 是「这份快照代表的数据时刻」，前台靠它和后台写入的 rev 比大小决定要不要走实时接口。
+       丢了 build 不会报错，只会让「后台改完刷新即见」悄悄失效，退回到等 CI 的分钟级延迟。 */
+    if (!(Number(snap.build) > 0))
+      add(blocker, "首屏快照缺 build 时间戳", "data/software.json", "前台无法判断快照是否落后于后台改动");
     if (!Array.isArray(snap.categories) || !snap.categories.length) add(warn, "首屏快照缺分类", "data/software.json", "categories 为空");
   } catch (e) {
     add(blocker, "首屏快照缺失/不可解析", "data/software.json", `${e.code || e.message} —— 新访客首屏会静默退化到 REST`);
@@ -262,6 +266,28 @@ const report = {
   }
   if (!/_bootSeq\s*=\s*_navSeq/.test(home) || !/_navStale\(_bootSeq\)/.test(home)) {
     add(blocker, "启动收尾未做导航比对", "index.html", "DB.loadAll 之后的收尾必须 if(_navStale(_bootSeq))return; 后才 handleUrlParams()/goHome()");
+  }
+}
+
+/* 护栏：后台即时可见（2026-11-06）——
+   后台写库成功后打 rev 并广播，前台发现 rev 比快照 build 新就改走实时接口。
+   这一层整条都是「看着没事、其实退化了」的类型：任一环被删，功能照常，只是后台改完
+   又要等 CI 重建（几分钟），界面上完全看不出异常。所以三端都守。 */
+{
+  const home = await readFile(join(ROOT, "index.html"), "utf8");
+  const admin = await readFile(join(ROOT, "admin.html"), "utf8");
+  if (!/lezhe_data_rev/.test(home) || !/function\s+revIsNewer\s*\(/.test(home)) {
+    add(blocker, "即时可见：前台 rev 判定缺失", "index.html", "getDataRev/revIsNewer 被删，后台改完刷新看不到新数据");
+  }
+  if (!/BroadcastChannel\(\s*["']lezhe-sync["']\s*\)/.test(home)) {
+    add(blocker, "即时可见：前台广播监听缺失", "index.html", "已打开的页面不会自己换数据，必须手动刷新");
+  }
+  if (!/function\s+bumpDataRev\s*\(/.test(admin)) {
+    add(blocker, "即时可见：后台 rev 打点缺失", "admin.html", "bumpDataRev 被删，前台永远认为快照是最新的");
+  } else {
+    // 定义 1 次 + 软件增删改 5 处 + 分类增删改名 3 处；掉到 6 以下说明有写操作漏接了
+    const wired = (admin.match(/bumpDataRev\(\)/g) || []).length;
+    if (wired < 6) add(blocker, "即时可见：写操作漏接 rev", "admin.html", `仅 ${wired} 处调用 bumpDataRev，增删改应全覆盖`);
   }
 }
 

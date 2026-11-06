@@ -184,6 +184,8 @@ const DATA_MASTERS = [
   { table: "tutorials", id: "91e1887a-ebb6-4171-a588-99866f62aca2", field: "content", file: "content-master-91e1887a.txt" },
   { table: "tutorials", id: "ca626bf2-5874-41f5-ad12-8bb4c1309499", field: "content", file: "content-master-ca626bf2.txt" },
   { table: "tutorials", id: "ca626bf2-5874-41f5-ad12-8bb4c1309499", field: "summary", file: "summary-master-ca626bf2.txt" },
+  // AdGuard 教程（2026-11-06 生成时正文被代理截断成「��告拦截」）：补母本兜底
+  { table: "tutorials", id: "f8337a6e-7a42-432b-9b0d-b4b939333f47", field: "content", file: "content-master-f8337a6e.txt" },
   // Windows 11（software 表对 anon key 只读，改不了库）：描述传输易损坏，母本兜底
   { table: "software", id: "d05e874d28573342261a189c", field: "description", file: "desc-master-d05e874d.txt" },
   // 该页描述 693 字，传输层随机截断频率高（2026-11-06 起用母本兜底，消除生成非幂等）
@@ -641,7 +643,25 @@ try {
   const snapSoft = [...softs].sort((a, b) =>
     String(b.created_at || "").localeCompare(String(a.created_at || ""))
   );
-  const payload = { v: 1, count: snapSoft.length, categories: cats, software: snapSoft };
+  /* build 是「这份快照代表的数据时刻」（毫秒），前台拿它和后台写入的 rev 比较：
+     rev > build 说明后台改过、这版快照还没跟上，前台改走 REST 取实时数据。
+     关键约束：数据没变时必须沿用旧 build，否则每次 CI 生成都会产生 diff、
+     每 5 分钟白提交一个 commit。所以先比内容，内容一致就复用上一版的 build。 */
+  const target = join(ROOT, SNAP_REL);
+  const body = JSON.stringify({ categories: cats, software: snapSoft });
+  let prevBuild = 0;
+  let prevBody = "";
+  try {
+    const prev = JSON.parse(await readFile(target, "utf8"));
+    prevBuild = Number(prev.build) || 0;
+    if (Array.isArray(prev.software)) {
+      prevBody = JSON.stringify({ categories: prev.categories, software: prev.software });
+    }
+  } catch {
+    /* 首次生成 / 上一版损坏：按新内容处理 */
+  }
+  const build = prevBuild && prevBody === body ? prevBuild : Date.now();
+  const payload = { v: 1, build, count: snapSoft.length, categories: cats, software: snapSoft };
   const json = JSON.stringify(payload);
   if (snapSoft.length < 50) {
     console.warn(`⚠ 软件仅 ${snapSoft.length} 条（正常 159），疑似抓取残缺：跳过 ${SNAP_REL}，保留上一版`);
@@ -650,7 +670,6 @@ try {
   } else {
     const dir = join(ROOT, "data");
     await mkdir(dir, { recursive: true });
-    const target = join(ROOT, SNAP_REL);
     const tmp = join(dir, ".software.json.tmp");
     await writeFile(tmp, json, "utf8");
     const { rename } = await import("node:fs/promises");

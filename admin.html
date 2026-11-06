@@ -1376,6 +1376,29 @@ if(!quill||!quill.root)return;
 if(quill.root.tagName==='TEXTAREA')quill.root.value=html||'';
 else quill.root.innerHTML=html||'';
 }
+/* ── 后台即时可见（2026-11-06） ────────────────────────────────────────────────
+   后台写的是 Supabase，线上首页读的是 CI 定时重建的静态快照，中间隔着几分钟。
+   每次写库成功后调用一次本函数：
+     ① 在 localStorage 记一个 rev（毫秒时间戳），本机打开/刷新首页时前台据此改走实时接口
+        —— 后台保存完，前台刷新立刻就是新数据；
+     ② 通过 BroadcastChannel 广播，已经开着的首页标签页会自己换数据，连刷新都不用；
+     ③ 顺手触发一次静态页重建，让「别的设备 / 普通访客」也能在约 3 分钟内看到（60 秒节流）。
+   只写 localStorage 不动任何线上文件，失败也不会影响保存本身。 */
+var _revBC=null,_revLastSync=0,_revSyncTimer=null;
+function bumpDataRev(){
+ var at=Date.now();
+ try{localStorage.setItem('lezhe_data_rev',String(at));}catch(e){}
+ try{if(!_revBC)_revBC=new BroadcastChannel('lezhe-sync');_revBC.postMessage({type:'data-rev',at:at});}catch(e){}
+ if(at-_revLastSync>60000){
+  _revLastSync=at;
+  try{clearTimeout(_revSyncTimer);}catch(e){}
+  _revSyncTimer=setTimeout(function(){
+   var token=localStorage.getItem('lezhe_gh_token');
+   if(!token)return; /* 没配令牌就交给 GitHub 定时任务与本地守卫兜底 */
+   fetch('https://api.github.com/repos/qbx3171/my-index/actions/workflows/ai-sync.yml/dispatches',{method:'POST',headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'},body:JSON.stringify({ref:'main'})}).catch(function(){});
+  },800);
+ }
+}
 var DB={
 _sw:null,_swT:0,_ca:null,_caT:0,_tu:null,_tuT:0,_qu:null,_quT:0,_an:null,_anT:0,_cm:null,_cmT:0,_fb:null,_fbT:0,_sb:null,_sbT:0,_pf:null,_pfT:0,_ml:null,_mlT:0,_rd:null,_rdT:0,_mlErr:null,_ttl:120000,
 _t:function(p,ms){ms=ms||10000;return new Promise(function(res,rej){var t=setTimeout(function(){rej(new Error('请求超时'));},ms);p.then(function(v){clearTimeout(t);res(v);},function(e){clearTimeout(t);rej(e);});});},
@@ -1383,13 +1406,13 @@ invalidate:function(){this._sw=null;this._ca=null;this._tu=null;this._qu=null;th
 async soft(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._sw&&n-this._swT<this._ttl)return this._sw;try{var r=await this._t(supabaseClient.from('software').select('id,name,category,version,icon,icon_url,platforms,downloads,views,recommend,created_at').order('created_at',{ascending:false}));if(r.error)return this._sw||[];this._sw=r.data||[];this._swT=n;return this._sw;}catch(e){return this._sw||[];}},
 async cats(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._ca&&n-this._caT<this._ttl)return this._ca;try{var r=await this._t(supabaseClient.from('categories').select('*').order('name'));if(r.error)return this._ca||[];this._ca=r.data||[];this._caT=n;return this._ca;}catch(e){return this._ca||[];}},
 async softOne(id){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').select('*').eq('id',id).limit(1));if(r.error)return null;return (r.data&&r.data[0])||null;}catch(e){return null;}},
-async addSoft(s){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').insert(s).select());if(r.error)return null;this.invalidate();return r.data?r.data[0]:null;}catch(e){return null;}},
-async updSoft(id,u){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').update(u).eq('id',id).select());if(r.error)throw r.error;this.invalidate();},
-async delSoft(id){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').delete().eq('id',id).select('id'));if(r.error)throw r.error;if(!r.data||r.data.length===0)throw new Error('删除失败或权限不足');this.invalidate();},
-async delSoftBatch(ids){if(!supabaseClient)throw new Error('客户端未初始化');if(!ids||ids.length===0)return;var r=await this._t(supabaseClient.from('software').delete().in('id',ids));if(r.error)throw r.error;this.invalidate();},
-async recSoftBatch(ids,rec){if(!supabaseClient)throw new Error('客户端未初始化');if(!ids||ids.length===0)return;var r=await this._t(supabaseClient.from('software').update({recommend:rec}).in('id',ids));if(r.error)throw r.error;this.invalidate();},
-async addCat(n){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('categories').insert({name:n}));if(r.error)throw r.error;this._ca=null;},
-async delCat(n){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('categories').delete().eq('name',n));if(r.error)throw r.error;this._ca=null;},
+async addSoft(s){if(!supabaseClient)return null;try{var r=await this._t(supabaseClient.from('software').insert(s).select());if(r.error)return null;this.invalidate();bumpDataRev();return r.data?r.data[0]:null;}catch(e){return null;}},
+async updSoft(id,u){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').update(u).eq('id',id).select());if(r.error)throw r.error;this.invalidate();bumpDataRev();},
+async delSoft(id){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('software').delete().eq('id',id).select('id'));if(r.error)throw r.error;if(!r.data||r.data.length===0)throw new Error('删除失败或权限不足');this.invalidate();bumpDataRev();},
+async delSoftBatch(ids){if(!supabaseClient)throw new Error('客户端未初始化');if(!ids||ids.length===0)return;var r=await this._t(supabaseClient.from('software').delete().in('id',ids));if(r.error)throw r.error;this.invalidate();bumpDataRev();},
+async recSoftBatch(ids,rec){if(!supabaseClient)throw new Error('客户端未初始化');if(!ids||ids.length===0)return;var r=await this._t(supabaseClient.from('software').update({recommend:rec}).in('id',ids));if(r.error)throw r.error;this.invalidate();bumpDataRev();},
+async addCat(n){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('categories').insert({name:n}));if(r.error)throw r.error;this._ca=null;bumpDataRev();},
+async delCat(n){if(!supabaseClient)throw new Error('客户端未初始化');var r=await this._t(supabaseClient.from('categories').delete().eq('name',n));if(r.error)throw r.error;this._ca=null;bumpDataRev();},
 async renameCat(oldN,newN){
 if(!supabaseClient)throw new Error('客户端未初始化');
 // 先同步软件表，再改分类表；分类表失败时回滚软件，避免出现两边不一致
@@ -1400,7 +1423,7 @@ if(r2.error||!r2.data||r2.data.length===0){
 try{await this._t(supabaseClient.from('software').update({category:oldN}).eq('category',newN));}catch(e){}
 throw (r2.error||new Error('重命名失败或权限不足'));
 }
-this._ca=null;this._sw=null;
+this._ca=null;this._sw=null;bumpDataRev();
 return (r.data||[]).length;
 },
 async tut(f){if(!supabaseClient)return [];f=f||false;var n=Date.now();if(!f&&this._tu&&n-this._tuT<this._ttl)return this._tu;try{var r=await this._t(supabaseClient.from('tutorials').select('*').order('created_at',{ascending:false}));if(r.error)return this._tu||[];this._tu=r.data||[];this._tuT=n;return this._tu;}catch(e){return this._tu||[];}},
@@ -2422,7 +2445,7 @@ if(sa){var allChecked=rcb.length>0;for(var ai=0;ai<rcb.length;ai++){if(!rcb[ai].
 updT();
 w.querySelectorAll('.view-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;var btn=this;btn.disabled=true;DB.softOne(id).then(function(s){btn.disabled=false;if(s)App.showSoft(s);else toast('详情加载失败','error');}).catch(function(){btn.disabled=false;toast('详情加载失败','error');});});});
 w.querySelectorAll('.edit-btn').forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var id=this.dataset.id;self._editId=id;self.setSel([]);self.renderTab('add');});});
-w.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',async function(e){e.stopPropagation();var id=this.dataset.id;if(!(await uiConfirm('确定要删除此软件吗？删除后不可恢复。',{title:'删除软件',icon:'🗑',danger:true,okText:'删除'})))return;DB.delSoft(id).then(function(){DB.addLog('删除软件','ID: '+shortId(id));toast('已删除');DB.soft(true).then(function(d){self._all=d;self._fil=d.slice();self._renderSoftPage(c);});}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');});});});
+w.querySelectorAll('.del-btn').forEach(function(b){b.addEventListener('click',async function(e){e.stopPropagation();var id=this.dataset.id;if(!(await uiConfirm('确定要删除此软件吗？删除后不可恢复。',{title:'删除软件',icon:'🗑',danger:true,okText:'删除'})))return;DB.delSoft(id).then(function(){DB.addLog('删除软件','ID: '+shortId(id));toast('已删除（前台刷新即见）');DB.soft(true).then(function(d){self._all=d;self._fil=d.slice();self._renderSoftPage(c);});}).catch(function(e){toast('删除失败: '+(e.message||'未知错误'),'error');});});});
 var si=c.querySelector('#searchInput');
 self._bindSearch(si,function(v){self._kw=v;self._focusSearch='searchInput';self.setSel([]);self._page=1;self._renderSoftPage(c);});
 var fs=c.querySelector('#categoryFilter');
@@ -2844,7 +2867,7 @@ if(!goOn)return;
 if(self._editId){
 await DB.updSoft(self._editId,d);
 DB.addLog('更新软件','软件: '+d.name);
-toast('已更新: '+d.name);
+toast('已更新: '+d.name+'（前台刷新即见）');
 DB.sendNotificationToAll('【软件更新】'+d.name+' 已更新到 v'+d.version+'，快来看看吧！').catch(function(){});
 self._editId=null;
 await DB.soft(true).then(function(dd){self._all=dd;self._fil=dd.slice();});
@@ -2854,7 +2877,7 @@ var ns={name:d.name,category:d.category,version:d.version,icon:d.icon,icon_url:d
 var r=await DB.addSoft(ns);
 if(r){
 DB.addLog('添加软件','软件: '+d.name);
-toast('上传成功: '+d.name);
+toast('上传成功: '+d.name+'（前台刷新即见）');
 DB.sendNotificationToAll('【新软件上架】'+d.name+' v'+d.version+' 已发布，快来看看吧！').catch(function(){});
 form.reset();
 App._softShots=[];
