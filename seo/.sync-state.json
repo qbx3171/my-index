@@ -1,6 +1,15 @@
 {
- "ai_collections": "de2c395f7c",
- "ai_tools": "9d8bda1cd7",
- "tutorials": "9cb35f52f7",
+ "ai_collections": {
+  "s": "de2c395f7c",
+  "c": "de2c395f7c"
+ },
+ "ai_tools": {
+  "s": "0410d92456",
+  "c": "1c92544c8f"
+ },
+ "tutorials": {
+  "s": "9c586ee9f4",
+  "c": null
+ },
  "software": "159:2026-11-02T02:03:47.593+00:00"
 }

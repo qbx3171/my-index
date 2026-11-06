@@ -176,8 +176,18 @@ const DATA_MASTERS = [
   // 傲梅轻松备份 教程（2026-11-05 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "24929da4-ff46-46b3-b05f-11a39f79030d", field: "content", file: "content-master-24929da4.txt" },
   { table: "tutorials", id: "24929da4-ff46-46b3-b05f-11a39f79030d", field: "summary", file: "summary-master-24929da4.txt" },
+  // Total Uninstall 教程（2026-11-06 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "cd20b6ed-ae5d-49c5-95b1-4e1e0541f227", field: "content", file: "content-master-cd20b6ed.txt" },
+  { table: "tutorials", id: "cd20b6ed-ae5d-49c5-95b1-4e1e0541f227", field: "summary", file: "summary-master-cd20b6ed.txt" },
+  // 三篇早期教程（建站期入库，此前无母本）：2026-11-06 起补母本，消除「同一数据两次生成 md5 不同」
+  { table: "tutorials", id: "7aa79aaa-b1ba-4f8a-9056-20b0a731afb3", field: "content", file: "content-master-7aa79aaa.txt" },
+  { table: "tutorials", id: "91e1887a-ebb6-4171-a588-99866f62aca2", field: "content", file: "content-master-91e1887a.txt" },
+  { table: "tutorials", id: "ca626bf2-5874-41f5-ad12-8bb4c1309499", field: "content", file: "content-master-ca626bf2.txt" },
+  { table: "tutorials", id: "ca626bf2-5874-41f5-ad12-8bb4c1309499", field: "summary", file: "summary-master-ca626bf2.txt" },
   // Windows 11（software 表对 anon key 只读，改不了库）：描述传输易损坏，母本兜底
   { table: "software", id: "d05e874d28573342261a189c", field: "description", file: "desc-master-d05e874d.txt" },
+  // 该页描述 693 字，传输层随机截断频率高（2026-11-06 起用母本兜底，消除生成非幂等）
+  { table: "software", id: "ba65264357f25999f28052c1", field: "description", file: "desc-master-ba652643.txt" },
 ];
 const coveredByMaster = new Set();
 for (const m of DATA_MASTERS) {
@@ -616,7 +626,9 @@ const scanDir = async (dir) => {
     else if (f.endsWith(".html") && (await readFile(p, "utf8")).includes(FFD)) badFiles.push(p);
   }
 };
-for (const dir of ["soft", "cat", "tutorial"]) await scanDir(join(ROOT, dir));
+// 2026-11-06 修复：原先只扫 soft/cat/tutorial + 根目录，ai/ 与 ai/tool/ 的乱码逃过自检，
+// 导致「产物自检通过」与 qa.mjs 的 fffdCount=1 自相矛盾。现把 ai 一并纳入。
+for (const dir of ["soft", "cat", "tutorial", "ai"]) await scanDir(join(ROOT, dir));
 for (const f of readdirSync(ROOT)) {
   if (f.endsWith(".html") && (await readFile(join(ROOT, f), "utf8")).includes(FFD)) badFiles.push(f);
 }

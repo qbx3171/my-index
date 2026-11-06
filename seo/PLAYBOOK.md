@@ -32,10 +32,19 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 不要 `curl … | node` 直接查管道——分块边界会把多字节中文字符切断，产生 U+FFFD 假阳性
 （实测同页面落盘查为 0，管道查为 1）。死链/乱码以外的一致性断言同理。
 
-数据写入权限（2026-11-02 实测）：`tutorials` 表 anon key 可 INSERT/PATCH；
-`software` 表 **只能 SELECT**——PATCH 返回 204 但 `Prefer: return=representation` 回 `[]`（RLS 过滤，0 行受影响）。
+数据写入权限（2026-11-02 实测）：`tutorials` 表 anon key 可 INSERT/PATCH；`software` 表 **只能 SELECT**——PATCH 返回 204 但 `Prefer: return=representation` 回 `[]`（RLS 过滤，0 行受影响）。
 所以软件名/分类/描述的修正只能走 `generate.mjs` 的 `NAME_OVERRIDES` / `CATEGORY_OVERRIDES` / `DESC_OVERRIDES`，
 单次读取也别直接信：传输层会随机插 U+FFFD（同一记录连读两次坏在不同位置），判断数据好坏必须看生成器 5 轮合并后的结果。
+
+**乱码自检的覆盖范围（2026-11-06 修复的 BUG）**：`generate.mjs` 末尾自检原先只扫 `soft/ cat/ tutorial/` 与根目录，
+`ai/` 和 `ai/tool/` 不在扫描列表里 —— 结果 AI 工具详情页出现 U+FFFD 时，生成器照样打印「产物自检通过」，
+而 `qa.mjs` 报 fffdCount=1，两者自相矛盾、且不会触发 exit 2 重跑。现已把 `ai` 纳入扫描。
+**结论：只要 qa 报 fffd>0 而生成器说通过，第一反应就是查自检的扫描目录覆盖。**
+
+**母本（DATA_MASTERS）覆盖现状（2026-11-06）**：11 篇教程的 content 全部已登记母本（含建站期三篇 `7aa79aaa` / `91e1887a` / `ca626bf2`），
+`software` 表另有 `d05e874d`（Windows 11）与 `ba652643`（693 字长描述）两条 desc 母本。
+新增长教程后必须同时落 `content-master-<id前8位>.txt` 并登记，否则会出现「同一数据两次生成 md5 不同」（非幂等）。
+取干净母本的办法：`?select=<字段>,id&id=eq.<id>` 单字段小响应，通常一次就干净；若反复坏，换 `?select=id,<字段>` 顺序绕开坏响应缓存。
 
 已知豁免（不算 BUG，不要「修」）：
 - `all.html`：有意的跳转存根（noindex + JS 跳 sitemap.html），canonical 指向 sitemap.html
@@ -90,8 +99,9 @@ sitemap lastmod 覆盖率、robots.txt 的 Sitemap 声明、首页 /cat/ 静态�
 - [x] 59 个软件页入链 <3：在分类页/相关推荐增加交叉链接（2026-10-31 完成，59→1；做法：同分类相关推荐改「按热度排序 + 环形轮转取 8 条」，每页链接数不变但分布均匀，剩余 1 页为 admin.html 误报类页面）
 - [x] AI 工具集页内容偏薄（2026-11-03 完成，3 页 <300 字 → 0）：工具集 description 后台留空，分类页原来只有卡片、纯文字 159/168 字。改法：`ai-section.mjs` 新增 `buildCompare()`，按真实数据输出「工具 / 定位 / 收费模式」对比表 + 按款数与收费分布生成的挑选提示（不搬详情页 intro，避免正文重复）；`fitDesc()` 把描述补齐到 100 字以上；`renderAiHub()` 每节加一行 `secLead`（款数 + 名单 + 收费模式）。现 index 283→543、ai-xiezuo 168→494、photo 159→431，shortDesc 2→0。**注意**：`fitDesc` 是描述长度红线的兜底，AI 页改文案时必须走它，别直接拼字符串。
   - **2026-11-04 回归修复**：新工具集上线后 thinCount 回升到 3（ai/index 178、ai-bangong 289、ai-shiping 295）——工作区的 ai-section.mjs 丢了 hub 的 secLead 富化（该文件只 staged 未提交，无历史可 diff），且两个**空工具集**占位导语 289/295 字刚好差一点过 300 阈值。已重写 hub 的 `secLead()` + hub 导语（真实款数/收费分布），空集占位段补「收录标准」一句。thinCount 3→0。**今后 AI 工具集增删后必须复跑 `node seo/optimize.mjs` 看 thinCount**。
-- [ ] 教程页仅 3 篇：内容增量优先级最高（百度/必应都吃内容量）——已转为每日自动化新增 1 篇（2026-10-30 起，现 8 篇）
+- [ ] 教程页仅 3 篇：内容增量优先级最高（百度/必应都吃内容量）——已转为每日自动化新增 1 篇（2026-10-30 起，现 11 篇）
 - [ ] 软件页正文深度：目前中位数 548 字，可补「最低配置/适用场景/常见问题」结构化段落（2026-10-30 已修复最后一个薄页 Keka，薄内容 1→0；optimize.mjs 标题统计已改为按解码后可见字符计数，&amp; 不再误报超长）
+- [x] 同步守卫指纹不稳（2026-11-06 修复）：`auto-sync.mjs` 原来直接对「整表 JSON」做 md5，而代理传输会把汉字随机截成 U+FFFD（同一份未改动的数据连读 3 次，ai_tools 出 2 个不同哈希、tutorials 出 3 个不同哈希）→ 守卫几乎每小时都判「变了」，白跑一次生成+推送。改法：①单表读 3 次按行按字段合并取无乱码值；②仍脏的行用 `select=<字段>,id` 单字段小响应重拉（轮换 select 顺序绕开坏响应缓存）；③指纹拆两段 `{s,c}`：s=结构哈希（id + ≤200 字短字段，恒稳），c=全字段内容哈希（仅在读到干净版本时更新，否则沿用上一轮）。实测改后连跑 3 次指纹完全一致，守卫输出「数据无变更，跳过」。**已知取舍**：教程 `content` 这类超长字段始终读不干净，故 c 常为 null——正文纯文字微调由后台 dispatch 与每日巡检兜底，新增/改名/上下架/摘要改动仍即时生效。排查用 `node seo/auto-sync.mjs --dry`（只打印指纹，不生成不推送）。
 - [ ] 移动端 CWV 实测（需真实设备数据，Pages 无字段数据时用 PSI API）
 - [x] 图片缺 alt（2026-10-31 完成，4 页 23 张 → 1 页 2 张；教程页正文图片在 render 层补「标题 + 序号」alt，剩余 admin.html 为 JS 模板字符串误报）
 - [x] 建立每日 BUG 体检（2026-10-31 新增 seo/audit.mjs，BLOCKER 0 / WARN 1）
