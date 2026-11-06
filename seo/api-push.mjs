@@ -3,7 +3,7 @@
 // 流程：取远程 main ref → 以远程 HEAD 为 base_tree → 批量建 blob → 建 tree → 建 commit → 更新 ref
 // 文件清单来自 git status --porcelain（含新增/修改/删除），删除的路径以 sha:null 标记。
 import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const REPO = "qbx3171/my-index";
@@ -81,6 +81,33 @@ for (const it of items) {
 }
 if (wfSkipped.length) console.log(`⚠ 跳过工作流文件（需有 workflow 权限的令牌另行处理）: ${wfSkipped.join(", ")}`);
 if (skipped.length) console.log(`内容未变跳过 ${skipped.length} 个`);
+
+// 2.6 补齐「本地已提交、远程从来没有」的文件。
+// 本地 git 比远程领先几百个提交（push 被墙，只能走这个脚本），而 status 只反映工作区变更，
+// 于是那些「早就 commit 过、但从没上传」的文件会永远漏在远程之外（2026-11-06 的 5 张教程封面
+// 就是这么丢的：本地有、线上一律 404）。这里用 git ls-files 的已跟踪清单对远程路径做差集。
+const tracked = execSync("git ls-files -z", { cwd: ROOT, encoding: "utf8" }).split("\0").filter(Boolean);
+const untrackedRemote = tracked.filter(
+  (p) =>
+    !remotePaths.has(p) &&
+    !p.startsWith(".github/workflows/") &&
+    !p.startsWith(".workbuddy/") &&
+    !realItems.some((i) => i.path === p)
+);
+const missingPushed = [];
+for (const p of untrackedRemote) {
+  try {
+    if (!statSync(join(ROOT, p)).isFile()) continue;
+  } catch {
+    continue;
+  }
+  realItems.push({ st: "M", path: p });
+  missingPushed.push(p);
+}
+if (missingPushed.length) {
+  console.log(`补推「本地有、远程没有」${missingPushed.length} 个（例：${missingPushed.slice(0, 3).join(", ")}）`);
+}
+
 if (!realItems.length) {
   console.log("✅ 与远程完全一致，无需推送");
   process.exit(0);
