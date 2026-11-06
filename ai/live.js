@@ -81,14 +81,32 @@
     tools.forEach(function (t) { var p = pricingOf(t); if (!seen[p]) { seen[p] = 1; out.push(p); } });
     return out;
   }
-  function cover(item, cls) {
+  // 图标地址：logo 优先；历史数据里图床链接存在 icon 字段的（后台旧版本行为），同样当图片用。
+  // 必须与生成器 ai-section.mjs 的 picUrlOf() 保持同一规则，否则静态页有图、实时补丁变字母。
+  function picUrl(item) {
+    // 静态构建时已把图床图下载到站内，优先用站内地址（重绘也保持同源，不退回第三方）
+    var local = CFG.logos && CFG.logos[item.id];
+    if (local) return local;
     var logo = String(item.logo || '').trim();
-    if (/^https?:\/\//i.test(logo)) {
-      return '<img class="' + cls + '" src="' + esc(logo) + '" alt="' + esc(item.name) + ' 封面" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=aiFallback(' +
+    if (/^https?:\/\//i.test(logo)) return logo;
+    var icon = String(item.icon || '').trim();
+    if (/^https?:\/\//i.test(icon)) return icon;
+    return '';
+  }
+  function fb(name, cls) {
+    if (typeof window.aiFallback === 'function') return window.aiFallback(name, cls);
+    return '<span class="' + cls + ' ai-cover-fb">' + esc(String(name || 'A').slice(0, 1)) + '</span>';
+  }
+  // 图床偶发抖动：失败后换一个新 <img> 带参重试一次，再降级字母封面
+  // （同一次失败的重复 error 事件靠 data-retrying 忽略，否则第二次 error 会直接降级）
+  window.aiImgErr = window.aiImgErr || function aiImgErr(el,n,c){if(el.getAttribute("data-retrying"))return;var s=el.getAttribute("src")||"";if(!s){el.outerHTML=aiFallback(n,c);return;}el.setAttribute("data-retrying","1");var im=new Image();im.className=el.className;im.alt=el.alt;im.decoding="async";im.referrerPolicy="no-referrer";im.onload=function(){if(el.isConnected)el.replaceWith(im);else el.parentNode&&el.parentNode.replaceChild(im,el);};im.onerror=function(){if(el.isConnected)el.outerHTML=aiFallback(n,c);};im.src=s+(s.indexOf("?")>-1?"&":"?")+"r="+Date.now();};
+  function cover(item, cls) {
+    var src = picUrl(item);
+    if (src) {
+      return '<img class="' + cls + '" src="' + esc(src) + '" alt="' + esc(item.name) + ' 封面" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="aiImgErr(this,' +
         JSON.stringify(String(item.name || 'AI')).replace(/"/g, '&quot;') + ',\'' + cls + '\')">';
     }
-    return window.aiFallback ? window.aiFallback(item.name, cls)
-      : '<span class="' + cls + ' ai-cover-fb">' + esc(String(item.name || 'A').slice(0, 1)) + '</span>';
+    return fb(item.name, cls);
   }
 
   /* ---------------- 渲染（与静态页同结构） ---------------- */

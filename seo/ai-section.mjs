@@ -3,7 +3,7 @@
 // 数据由站长在 admin.html「AI工具集」后台上传，这里只做静态渲染。
 // 排版：左侧工具集导航 + 封面卡片流（有 logo 用 logo，无 logo 自动生成渐变字母封面）。
 // 表不存在或为空时优雅降级：仍生成 /ai/index.html 导航首页（导航入口的落点），其余跳过。
-import { mkdir, writeFile, rm } from "node:fs/promises";
+import { mkdir, writeFile, rm, readdir, unlink } from "node:fs/promises";
 import { existsSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
@@ -70,14 +70,93 @@ async function fetchTable(U, K, table) {
   return rows;
 }
 
-// —— 封面：有 logo 用图（懒加载），否则按名称生成稳定的渐变字母封面 ——
-function coverHtml(item, cls) {
+// —— 图标地址：logo 优先；历史数据把图床链接存在 icon 字段的，同样当图片用 ——
+// 与 seo/ai-live.js 的 picUrl() 必须完全同规则，否则静态页有图、前端实时补丁会退化成字母。
+function picUrlOf(item) {
   const logo = String(item.logo || "").trim();
-  if (/^https?:\/\//i.test(logo)) {
-    return `<img class="${cls}" src="${esc(logo)}" alt="${esc(item.name)} 封面" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML=aiFallback('${esc(item.name).replace(/'/g, "\\'")}','${cls}')">`;
+  if (/^https?:\/\//i.test(logo)) return logo;
+  const icon = String(item.icon || "").trim();
+  if (/^https?:\/\//i.test(icon)) return icon;
+  return "";
+}
+
+// —— 封面：有图用图（懒加载 + 失败重试一次再降级），否则按名称生成稳定的渐变字母封面 ——
+// 同源图标用相对路径输出：本地可验证、线上同源少一次 DNS；og:image 仍用绝对地址
+const imgSrc = (u) => (u.startsWith(SITE + "/") ? u.slice(SITE.length) : u);
+
+function coverHtml(item, cls) {
+  const src = picUrlOf(item);
+  if (src) {
+    const nameArg = JSON.stringify(String(item.name || "AI")).replace(/"/g, "&quot;");
+    return `<img class="${cls}" src="${esc(imgSrc(src))}" alt="${esc(item.name)} 封面" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="aiImgErr(this,${nameArg},'${cls}')">`;
   }
   return aiFallback(item.name, cls);
 }
+// —— 图标自托管：把图床图片下载到 /assets/ai-logos/，避免第三方图床抖动/被拦导致 logo 变字母 ——
+// 文件名 = URL 的 md5 前 10 位 + 原扩展名：URL 不变则文件名不变，产物逐字节稳定（幂等）。
+// 下载失败时保留外链（页面仍能显示），不会让整次生成失败。
+const LOGO_EXT_RE = /\.(png|jpe?g|webp|gif|svg|ico|avif)$/i;
+async function localizeLogos(ROOT, items) {
+  const dir = join(ROOT, "assets", "ai-logos");
+  await mkdir(dir, { recursive: true }).catch(() => {});
+  const existing = new Map();
+  for (const f of await readdir(dir).catch(() => [])) {
+    const m = f.match(/^([0-9a-f]{10})\.([a-z0-9]+)$/i);
+    if (m) existing.set(m[1].toLowerCase(), f);
+  }
+  const used = new Set();
+  let fresh = 0, reused = 0, failed = 0;
+  for (const it of items) {
+    const url = picUrlOf(it);
+    if (!url) continue;
+    const key = createHash("md5").update(url).digest("hex").slice(0, 10);
+    if (existing.has(key)) {
+      const f = existing.get(key);
+      used.add(f);
+      it.logo = `${SITE}/assets/ai-logos/${f}`;
+      reused++;
+      continue;
+    }
+    try {
+      const r = await fetch(url, {
+        signal: AbortSignal.timeout(20000),
+        headers: { "user-agent": "Mozilla/5.0 (compatible; lezhesoft-logo-sync)" },
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const type = (r.headers.get("content-type") || "").toLowerCase();
+      if (type && !/^image\//.test(type)) throw new Error(`content-type ${type}`);
+      const buf = Buffer.from(await r.arrayBuffer());
+      if (!buf.length) throw new Error("空文件");
+      if (buf.length > 3 * 1024 * 1024) throw new Error(`过大 ${buf.length}B`);
+      const urlExt = (url.split("?")[0].match(LOGO_EXT_RE) || [])[1] || "";
+      const ext = (type.includes("jpeg") ? "jpg"
+        : type.includes("png") ? "png"
+        : type.includes("webp") ? "webp"
+        : type.includes("gif") ? "gif"
+        : type.includes("svg") ? "svg"
+        : type.includes("avif") ? "avif"
+        : urlExt || "png").toLowerCase();
+      const name = `${key}.${ext}`;
+      await writeFile(join(dir, name), buf);
+      existing.set(key, name);
+      used.add(name);
+      it.logo = `${SITE}/assets/ai-logos/${name}`;
+      fresh++;
+    } catch (e) {
+      failed++;
+      console.warn(`⚠ 图标自托管失败（保留外链）${it.name || it.id}: ${e.message}`);
+    }
+  }
+  // 清掉换过 URL 的旧图，避免 assets 无限增长
+  let pruned = 0;
+  for (const f of await readdir(dir).catch(() => [])) {
+    if (used.has(f) || !/^[0-9a-f]{10}\.[a-z0-9]+$/i.test(f)) continue;
+    await unlink(join(dir, f)).catch(() => {});
+    pruned++;
+  }
+  console.log(`AI 图标自托管：新下载 ${fresh} / 复用 ${reused} / 失败 ${failed} / 清理 ${pruned}`);
+}
+
 // —— 分区图标：统一线性 SVG（替代 emoji / emoji 风图片），按 slug 关键词配色 ——
 const SEC_ICONS = [
   [/xiezuo|write|写作/, { c: "#0b66f0", bg: "rgba(11,102,240,.09)", d: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>' }],
@@ -101,7 +180,8 @@ function aiFallback(name, cls) {
   const ch = [...s][0] || "A";
   return `<span class="${cls} ai-cover-fb" style="background:linear-gradient(135deg,#0b66f0,#6c5ce7)">${esc(ch)}</span>`;
 }
-const FALLBACK_SNIPPET = `<script>function aiFallback(n,c){var s=String(n||'AI'),ch=[...s][0]||'A';return '<span class="'+c+' ai-cover-fb" style="background:linear-gradient(135deg,#0b66f0,#6c5ce7)">'+ch+'</span>';}</script>`;
+// 兜底脚本注入 <head>：必须早于卡片解析，否则首屏图片先报错时 aiImgErr 还不存在，会留下破图
+const FALLBACK_SNIPPET = `<script>function aiFallback(n,c){var s=String(n||'AI'),ch=[...s][0]||'A';return '<span class="'+c+' ai-cover-fb" style="background:linear-gradient(135deg,#0b66f0,#6c5ce7)">'+ch+'</span>';}function aiImgErr(el,n,c){if(el.getAttribute("data-retrying"))return;var s=el.getAttribute("src")||"";if(!s){el.outerHTML=aiFallback(n,c);return;}el.setAttribute("data-retrying","1");var im=new Image();im.className=el.className;im.alt=el.alt;im.decoding="async";im.referrerPolicy="no-referrer";im.onload=function(){if(el.isConnected)el.replaceWith(im);else el.parentNode&&el.parentNode.replaceChild(im,el);};im.onerror=function(){if(el.isConnected)el.outerHTML=aiFallback(n,c);};im.src=s+(s.indexOf("?")>-1?"&":"?")+"r="+Date.now();}</script>`;
 
 // —— 工具卡片（ai-bot.cn 同款：圆形图标 + 名称/一句话简介，无角标；点击进站内详情页）——
 function toolCard(t) {
@@ -174,7 +254,7 @@ export function renderAiToolDetail(t, col, collections, siblings) {
     : "持续更新";
 
   const html =
-    head(title4Tool(t, col), desc, canonical, `<meta property="og:image" content="${esc(logo || `${SITE}/og-cover.png`)}">` + aiCss()) +
+    head(title4Tool(t, col), desc, canonical, `<meta property="og:image" content="${esc(logo || `${SITE}/og-cover.png`)}">` + aiCss() + FALLBACK_SNIPPET) +
     `
 <main>
 ${crumb([
@@ -221,7 +301,6 @@ ${jsonLd({
     applicationCategory: "AI Tool",
     offers: { "@type": "Offer", price: "0", priceCurrency: "CNY" },
   })}
-${FALLBACK_SNIPPET}
 ${liveTag()}
 ${foot("ai-tool-" + toolSlug(t))}`;
   return { html };
@@ -278,7 +357,7 @@ export function renderAiHub(collections, byCollection) {
     : `<div class="ai-empty"><p>各工具集正在整理中，很快上线。</p><p>计划方向：AI 对话助手、AI 写作、AI 绘画图像、AI 视频音频、AI 编程开发、AI 办公效率等，每个方向一个独立工具集。</p></div>`;
 
   const html =
-    head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
+    head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss() + FALLBACK_SNIPPET) +
     `
 <main>
 <h1 class="ai-h1">AI 工具集</h1>
@@ -291,7 +370,6 @@ ${jsonLd({
     description: desc,
     url: canonical,
   })}
-${FALLBACK_SNIPPET}
 ${liveTag()}
 ${foot("aihub")}`;
   return { html };
@@ -377,7 +455,7 @@ export function renderAiCollection(col, tools, collections = []) {
 <p>这里将收录与「${esc(col.name)}」相关的 AI 工具：逐个标注收费模式、核心定位与适用人群，附官网入口与快速对比表。正在找这类工具的话，可以先收藏本页，上架后会第一时间出现在这里。上架节奏以实用为先：先把每个方向最常用的两三款补齐并逐一试用核对，再逐步扩充长尾工具，避免一次塞满却没有筛选。收录标准同样以日常可用性为先：注册门槛低、中文支持好、免费额度够跑通完整流程的优先收录，纯套壳或长期无法访问的不收。</p></div>`;
 
   const html =
-    head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss()) +
+    head(title, desc, canonical, `<meta property="og:image" content="${SITE}/og-cover.png">` + aiCss() + FALLBACK_SNIPPET) +
     `
 <main>
 ${crumb([
@@ -402,7 +480,6 @@ ${jsonLd({
     url: canonical,
     numberOfItems: tools.length,
   })}
-${FALLBACK_SNIPPET}
 ${liveTag()}
 ${foot("ai-" + col.slug)}`;
   return { html };
@@ -457,6 +534,9 @@ export async function buildAiSection(ROOT, softs = []) {
     }
   }
 
+  // 图标自托管：第三方图床在部分网络下会超时/被拦，卡片就退化成一个字。下载到站内更稳。
+  await localizeLogos(ROOT, [...(tools || []), ...(cols || [])]);
+
   const collections = (cols || [])
     .filter((c) => c.is_published !== false && c.slug && c.name)
     .sort((a, b) => (a.sort || 0) - (b.sort || 0));
@@ -502,12 +582,17 @@ export async function buildAiSection(ROOT, softs = []) {
   for (const c of collections) livePages[c.slug] = 1;
   const liveTools = {};
   for (const t of allTools) liveTools[SLUG_MAP.get(t.id)] = t.id;
+  // 本地图标映射：前端实时重绘时优先用站内图，避免「新工具一出现 → 老卡片又退回第三方图床」
+  const logoMap = {};
+  for (const t of allTools) if (t.logo && t.logo.startsWith(SITE + "/")) logoMap[t.id] = imgSrc(t.logo);
+  for (const c of collections) if (c.logo && c.logo.startsWith(SITE + "/")) logoMap[c.id] = imgSrc(c.logo);
   LIVE_CFG = {
     api: U,
     key: K,
     sig: aiSig(collections, allTools),
     pages: livePages,
     tools: liveTools,
+    logos: logoMap,
   };
   const liveJs = readFileSync(join(ROOT, "seo", "ai-live.js"), "utf8");
   await writeFile(join(aiDir, "live.js"), liveJs, "utf8");
