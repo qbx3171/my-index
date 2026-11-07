@@ -2175,8 +2175,10 @@ aiColSave:function(){var self=this;
  if(/^https?:\/\//i.test(payload.icon)){payload.logo=payload.logo||payload.icon;payload.icon='🧩';}
  if(!payload.name||!payload.slug){toast('名称和 slug 必填','warning');return;}
  if(!/^[a-z0-9][a-z0-9-]*$/.test(payload.slug)){toast('slug 只能用小写英文、数字和横线','warning');return;}
+ var dup=(self._aiCols||[]).find(function(x){return x.slug===payload.slug&&x.id!==id;});
+ if(dup){toast('保存失败：URL 标识「'+payload.slug+'」已被工具集「'+dup.name+'」占用，请换一个（如 '+payload.slug+'-2）','error');return;}
  var q=id?supabaseClient.from('ai_collections').update(payload).eq('id',id):supabaseClient.from('ai_collections').insert(payload);
- q.then(function(r){if(r.error){toast('保存失败：'+r.error.message,'error');return;}toast('已保存 ✓ 前端列表即时可见');self._aiEditCol=null;self.aiAutoSync();return self.aiLoadCols().then(function(){self.aiRenderCols();});});
+ q.then(function(r){if(r.error){var m=r.error.message||'';if(r.error.code==='23505'||/duplicate|unique|Conflict/i.test(m)){toast('保存失败：URL 标识（slug）已被其他工具集占用，请换一个英文标识','error');}else{toast('保存失败：'+m,'error');}return;}toast('已保存 ✓ 前端列表即时可见');self._aiEditCol=null;self.aiAutoSync();return self.aiLoadCols().then(function(){self.aiRenderCols();});});
 },
 // 保存/删除后自动触发一次静态页重建（配过令牌立即生效；未配则由 GitHub 定时与本地守卫兜底，最迟约 1 小时）
 aiAutoSync:function(){
