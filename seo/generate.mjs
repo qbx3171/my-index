@@ -179,6 +179,9 @@ const DATA_MASTERS = [
   // Total Uninstall 教程（2026-11-06 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "cd20b6ed-ae5d-49c5-95b1-4e1e0541f227", field: "content", file: "content-master-cd20b6ed.txt" },
   { table: "tutorials", id: "cd20b6ed-ae5d-49c5-95b1-4e1e0541f227", field: "summary", file: "summary-master-cd20b6ed.txt" },
+  // GIMP 教程（2026-11-07 新增）：长中文正文 + 英文菜单路径写库即带乱码，母本兜底
+  { table: "tutorials", id: "b734102f-efe6-4faa-b199-a590cd7c0e1f", field: "content", file: "content-master-b734102f.txt" },
+  { table: "tutorials", id: "b734102f-efe6-4faa-b199-a590cd7c0e1f", field: "summary", file: "summary-master-b734102f.txt" },
   // 三篇早期教程（建站期入库，此前无母本）：2026-11-06 起补母本，消除「同一数据两次生成 md5 不同」
   { table: "tutorials", id: "7aa79aaa-b1ba-4f8a-9056-20b0a731afb3", field: "content", file: "content-master-7aa79aaa.txt" },
   { table: "tutorials", id: "91e1887a-ebb6-4171-a588-99866f62aca2", field: "content", file: "content-master-91e1887a.txt" },

@@ -1,0 +1,23 @@
+<h2>软件简介与适用场景</h2>
+<p>GIMP（GNU Image Manipulation Program）是一款免费开源的图像编辑软件，Windows、macOS、Linux 都有版本，本站收录 Windows 版。图层蒙版、选区路径、色彩调整、滤镜、批量处理都齐全，源码公开、无订阅费，长期被视为 Photoshop 之外最完整的选择。</p>
+<p>3.0 起换成 GTK3 界面，HiDPI 缩放与数位板支持改善，最实用的变化是「非破坏性滤镜」：滤镜挂上去还能改参数、临时关掉或整条删除；3.2 又补了链接图层、矢量图层与蒙版处理，按 Shift+X 可在最近两个工具间切换。</p>
+<p>适合预算有限又要做正经修图、批量改尺寸压缩、UI 切图与合成；不适合需要 CMYK 印刷分色，或要与 Adobe 智能对象、Camera Raw 无缝协作的团队。</p>
+
+<h2>安装步骤</h2>
+<p>一、在本站软件页下载 Windows 安装包，先核对版本号，用 Help → About GIMP 确认，别照着 2.10 的旧教程找 3.x 的菜单。</p>
+<p>二、双击运行，向导里可选界面语言。路径保持默认最省事；换盘时别带中文和空格，否则个别插件加载会报错。</p>
+<p>三、首次启动明显变慢，它在扫描系统字体、生成插件缓存，跑完一次就恢复正常。界面是英文或中文成方块时，去 Edit → Preferences → Interface → Language 选「中文（简体）」重启；仍缺字就到 Folders → Fonts 补字体目录再重新扫描。</p>
+
+<h2>从 PS 迁移必改的 5 个设置</h2>
+<p><strong>1. 单窗口模式。</strong>默认把工具箱、图层、笔刷拆成一堆浮动窗口，桌面很容易铺满。在「窗口」菜单勾上 Single-Window Mode，面板收进同一窗口，布局立刻接近 PS；位置可自己拖，正常关闭后下次沿用。</p>
+<p><strong>2. 主题与图标尺寸。</strong>Edit → Preferences → Interface → Theme 有亮、灰、暗三套，长修图建议暗色；同页 Icon size 在 2K/4K 屏必须调大，否则按钮小到点不准。图标风格另有 symbolic / color / legacy 三选。</p>
+<p><strong>3. 快捷键与动作搜索。</strong>Edit → Keyboard Shortcuts 可按动作名搜索后重录键位。不建议整套照搬 PS，两边工具语义不同；先把导出、自由变换、新建图层、复制合并改顺手。想不起菜单位置，按斜杠键 / 打开动作搜索，输命令名直接执行。</p>
+<p><strong>4. 保存与导出的语义（最容易踩）。</strong>Ctrl+S 存的是 .xcf 工程文件，不是 JPG/PNG。出成品走 File → Export As（Ctrl+Shift+E），同一张图再导出用 Ctrl+E 覆盖。习惯「Ctrl+S 就是存 PSD」的人常在这里少做一步，交图时才发现只有一个 .xcf。</p>
+<p><strong>5. 颜色管理。</strong>Image → Color Management 能看出图片有没带配置文件，需要时用 Assign Color Profile 指定、Convert to Color Profile 转换。PS 里用 Adobe RGB 做的图，进 GIMP 前要确认配置没丢，否则屏幕和导出都偏色；工作空间在 Preferences → Color Management 设。</p>
+<p>大图拖不动时，去 Preferences → System Resources 调高线程数与 tile cache，比换电脑见效快。</p>
+
+<h2>基础修图流程与常见问题</h2>
+<p>完整链路：打开原图 → Layer → Duplicate Layer（Ctrl+Shift+D）留底 → 裁剪拉直 → Colors → Levels / Curves 调明暗 → 修复工具去瑕疵 → Filters → Enhance → Sharpen 锐化 → Ctrl+Shift+E 导出。需反复调整的效果尽量用非破坏性滤镜，别直接应用到原图层。</p>
+<p><strong>FAQ 1：打开 PSD 后文字变形、样式没了？</strong>GIMP 对 PSD 是尽量还原，文字会被栅格化，图层样式与智能对象基本不保留。交接前在 PS 里另存一份「合并样式、栅格化文字」的副本更稳。</p>
+<p><strong>FAQ 2：有没有调整图层？</strong>没有 PS 那种。可用非破坏性滤镜（可改参数、可隐藏）、复制图层调色后加蒙版，或把调色结果放独立图层配混合模式。</p>
+<p><strong>FAQ 3：装完打不开或提示缺运行库？</strong>先确认系统为 64 位、安装包完整（重下一次），再看是否被杀毒软件拦了插件目录；仍报错就记下错误码，在本站软件页留言。</p>
