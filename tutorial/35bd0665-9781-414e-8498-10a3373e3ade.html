@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>if(location.protocol==="http:"&&/(^|\.)lezhesoft\.cn$/.test(location.hostname))location.replace("https://"+location.host+location.pathname+location.search+location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="applicable-device" content="pc,mobile">
+<title>Photon Studio使用教程：AI抠图、换背景与批量导出_乐哲软件教程</title>
+<meta name="description" content="Photon Studio 是 Tenzen Studio 出品的免费桌面图像编辑器，把 Photoshop 的图层工作流搬到本机，图片不上传、不用账号。本文按安装设置、AI 抠图换背景、批量导出三步讲清常用操作，也写明 PSD 往返兼容与中文输入这类早期版本要注意的地方。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.lezhesoft.cn/tutorial/35bd0665-9781-414e-8498-10a3373e3ade.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="乐哲软件">
+<meta property="og:title" content="Photon Studio使用教程：AI抠图、换背景与批量导出_乐哲软件教程">
+<meta property="og:description" content="Photon Studio 是 Tenzen Studio 出品的免费桌面图像编辑器，把 Photoshop 的图层工作流搬到本机，图片不上传、不用账号。本文按安装设置、AI 抠图换背景、批量导出三步讲清常用操作，也写明 PSD 往返兼容与中文输入这类早期版本要注意的地方。">
+<meta property="og:url" content="https://www.lezhesoft.cn/tutorial/35bd0665-9781-414e-8498-10a3373e3ade.html">
+
+<meta property="og:image" content="https://www.lezhesoft.cn/tutorial/cover/35bd0665-9781-414e-8498-10a3373e3ade.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Photon Studio使用教程：AI抠图、换背景与批量导出","image":"https://www.lezhesoft.cn/tutorial/cover/35bd0665-9781-414e-8498-10a3373e3ade.png","datePublished":"2026-11-09T00:06:14.649421+00:00","dateModified":"2026-11-09T00:06:14.649421+00:00","author":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"},"publisher":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"}}</script>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
+/* 内页导航（与首页方案B胶囊导航同款视觉） */
+header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e8edf4;padding:10px 20px}
+.hd-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto}
+.hd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.hd-brand{font-weight:800;font-size:1.02rem;color:#1c2333}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:#f2f5fa;border:1px solid #e5eaf2;border-radius:50px;padding:3px;margin:0 auto}
+.nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
+.nav-links a:hover{color:#1c2333;background:#fff}
+.nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{color:#41506b;font-weight:700;background-image:linear-gradient(135deg,#0077ff,#6c5ce7);background-repeat:no-repeat;background-size:0% 100%;background-position:left center;transition:background-size .3s,color .3s}
+.nav-links a.nav-ai:hover{background-size:100% 100%;color:#fff}
+.nav-links a.nav-ai.active{background-size:100% 100%;color:#fff}
+.hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
+.hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
+.hd-search input:focus{border-color:#0077ff;background:#fff}
+.hd-search button{padding:7px 13px;border:0;border-radius:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+/* 中屏：搜索收紧 */
+@media(max-width:1000px){.hd-search input{width:110px}.nav-links a{padding:6px 11px;font-size:.8rem}}
+/* 移动端：导航条变全宽横向滑动，搜索隐藏（进入搜索页用） */
+@media(max-width:768px){
+.hd-in{flex-wrap:wrap;gap:10px}
+.hd-search{display:none}
+.nav-links{order:3;width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;padding:3px;margin:0;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{padding:7px 13px;font-size:.82rem}
+}
+@media(max-width:380px){.hd-brand{font-size:.92rem}.hd-mark{width:26px;height:26px;font-size:13px}}
+main{max-width:760px;margin:0 auto;padding:24px 20px}
+.meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
+.btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
+.rel{margin-top:36px;border-top:1px solid #eee;padding-top:18px}
+.cta{margin-top:26px;padding:13px 16px;background:#f0f6ff;border:1px solid #d8e6ff;border-radius:9px;font-size:14px;line-height:1.9;color:#333}
+.cta a{color:#0077ff;text-decoration:none;font-weight:500}
+.rel a{display:inline-block;margin:0 10px 10px 0;color:#0077ff;text-decoration:none}
+article img{max-width:100%}
+footer{max-width:760px;margin:0 auto;padding:20px;color:#888;font-size:13px}
+footer a{color:#888}
+nav.crumb{font-size:13px;color:#999;margin-bottom:12px}nav.crumb a{color:#999;text-decoration:none}
+h1{font-size:24px;margin:8px 0}
+</style>
+</head>
+<body>
+<header>
+<div class="hd-in">
+<a class="hd-logo" href="https://www.lezhesoft.cn/"><span class="hd-mark">乐</span><span class="hd-brand">乐哲软件</span></a>
+<ul class="nav-links">
+<li><a href="https://www.lezhesoft.cn/">首页</a></li>
+<li><a href="https://www.lezhesoft.cn/all.html">软件库</a></li>
+<li><a href="https://www.lezhesoft.cn/ai/index.html" class="nav-ai">AI工具集</a></li>
+<li><a href="https://www.lezhesoft.cn/sitemap.html">搜索</a></li>
+</ul>
+<form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
+</div>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.pathname||a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if((h==="/"||h==="/index.html")&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+</header>
+<main>
+<nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / 图像处理教程</nav>
+<h1>Photon Studio使用教程：AI抠图、换背景与批量导出</h1>
+<div class="meta"><span>发布：2026-11-09</span><span>分类：<a href="https://www.lezhesoft.cn/cat/tuxiang-chuli.html">图像处理</a></span></div>
+<img src="https://www.lezhesoft.cn/tutorial/cover/35bd0665-9781-414e-8498-10a3373e3ade.png" alt="Photon Studio使用教程：AI抠图、换背景与批量导出封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+<article><h2>Photon Studio 是什么：免费、本机跑、能开 PSD</h2>
+<p>Photon Studio 是 Tenzen Studio 出品的桌面图像编辑器，把 Photoshop 那套图层工作流搬到本机，整个应用免费，没有试用期也没有付费档，打开和编辑文件都不需要账号。它支持 macOS 12 以上（Apple 芯片与 Intel）、Windows 64 位（Intel/AMD 与 ARM64），另有 Linux 的 Flatpak、AppImage 包，Windows 也能从 Microsoft Store 安装。</p>
+<p>它和网页修图工具最大的区别是不上传：图层运算、调色、修复，以及主体选择、去背景这类 AI 选区，用的都是随安装包打包的本机模型，图片不经过服务器，断网也能编辑和导出，代价是安装包在 GB 量级。工具箱、菜单布局和默认快捷键都对齐 Photoshop，老用户几乎不用重学，另有命令搜索可按名字找功能。</p>
+<p>适合偶尔修图、做封面图、改别人 PSD 的人；不适合每天高强度精修、依赖 PS 插件和印刷流程的团队。</p>
+
+<h2>安装与首次设置</h2>
+<p>只走官方渠道：打开 tenzen.studio/photon（站内下载按钮就指向这里），按系统选安装包。官网流程要填邮箱收下载链接，没收到先翻垃圾邮件；装完编辑文件并不需要登录。双击安装包按向导走完即可，Windows 上多人共用电脑时建议选「为这台电脑上的所有用户安装」。</p>
+<p>首次打开做三件小验证：打开一张自己的图片拉一次曲线，看预览是否即时；用文字工具打一段中文，确认字体和输入正常；再用选择工具试一次主体选择，看本机模型是否加载成功。界面默认英文，部分版本可在设置或右上角语言入口切换中文；主要做中文排版的话，务必先试那段中文文字，早期版本有反馈中文输入会出问题。</p>
+
+<h2>AI 抠图与换背景：三步做完</h2>
+<p>第一步，打开图片，在图层面板选中该图层；第二步，用选择菜单里的「主体选择（Select Subject）」或「移除背景（Remove Background）」，等本机模型跑完，主体周围会出现选区；第三步，微调边缘。头发、半透明边缘、和背景颜色接近的区域，自动结果通常留一点毛边，用「选择并遮住」配合调整边缘画笔刷一遍。</p>
+<p>换背景不用换软件：删掉背景、保留透明区域，在下面新建一层，填纯色、拉渐变或放进新的背景图即可。要保住透明，导出选 PNG；选 JPEG 的话透明区会按白底合成。</p>
+<p>同一类图要处理几十张时别一张张点：把「主体选择 → 去背景 → 存 PNG」录成动作（Action），再用「文件 → 自动 → 批处理」指定源文件夹和目标文件夹；把动作存成 Droplets 后直接拖文件夹到图标上更省事。</p>
+
+<h2>导出与批量导出</h2>
+<p>单张导出走「文件 → 导出」或「存储副本」，可选 PSD/PSB、PNG、PNG-8、APNG、JPEG、WebP、AVIF、TIFF、PDF、GIF、BMP、ICO，。做封面、缩略图用 WebP 或 JPEG 就够，要给下游继续改就存 PSD。</p>
+<p>多尺寸批量：在一个文档里建多个画板（Artboards），每个画板设一组尺寸，导出时选按画板导出，一次出齐详情页、主图、缩略图几套规格。多文件批量则靠动作加批处理，能指定重命名规则和输出格式，跑之前先用三五张图试一遍。</p>
+<p>两条务实提醒。PSD 往返方面，官方说过「能开能存」不等于每个特性都能 1:1 还原，文字、图层效果、智能对象、依赖插件的内容最容易出偏差，重要工程先留原件、另存副本。性能方面，早期版本里曲线、色相这类调整在大文件上可能要等一两秒，处理大图时关掉其他吃内存的程序会顺手些。</p>
+
+<h2>常见问题</h2>
+<p><strong>Q1：真的免费吗？要注册账号吗？</strong><br>整个应用免费，没有试用期，也没把功能锁在付费墙后。打开、编辑、导出都不需要账号，只有和 Tenzen 账号打通或使用付费套件里其他应用时才涉及登录。</p>
+<p><strong>Q2：打开 PSD 图层会丢吗？能存回 PSD 吗？</strong><br>PSD 和 PSB 能带着图层、图层组、蒙版、调整图层、智能对象、可编辑文字和图层效果打开，改完也能存回。但复杂特性不保证完全一致，尤其特殊字体和插件效果，稳妥做法是保留原始 PSD、结果另存新文件。</p>
+<p><strong>Q3：抠图会上传云端吗？断网能用吗？</strong><br>不会。主体选择、移除背景、对象选择、选择天空用的模型都随软件打包在本机运行，图片不离开电脑。装好后断网也能完成编辑和导出，只有下载和更新需要联网。</p></article>
+<div class="cta"><strong>教程里的软件去哪下载？</strong>本站全部软件免费下载，注册登录后即可获取下载地址，完全免费，无需付费开通。<a href="https://www.lezhesoft.cn/">免费注册 →</a></div>
+<div class="rel"><strong>相关软件下载：</strong><br><a href="https://www.lezhesoft.cn/soft/600583ddfa8071e7929f3515.html">Photon Studio 图片编辑软件</a></div><div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/24929da4-ff46-46b3-b05f-11a39f79030d.html">傲梅轻松备份使用教程：系统备份、还原与克隆硬盘入门指南</a><a href="https://www.lezhesoft.cn/tutorial/b734102f-efe6-4faa-b199-a590cd7c0e1f.html">GIMP使用教程：从PS迁移必改的5个设置与基础修图流程</a><a href="https://www.lezhesoft.cn/tutorial/91e1887a-ebb6-4171-a588-99866f62aca2.html">MacOS 提示「已损坏，无法打开」怎么办？</a><a href="https://www.lezhesoft.cn/tutorial/cd20b6ed-ae5d-49c5-95b1-4e1e0541f227.html">Total Uninstall使用教程：安装监视、彻底卸载与启动项清理入门指南</a><a href="https://www.lezhesoft.cn/tutorial/7aa79aaa-b1ba-4f8a-9056-20b0a731afb3.html">0xc000007b应用程序错误</a><a href="https://www.lezhesoft.cn/tutorial/ca626bf2-5874-41f5-ad12-8bb4c1309499.html">关于Adobe Genuine Service Alert盗版提示的解决方法</a></div>
+</main>
+<footer><a href="https://www.lezhesoft.cn/">乐哲软件官网</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具</a> · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
+</body></html>

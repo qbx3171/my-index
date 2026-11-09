@@ -182,6 +182,9 @@ const DATA_MASTERS = [
   // GIMP 教程（2026-11-07 新增）：长中文正文 + 英文菜单路径写库即带乱码，母本兜底
   { table: "tutorials", id: "b734102f-efe6-4faa-b199-a590cd7c0e1f", field: "content", file: "content-master-b734102f.txt" },
   { table: "tutorials", id: "b734102f-efe6-4faa-b199-a590cd7c0e1f", field: "summary", file: "summary-master-b734102f.txt" },
+  // Photon Studio 教程（2026-11-09 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "35bd0665-9781-414e-8498-10a3373e3ade", field: "content", file: "content-master-35bd0665.txt" },
+  { table: "tutorials", id: "35bd0665-9781-414e-8498-10a3373e3ade", field: "summary", file: "summary-master-35bd0665.txt" },
   // 三篇早期教程（建站期入库，此前无母本）：2026-11-06 起补母本，消除「同一数据两次生成 md5 不同」
   { table: "tutorials", id: "7aa79aaa-b1ba-4f8a-9056-20b0a731afb3", field: "content", file: "content-master-7aa79aaa.txt" },
   { table: "tutorials", id: "91e1887a-ebb6-4171-a588-99866f62aca2", field: "content", file: "content-master-91e1887a.txt" },
@@ -198,10 +201,17 @@ const coveredByMaster = new Set();
 for (const m of DATA_MASTERS) {
   const rows = m.table === "software" ? softs : tutorials;
   const row = rows.find((t) => t.id === m.id);
-  if (row && typeof row[m.field] === "string" && row[m.field].includes(FFD)) {
-    row[m.field] = await readFile(join(ROOT, "seo", m.file), "utf8");
-    coveredByMaster.add(`${m.id}/${m.field}`);
-    console.log(`已用母本覆盖 ${m.id}.${m.field}（传输乱码兜底）`);
+  if (row && typeof row[m.field] === "string") {
+    /* 2026-11-09：库里的 content 末尾带 \n、summary 不带，母本文件同样混着有/无；
+       而「命中母本」只在传输出现乱码时才发生（随机），于是同一数据两次生成会差一个 \n，
+       破坏幂等。这里不论是否命中母本，统一 trim 一次，输出稳定且对 HTML / 摘要无影响。 */
+    if (row[m.field].includes(FFD)) {
+      row[m.field] = (await readFile(join(ROOT, "seo", m.file), "utf8")).trim();
+      coveredByMaster.add(`${m.id}/${m.field}`);
+      console.log(`已用母本覆盖 ${m.id}.${m.field}（传输乱码兜底）`);
+    } else {
+      row[m.field] = row[m.field].trim();
+    }
   }
 }
 // 汇报：母本兜底后仍残留的才是真问题（产物会带乱码，末尾自检会 exit 2）
@@ -363,23 +373,61 @@ const pickRelated = (s) => {
   for (let i = 1; i <= REL_N; i += 1) out.push(list[(idx + i) % list.length]);
   return out;
 };
-// 教程 ↔ 软件 互链：教程标题里出现完整软件名（去空格、忽略大小写，长度≥3）即视为同一主题。
-// 现状 6 篇教程只命中 2 款软件，命中率低属正常；教程每日 +1，这条链路会自动变密，
-// 且匹配不到时该区块整段不渲染（不会输出空壳或无关推荐）。
+// 教程 ↔ 软件 互链：教程标题里出现软件名（去空格、忽略大小写，长度≥3）即视为同一主题。
+// 2026-11-09 优化：原来只认「完整软件名」，但库里软件名多带中文后缀（如「Photon Studio 图片编辑软件」
+// 「CleanMyMac 苹果电脑清理工具软件」），教程标题写的是「Photon Studio使用教程：…」，永远匹配不上——
+// 13 篇教程只命中 4 篇。改为「别名集」匹配：完整名 + 开头连续拉丁/数字段（≥4 位）+ 开头连续中文段（≥3 位），
+// 命中任一即算，完整名命中优先。匹配不到时区块整段不渲染，不会出现空壳。
 const norm = (s) => String(s || "").toLowerCase().replace(/\s+/g, "");
+const aliasCache = new Map();
+function aliasesOf(name) {
+  const key = norm(name);
+  if (aliasCache.has(key)) return aliasCache.get(key);
+  const out = [];
+  if (key.length >= 3) out.push({ a: key, full: true });
+  const latin = key.match(/^[a-z0-9][a-z0-9.+#&_-]*/);
+  if (latin && latin[0].length >= 4) {
+    out.push({ a: latin[0], full: false });
+    // 软件名常带版本号（Total Uninstall 2026 / Adobe Creative Cloud 2025），教程标题一般不带，去掉尾数字再试一次
+    const noVer = latin[0].replace(/[0-9._-]+$/, "");
+    if (noVer.length >= 4 && noVer !== latin[0]) out.push({ a: noVer, full: false });
+  }
+  const cn = key.match(/^[\u4e00-\u9fa5]{3,}/);
+  if (cn && cn[0] !== key) out.push({ a: cn[0], full: false });
+  // 长别名优先，避免短别名先把不相关页面拉进来
+  out.sort((x, y) => (y.full ? 1 : 0) - (x.full ? 1 : 0) || y.a.length - x.a.length);
+  aliasCache.set(key, out);
+  return out;
+}
 const tutBySoft = new Map();
 for (const s of softs) {
-  const n = norm(s.name);
-  if (n.length < 3) continue;
-  const hit = tutorials.filter((t) => norm(t.title).includes(n)).slice(0, 3);
+  const al = aliasesOf(s.name);
+  if (!al.length) continue;
+  const nt = tutorials.map((t) => ({ t, n: norm(t.title) }));
+  const hit = nt
+    .map(({ t, n }) => {
+      const m = al.find((x) => n.includes(x.a));
+      return m ? { t, rank: m.full ? 2 : 1, len: m.a.length } : null;
+    })
+    .filter(Boolean)
+    .sort((x, y) => y.rank - x.rank || y.len - x.len)
+    .slice(0, 3)
+    .map((x) => x.t);
   if (hit.length) tutBySoft.set(s.id, hit);
 }
 const softByTut = new Map();
 for (const t of tutorials) {
   const nt = norm(t.title);
   const hit = softs
-    .filter((s) => s.name && norm(s.name).length >= 3 && nt.includes(norm(s.name)))
-    .slice(0, 4);
+    .map((s) => {
+      const al = aliasesOf(s.name);
+      const m = al.find((x) => nt.includes(x.a));
+      return m ? { s, rank: m.full ? 2 : 1, len: m.a.length } : null;
+    })
+    .filter(Boolean)
+    .sort((x, y) => y.rank - x.rank || y.len - x.len)
+    .slice(0, 4)
+    .map((x) => x.s);
   if (hit.length) softByTut.set(t.id, hit);
 }
 const catSet = new Set(softs.map((s) => s.category).filter(Boolean));
@@ -693,8 +741,10 @@ try {
 // 只修「库里含 FFFD 且这里不含」的字段，静态数据不会覆盖后台新改的干净内容；
 // 记录的 updated_at 晚于本文件 build 时整个跳过，防止用户刚改完的正文被旧版回退。
 try {
-  const tutPayload = {
-    build: Date.now(),
+  /* 2026-11-09 修复：原先 build 恒为 Date.now()，同一份数据连续生成也会让 data/tutorials.json
+     每次都变 → 生成不再幂等，守卫/CI 每个周期白提交一个 commit（software.json 早已按内容复用 build，
+     这里此前漏了）。改成：内容（除 build 外）一致就沿用上一版 build。 */
+  const tutBody = JSON.stringify({
     tutorials: tutorials.map((t) => ({
       id: t.id,
       title: t.title,
@@ -702,8 +752,20 @@ try {
       content: t.content,
       updated_at: t.updated_at || null,
     })),
-  };
-  const tutJson = JSON.stringify(tutPayload);
+  });
+  let prevTutBuild = 0;
+  let prevTutBody = "";
+  try {
+    const prev = JSON.parse(await readFile(join(ROOT, "data/tutorials.json"), "utf8"));
+    prevTutBuild = Number(prev.build) || 0;
+    if (Array.isArray(prev.tutorials)) {
+      prevTutBody = JSON.stringify({ tutorials: prev.tutorials });
+    }
+  } catch {
+    /* 首次生成 / 上一版损坏：按新内容处理 */
+  }
+  const tutBuild = prevTutBuild && prevTutBody === tutBody ? prevTutBuild : Date.now();
+  const tutJson = JSON.stringify({ build: tutBuild, tutorials: JSON.parse(tutBody).tutorials });
   if (tutorials.length < 5) {
     console.warn(`⚠ 教程仅 ${tutorials.length} 篇，疑似抓取残缺：跳过 data/tutorials.json`);
   } else if (tutJson.includes(FFD)) {
