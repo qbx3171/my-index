@@ -107,6 +107,21 @@ const stripHtml = (s) =>
 // meta description 目标长度：过短会被 Bing 判为「too short」
 const MIN_DESC = 100;
 
+// 描述补足时不得把「破解 / 激活 / 提取码 / 补丁」这类安装指令带进摘要（2026-11-10 修复）
+// 起因：库里 software.detail 有 40 条含破解步骤或提取码，而 renderSoftPage 在 description
+// 不足 100 字时会把 stripHtml(detail) 直接拼进 meta description，结果 SERP 摘要里出现
+// 「软件详情：提取码：4xsd」「软件详情：解锁完整功能，直装即可无限制使用订阅版」。
+// 处理：按句过滤，命中即整句丢弃；宁可回落到通用模板句（含软件名+版本，保证唯一），
+// 也不让这类字样出现在搜索结果里。正文仍按原样渲染库内文案（数据侧问题另记）。
+const CRACK_HINT = /(破解|激活|注册机|序列号|提取码|免激活|解锁|去除收费|终身许可|补丁)/;
+const cleanMetaText = (text) =>
+  String(text || "")
+    .split(/[。！？；\n]+/)
+    .map((s) => s.replace(/提取码[：:]\s*\S+/g, "").trim())
+    .filter((s) => s && !CRACK_HINT.test(s))
+    .join("。")
+    .trim();
+
 // 按标点边界裁剪，避免描述断在半句/词中间（如「…屏幕检测、电池信」）
 const clip = (s, max) => {
   if (s.length <= max) return s;
@@ -313,10 +328,10 @@ export function renderSoftPage(soft, related = [], opts = {}) {
   } else if (dupPlatform) {
     tail = `本页面为${dupPlatform}平台版本，其他平台版本请查看同分类列表。`;
   }
-  let descFull = base;
+  let descFull = cleanMetaText(base);
   if (descFull.length < MIN_DESC) {
-    const detailText = stripHtml(soft.detail);
-    if (detailText) descFull += `软件详情：${detailText}`;
+    const detailText = cleanMetaText(stripHtml(soft.detail));
+    if (detailText.length >= 30) descFull += `软件详情：${detailText}`;
   }
   if (descFull.length < MIN_DESC) {
     descFull += `${name}${version ? ` v${version}` : ""}已由乐哲软件完整收录，提供高速免费下载通道，页面附版本号、更新日期、文件大小与平台兼容性等参数信息，安装或使用中遇到问题可查阅站内图文教程，下载前请确认系统环境满足软件运行要求。`;
@@ -473,10 +488,10 @@ export function renderTutorialPage(t, related = [], opts = {}) {
   const canonical = tutUrl(id);
   const title = `${title0}_乐哲软件教程`;
 
-  // 描述：summary 过短时补足，避免被 Bing 判为 too short
-  let descFull = summary.trim();
+  // 描述：summary 过短时补足，避免被 Bing 判为 too short（同样过滤盗版字样，见 cleanMetaText）
+  let descFull = cleanMetaText(summary);
   if (descFull.length < MIN_DESC) {
-    const contentText = stripHtml(content);
+    const contentText = cleanMetaText(stripHtml(content));
     if (contentText) descFull += `教程正文节选：${contentText}`;
   }
   if (descFull.length < MIN_DESC) {

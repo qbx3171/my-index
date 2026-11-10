@@ -185,6 +185,9 @@ const DATA_MASTERS = [
   // Photon Studio 教程（2026-11-09 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "35bd0665-9781-414e-8498-10a3373e3ade", field: "content", file: "content-master-35bd0665.txt" },
   { table: "tutorials", id: "35bd0665-9781-414e-8498-10a3373e3ade", field: "summary", file: "summary-master-35bd0665.txt" },
+  // Adobe Illustrator 教程（2026-11-10 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "482d2fa9-582b-436f-91a9-646842b60e46", field: "content", file: "content-master-482d2fa9.txt" },
+  { table: "tutorials", id: "482d2fa9-582b-436f-91a9-646842b60e46", field: "summary", file: "summary-master-482d2fa9.txt" },
   // 三篇早期教程（建站期入库，此前无母本）：2026-11-06 起补母本，消除「同一数据两次生成 md5 不同」
   { table: "tutorials", id: "7aa79aaa-b1ba-4f8a-9056-20b0a731afb3", field: "content", file: "content-master-7aa79aaa.txt" },
   { table: "tutorials", id: "91e1887a-ebb6-4171-a588-99866f62aca2", field: "content", file: "content-master-91e1887a.txt" },
