@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>if(location.protocol==="http:"&&/(^|\.)lezhesoft\.cn$/.test(location.hostname))location.replace("https://"+location.host+location.pathname+location.search+location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="applicable-device" content="pc,mobile">
+<title>Geek Uninstaller使用教程：卸载捆绑软件与清理残留_乐哲软件教程</title>
+<meta name="description" content="Geek Uninstaller 是一款单文件免安装的 Windows 卸载工具，价值在「卸完再扫一遍」：调用软件自带向导走完流程后，自动列出残留的文件与注册表项供勾选删除。本文讲清为何要管理员权限、普通卸载的完整步骤、强制删除与商店应用视图的适用边界，以及卸载后仍在列表、提示正在运行等常见问题的处理办法">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.lezhesoft.cn/tutorial/9c916a87-807f-4e8f-ba8b-e3b8de631c02.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="乐哲软件">
+<meta property="og:title" content="Geek Uninstaller使用教程：卸载捆绑软件与清理残留_乐哲软件教程">
+<meta property="og:description" content="Geek Uninstaller 是一款单文件免安装的 Windows 卸载工具，价值在「卸完再扫一遍」：调用软件自带向导走完流程后，自动列出残留的文件与注册表项供勾选删除。本文讲清为何要管理员权限、普通卸载的完整步骤、强制删除与商店应用视图的适用边界，以及卸载后仍在列表、提示正在运行等常见问题的处理办法">
+<meta property="og:url" content="https://www.lezhesoft.cn/tutorial/9c916a87-807f-4e8f-ba8b-e3b8de631c02.html">
+
+<meta property="og:image" content="https://www.lezhesoft.cn/tutorial/cover/9c916a87-807f-4e8f-ba8b-e3b8de631c02.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Geek Uninstaller使用教程：卸载捆绑软件与清理残留","image":"https://www.lezhesoft.cn/tutorial/cover/9c916a87-807f-4e8f-ba8b-e3b8de631c02.png","datePublished":"2026-11-12T00:05:31.561689+00:00","dateModified":"2026-11-12T00:05:31.561689+00:00","author":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"},"publisher":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"}}</script>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
+/* 内页导航（与首页方案B胶囊导航同款视觉） */
+header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e8edf4;padding:10px 20px}
+.hd-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto}
+.hd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.hd-brand{font-weight:800;font-size:1.02rem;color:#1c2333}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:#f2f5fa;border:1px solid #e5eaf2;border-radius:50px;padding:3px;margin:0 auto}
+.nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
+.nav-links a:hover{color:#1c2333;background:#fff}
+.nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{color:#41506b;font-weight:700;background-image:linear-gradient(135deg,#0077ff,#6c5ce7);background-repeat:no-repeat;background-size:0% 100%;background-position:left center;transition:background-size .3s,color .3s}
+.nav-links a.nav-ai:hover{background-size:100% 100%;color:#fff}
+.nav-links a.nav-ai.active{background-size:100% 100%;color:#fff}
+.hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
+.hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
+.hd-search input:focus{border-color:#0077ff;background:#fff}
+.hd-search button{padding:7px 13px;border:0;border-radius:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+/* 中屏：搜索收紧 */
+@media(max-width:1000px){.hd-search input{width:110px}.nav-links a{padding:6px 11px;font-size:.8rem}}
+/* 移动端：导航条变全宽横向滑动，搜索隐藏（进入搜索页用） */
+@media(max-width:768px){
+.hd-in{flex-wrap:wrap;gap:10px}
+.hd-search{display:none}
+.nav-links{order:3;width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;padding:3px;margin:0;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{padding:7px 13px;font-size:.82rem}
+}
+@media(max-width:380px){.hd-brand{font-size:.92rem}.hd-mark{width:26px;height:26px;font-size:13px}}
+main{max-width:760px;margin:0 auto;padding:24px 20px}
+.meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
+.btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
+.rel{margin-top:36px;border-top:1px solid #eee;padding-top:18px}
+.cta{margin-top:26px;padding:13px 16px;background:#f0f6ff;border:1px solid #d8e6ff;border-radius:9px;font-size:14px;line-height:1.9;color:#333}
+.cta a{color:#0077ff;text-decoration:none;font-weight:500}
+.rel a{display:inline-block;margin:0 10px 10px 0;color:#0077ff;text-decoration:none}
+article img{max-width:100%}
+footer{max-width:760px;margin:0 auto;padding:20px;color:#888;font-size:13px}
+footer a{color:#888}
+nav.crumb{font-size:13px;color:#999;margin-bottom:12px}nav.crumb a{color:#999;text-decoration:none}
+h1{font-size:24px;margin:8px 0}
+</style>
+</head>
+<body>
+<header>
+<div class="hd-in">
+<a class="hd-logo" href="https://www.lezhesoft.cn/"><span class="hd-mark">乐</span><span class="hd-brand">乐哲软件</span></a>
+<ul class="nav-links">
+<li><a href="https://www.lezhesoft.cn/">首页</a></li>
+<li><a href="https://www.lezhesoft.cn/all.html">软件库</a></li>
+<li><a href="https://www.lezhesoft.cn/ai/index.html" class="nav-ai">AI工具集</a></li>
+<li><a href="https://www.lezhesoft.cn/sitemap.html">搜索</a></li>
+</ul>
+<form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
+</div>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.pathname||a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if((h==="/"||h==="/index.html")&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+</header>
+<main>
+<nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / 实用工具教程</nav>
+<h1>Geek Uninstaller使用教程：卸载捆绑软件与清理残留</h1>
+<div class="meta"><span>发布：2026-11-12</span><span>分类：<a href="https://www.lezhesoft.cn/cat/shiyong-gongju.html">实用工具</a></span></div>
+<img src="https://www.lezhesoft.cn/tutorial/cover/9c916a87-807f-4e8f-ba8b-e3b8de631c02.png" alt="Geek Uninstaller使用教程：卸载捆绑软件与清理残留封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+<article><h2>Geek Uninstaller 是做什么的，适合谁用</h2>
+<p>Windows 自带的「程序和功能」只负责把软件主体拆掉，配置文件、缓存目录、注册表项往往原地不动。用得久了，C 盘里堆一堆「已卸载软件的遗物」，装新版本时还会因为旧键值没清干净而出错。Geek Uninstaller 解决的就是这一步：调用软件自身的卸载程序走完正常流程后，再扫描文件系统与注册表，把剩下的列成清单让你确认删除。</p>
+<p>它的定位很明确——不做系统优化、不弹窗、不常驻后台，就是一个「卸得干净」的小工具。适合经常试装软件、接手别人电脑做清理、或者只想让硬盘别越用越满的人。整包只有一个可执行文件，体积几 MB，免安装、可放 U 盘，也不写系统服务。</p>
+
+<h2>获取与启动：一个 exe，双击就能用</h2>
+<p>站内提供的是 Windows 版，版本 1.5.4.180，解压后得到单个 Geek Uninstaller 主程序，无需运行安装向导。建议右键「以管理员身份运行」——普通权限下删 Program Files 与 HKLM 下的项会失败，这是新手最常踩的坑。</p>
+<p>启动后窗口里直接是已安装程序列表，按名称字母序排列，也可以点表头改按占用空间或安装时间排序。顶部有搜索框，想卸哪个直接敲名字即时过滤。首次使用先改语言：菜单「选项 &gt; 语言」里选简体中文。</p>
+
+<h2>把软件卸干净：普通卸载 + 残留扫描</h2>
+<p><strong>① 右键 &gt; 卸载。</strong>最常规的路径。Geek 会拉起该软件自己的卸载向导，按提示点完（遇到「是否保留配置」「是否重启」按需求选）。此时先别急着关 Geek 窗口。</p>
+<p><strong>② 等它自动扫描残留。</strong>向导结束后立刻扫描，结果分两栏：文件系统（残留的安装目录、AppData 下的配置与缓存）和注册表（软件写入的键值）。默认已勾选，扫出什么、在哪个路径都写得很清楚，逐条看一眼再点「完成」。这是整个工具的核心价值，跳过等于白用。</p>
+<p><strong>③ 顺手清条目。</strong>若卸载中途报错、软件从列表消失但文件还在，右键还有兜底项：「删除条目」只删列表记录（不动文件），适合清僵尸条目；「安装文件夹」跳到安装位置核对；「注册表条目」定位到该软件的键。</p>
+<p><strong>④ 留一份装机清单。</strong>「文件 &gt; 导出为 HTML」把当前所有已安装程序导成网页表格，含名称、大小、安装时间，换机或报故障时发给对方比截图靠谱。「查看 &gt; 卸载记录」则保留历史卸载动作。</p>
+
+<h2>顽固软件与商店应用：两条备用通道</h2>
+<p><strong>强制删除（Force Removal）。</strong>遇到卸载程序损坏、点了没反应、或者压根没有卸载入口的软件，右键选「强制删除」。它绕过自带卸载程序，直接删关联文件、注册表项，以及注册的服务与驱动。执行前要求输入名称二次确认，扫出的清单同样要人工勾选。这条通道适合流氓软件、装机残留、卸载中途崩掉的半成品；<strong>不要用它卸系统组件、运行库和驱动</strong>，删错会影响启动。</p>
+<p><strong>Microsoft Store 应用视图。</strong>按 Ctrl+Tab 切到商店应用列表，Xbox、邮件这类预装 UWP 应用会单独列出来，右键即可正常卸载，不需要强制删除。有些系统级组件即便卸掉，系统更新后可能被重新装回，这属于 Windows 自身行为。</p>
+<p><strong>关于版本边界。</strong>免费版个人免费，卸载、残留清理、强制删除都在，一次一款。批量卸载、实时监控、启动项管理属付费 Pro 版，日常清理用不到。</p>
+
+<h2>常见问题</h2>
+<p><strong>卸载完软件还在列表里？</strong>先去「安装文件夹」看目录是否还在，还在就用强制删除重来一次；文件确实删掉了、只是列表残留，右键「删除条目」抹掉记录即可，不会碰文件。</p>
+<p><strong>提示程序正在运行、卸不掉？</strong>先退出软件主界面，再检查右下角托盘图标右键退出；带后台服务的（网盘、输入法、安全软件）要在服务管理器里停掉对应服务。若被杀毒软件占用，临时关闭防护再试。</p>
+<p><strong>强制删除会不会误删别的东西？</strong>它按软件登记的文件与注册表关联扫描，删除前列出清单让你确认，不勾的不会删。稳妥做法是先只勾明显属于该软件的目录与键，拿不准的留着——残留一点比删错系统文件安全得多。</p></article>
+<div class="cta"><strong>教程里的软件去哪下载？</strong>本站全部软件免费下载，注册登录后即可获取下载地址，完全免费，无需付费开通。<a href="https://www.lezhesoft.cn/">免费注册 →</a></div>
+<div class="rel"><strong>相关软件下载：</strong><br><a href="https://www.lezhesoft.cn/soft/mt6ogh8esql4.html">Geek Uninstaller Geek卸载工具</a></div><div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/482d2fa9-582b-436f-91a9-646842b60e46.html">Adobe Illustrator使用教程：5个提效隐藏功能与快捷键</a><a href="https://www.lezhesoft.cn/tutorial/24929da4-ff46-46b3-b05f-11a39f79030d.html">傲梅轻松备份使用教程：系统备份、还原与克隆硬盘入门指南</a><a href="https://www.lezhesoft.cn/tutorial/b734102f-efe6-4faa-b199-a590cd7c0e1f.html">GIMP使用教程：从PS迁移必改的5个设置与基础修图流程</a><a href="https://www.lezhesoft.cn/tutorial/91e1887a-ebb6-4171-a588-99866f62aca2.html">MacOS 提示「已损坏，无法打开」怎么办？</a><a href="https://www.lezhesoft.cn/tutorial/cd20b6ed-ae5d-49c5-95b1-4e1e0541f227.html">Total Uninstall使用教程：安装监视、彻底卸载与启动项清理入门指南</a><a href="https://www.lezhesoft.cn/tutorial/35bd0665-9781-414e-8498-10a3373e3ade.html">Photon Studio使用教程：AI抠图、换背景与批量导出</a></div>
+</main>
+<footer><a href="https://www.lezhesoft.cn/">乐哲软件官网</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具</a> · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
+</body></html>

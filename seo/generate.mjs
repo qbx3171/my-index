@@ -188,6 +188,9 @@ const DATA_MASTERS = [
   // Adobe Illustrator 教程（2026-11-10 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "482d2fa9-582b-436f-91a9-646842b60e46", field: "content", file: "content-master-482d2fa9.txt" },
   { table: "tutorials", id: "482d2fa9-582b-436f-91a9-646842b60e46", field: "summary", file: "summary-master-482d2fa9.txt" },
+  // Geek Uninstaller 教程（2026-11-12 新增）：写库即带乱码，母本兜底
+  { table: "tutorials", id: "9c916a87-807f-4e8f-ba8b-e3b8de631c02", field: "content", file: "content-master-9c916a87.txt" },
+  { table: "tutorials", id: "9c916a87-807f-4e8f-ba8b-e3b8de631c02", field: "summary", file: "summary-master-9c916a87.txt" },
   // 三篇早期教程（建站期入库，此前无母本）：2026-11-06 起补母本，消除「同一数据两次生成 md5 不同」
   { table: "tutorials", id: "7aa79aaa-b1ba-4f8a-9056-20b0a731afb3", field: "content", file: "content-master-7aa79aaa.txt" },
   { table: "tutorials", id: "91e1887a-ebb6-4171-a588-99866f62aca2", field: "content", file: "content-master-91e1887a.txt" },
@@ -397,6 +400,19 @@ function aliasesOf(name) {
   }
   const cn = key.match(/^[\u4e00-\u9fa5]{3,}/);
   if (cn && cn[0] !== key) out.push({ a: cn[0], full: false });
+  // 2026-11-12：norm() 去空格会把相邻拉丁词粘成一整段。软件名里拉丁词重复出现时
+  // （「Geek Uninstaller Geek卸载工具」→ geekuninstallergeek），与教程标题里的
+  // 「Geek Uninstaller」永远匹配不上。改按原串（中文之前的拉丁前缀）取前两个词作别名，
+  // 只用两词前缀、不用单词，避免「adobe」这类泛词把不相关页面拉进来。
+  const head = String(name || "").split(/[\u4e00-\u9fa5]/)[0];
+  const words = head
+    .split(/\s+/)
+    .map((w) => w.replace(/^[^A-Za-z0-9]+/, "").replace(/[^A-Za-z0-9.+#&_-]+$/, ""))
+    .filter(Boolean);
+  if (words.length >= 2) {
+    const two = norm(words.slice(0, 2).join(" "));
+    if (two.length >= 5 && two !== key && !out.some((x) => x.a === two)) out.push({ a: two, full: false });
+  }
   // 长别名优先，避免短别名先把不相关页面拉进来
   out.sort((x, y) => (y.full ? 1 : 0) - (x.full ? 1 : 0) || y.a.length - x.a.length);
   aliasCache.set(key, out);

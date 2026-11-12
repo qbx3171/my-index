@@ -21,8 +21,8 @@
 | 2 | 2026-11-08 | 日 | PS越用越卡？改这5个设置就够了 | 痛点 | Adobe Photoshop | Adobe Photoshop使用教程：卡顿优化与性能设置排查 | 跳过 · 11-08 无运行（当日未执行巡检），该软件已有入门篇，待后续排期重排 |
 | 3 | 2026-11-09 | 一 | 实测5款免费AI抠图工具，哪款值得装？ | AI实测 | Photon Studio 图片编辑软件 | Photon Studio使用教程：AI抠图、换背景与批量导出 | 已写 2026-11-09 · 35bd0665 |
 | 4 | 2026-11-10 | 二 | 用了6年PS才知道，这5个隐藏功能 | 技巧 | Adobe Illustrator | Adobe Illustrator使用教程：5个提效隐藏功能与快捷键 | 已写 2026-11-10 · 482d2fa9 |
-| 5 | 2026-11-11 | 三 | Mac新手必装！8个免费软件 | Mac | Keka 解压缩软件 | Keka使用教程：Mac解压rar/7z与压缩包密码处理 | 待写 |
-| 6 | 2026-11-12 | 四 | 别乱下免费PS了！4个安全渠道 | 避坑 | Geek Uninstaller Geek卸载工具 | Geek Uninstaller使用教程：卸载捆绑软件与清理残留 | 待写 |
+| 5 | 2026-11-11 | 三 | Mac新手必装！8个免费软件 | Mac | Keka 解压缩软件 | Keka使用教程：Mac解压rar/7z与压缩包密码处理 | 跳过 · 11-11 无运行（当日未执行巡检），待后续排期重排 |
+| 6 | 2026-11-12 | 四 | 别乱下免费PS了！4个安全渠道 | 避坑 | Geek Uninstaller Geek卸载工具 | Geek Uninstaller使用教程：卸载捆绑软件与清理残留 | 已写 2026-11-12 · 9c916a87 |
 | 7 | 2026-11-13 | 五 | 修图师被问爆的5个问题，一次说清 | 人设 | Eagle 图像管理查看 | Eagle使用教程：修图师素材库搭建与分类检索 | 待写 |
 | 8 | 2026-11-14 | 六 | 打工人必备！6个免费办公软件 | 合集 | WPS电信定制版 v12.8.2.18205 专业版 | WPS Office使用教程：免费版够用的6个办公场景 | 待写 |
 | 9 | 2026-11-15 | 日 | C盘爆满？先删这5个文件夹 | 痛点 | Everything 文件搜索利器 | Everything使用教程：3分钟找出C盘占用最大的文件 | 待写 |
@@ -51,7 +51,7 @@
 | 修图/图像 | GIMP ✗ · Photon Studio ✗ · Eagle ✗ · Capture One ✗ · CorelDRAW ✗ · Figma EX ✗ · Sketch ✗ · Adobe Illustrator ✗ · Adobe Photoshop ✓（入门）· 2345看图王 ✓ |
 | 办公 | WPS ✗ · 微软Office 2021 ✗ · XMind ✗ · PDF-XChange Editor ✗ · 微软Office 2024 ✗ |
 | 媒体/剪辑 | DaVinci Resolve ✗ · 万兴优转 ✗ · Wondershare Filmora ✗ · Permute 4（Mac）✗ · PotPlayer ✗ · Topaz Video AI ✗ |
-| 实用/清理 | Everything ✗ · Geek Uninstaller ✗ · Driver Booster ✗ · PDF-XChange ✗ · Total Uninstall ✓ · CleanMyMac ✓ · AdGuard ✓ · AnyDesk ✓ · 傲梅轻松备份 ✓ |
+| 实用/清理 | Everything ✗ · Geek Uninstaller ✓ · Driver Booster ✗ · PDF-XChange ✗ · Total Uninstall ✓ · CleanMyMac ✓ · AdGuard ✓ · AnyDesk ✓ · 傲梅轻松备份 ✓ |
 | 压缩 | Keka ✗ · Bandizip ✗ · 7-Zip ✗ · WinRAR ✗ |
 | 三维 | Autodesk Maya ✗ · Rhino ✗ · Autodesk CAD ✗ · SketchUp ✗ · 3ds Max ✗ · 中望CAD ✗ |
 | AI/开发 | WorkBuddy ✗ · 豆包电脑版 ✗ · JetBrains PyCharm ✗ |
