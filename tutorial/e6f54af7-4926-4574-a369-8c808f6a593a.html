@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>if(location.protocol==="http:"&&/(^|\.)lezhesoft\.cn$/.test(location.hostname))location.replace("https://"+location.host+location.pathname+location.search+location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="applicable-device" content="pc,mobile">
+<title>Eagle使用教程：修图师素材库搭建与分类检索_乐哲软件教程</title>
+<meta name="description" content="Eagle 是一款专业的图片与设计素材管理工具，本教程面向修图师与设计师，讲解素材库创建与初始化、文件夹与智能文件夹的搭建方法、标签与评分体系，以及浏览器扩展收藏、关键词与以图找图等快速检索技巧，帮你把散落各处的参考图整理成随取随用的个人素材库">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.lezhesoft.cn/tutorial/e6f54af7-4926-4574-a369-8c808f6a593a.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="乐哲软件">
+<meta property="og:title" content="Eagle使用教程：修图师素材库搭建与分类检索_乐哲软件教程">
+<meta property="og:description" content="Eagle 是一款专业的图片与设计素材管理工具，本教程面向修图师与设计师，讲解素材库创建与初始化、文件夹与智能文件夹的搭建方法、标签与评分体系，以及浏览器扩展收藏、关键词与以图找图等快速检索技巧，帮你把散落各处的参考图整理成随取随用的个人素材库">
+<meta property="og:url" content="https://www.lezhesoft.cn/tutorial/e6f54af7-4926-4574-a369-8c808f6a593a.html">
+
+<meta property="og:image" content="https://www.lezhesoft.cn/tutorial/cover/e6f54af7-4926-4574-a369-8c808f6a593a.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Eagle使用教程：修图师素材库搭建与分类检索","image":"https://www.lezhesoft.cn/tutorial/cover/e6f54af7-4926-4574-a369-8c808f6a593a.png","datePublished":"2026-11-13T00:21:36.280621+00:00","dateModified":"2026-11-13T00:21:36.280621+00:00","author":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"},"publisher":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"}}</script>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
+/* 内页导航（与首页方案B胶囊导航同款视觉） */
+header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e8edf4;padding:10px 20px}
+.hd-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto}
+.hd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.hd-brand{font-weight:800;font-size:1.02rem;color:#1c2333}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:#f2f5fa;border:1px solid #e5eaf2;border-radius:50px;padding:3px;margin:0 auto}
+.nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
+.nav-links a:hover{color:#1c2333;background:#fff}
+.nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{color:#41506b;font-weight:700;background-image:linear-gradient(135deg,#0077ff,#6c5ce7);background-repeat:no-repeat;background-size:0% 100%;background-position:left center;transition:background-size .3s,color .3s}
+.nav-links a.nav-ai:hover{background-size:100% 100%;color:#fff}
+.nav-links a.nav-ai.active{background-size:100% 100%;color:#fff}
+.hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
+.hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
+.hd-search input:focus{border-color:#0077ff;background:#fff}
+.hd-search button{padding:7px 13px;border:0;border-radius:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+/* 中屏：搜索收紧 */
+@media(max-width:1000px){.hd-search input{width:110px}.nav-links a{padding:6px 11px;font-size:.8rem}}
+/* 移动端：导航条变全宽横向滑动，搜索隐藏（进入搜索页用） */
+@media(max-width:768px){
+.hd-in{flex-wrap:wrap;gap:10px}
+.hd-search{display:none}
+.nav-links{order:3;width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;padding:3px;margin:0;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{padding:7px 13px;font-size:.82rem}
+}
+@media(max-width:380px){.hd-brand{font-size:.92rem}.hd-mark{width:26px;height:26px;font-size:13px}}
+main{max-width:760px;margin:0 auto;padding:24px 20px}
+.meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
+.btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
+.rel{margin-top:36px;border-top:1px solid #eee;padding-top:18px}
+.cta{margin-top:26px;padding:13px 16px;background:#f0f6ff;border:1px solid #d8e6ff;border-radius:9px;font-size:14px;line-height:1.9;color:#333}
+.cta a{color:#0077ff;text-decoration:none;font-weight:500}
+.rel a{display:inline-block;margin:0 10px 10px 0;color:#0077ff;text-decoration:none}
+article img{max-width:100%}
+footer{max-width:760px;margin:0 auto;padding:20px;color:#888;font-size:13px}
+footer a{color:#888}
+nav.crumb{font-size:13px;color:#999;margin-bottom:12px}nav.crumb a{color:#999;text-decoration:none}
+h1{font-size:24px;margin:8px 0}
+</style>
+</head>
+<body>
+<header>
+<div class="hd-in">
+<a class="hd-logo" href="https://www.lezhesoft.cn/"><span class="hd-mark">乐</span><span class="hd-brand">乐哲软件</span></a>
+<ul class="nav-links">
+<li><a href="https://www.lezhesoft.cn/">首页</a></li>
+<li><a href="https://www.lezhesoft.cn/all.html">软件库</a></li>
+<li><a href="https://www.lezhesoft.cn/ai/index.html" class="nav-ai">AI工具集</a></li>
+<li><a href="https://www.lezhesoft.cn/sitemap.html">搜索</a></li>
+</ul>
+<form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
+</div>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.pathname||a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if((h==="/"||h==="/index.html")&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+</header>
+<main>
+<nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / 图像处理教程</nav>
+<h1>Eagle使用教程：修图师素材库搭建与分类检索</h1>
+<div class="meta"><span>发布：2026-11-13</span><span>分类：<a href="https://www.lezhesoft.cn/cat/tuxiang-chuli.html">图像处理</a></span></div>
+<img src="https://www.lezhesoft.cn/tutorial/cover/e6f54af7-4926-4574-a369-8c808f6a593a.png" alt="Eagle使用教程：修图师素材库搭建与分类检索封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+<article><h2>Eagle 是什么：修图师的素材库中枢</h2><p>Eagle 是一款专业的图片收集与管理工具，支持图片、GIF 动图、视频、音频以及 PSD、AI、AE 等设计源文件的管理，官方宣称搜索可在 0.5 秒内完成。对修图师来说，它主要解决三类痛点：接单时甲方风格参考图散落在微信、浏览器收藏夹和桌面；项目做完后过程稿无处归档；想找某张"好像存过"的参考图时翻遍硬盘。把日常收集的素材集中进 Eagle，配合文件夹、标签和智能文件夹，就能搭出一个随取随用的个人素材库。官网提供了 Windows 和 macOS 版本，本教程以 Windows 版 1.8.2 为例。</p><h2>安装与素材库初始化</h2><p>从下载页获取 Eagle 的 Windows 安装包（本站收录版本为 1.8.2），双击运行并按提示完成安装。首次启动时 Eagle 会要求创建或导入素材库——素材库在磁盘上是一个独立的文件夹（.library 结构），所有收藏的文件都存在里面，建议放在剩余空间充足的分区，方便日后整库备份或换机迁移。主界面分为三个区域：左侧是文件夹树与标签面板，中间是素材流，右侧是选中素材的详细信息面板，所有整理工作都围绕这三个区域展开。</p><h2>素材库搭建：文件夹、智能文件夹与标签</h2><p><strong>文件夹</strong>：在左侧栏按"项目 / 风格 / 用途"建立多层级文件夹，是最直观的分类方式。批量建文件夹有个技巧：在任意文本编辑器里写好命名规则并复制，回到 Eagle 新建文件夹的命名状态下直接粘贴，就能一次性建出整组文件夹；已有的文件夹结构也可以克隆复用。</p><p><strong>智能文件夹</strong>：它相当于"保存起来的搜索条件"，满足设定条件的素材会自动归入，无需手动拖动。修图师推荐先建一个"待分类视图"：条件设为"格式是 png 且文件夹为空"，之后没整理的图会自动出现在这里，定期清空即可。也可以按标签建，比如给做项目时随手打上"1"标签的灵感图建一个智能文件夹，项目结束一键筛出。</p><p><strong>标签与评分</strong>：标签是 Eagle 检索的核心，一张图可以挂多个标签，输入时用英文逗号分隔即可批量创建；右键某个文件夹选择"设置自动标签"，之后存入该文件夹的素材会自动带上标签。想给多张图加同一组标签，可以复制标签（快捷键 Ctrl+Shift+C）再粘贴。评分快捷键是数字 1–5，评分可叠加作为筛选条件，用来标记"精修过的案例"或"优先参考"都很顺手。</p><h2>高效收藏与检索</h2><p><strong>收藏</strong>：安装 Eagle 的浏览器扩展后，看到参考图可以直接拖入收藏区；遇到禁用右键保存的网站，按住 Alt 再右键图片即可保存；想收藏整个页面时用"批量保存"功能，Eagle 会列出页面上的全部图片供你勾选。扩展还提供区域截图、可视范围截图和整页截图三种截取方式。</p><p><strong>检索</strong>：搜索框支持多关键词同时搜索，用减号可以排除词，例如"海报 食物 -春节"会排除春节相关结果；支持按颜色筛选和"以图找图"（找到相似图或溯源原图作者）。素材多、文件夹深时，用 Ctrl+J 打开"前往文件夹"的模糊搜索，输入不完整也能命中；整理时选中图片按 F 键可弹出文件夹菜单快速归类，重复同类操作用 Shift+D 复现上一次分类。</p><h2>常见问题</h2><p><strong>Q：换电脑或担心素材丢失怎么办？</strong>素材库本身就是一个完整文件夹，直接整库拷贝到新电脑再"导入素材库"即可；重要项目建议再备份一份到移动硬盘或网盘。<strong>Q：收藏的图之后想找回来源？</strong>通过浏览器扩展收藏的图片，网址字段会自动记录来源 URL，点开详情面板即可回溯。<strong>Q：素材太多懒得逐张分类？</strong>把"智能文件夹 + 自动标签"组合起来用：按格式或来源自动归集，标签交给文件夹自动添加，人工只处理最后一步筛选。</p></article>
+<div class="cta"><strong>教程里的软件去哪下载？</strong>本站全部软件免费下载，注册登录后即可获取下载地址，完全免费，无需付费开通。<a href="https://www.lezhesoft.cn/">免费注册 →</a></div>
+<div class="rel"><strong>相关软件下载：</strong><br><a href="https://www.lezhesoft.cn/soft/mryoyx2njx15.html">Eagle 图像管理查看</a><a href="https://www.lezhesoft.cn/soft/mryowri0r74x.html">Eagle  图像管理查看</a></div><div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/482d2fa9-582b-436f-91a9-646842b60e46.html">Adobe Illustrator使用教程：5个提效隐藏功能与快捷键</a><a href="https://www.lezhesoft.cn/tutorial/24929da4-ff46-46b3-b05f-11a39f79030d.html">傲梅轻松备份使用教程：系统备份、还原与克隆硬盘入门指南</a><a href="https://www.lezhesoft.cn/tutorial/b734102f-efe6-4faa-b199-a590cd7c0e1f.html">GIMP使用教程：从PS迁移必改的5个设置与基础修图流程</a><a href="https://www.lezhesoft.cn/tutorial/91e1887a-ebb6-4171-a588-99866f62aca2.html">MacOS 提示「已损坏，无法打开」怎么办？</a><a href="https://www.lezhesoft.cn/tutorial/cd20b6ed-ae5d-49c5-95b1-4e1e0541f227.html">Total Uninstall使用教程：安装监视、彻底卸载与启动项清理入门指南</a><a href="https://www.lezhesoft.cn/tutorial/35bd0665-9781-414e-8498-10a3373e3ade.html">Photon Studio使用教程：AI抠图、换背景与批量导出</a></div>
+</main>
+<footer><a href="https://www.lezhesoft.cn/">lezhesoft.cn</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具</a> · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
+</body></html>
