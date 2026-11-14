@@ -1,0 +1,67 @@
+oogle Gemini 是 Google DeepMind 团队研发的原生多模态 AI 模型与个人助理，前身为 Google Bard，2024 年初全面更名。与传统 AI 不同，Gemini 从设计之初即为多模态而生，能够无缝理解和生成文本、代码、音频、图像和视频等多种类型的内容。截至 2026 年，Gemini 应用已在 230 多个国家、70 多种语言中拥有超过 9 亿月活用户。2026 年 I/O 大会上，Google 对 Gemini 进行了从模型、交互到计费体系的全面重构，使其从“问答助手”进化为能够主动执行任务的 AI 智能体平台。
+
+【核心功能】
+
+前沿模型矩阵（Gemini 3.5 Flash / Omni）
+Gemini 3.5 Flash 是 Google 迄今最强的智能体与编程模型，在 Terminal-Bench 2.1、MCP Atlas、Finance Agent v2 等编程与 Agent 基准测试中全面超越上代 Gemini 3.1 Pro，输出速度达到同级前沿模型的约 4 倍，API 定价较 3.1 Pro 降低约 40%。Gemini Omni 则是全新的多模态视频生成模型，支持将文本、图片、音频和草图自由组合，对话式生成和编辑高质量视频，可创建最长 15 秒的片段，并支持从 360p/720p 草稿升级至 1080p/4K。
+
+Gemini Live：无缝对话
+Gemini Live 已深度集成到聊天中，支持在语音和文字输入之间无缝切换，并可连接 Gmail、日历等常用应用执行实际任务，从比较产品到处理邮件均可覆盖。
+
+Daily Brief：个性化晨间简报
+Daily Brief 是一个智能体功能，从用户连接的应用程序和 Gemini 对话中提炼优先级，生成一份可读性极强的个性化晨间摘要，不仅汇总信息，还会主动组织、排序并建议下一步行动。
+
+Gemini Spark：24/7 个人 AI 智能体
+Gemini Spark 是全天候运行的个人 AI 代理，能够在后台自主执行任务，如撰写邮件、创建持续更新的学习资料、监控信用卡账单中的隐藏订阅费用、汇总会议纪要和筹划活动等。它可读取 Gmail、Google Docs、日历、Drive 等生态数据，将分散信息串联为具体行动。
+
+原生多模态与超长上下文
+Gemini 3 Pro 支持高达 200 万 tokens 的上下文窗口，可上传数百页 PDF、完整代码库或数小时视频进行分析、重构和摘要。视频分析方面，Gemini 能识别比赛中的关键事件和战术站位；图像推理方面，可读取复杂图表数据并生成结构化表格。
+
+Google 生态深度整合
+Gemini 已嵌入 Gmail、Google Docs、Chrome、Google 相册、YouTube 等核心产品，可在 Gmail 中智能起草和总结邮件链，在 Docs 中扩写和润色，在 Chrome 桌面端通过侧边面板直接调用（Windows 快捷键 Alt+G，Mac 为 Ctrl+G）。
+
+【订阅定价（2026 年调整后）】
+
+Google 在 2026 年 I/O 大会上对 Gemini 订阅体系进行了重大调整：取消原有按次计费，转向基于算力消耗的计量模式，算力额度每 5 小时刷新一次，并设每周上限；额度耗尽后自动降级至轻量模型，用户也可额外购买算力点数（AI credits）。
+
+方案	价格	核心权益
+免费版（Google AI Studio）	$0	仅限 Flash 系列模型，Pro 模型已于 2026 年 4 月从免费层移除
+Google AI Plus	$7.99/月	入门付费层，含 Flash 及部分 Pro 功能，算力额度为标准的 2 倍；2026 年 6 月曾短期降至 $4.99/月并扩容至 400GB 存储
+Google AI Pro	$19.99/月	完整 Gemini 3.1 Pro 访问权限，1M 上下文，附赠 YouTube Premium Lite
+Google AI Ultra（基础版）	$99.99/月（原 $249.99）	5 倍 Pro 算力，20TB 存储；2026 年 I/O 后新增 $100/月开发者版本，面向技术主管，含 20TB 云存储及 YouTube Premium
+Google AI Ultra（旗舰版）	$200/月	20 倍 Pro 算力，最高阶体验
+（注：上述为美元区参考价，各地实际定价及权益可能因区域有所差异，建议以 Google 官方页面实时信息为准。）
+
+【如何使用】
+
+方式一：网页端
+访问 gemini.google.com，使用 Google 账号登录即可开始对话。Gemini 会自动识别系统语言，如需强制中文，可在 Google 账号设置中将“首选语言”改为“简体中文”。
+
+方式二：移动端
+在 iOS App Store 或 Google Play 下载 Gemini 应用，登录同一 Google 账号即可使用。Gemini 已在多数 Android 设备上逐步取代 Google Assistant 成为默认数字助理。
+
+方式三：Chrome 侧边栏
+在 Chrome 桌面端可通过侧边面板直接调用 Gemini，无需离开当前页面即可进行查询、总结或内容生成。
+
+方式四：国内用户接入方案
+由于网络环境限制，国内用户直接访问 Gemini 官网存在障碍，可选用以下合规路径：
+
+中文镜像站：对接 Gemini 官方模型，支持国内手机号或微信登录，开箱即用，适合新手。
+
+Google AI Studio + API：访问 aistudio.google.com 创建 API Key，通过代码调用 Gemini 模型；Gemini 3 Flash 提供慷慨的免费额度（每分钟 15 次请求），适合开发者集成。
+
+网络工具 + 官方账号：拥有稳定网络环境和 Google 账号的用户可直接访问 gemini.google.com，建议选择美国、新加坡或日本节点。
+
+【常见问题】
+
+Gemini 和 Google Assistant 是什么关系？
+Gemini 正在逐步取代 Google Assistant，成为 Android 设备及 Google 生态的核心 AI 入口。启用 Gemini 后，它会接管手机的主要数字助理角色，部分 Assistant 的语音功能暂时尚未迁移。
+
+免费版够用吗？
+对于日常问答、短文生成、常规图像分析等基础场景，免费版（Flash 模型）基本够用。但处理 50 页以上 PDF、复杂代码库或需要高频调用 Pro 模型时，免费版的上下文限制和算力额度会成为瓶颈，需升级至 AI Plus 或 AI Pro。
+
+计费方式有什么变化？
+2026 年 5 月起，Google 取消了原有的每日固定提问次数限制，改为按算力消耗计量，综合考量提示词复杂度、调用功能（如视频生成、深度研究）及对话历史长度。用户的算力额度每 5 小时刷新一次，并设每周上限；额度耗尽后自动降级至轻量模型，也可单独购买 AI credits 补充。
+
+国内有官方版本吗？
+Google 未在中国大陆推出 Gemini 官方服务，国内可用的均为第三方镜像站或 API 代理。镜像站在便捷性上有优势，但数据隐私和长期稳定性需自行评估；开发者更推荐通过 Google AI Studio 的 API 接入，可控性更强。

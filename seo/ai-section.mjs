@@ -533,6 +533,26 @@ export async function buildAiSection(ROOT, softs = []) {
   const cols = await fetchTable(U, K, "ai_collections");
   const tools = cols ? await fetchTable(U, K, "ai_tools") : null;
 
+  // AI 长文本母本兜底（2026-11-14）：Gemini/千问的 intro（约 3k 字）经代理传输会在固定字节偏移
+  // 截断出 U+FFFD——重拉无效、8 副本合并无效（坏点不是随机的，是确定的）。
+  // 母本由「变换 select 字段组合改变响应字节对齐 + 锚点补丁」重建，可信。
+  // 命中条件 = 本次拉取值含 U+FFFD：后台日后正常编辑（无乱码）不会被母本遮蔽。
+  const AI_DATA_MASTERS = [
+    { id: "e5250392-a028-4434-9e69-f0b5ac19c654", field: "intro", file: "content-master-e5250392.txt" },
+    { id: "04797ed9-11be-4cc1-8f2a-a87af7718fb2", field: "intro", file: "content-master-04797ed9.txt" },
+  ];
+  for (const m of AI_DATA_MASTERS) {
+    const row = (tools || []).find((t) => t.id === m.id);
+    if (!row || typeof row[m.field] !== "string" || !row[m.field].includes("\uFFFD")) continue;
+    try {
+      const master = readFileSync(join(ROOT, "seo", m.file), "utf8").replace(/\s+$/, "");
+      if (master && !master.includes("\uFFFD")) {
+        row[m.field] = master;
+        console.log(`已用母本覆盖 AI 工具 ${m.id.slice(0, 8)}.${m.field}（传输乱码兜底）`);
+      }
+    } catch {}
+  }
+
   // 源数据定点修复：后台粘贴时个别字符写入即损坏（库里即 U+FFFD，重拉无效），按上下文还原
   const AI_TEXT_FIXUPS = [
     {
