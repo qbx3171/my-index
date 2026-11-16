@@ -197,6 +197,9 @@ const DATA_MASTERS = [
   // WPS Office 教程（2026-11-14 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "c9b4851f-7e66-4ca2-84c1-398642197cd4", field: "content", file: "content-master-c9b4851f.txt" },
   { table: "tutorials", id: "c9b4851f-7e66-4ca2-84c1-398642197cd4", field: "summary", file: "summary-master-c9b4851f.txt" },
+  // WorkBuddy 教程（2026-11-16 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "0ba942be-19fc-4482-9ad8-d1488b22e315", field: "content", file: "content-master-0ba942be.txt" },
+  { table: "tutorials", id: "0ba942be-19fc-4482-9ad8-d1488b22e315", field: "summary", file: "summary-master-0ba942be.txt" },
   // 三篇早期教程（建站期入库，此前无母本）：2026-11-06 起补母本，消除「同一数据两次生成 md5 不同」
   { table: "tutorials", id: "7aa79aaa-b1ba-4f8a-9056-20b0a731afb3", field: "content", file: "content-master-7aa79aaa.txt" },
   { table: "tutorials", id: "91e1887a-ebb6-4171-a588-99866f62aca2", field: "content", file: "content-master-91e1887a.txt" },
@@ -403,6 +406,13 @@ function aliasesOf(name) {
     // 软件名常带版本号（Total Uninstall 2026 / Adobe Creative Cloud 2025），教程标题一般不带，去掉尾数字再试一次
     const noVer = latin[0].replace(/[0-9._-]+$/, "");
     if (noVer.length >= 4 && noVer !== latin[0]) out.push({ a: noVer, full: false });
+  }
+  // 2026-11-16：3 位全大写缩写（WPS / PDF / CAD）被上面的「≥4 位」规则漏掉，
+  // 导致「WPS Office使用教程」与「WPS电信定制版…」双向不互链。只认「全大写 3 位 + 后面不是字母数字」，
+  // 避免把小写短词当别名；实测全站影响面 = 新增 1 对（WPS），无误配。
+  if (!(latin && latin[0].length >= 4)) {
+    const acro = String(name || "").match(/^([A-Z0-9]{3})(?![A-Za-z0-9])/);
+    if (acro) out.push({ a: acro[1].toLowerCase(), full: false });
   }
   const cn = key.match(/^[\u4e00-\u9fa5]{3,}/);
   if (cn && cn[0] !== key) out.push({ a: cn[0], full: false });

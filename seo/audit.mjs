@@ -239,10 +239,13 @@ if (!(await exists(join(ROOT, "404.html")))) {
     add(blocker, "首屏快照缺失/不可解析", "data/software.json", `${e.code || e.message} —— 新访客首屏会静默退化到 REST`);
   }
   const home = await readFile(join(ROOT, "index.html"), "utf8");
-  if (!/SNAP_URL\s*=\s*['"]\/data\/software\.json['"]/.test(home) || !/async function fetchSnapshot\(/.test(home)) {
+  // 2026-11-16 主脚本外链 assets/main.js，前台启动逻辑在外链文件，一并匹配
+  let homeJs = home;
+  try { homeJs += "\n" + (await readFile(join(ROOT, "assets", "main.js"), "utf8")); } catch {}
+  if (!/SNAP_URL\s*=\s*['"]\/data\/software\.json['"]/.test(homeJs) || !/async function fetchSnapshot\(/.test(homeJs)) {
     add(blocker, "首屏快照优先逻辑缺失", "index.html", "fetchSnapshot/SNAP_URL 被删，首屏回到经代理的 REST");
   }
-  if (!/async fetchFromRest\(/.test(home)) {
+  if (!/async fetchFromRest\(/.test(homeJs)) {
     add(blocker, "首屏 REST 兜底缺失", "index.html", "快照拉不到时没有 REST 兜底 → 白屏");
   }
 }
@@ -261,10 +264,13 @@ const report = {
    首页数据加载完的收尾逻辑若又变回无条件 goHome()，用户在骨架屏期间点开的板块会被弹回首页。 */
 {
   const home = await readFile(join(ROOT, "index.html"), "utf8");
-  if (!/function\s+_bumpNav\s*\(/.test(home) || !/function\s+_navStale\s*\(/.test(home)) {
+  // 2026-11-16 主脚本外链 assets/main.js，前台启动逻辑在外链文件，一并匹配
+  let homeJs2 = home;
+  try { homeJs2 += "\n" + (await readFile(join(ROOT, "assets", "main.js"), "utf8")); } catch {}
+  if (!/function\s+_bumpNav\s*\(/.test(homeJs2) || !/function\s+_navStale\s*\(/.test(homeJs2)) {
     add(blocker, "启动期导航令牌缺失", "index.html", "_bumpNav/_navStale 被删，骨架屏期间点板块会被弹回首页");
   }
-  if (!/_bootSeq\s*=\s*_navSeq/.test(home) || !/_navStale\(_bootSeq\)/.test(home)) {
+  if (!/_bootSeq\s*=\s*_navSeq/.test(homeJs2) || !/_navStale\(_bootSeq\)/.test(homeJs2)) {
     add(blocker, "启动收尾未做导航比对", "index.html", "DB.loadAll 之后的收尾必须 if(_navStale(_bootSeq))return; 后才 handleUrlParams()/goHome()");
   }
 }
@@ -275,11 +281,17 @@ const report = {
    又要等 CI 重建（几分钟），界面上完全看不出异常。所以三端都守。 */
 {
   const home = await readFile(join(ROOT, "index.html"), "utf8");
+  // 2026-11-16 起主脚本外链 assets/main.js（defer），前台 rev/广播监听代码在外链文件里，
+  // 检测时把外链主脚本内容并入 home 一起匹配，避免外链化被误判为「监听被删」。
+  let homeJs = home;
+  try {
+    homeJs += "\n" + (await readFile(join(ROOT, "assets", "main.js"), "utf8"));
+  } catch {}
   const admin = await readFile(join(ROOT, "admin.html"), "utf8");
-  if (!/lezhe_data_rev/.test(home) || !/function\s+revIsNewer\s*\(/.test(home)) {
+  if (!/lezhe_data_rev/.test(homeJs) || !/function\s+revIsNewer\s*\(/.test(homeJs)) {
     add(blocker, "即时可见：前台 rev 判定缺失", "index.html", "getDataRev/revIsNewer 被删，后台改完刷新看不到新数据");
   }
-  if (!/BroadcastChannel\(\s*["']lezhe-sync["']\s*\)/.test(home)) {
+  if (!/BroadcastChannel\(\s*["']lezhe-sync["']\s*\)/.test(homeJs)) {
     add(blocker, "即时可见：前台广播监听缺失", "index.html", "已打开的页面不会自己换数据，必须手动刷新");
   }
   if (!/function\s+bumpDataRev\s*\(/.test(admin)) {
