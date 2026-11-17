@@ -18,6 +18,9 @@ package-lock.json
 seo/.*.mjs
 seo/.*.png
 seo/.*.json
+# 仓库根目录的临时复现/调试脚本与静态服务日志，不入库
+/.*.mjs
+/.server*.log
 
 # Supabase service_role key（本机私有，仅用于收紧 RLS 后的写库）
 seo/supabase-service-key.txt
