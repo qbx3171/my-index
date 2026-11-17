@@ -540,6 +540,11 @@ export async function buildAiSection(ROOT, softs = []) {
   const AI_DATA_MASTERS = [
     { id: "e5250392-a028-4434-9e69-f0b5ac19c654", field: "intro", file: "content-master-e5250392.txt" },
     { id: "04797ed9-11be-4cc1-8f2a-a87af7718fb2", field: "intro", file: "content-master-04797ed9.txt" },
+    // DeepSeek 工具（2026-11-17 用户后台新增）：intro 固定字节偏移损坏，锚点+供体补丁重建母本兜底
+    { id: "059c81e4-b71d-40f2-bbc0-2949e58ce164", field: "intro", file: "content-master-059c81e4.txt" },
+    // 腾讯元宝 / 问小白（2026-11-17 用户后台新增）：intro 固定字节偏移损坏，锚点+供体补丁重建母本兜底
+    { id: "91e9efc9-2f2d-43ac-a962-f5c405674f9e", field: "intro", file: "content-master-91e9efc9.txt" },
+    { id: "be0e1cad-1dbb-4cdb-b7b3-9ee61ec95df7", field: "intro", file: "content-master-be0e1cad.txt" },
   ];
   for (const m of AI_DATA_MASTERS) {
     const row = (tools || []).find((t) => t.id === m.id);

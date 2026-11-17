@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>if(location.protocol==="http:"&&/(^|\.)lezhesoft\.cn$/.test(location.hostname))location.replace("https://"+location.host+location.pathname+location.search+location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="applicable-device" content="pc,mobile">
+<title>Bandizip使用教程：密码恢复、分卷压缩与批量解压_乐哲软件教程</title>
+<meta name="description" content="Bandizip 是 Windows 平台的高效全能压缩软件，界面无广告。本教程讲解密码管理器与自动密码的设置方法、忘记密码时用密码恢复功能找回密码的操作要点、大文件分卷压缩的正确姿势，以及批量解压与常见故障处理">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.lezhesoft.cn/tutorial/d0513e07-dea4-41d8-97b9-b08f42427457.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="乐哲软件">
+<meta property="og:title" content="Bandizip使用教程：密码恢复、分卷压缩与批量解压_乐哲软件教程">
+<meta property="og:description" content="Bandizip 是 Windows 平台的高效全能压缩软件，界面无广告。本教程讲解密码管理器与自动密码的设置方法、忘记密码时用密码恢复功能找回密码的操作要点、大文件分卷压缩的正确姿势，以及批量解压与常见故障处理">
+<meta property="og:url" content="https://www.lezhesoft.cn/tutorial/d0513e07-dea4-41d8-97b9-b08f42427457.html">
+
+<meta property="og:image" content="https://www.lezhesoft.cn/tutorial/cover/d0513e07-dea4-41d8-97b9-b08f42427457.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Bandizip使用教程：密码恢复、分卷压缩与批量解压","image":"https://www.lezhesoft.cn/tutorial/cover/d0513e07-dea4-41d8-97b9-b08f42427457.png","datePublished":"2026-11-17T00:23:48.018779+00:00","dateModified":"2026-11-17T00:23:48.018779+00:00","author":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"},"publisher":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"}}</script>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
+/* 内页导航（与首页方案B胶囊导航同款视觉） */
+header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e8edf4;padding:10px 20px}
+.hd-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto}
+.hd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.hd-brand{font-weight:800;font-size:1.02rem;color:#1c2333}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:#f2f5fa;border:1px solid #e5eaf2;border-radius:50px;padding:3px;margin:0 auto}
+.nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
+.nav-links a:hover{color:#1c2333;background:#fff}
+.nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{color:#41506b;font-weight:700;background-image:linear-gradient(135deg,#0077ff,#6c5ce7);background-repeat:no-repeat;background-size:0% 100%;background-position:left center;transition:background-size .3s,color .3s}
+.nav-links a.nav-ai:hover{background-size:100% 100%;color:#fff}
+.nav-links a.nav-ai.active{background-size:100% 100%;color:#fff}
+.hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
+.hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
+.hd-search input:focus{border-color:#0077ff;background:#fff}
+.hd-search button{padding:7px 13px;border:0;border-radius:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+/* 中屏：搜索收紧 */
+@media(max-width:1000px){.hd-search input{width:110px}.nav-links a{padding:6px 11px;font-size:.8rem}}
+/* 移动端：导航条变全宽横向滑动，搜索隐藏（进入搜索页用） */
+@media(max-width:768px){
+.hd-in{flex-wrap:wrap;gap:10px}
+.hd-search{display:none}
+.nav-links{order:3;width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;padding:3px;margin:0;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{padding:7px 13px;font-size:.82rem}
+}
+@media(max-width:380px){.hd-brand{font-size:.92rem}.hd-mark{width:26px;height:26px;font-size:13px}}
+main{max-width:760px;margin:0 auto;padding:24px 20px}
+.meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
+.btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
+.rel{margin-top:36px;border-top:1px solid #eee;padding-top:18px}
+.cta{margin-top:26px;padding:13px 16px;background:#f0f6ff;border:1px solid #d8e6ff;border-radius:9px;font-size:14px;line-height:1.9;color:#333}
+.cta a{color:#0077ff;text-decoration:none;font-weight:500}
+.rel a{display:inline-block;margin:0 10px 10px 0;color:#0077ff;text-decoration:none}
+article img{max-width:100%}
+footer{max-width:760px;margin:0 auto;padding:20px;color:#888;font-size:13px}
+footer a{color:#888}
+nav.crumb{font-size:13px;color:#999;margin-bottom:12px}nav.crumb a{color:#999;text-decoration:none}
+h1{font-size:24px;margin:8px 0}
+</style>
+</head>
+<body>
+<header>
+<div class="hd-in">
+<a class="hd-logo" href="https://www.lezhesoft.cn/"><span class="hd-mark">乐</span><span class="hd-brand">乐哲软件</span></a>
+<ul class="nav-links">
+<li><a href="https://www.lezhesoft.cn/">首页</a></li>
+<li><a href="https://www.lezhesoft.cn/all.html">软件库</a></li>
+<li><a href="https://www.lezhesoft.cn/ai/index.html" class="nav-ai">AI工具集</a></li>
+<li><a href="https://www.lezhesoft.cn/sitemap.html">搜索</a></li>
+</ul>
+<form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
+</div>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.pathname||a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if((h==="/"||h==="/index.html")&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+</header>
+<main>
+<nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / 压缩工具教程</nav>
+<h1>Bandizip使用教程：密码恢复、分卷压缩与批量解压</h1>
+<div class="meta"><span>发布：2026-11-17</span><span>分类：<a href="https://www.lezhesoft.cn/cat/yasuo-gongju.html">压缩工具</a></span></div>
+<img src="https://www.lezhesoft.cn/tutorial/cover/d0513e07-dea4-41d8-97b9-b08f42427457.png" alt="Bandizip使用教程：密码恢复、分卷压缩与批量解压封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+<article><h2>软件简介与适用场景</h2>
+<p>Bandizip 是韩国 Bandisoft 公司开发的高效全能压缩软件，站内收录 Windows 平台 v7.44 版本。它支持 ZIP、7Z、RAR 等常见格式的压缩与解压，界面简洁无广告，多核优化让压缩解压速度在同级别软件中表现突出。适合三类场景：日常的压缩与解压；超大文件的分卷传输；以及经常处理加密压缩包、担心忘记密码的用户。</p>
+
+<h2>安装步骤</h2>
+<p>下载 Bandizip 安装包后双击运行，按向导提示完成安装，建议勾选关联常见压缩格式，这样以后右键就能直接操作。安装完成后，右键菜单会多出 Bandizip 的压缩与解压选项，可在「选项 > 设置」里按自己的习惯调整右键菜单样式。首次启动后建议先到「选项 > 密码管理器」把常用密码登记好，后面加密与解压都会用上。</p>
+
+<h2>核心功能操作要点</h2>
+<h3>1. 密码管理器与自动密码</h3>
+<p>点击「选项 > 密码管理器…」，点「添加」录入常用密码并可加一个显示名方便辨认。压缩时点「设置密码…」，在输入框右侧的下拉菜单里即可选用已存密码；解压带密码的压缩包时同样从下拉选择，不用再费劲回忆。在密码管理器里开启自动尝试存储的密码后，解压时会自动逐个尝试（RAR 格式建议排除，避免大文件解压白等很久）。注意两点：密码保存在注册表且未加密，公用电脑务必点「设置主密码…」加一道锁；主密码一旦忘记只能点「重置」，会清空所有已存密码。</p>
+<h3>2. 忘记密码：密码恢复</h3>
+<p>点「工具 > 密码恢复…」，打开要恢复的加密压缩包，按对话框指引设置字符类型与长度范围即可开始搜索。该功能支持 ZIP、ZIPX、RAR、7Z、EGG、ALZ 格式，不支持文件名加密的 RAR 和 7Z。速度参考（Intel 13900K、ZIP 格式、数字加小写字母）：1~7 位密码不到 2 分钟，8 位约 2 小时，9 位约 2 天，10 位就要约 50 天。因此长密码基本只能靠回忆找回，日常建议把密码同步登记进密码管理器防遗忘。此功能仅用于恢复自己拥有或有权处理的文件。</p>
+<h3>3. 分卷压缩</h3>
+<p>新建压缩文件时点「更多选项…」，在分卷压缩处选择预设大小或手动输入，比如邮件附件限制 25MB 就按 20MB 拆。生成的分卷文件名会带 001、002 等编号，发送或下载时必须保留全部分卷并放在同一目录，解压时只需打开第一个分卷。</p>
+<h3>4. 批量解压</h3>
+<p>选中多个压缩包后右键用 Bandizip 批量解压，每个压缩包会分别解压到以其文件名命名的独立文件夹，不会散落一地混在一起。</p>
+
+<h2>常见问题 FAQ</h2>
+<p><strong>Q：密码恢复搜不出密码怎么办？</strong><br>先确认格式是否在支持列表、文件名是否加密、密码长度是否超出恢复能力；超过 9 位的复杂密码恢复时间以年计，建议优先回忆常用组合，再用密码管理器防止下次遗忘。</p>
+<p><strong>Q：解压分卷时提示缺卷？</strong><br>全部分卷必须齐全且在同一文件夹，任何一卷缺失或损坏都无法解压，需要重新获取对应分卷后再解压。</p>
+<p><strong>Q：压缩包提示损坏打不开？</strong><br>可用「工具 > 修复压缩文件」尝试修复损坏的 ZIP 或 RAR；若是下载不完整导致的损坏，先重新下载完整文件再解压。</p></article>
+<div class="cta"><strong>教程里的软件去哪下载？</strong>本站全部软件免费下载，注册登录后即可获取下载地址，完全免费，无需付费开通。<a href="https://www.lezhesoft.cn/">免费注册 →</a></div>
+<div class="rel"><strong>相关软件下载：</strong><br><a href="https://www.lezhesoft.cn/soft/mrt00wlgv35a.html">Bandizip 去广告专业版(解压缩软件+密码恢复)</a></div><div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/0ba942be-19fc-4482-9ad8-d1488b22e315.html">WorkBuddy使用教程：用AI把大纲变成一份可用PPT</a><a href="https://www.lezhesoft.cn/tutorial/24929da4-ff46-46b3-b05f-11a39f79030d.html">傲梅轻松备份使用教程：系统备份、还原与克隆硬盘入门指南</a><a href="https://www.lezhesoft.cn/tutorial/482d2fa9-582b-436f-91a9-646842b60e46.html">Adobe Illustrator使用教程：5个提效隐藏功能与快捷键</a><a href="https://www.lezhesoft.cn/tutorial/e6f54af7-4926-4574-a369-8c808f6a593a.html">Eagle使用教程：修图师素材库搭建与分类检索</a><a href="https://www.lezhesoft.cn/tutorial/b734102f-efe6-4faa-b199-a590cd7c0e1f.html">GIMP使用教程：从PS迁移必改的5个设置与基础修图流程</a><a href="https://www.lezhesoft.cn/tutorial/91e1887a-ebb6-4171-a588-99866f62aca2.html">MacOS 提示「已损坏，无法打开」怎么办？</a></div>
+</main>
+<footer><a href="https://www.lezhesoft.cn/">乐哲软件官网</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具</a> · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
+</body></html>
