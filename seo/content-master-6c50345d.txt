@@ -1,0 +1,10 @@
+<h2>一、软件简介与适用场景</h2>
+<p>Parallels Desktop 是 macOS 上最主流的虚拟机软件，27 版（本站收录 27.1）专为 Apple Silicon 打造，支持 M1 至 M5 全系芯片，可以在 Mac 上不重启直接运行 Windows 11、各类 Linux 发行版，实现双系统级的工作流。典型场景包括：单位内网或财务软件只有 Windows 版、需要用 Windows 专用的网银与行业客户端、开发测试多平台环境等。有两点前置要求要留意：Parallels Desktop 27 已不再支持 Intel 芯片的 Mac，老款机型只能使用官方仍在维护安全更新的 26 版；系统需 macOS 14 Sonoma 或更新版本。</p>
+<h2>二、安装步骤：从下载到装好 Windows</h2>
+<p>安装分两步。<strong>第一步装虚拟机软件</strong>：下载 Parallels Desktop 安装包，拖入「应用程序」文件夹后首次启动，按提示注册并登录 Parallels 账号，新用户有 14 天全功能试用期。<strong>第二步装 Windows</strong>：首次运行会弹出「安装 Windows」引导，选择「下载 Windows 11」后，软件会自动从微软官方源拉取最新的 Windows 11 25H2 镜像并创建虚拟机，期间按建议分配 CPU 核心数与内存（一般 4 核 8GB 起步），进度走完即可进入 Windows 桌面，全程不需要手动下载 ISO 或分区。Windows 系统本身需自备正版授权，进入系统后联网按常规激活即可，Parallels 只提供运行环境、不包含 Windows 许可证。</p>
+<h2>三、核心功能操作要点</h2>
+<p><strong>Coherence 融合模式</strong>：在菜单栏「视图」中开启后，Windows 窗口会像 Mac 原生应用一样浮在桌面上，可与 Mac 窗口混排，适合只偶尔用一两个 Windows 软件的用户；想回到完整 Windows 桌面，取消 Coherence 即可。<strong>共享与拖拽</strong>：Mac 与虚拟机之间支持文件双向拖拽、剪贴板互通，共享文件夹默认开启，在 Windows 里打开「网络」就能看到 Mac 的文件；27 版修复了全屏模式拖拽失败等多个交互问题，建议保持软件更新。<strong>快照回滚</strong>：安装大型软件或改动重要配置前，右键虚拟机选「快照→拍摄快照」，出问题可一键恢复到之前状态。<strong>性能要点</strong>：27 版换用基于 Apple Metal API 重构的 OpenGL 4.3 驱动，官方实测在 M3 及更新机型的图形性能最高提升 2.6 倍；M4/M5 芯片还可用 SME 指令加速本地 AI 推理类负载。Linux 用户可开箱运行 Ubuntu 26.04 LTS、Fedora 44、Debian 13.6、Kali 2026.2 等新发行版。</p>
+<h2>四、常见问题</h2>
+<p><strong>1. 虚拟机运行卡顿怎么办？</strong>打开虚拟机「配置→硬件」，适当调高 CPU 与内存（建议不超过 Mac 物理核心数的一半），并确认已安装 Parallels Tools（Windows 内菜单「操作→安装 Parallels Tools」），它是性能、显卡与无缝交互的关键组件。</p>
+<p><strong>2. 需要单独购买 Windows 吗？</strong>需要。Parallels 只负责虚拟化运行环境，Windows 系统授权要自备正版，安装后联网激活，这也是官方推荐的安全做法。</p>
+<p><strong>3. Intel 老款 Mac 还能用吗？</strong>27 版起不再支持 Intel 机型。Intel Mac 可继续使用 26 版，官方承诺通过定期更新继续提供安全性与兼容性支持。</p>
