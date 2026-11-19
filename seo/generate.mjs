@@ -206,6 +206,9 @@ const DATA_MASTERS = [
   // Parallels Desktop 教程（2026-11-18 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "6c50345d-1214-4d73-acbc-c665aab664c2", field: "content", file: "content-master-6c50345d.txt" },
   { table: "tutorials", id: "6c50345d-1214-4d73-acbc-c665aab664c2", field: "summary", file: "summary-master-6c50345d.txt" },
+  // App Cleaner 教程（2026-11-19 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "e1b7afef-e5b5-495e-9b9d-506b01658b85", field: "content", file: "content-master-e1b7afef.txt" },
+  { table: "tutorials", id: "e1b7afef-e5b5-495e-9b9d-506b01658b85", field: "summary", file: "summary-master-e1b7afef.txt" },
   // 三篇早期教程（建站期入库，此前无母本）：2026-11-06 起补母本，消除「同一数据两次生成 md5 不同」
   { table: "tutorials", id: "7aa79aaa-b1ba-4f8a-9056-20b0a731afb3", field: "content", file: "content-master-7aa79aaa.txt" },
   { table: "tutorials", id: "91e1887a-ebb6-4171-a588-99866f62aca2", field: "content", file: "content-master-91e1887a.txt" },

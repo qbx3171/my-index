@@ -29,7 +29,7 @@
 | 10 | 2026-11-16 | 一 | 用AI 10分钟做完一份PPT | AI实测 | WorkBuddy | WorkBuddy使用教程：用AI把大纲变成一份可用PPT | 已写 2026-11-16 · 0ba942be |
 | 11 | 2026-11-17 | 二 | 压缩包忘了密码？3个办法 | 技巧 | Bandizip 去广告专业版(解压缩软件+密码恢复) | Bandizip使用教程：密码恢复、分卷压缩与批量解压 | 已写 2026-11-17 · d0513e07 |
 | 12 | 2026-11-18 | 三 | Mac装Windows，虚拟机怎么选 | Mac | Parallels Desktop 27 - Mac 虚拟机管理软件 | Parallels Desktop使用教程：在Mac上装Windows的正确流程 | 已写 2026-11-18 · 6c50345d |
-| 13 | 2026-11-19 | 四 | 这些清理大师别装 | 避坑 | App Cleaner & Uninstaller Pro软件深度卸载清理 | App Cleaner使用教程：Mac正确卸载与残留清理 | 待写 |
+| 13 | 2026-11-19 | 四 | 这些清理大师别装 | 避坑 | App Cleaner & Uninstaller Pro软件深度卸载清理 | App Cleaner使用教程：Mac正确卸载与残留清理 | 已写 2026-11-19 · e1b7afef |
 | 14 | 2026-11-20 | 五 | 我电脑里5年没删的软件 | 人设 | PotPlayer绿色版 | PotPlayer使用教程：播放器设置与字幕、倍速技巧 | 待写 |
 
 ## 三、7 天方向轮换模板（表用尽时按此续排）

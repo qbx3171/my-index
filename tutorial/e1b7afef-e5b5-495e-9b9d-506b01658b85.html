@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>if(location.protocol==="http:"&&/(^|\.)lezhesoft\.cn$/.test(location.hostname))location.replace("https://"+location.host+location.pathname+location.search+location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="applicable-device" content="pc,mobile">
+<title>App Cleaner使用教程：Mac正确卸载与残留清理_乐哲软件教程</title>
+<meta name="description" content="App Cleaner &amp; Uninstaller 是 macOS 上的专业卸载清理工具。本教程讲解如何授权全磁盘访问、彻底卸载应用并清理配置缓存等残留文件、管理启动项与浏览器扩展，以及恢复误删应用的方法">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.lezhesoft.cn/tutorial/e1b7afef-e5b5-495e-9b9d-506b01658b85.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="乐哲软件">
+<meta property="og:title" content="App Cleaner使用教程：Mac正确卸载与残留清理_乐哲软件教程">
+<meta property="og:description" content="App Cleaner &amp; Uninstaller 是 macOS 上的专业卸载清理工具。本教程讲解如何授权全磁盘访问、彻底卸载应用并清理配置缓存等残留文件、管理启动项与浏览器扩展，以及恢复误删应用的方法">
+<meta property="og:url" content="https://www.lezhesoft.cn/tutorial/e1b7afef-e5b5-495e-9b9d-506b01658b85.html">
+
+<meta property="og:image" content="https://www.lezhesoft.cn/tutorial/cover/e1b7afef-e5b5-495e-9b9d-506b01658b85.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"App Cleaner使用教程：Mac正确卸载与残留清理","image":"https://www.lezhesoft.cn/tutorial/cover/e1b7afef-e5b5-495e-9b9d-506b01658b85.png","datePublished":"2026-11-19T00:19:57.205568+00:00","dateModified":"2026-11-19T00:19:57.205568+00:00","author":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"},"publisher":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"}}</script>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
+/* 内页导航（与首页方案B胶囊导航同款视觉） */
+header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e8edf4;padding:10px 20px}
+.hd-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto}
+.hd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.hd-brand{font-weight:800;font-size:1.02rem;color:#1c2333}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:#f2f5fa;border:1px solid #e5eaf2;border-radius:50px;padding:3px;margin:0 auto}
+.nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
+.nav-links a:hover{color:#1c2333;background:#fff}
+.nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{color:#41506b;font-weight:700;background-image:linear-gradient(135deg,#0077ff,#6c5ce7);background-repeat:no-repeat;background-size:0% 100%;background-position:left center;transition:background-size .3s,color .3s}
+.nav-links a.nav-ai:hover{background-size:100% 100%;color:#fff}
+.nav-links a.nav-ai.active{background-size:100% 100%;color:#fff}
+.hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
+.hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
+.hd-search input:focus{border-color:#0077ff;background:#fff}
+.hd-search button{padding:7px 13px;border:0;border-radius:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+/* 中屏：搜索收紧 */
+@media(max-width:1000px){.hd-search input{width:110px}.nav-links a{padding:6px 11px;font-size:.8rem}}
+/* 移动端：导航条变全宽横向滑动，搜索隐藏（进入搜索页用） */
+@media(max-width:768px){
+.hd-in{flex-wrap:wrap;gap:10px}
+.hd-search{display:none}
+.nav-links{order:3;width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;padding:3px;margin:0;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{padding:7px 13px;font-size:.82rem}
+}
+@media(max-width:380px){.hd-brand{font-size:.92rem}.hd-mark{width:26px;height:26px;font-size:13px}}
+main{max-width:760px;margin:0 auto;padding:24px 20px}
+.meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
+.btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
+.rel{margin-top:36px;border-top:1px solid #eee;padding-top:18px}
+.cta{margin-top:26px;padding:13px 16px;background:#f0f6ff;border:1px solid #d8e6ff;border-radius:9px;font-size:14px;line-height:1.9;color:#333}
+.cta a{color:#0077ff;text-decoration:none;font-weight:500}
+.rel a{display:inline-block;margin:0 10px 10px 0;color:#0077ff;text-decoration:none}
+article img{max-width:100%}
+footer{max-width:760px;margin:0 auto;padding:20px;color:#888;font-size:13px}
+footer a{color:#888}
+nav.crumb{font-size:13px;color:#999;margin-bottom:12px}nav.crumb a{color:#999;text-decoration:none}
+h1{font-size:24px;margin:8px 0}
+</style>
+</head>
+<body>
+<header>
+<div class="hd-in">
+<a class="hd-logo" href="https://www.lezhesoft.cn/"><span class="hd-mark">乐</span><span class="hd-brand">乐哲软件</span></a>
+<ul class="nav-links">
+<li><a href="https://www.lezhesoft.cn/">首页</a></li>
+<li><a href="https://www.lezhesoft.cn/all.html">软件库</a></li>
+<li><a href="https://www.lezhesoft.cn/ai/index.html" class="nav-ai">AI工具集</a></li>
+<li><a href="https://www.lezhesoft.cn/sitemap.html">搜索</a></li>
+</ul>
+<form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
+</div>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.pathname||a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if((h==="/"||h==="/index.html")&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+</header>
+<main>
+<nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / 实用工具教程</nav>
+<h1>App Cleaner使用教程：Mac正确卸载与残留清理</h1>
+<div class="meta"><span>发布：2026-11-19</span><span>分类：<a href="https://www.lezhesoft.cn/cat/shiyong-gongju.html">实用工具</a></span></div>
+<img src="https://www.lezhesoft.cn/tutorial/cover/e1b7afef-e5b5-495e-9b9d-506b01658b85.png" alt="App Cleaner使用教程：Mac正确卸载与残留清理封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+<article><p>很多 Mac 用户卸载软件就是把图标拖进废纸篓，但应用的偏好设置、缓存、启动代理等隐藏文件仍散落在 Library 各个角落，日积月累占用数 GB 空间。App Cleaner & Uninstaller（Nektony 出品，需 macOS 11 及以上）可以在卸载应用时把全部服务文件一并清走，还能管理启动项、扩展和软件更新。本教程基于官方使用指南，带你完成从安装到彻底清理的全流程。</p>
+<h2>软件简介与适用场景</h2>
+<p>App Cleaner & Uninstaller 是一款专注于「完整卸载」的 Mac 工具，左侧面板分为六个板块：Applications（应用卸载与残留清理）、Updates（软件更新）、Startup Programs（登录启动项）、Network Access（应用联网监控）、Extensions（浏览器插件、小组件与屏保）以及 MacCleaner（Nektony 其他清理工具入口）。适合以下场景：卸载软件后想连缓存配置一起清干净；清理以前拖进废纸篓的应用留下的残留文件；关掉不想开机自启的程序；审计哪些应用拿了摄像头、麦克风等权限。软件经 Apple 公证，免费试用 2 天，之后可按年订阅或一次性买断。</p>
+<h2>安装与首次设置</h2>
+<p>从 Nektony 官网下载安装包，把应用拖入「应用程序」文件夹后打开。首次启动会弹出「完全磁盘访问权限」授权引导：这是为了扫描受保护目录里的服务文件和残留，跳过授权会导致部分残留检测不到。点击对话框里的 Open System Settings，系统会自动跳到「隐私与安全性 → 完全磁盘访问权限」，把 App Cleaner & Uninstaller 的开关打开，然后重启应用。重启后它会自动扫描 Mac 上的全部应用及其支持文件。另外建议在设置的 General 页开启「Detect apps moved to Trash」，以后手动拖应用进废纸篓时会自动提醒你清理残留。</p>
+<h2>核心功能操作要点</h2>
+<p><b>彻底卸载应用</b>：在 Applications 标签选中要删除的应用（可用搜索栏定位），点 Uninstall 按钮，核对清单后点 Remove 确认，应用连同服务文件一起删除。想保留应用只清缓存，可打开顶部的 Expert Mode（专家模式），按类别勾选要删的具体文件。安装包（如遗留的 .dmg）会被单独归类，不会混进删除清单被误删。</p>
+<p><b>清理历史残留</b>：以前直接拖废纸篓删掉的应用，其残留文件（Remains/Remaining Files）也归在 Applications 标签里，把列表从 Apps 切到 Remains 即可看到，每一组残留都标注了来源应用，选中后点 Remove 清除。</p>
+<p><b>启动项与扩展</b>：在 Startup Programs 标签用开关停用或启用登录自启项，悬停后出现的 Remove 按钮可永久移除；Extensions 标签集中管理浏览器插件、偏好设置面板、小组件和屏保，勾选后确认删除即可。</p>
+<p><b>误删恢复</b>：每次卸载都会记录在 Removal History（卸载历史）里，还在废纸篓里的文件可以从历史记录一键恢复，手滑删错有两次挽回机会。</p>
+<h2>常见问题 FAQ</h2>
+<p><b>Q：为什么扫描不到某些应用的残留？</b><br>A：大概率是没授予完全磁盘访问权限，或后来又点了拒绝。到「系统设置 → 隐私与安全性 → 完全磁盘访问权限」里补开开关，重启应用重新扫描即可。</p>
+<p><b>Q：卸载会删掉我的个人文档吗？</b><br>A：不会。它清理的是应用产生的偏好设置、缓存、支持文件等服务文件；存放在文稿、桌面等位置的个人文件不受影响。删除前会列出完整清单供确认，不确定的项目可以先不勾选。</p>
+<p><b>Q：试用到期后还能用吗？</b><br>A：完整功能试用 2 天，到期后需要购买许可（订阅制或一次性买断）才能继续深度卸载和清理。</p></article>
+<div class="cta"><strong>教程里的软件去哪下载？</strong>本站全部软件免费下载，注册登录后即可获取下载地址，完全免费，无需付费开通。<a href="https://www.lezhesoft.cn/">免费注册 →</a></div>
+<div class="rel"><strong>相关软件下载：</strong><br><a href="https://www.lezhesoft.cn/soft/mrk0osf8gzmg.html">App Cleaner &amp; Uninstaller Pro软件深度卸载清理</a></div><div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/24929da4-ff46-46b3-b05f-11a39f79030d.html">傲梅轻松备份使用教程：系统备份、还原与克隆硬盘入门指南</a><a href="https://www.lezhesoft.cn/tutorial/482d2fa9-582b-436f-91a9-646842b60e46.html">Adobe Illustrator使用教程：5个提效隐藏功能与快捷键</a><a href="https://www.lezhesoft.cn/tutorial/e6f54af7-4926-4574-a369-8c808f6a593a.html">Eagle使用教程：修图师素材库搭建与分类检索</a><a href="https://www.lezhesoft.cn/tutorial/b734102f-efe6-4faa-b199-a590cd7c0e1f.html">GIMP使用教程：从PS迁移必改的5个设置与基础修图流程</a><a href="https://www.lezhesoft.cn/tutorial/0ba942be-19fc-4482-9ad8-d1488b22e315.html">WorkBuddy使用教程：用AI把大纲变成一份可用PPT</a><a href="https://www.lezhesoft.cn/tutorial/6c50345d-1214-4d73-acbc-c665aab664c2.html">Parallels Desktop使用教程：在Mac上装Windows的正确流程</a></div>
+</main>
+<footer><a href="https://www.lezhesoft.cn/">乐哲软件官网</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具</a> · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
+</body></html>
