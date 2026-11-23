@@ -161,6 +161,9 @@ const tutorials = applyFixups(await sb("tutorials?select=*&limit=500"));
 // （6058916d / c298b689 的存储层数据已于 2026-11-03 经服务端探测确认干净，
 //   残留 FFD 纯属传输噪声，母本用于中和传输层损坏，不是源数据损坏。）
 const DATA_MASTERS = [
+  // 豆包电脑版 教程（2026-11-23 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "173d2052-60e4-424e-9abe-495fa45fd2f2", field: "content", file: "content-master-173d2052.txt" },
+  { table: "tutorials", id: "173d2052-60e4-424e-9abe-495fa45fd2f2", field: "summary", file: "summary-master-173d2052.txt" },
   { table: "tutorials", id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "content", file: "content-master-acd18f73.txt" },
   { table: "tutorials", id: "ab616030-0d0e-4462-be04-847abc6e9de5", field: "content", file: "content-master-ab616030.txt" },
   { table: "tutorials", id: "acd18f73-4840-4e8c-b6c2-d38d7625f0e8", field: "summary", file: "summary-master-acd18f73.txt" },
