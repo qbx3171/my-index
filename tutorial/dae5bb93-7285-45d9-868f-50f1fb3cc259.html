@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<script>if(location.protocol==="http:"&&/(^|\.)lezhesoft\.cn$/.test(location.hostname))location.replace("https://"+location.host+location.pathname+location.search+location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="applicable-device" content="pc,mobile">
+<title>Keka使用教程：Mac解压rar/7z与压缩包密码处理_乐哲软件教程</title>
+<meta name="description" content="Keka 是 macOS 上免费好用的压缩解压工具。本教程介绍安装步骤、拖拽解压 rar/7z/zip、AES-256 加密压缩、分卷压缩与合并解压方法，以及 Windows 压缩包中文文件名乱码的编码修复，并解答带密码压缩包解压、默认打开方式等常见问题">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.lezhesoft.cn/tutorial/dae5bb93-7285-45d9-868f-50f1fb3cc259.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="乐哲软件">
+<meta property="og:title" content="Keka使用教程：Mac解压rar/7z与压缩包密码处理_乐哲软件教程">
+<meta property="og:description" content="Keka 是 macOS 上免费好用的压缩解压工具。本教程介绍安装步骤、拖拽解压 rar/7z/zip、AES-256 加密压缩、分卷压缩与合并解压方法，以及 Windows 压缩包中文文件名乱码的编码修复，并解答带密码压缩包解压、默认打开方式等常见问题">
+<meta property="og:url" content="https://www.lezhesoft.cn/tutorial/dae5bb93-7285-45d9-868f-50f1fb3cc259.html">
+
+<meta property="og:image" content="https://www.lezhesoft.cn/tutorial/cover/dae5bb93-7285-45d9-868f-50f1fb3cc259.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Keka使用教程：Mac解压rar/7z与压缩包密码处理","image":"https://www.lezhesoft.cn/tutorial/cover/dae5bb93-7285-45d9-868f-50f1fb3cc259.png","datePublished":"2026-11-25T01:14:47.599914+00:00","dateModified":"2026-11-25T01:14:47.599914+00:00","author":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"},"publisher":{"@type":"Organization","name":"乐哲软件","url":"https://www.lezhesoft.cn/"}}</script>
+<style>
+body{font-family:system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;margin:0;color:#1a1a1a;line-height:1.8}
+/* 内页导航（与首页方案B胶囊导航同款视觉） */
+header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #e8edf4;padding:10px 20px}
+.hd-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:0 0 auto}
+.hd-mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-weight:800;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.hd-brand{font-weight:800;font-size:1.02rem;color:#1c2333}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;background:#f2f5fa;border:1px solid #e5eaf2;border-radius:50px;padding:3px;margin:0 auto}
+.nav-links a{font-size:.86rem;font-weight:500;color:#41506b;text-decoration:none;padding:7px 15px;border-radius:50px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;transition:.15s}
+.nav-links a:hover{color:#1c2333;background:#fff}
+.nav-links a.active{background:#fff;color:#0088ff;font-weight:700;box-shadow:0 2px 8px rgba(15,26,46,.10)}
+.nav-links a.nav-ai{color:#41506b;font-weight:700;background-image:linear-gradient(135deg,#0077ff,#6c5ce7);background-repeat:no-repeat;background-size:0% 100%;background-position:left center;transition:background-size .3s,color .3s}
+.nav-links a.nav-ai:hover{background-size:100% 100%;color:#fff}
+.nav-links a.nav-ai.active{background-size:100% 100%;color:#fff}
+.hd-search{margin:0 0 0 auto;display:flex;gap:6px;flex:0 0 auto}
+.hd-search input{width:150px;padding:7px 11px;border:1px solid #e5eaf2;border-radius:8px;font-size:14px;outline:none;font-family:inherit;background:#f7f9fc;color:#1a1a1a}
+.hd-search input:focus{border-color:#0077ff;background:#fff}
+.hd-search button{padding:7px 13px;border:0;border-radius:8px;background:linear-gradient(135deg,#0077ff,#6c5ce7);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+/* 中屏：搜索收紧 */
+@media(max-width:1000px){.hd-search input{width:110px}.nav-links a{padding:6px 11px;font-size:.8rem}}
+/* 移动端：导航条变全宽横向滑动，搜索隐藏（进入搜索页用） */
+@media(max-width:768px){
+.hd-in{flex-wrap:wrap;gap:10px}
+.hd-search{display:none}
+.nav-links{order:3;width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;padding:3px;margin:0;-webkit-overflow-scrolling:touch}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{padding:7px 13px;font-size:.82rem}
+}
+@media(max-width:380px){.hd-brand{font-size:.92rem}.hd-mark{width:26px;height:26px;font-size:13px}}
+main{max-width:760px;margin:0 auto;padding:24px 20px}
+.meta{color:#666;font-size:14px;margin:6px 0 18px}.meta span{margin-right:14px}
+.btn{display:inline-block;background:#0077ff;color:#fff;padding:11px 28px;border-radius:8px;text-decoration:none;font-size:16px;margin:10px 0}
+.rel{margin-top:36px;border-top:1px solid #eee;padding-top:18px}
+.cta{margin-top:26px;padding:13px 16px;background:#f0f6ff;border:1px solid #d8e6ff;border-radius:9px;font-size:14px;line-height:1.9;color:#333}
+.cta a{color:#0077ff;text-decoration:none;font-weight:500}
+.rel a{display:inline-block;margin:0 10px 10px 0;color:#0077ff;text-decoration:none}
+article img{max-width:100%}
+footer{max-width:760px;margin:0 auto;padding:20px;color:#888;font-size:13px}
+footer a{color:#888}
+nav.crumb{font-size:13px;color:#999;margin-bottom:12px}nav.crumb a{color:#999;text-decoration:none}
+h1{font-size:24px;margin:8px 0}
+</style>
+</head>
+<body>
+<header>
+<div class="hd-in">
+<a class="hd-logo" href="https://www.lezhesoft.cn/"><span class="hd-mark">乐</span><span class="hd-brand">乐哲软件</span></a>
+<ul class="nav-links">
+<li><a href="https://www.lezhesoft.cn/">首页</a></li>
+<li><a href="https://www.lezhesoft.cn/all.html">软件库</a></li>
+<li><a href="https://www.lezhesoft.cn/ai/index.html" class="nav-ai">AI工具集</a></li>
+<li><a href="https://www.lezhesoft.cn/sitemap.html">搜索</a></li>
+</ul>
+<form class="hd-search" action="https://www.lezhesoft.cn/sitemap.html" method="get" role="search"><input type="search" name="q" placeholder="搜索软件" aria-label="搜索软件" autocomplete="off"><button type="submit">搜索</button></form>
+</div>
+<script>(function(){var p=location.pathname;document.querySelectorAll(".nav-links a").forEach(function(a){var h=a.pathname||a.getAttribute("href")||"";if(h.indexOf("/ai/")===0&&p.indexOf("/ai/")===0)a.classList.add("active");else if(h.indexOf("/all.html")===0&&(p.indexOf("/soft/")===0||p.indexOf("/cat/")===0))a.classList.add("active");else if((h==="/"||h==="/index.html")&&(p==="/"||p==="/index.html"))a.classList.add("active");});var f=document.querySelector(".hd-search input");if(f&&f.value===""){var q=new URLSearchParams(location.search).get("q");if(q)f.value=q;}})();</script>
+</header>
+<main>
+<nav class="crumb"><a href="https://www.lezhesoft.cn/">首页</a> / 压缩工具教程</nav>
+<h1>Keka使用教程：Mac解压rar/7z与压缩包密码处理</h1>
+<div class="meta"><span>发布：2026-11-25</span><span>分类：<a href="https://www.lezhesoft.cn/cat/yasuo-gongju.html">压缩工具</a></span></div>
+<img src="https://www.lezhesoft.cn/tutorial/cover/dae5bb93-7285-45d9-868f-50f1fb3cc259.png" alt="Keka使用教程：Mac解压rar/7z与压缩包密码处理封面图" width="1200" height="630" loading="eager" style="width:100%;max-width:760px;height:auto;border-radius:10px;margin:14px 0;box-shadow:0 2px 10px rgba(0,0,0,.08)">
+<article><h2>软件简介与适用场景</h2>
+<p>Keka 是 macOS 上一款免费好用的文件压缩与解压工具，常年排在 Mac 效率类工具推荐榜前列。它的特点是「平时不占地方，用时一拖就完」：把 Keka 放在 Dock 里，压缩和解压都只需要把文件拖到图标上，甚至不需要打开主窗口。常见适用场景包括：解压 Windows 同事发来的 rar、7z 压缩包；打包发送邮件附件前把大文件压小；给敏感文件上 AES-256 加密；把超过邮箱或网盘单文件限制的大文件分成多个分卷。它支持的解压格式超过 35 种，包括 7Z、ZIP、ZIPX、RAR、TAR、GZIP、BZIP2、XZ、DMG、ISO、EXE、CAB、MSI、APK、IPA、XIP 等；可创建的格式有 7Z、ZIP、TAR、GZIP、BZIP2、XZ、DMG、ISO、BROTLI、ZSTD、WIM 等。</p>
+<h2>安装步骤</h2>
+<p>1. 打开 Keka 官网（keka.io）或 Mac App Store，下载最新版安装包；官网还提供适配旧版 macOS 的历史版本。2. 双击 dmg 文件，把 Keka 拖入「应用程序」文件夹完成安装。3. 首次打开如果提示来自未知开发者，进入「系统设置 → 隐私与安全性」，点击「仍要打开」。4. 建议把 Keka 拖到 Dock 栏长期保留，之后压缩文件直接拖到 Dock 图标即可。5. 如果希望双击压缩包时默认用 Keka 解压，可以使用官网提供的默认应用设置小工具，或选中任意压缩包右键「显示简介 → 打开方式」选择 Keka 并点击「全部更改」。</p>
+<h2>核心功能操作要点</h2>
+<p>解压压缩包：把 rar、7z、zip 等压缩包直接拖到 Keka 窗口或 Dock 图标上，文件会解压到压缩包所在目录下的同名文件夹；多个压缩包可以一次性拖入批量处理。压缩文件：打开 Keka 主窗口，先选择格式与压缩等级，再把文件或文件夹拖进来；7z 格式压缩率最高，适合归档大文件。加密压缩：格式选 7z 时在密码框输入密码即使用 AES-256 加密；zip 则是 Zip 2.0 传统加密，兼容性好但强度较低。密码务必自己记牢，官方不提供找回途径。分卷压缩：勾选分卷选项并填写单卷大小（例如 100M、4.7G），压缩后会得到 .7z.001、.7z.002 这样的分卷文件。中文文件名乱码补救：Windows 下用 GBK 编码打包的压缩包，Keka 默认按 UTF-8 解析会出现乱码，打开「偏好设置 → 解压」，把文件名编码改为 GBK 后重新解压即可恢复，解完建议改回 UTF-8 以免影响其他压缩包。另外 Keka 出于跨平台考虑不支持创建 .exe 自解压包，需要发给 Windows 用户时建议用普通 7z 或 zip。</p>
+<h2>常见问题</h2>
+<p>问：解压带密码的压缩包怎么做？答：把加密压缩包拖入 Keka，会自动弹出密码输入框，输入正确密码即可开始解压；如果密码来自网页复制，注意开头结尾不要带多余空格，区分大小写。个别很老版本的 WinRAR 加密方式可能无法解开，需要打包方重新压缩。</p>
+<p>问：分卷压缩包只能解开第一个卷？答：这是正常现象。.7z.001/.002 或 part1/part2 的所有分卷必须放在同一个文件夹里，解压时只需解编号第一个（.001 或 part1），Keka 会自动识别并串联全部分卷，缺任何一个分卷都会报错。</p>
+<p>问：双击压缩包不是用 Keka 打开的？答：选中文件右键「显示简介 → 打开方式」，选择 Keka 并点击「全部更改」；或使用官网的默认应用辅助工具一键设置。安装后也可以在 Finder 的「服务」菜单里直接调用 Keka 的压缩和解压项。</p></article>
+<div class="cta"><strong>教程里的软件去哪下载？</strong>本站全部软件免费下载，注册登录后即可获取下载地址，完全免费，无需付费开通。<a href="https://www.lezhesoft.cn/">免费注册 →</a></div>
+<div class="rel"><strong>相关软件下载：</strong><br><a href="https://www.lezhesoft.cn/soft/mrt05wkthp9y.html">Keka 解压缩软件</a></div><div class="rel"><strong>相关教程：</strong><br><a href="https://www.lezhesoft.cn/tutorial/482d2fa9-582b-436f-91a9-646842b60e46.html">Adobe Illustrator使用教程：5个提效隐藏功能与快捷键</a><a href="https://www.lezhesoft.cn/tutorial/173d2052-60e4-424e-9abe-495fa45fd2f2.html">豆包电脑版使用教程：AI问答与实用功能入门</a><a href="https://www.lezhesoft.cn/tutorial/e6f54af7-4926-4574-a369-8c808f6a593a.html">Eagle使用教程：修图师素材库搭建与分类检索</a><a href="https://www.lezhesoft.cn/tutorial/b734102f-efe6-4faa-b199-a590cd7c0e1f.html">GIMP使用教程：从PS迁移必改的5个设置与基础修图流程</a><a href="https://www.lezhesoft.cn/tutorial/0ba942be-19fc-4482-9ad8-d1488b22e315.html">WorkBuddy使用教程：用AI把大纲变成一份可用PPT</a><a href="https://www.lezhesoft.cn/tutorial/6c50345d-1214-4d73-acbc-c665aab664c2.html">Parallels Desktop使用教程：在Mac上装Windows的正确流程</a></div>
+</main>
+<footer><a href="https://www.lezhesoft.cn/">乐哲软件官网</a> · © 2026 乐哲软件 lezhesoft.cn · <a href="https://www.lezhesoft.cn/ai/index.html">AI 工具</a> · <a href="https://www.lezhesoft.cn/sitemap.html">网站地图</a> · <a href="https://www.lezhesoft.cn/copyright.html">版权声明</a></footer>
+</body></html>
