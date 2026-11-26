@@ -10,6 +10,7 @@ import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { DESC_OVERRIDES, NAME_OVERRIDES, CATEGORY_OVERRIDES } from "./overrides.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const N = Number(process.argv[2]) || 10;
@@ -47,10 +48,20 @@ function parsePlan(md) {
   return rows;
 }
 
-const [softs, tutorials] = await Promise.all([
+const [softsRaw, tutorials] = await Promise.all([
   sb("software?select=id,name,category,description,views,downloads,platforms,version&limit=1000"),
   sb("tutorials?select=id,title&limit=500"),
 ]);
+
+// 与 generate.mjs 共用同一套展示层覆盖表：排期表里写的是「展示名」，
+// 库内个别记录仍是促销标题/薄分类，不套覆盖表就会把已在库的软件误判成「不在库」
+// （2026-11-17 Bandizip、2026-11-26 Driver Booster 均因此误报）。
+const softs = softsRaw.map((s) => ({
+  ...s,
+  name: NAME_OVERRIDES[s.id] || s.name,
+  category: CATEGORY_OVERRIDES[s.id] || s.category,
+  description: DESC_OVERRIDES[s.id] || s.description,
+}));
 
 const titles = tutorials.map((t) => t.title || "");
 const uncovered = softs.filter((s) => s.name && !titles.some((t) => t.includes(s.name)));
@@ -76,13 +87,13 @@ if (existsSync(planPath)) {
   if (pick) {
     const norm = (s) => (s || "").toLowerCase().replace(/\s+/g, "");
     const want = norm(pick.softName);
+    // 首词兜底要在「去空格之前」切，norm() 会把空格全删掉，
+    // 对 want 再 split(/\s/) 永远只有一项（2026-11-26 修：原写法等于没兜底）
+    const head = norm(String(pick.softName || "").split(/[\s\-—_,、，]+/).filter(Boolean)[0] || "");
     const hit =
       softs.find((s) => norm(s.name) === want) ||
       softs.find((s) => want.includes(norm(s.name)) || norm(s.name).includes(want)) ||
-      softs.find((s) => {
-        const head = want.split(/[ -]/)[0];
-        return head.length >= 3 && norm(s.name).includes(head);
-      }) ||
+      softs.find((s) => head.length >= 3 && norm(s.name).includes(head)) ||
       null;
     xhsSync = {
       planned_date: pick.date,

@@ -403,6 +403,8 @@ host-resolver。原因：本机开着系统代理，Chrome 会把 `www.lezhesoft
 - [x] 统计「零第三方」（2026-10-31：前端已改成三层取值 —— ①自家 Supabase `site_hit/site_get` ②abacus 兜底 ③localStorage 上次值；自家通道探测失败后本会话不再重试。SQL 见 `seo/site-stats.sql`）
 - [x] Supabase 建表 + RPC（2026-10-31 已执行：`site_stats` 表 + `site_hit/site_get`；表无 policy、anon 直接 select 返回空数组，只能走函数。实测预检 200、自增正常、非法 key 返回 P0001。线上端到端验证：3 个请求全打自家 RPC，abacus 零调用。自检命令 `node seo/stat-check.mjs`）
 - [x] AI 工具集板块（/ai/）上线收尾（2026-11-02 已上线，commit aeebb22e）：站长需执行 seo/ai-schema.sql 末尾的升级段（logo/slug/intro/screenshots 五个 ALTER），再到 admin.html「🤖AI工具集」上传工具集与工具（支持封面图URL、详细介绍、多张截图；无封面自动生成字母封面）
+- [x] **选题器误判「排期软件不在库」（2026-11-26 修复）**：`tutorial-pick.mjs` 只按库内原始 `name` 匹配排期表的展示名，而个别记录源名是促销文案（Driver Booster 源名「电脑驱动更新工具 …，限时 7 折特惠快入手！」、展示名由 `NAME_OVERRIDES` 覆盖），于是 `matched_software` 判成 null，按规则会「换一款同方向软件」→ 排期与小红书脱钩。同类误报 11-17 Bandizip 也出现过。改法：①覆盖表抽到 `seo/overrides.mjs`，`generate.mjs` 与 `tutorial-pick.mjs` 共用同一套 NAME/CATEGORY/DESC 覆盖；②顺带修掉「首词兜底」死代码——原写法对已去掉空格的 `want` 再 `split(/[ -]/)` 永远只有一项（等于没兜底），改为在原始字符串上切。验证：当日排期行 `matched_software` 由 null → 847f51b9（展示名/分类/描述均正确）；重构后 `generate.mjs` 产物与重构前逐文件 md5 全等（0 diff）。
+- [ ] 教程覆盖判定口径偏严（小项）：`uncovered` / `has_tutorial` 用「教程标题包含完整软件名」，而教程标题习惯写短品牌名（「Driver Booster使用教程：…」），带中文长后缀的软件名永远判为未覆盖（今日 Driver Booster 写入后 `has_tutorial` 仍为 false，候选池里也仍会出现）。可参照 11-12 的 `aliasesOf()` 用「拉丁词前两词」做别名兜底，需先抽检防误配。
 
 ## ⛔ 用户明确禁改项（2026-11-04，优化时不得违反）
 - AI 工具集列表页（/ai/ 首页与所有页面）**禁止出现任何描述导语/段落**：hub 标题下不加 lead 段、每个分区标题下不加「本方向共收录…」之类导语。薄内容问题靠分类页的对比表与选择建议解决，不要往列表页加字。

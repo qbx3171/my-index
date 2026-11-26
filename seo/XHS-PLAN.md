@@ -36,7 +36,7 @@
 | 17 | 2026-11-23 | 一 | 实测豆包电脑版：免装App的AI助手 | AI实测 | 豆包电脑版 - 智能AI助手,随时唤起,高效提问 | 豆包电脑版使用教程：AI问答与实用功能入门 | 已写 2026-11-23 · 173d2052 |
 | 18 | 2026-11-24 | 二 | XMind这样用，思维导图快3倍 | 隐藏技巧 | XMind Pro 专业思维导图脑图软件 1年订阅 | XMind使用教程：思维导图快捷键与结构技巧 | 已写 2026-11-24 · ead9cc1b |
 | 19 | 2026-11-25 | 三 | Mac解压rar其实很简单 | Mac | Keka 解压缩软件 | Keka使用教程：Mac解压rar/7z与压缩包密码处理 | 已写 2026-11-25 · dae5bb93 |
-| 20 | 2026-11-26 | 四 | 驱动别乱更！这些坑要避开 | 避坑 | Driver Booster 13 Pro 驱动更新工具 | Driver Booster使用教程：驱动更新与回滚避坑 | 待写 |
+| 20 | 2026-11-26 | 四 | 驱动别乱更！这些坑要避开 | 避坑 | Driver Booster 13 Pro 驱动更新工具 | Driver Booster使用教程：驱动更新与回滚避坑 | 已写 2026-11-26 · af0c830b |
 | 21 | 2026-11-27 | 五 | 素材库用半年，我只靠这套标签流 | 人设 | Eagle  图像管理查看（Mac版） | Eagle使用教程：智能文件夹与自动标签工作流 | 待写 |
 
 ## 三、7 天方向轮换模板（表用尽时按此续排）
@@ -55,14 +55,14 @@
 
 | 方向 | 可用软件（✓已有教程 / ✗尚无） |
 |---|---|
-| 修图/图像 | GIMP ✗ · Photon Studio ✗ · Eagle ✗ · Capture One ✗ · CorelDRAW ✗ · Figma EX ✗ · Sketch ✗ · Adobe Illustrator ✗ · Adobe Photoshop ✓（入门）· 2345看图王 ✓ |
-| 办公 | WPS ✗ · 微软Office 2021 ✗ · XMind ✗ · PDF-XChange Editor ✗ · 微软Office 2024 ✗ |
-| 媒体/剪辑 | DaVinci Resolve ✗ · 万兴优转 ✗ · Wondershare Filmora ✗ · Permute 4（Mac）✗ · PotPlayer ✗ · Topaz Video AI ✗ |
-| 实用/清理 | Everything ✗ · Geek Uninstaller ✓ · Driver Booster ✗ · PDF-XChange ✗ · Total Uninstall ✓ · CleanMyMac ✓ · AdGuard ✓ · AnyDesk ✓ · 傲梅轻松备份 ✓ |
-| 压缩 | Keka ✗ · Bandizip ✗ · 7-Zip ✗ · WinRAR ✗ |
+| 修图/图像 | GIMP ✓ · Photon Studio ✓ · Eagle ✓ · Capture One ✗ · CorelDRAW ✗ · Figma EX ✗ · Sketch ✗ · Adobe Illustrator ✓ · Adobe Photoshop ✓（入门）· 2345看图王 ✓ |
+| 办公 | WPS ✓ · 微软Office 2021 ✗ · XMind ✓ · PDF-XChange Editor ✗ · 微软Office 2024 ✗ |
+| 媒体/剪辑 | DaVinci Resolve ✗ · 万兴优转 ✗ · Wondershare Filmora ✗ · Permute 4（Mac）✗ · PotPlayer ✓ · Topaz Video AI ✗ |
+| 实用/清理 | Everything ✗ · Geek Uninstaller ✓ · Driver Booster ✓ · PDF-XChange ✗ · Total Uninstall ✓ · CleanMyMac ✓ · AdGuard ✓ · AnyDesk ✓ · 傲梅轻松备份 ✓ |
+| 压缩 | Keka ✓ · Bandizip ✓ · 7-Zip ✗ · WinRAR ✗ |
 | 三维 | Autodesk Maya ✗ · Rhino ✗ · Autodesk CAD ✗ · SketchUp ✗ · 3ds Max ✗ · 中望CAD ✗ |
-| AI/开发 | WorkBuddy ✗ · 豆包电脑版 ✗ · JetBrains PyCharm ✗ |
-| Mac 专属 | App Cleaner & Uninstaller ✗ · Parallels Desktop ✗ · VMware Fusion ✗ · MuMuPlayer ✗ · Permute 4 ✗ · Keka ✗ · Eagle ✗ · Capture One ✗ |
+| AI/开发 | WorkBuddy ✓ · 豆包电脑版 ✓ · JetBrains PyCharm ✗ |
+| Mac 专属 | App Cleaner & Uninstaller ✓ · Parallels Desktop ✓ · VMware Fusion ✗ · MuMuPlayer ✗ · Permute 4 ✗ · Keka ✓ · Eagle ✓ · Capture One ✗ |
 | 系统 | Windows 11 24H2 ✗ · Windows 10 22H2 ✗ |
 
 ## 五、周复盘回写（每周日）
@@ -73,3 +73,4 @@
 
 - 2026-11-06 建立：首版 14 天（11-07 ~ 11-20），与小红书已交付的一周 7 篇对齐，后 7 天按同方向延伸；同步规则写入每日巡检自动化 B1。
 - 2026-11-20 续排：第 15~21 行（11-21 ~ 11-27）按 7 天方向轮换模板生成，选题软件均经 software 表核实存在（含 Keka 补 11-11 跳过行、Everything 补 11-15 跳过行的同题重排）；Driver Booster 选题用展示覆盖名。
+- 2026-11-26 软件池标记复核：按现状（26 篇教程中 23 篇为软件教程）把已覆盖的 13 款改标 ✓；同日修 seo/tutorial-pick.mjs 未套用展示名覆盖表、导致排期软件误判「不在库」的问题（Driver Booster / Bandizip 同类），覆盖表已抽到 seo/overrides.mjs 与 generate.mjs 共用。

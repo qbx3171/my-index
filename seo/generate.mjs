@@ -21,6 +21,7 @@ import {
 } from "./render.js";
 import { ensureCovers } from "./cover.mjs";
 import { buildAiSection } from "./ai-section.mjs";
+import { DESC_OVERRIDES, NAME_OVERRIDES, CATEGORY_OVERRIDES } from "./overrides.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -161,6 +162,9 @@ const tutorials = applyFixups(await sb("tutorials?select=*&limit=500"));
 // （6058916d / c298b689 的存储层数据已于 2026-11-03 经服务端探测确认干净，
 //   残留 FFD 纯属传输噪声，母本用于中和传输层损坏，不是源数据损坏。）
 const DATA_MASTERS = [
+  // Driver Booster 教程（2026-11-26 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "af0c830b-366a-4b7c-8353-bb967afedb24", field: "content", file: "content-master-af0c830b.txt" },
+  { table: "tutorials", id: "af0c830b-366a-4b7c-8353-bb967afedb24", field: "summary", file: "summary-master-af0c830b.txt" },
   // Keka 教程（2026-11-25 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "dae5bb93-7285-45d9-868f-50f1fb3cc259", field: "content", file: "content-master-dae5bb93.txt" },
   { table: "tutorials", id: "dae5bb93-7285-45d9-868f-50f1fb3cc259", field: "summary", file: "summary-master-dae5bb93.txt" },
@@ -263,16 +267,8 @@ for (const m of DATA_MASTERS) {
     console.log(`传输乱码 ${HEALING_LEFTOVER.length} 处，已全部由母本兜底覆盖 ✓`);
   }
 }
-// 描述定点重写：个别记录源描述含采集噪声且过短（触发薄内容/描述告警），用真实信息整体重写
-const DESC_OVERRIDES = {
-  // Keka 解压缩软件：源描述为「一款Mac上好用又免费的文件解压缩软件软件详情：提取码：x13i」，
-  // 含提取码噪声且正文仅 265 字，按软件公开功能重写
-  mrt05wkthp9y:
-    "Keka 是 macOS 平台免费好用的解压缩工具，支持 7z、Zip、Tar、Gzip 等常见压缩格式的创建与解压，也可解压 RAR 分卷压缩包，支持设置密码保护与分卷压缩，把文件拖到程序图标即可开始处理，适合日常压缩传输与接收解压场景。",
-  // Driver Booster：源描述是「新设备无法正常使用？…」营销问答体，按软件公开功能重写为事实性描述
-  "847f51b9ebfb78661faf5bde":
-    "Driver Booster 13 Pro 是 IObit 出品的 Windows 驱动更新工具，可自动扫描显卡、声卡、网卡、主板等硬件的过时或缺失驱动并一键更新，支持驱动备份与还原、离线驱动包安装，适合系统更新后出现无声、断网、蓝屏或游戏卡顿的设备快速排查修复。",
-};
+// 描述 / 名称 / 分类定点重写：表在 ./overrides.mjs（与 tutorial-pick.mjs 共用，
+// 保证「选题器看到的软件名」和「站点展示名」是同一个）
 for (const [id, desc] of Object.entries(DESC_OVERRIDES)) {
   const row = softs.find((s) => s.id === id);
   if (row) {
@@ -281,18 +277,6 @@ for (const [id, desc] of Object.entries(DESC_OVERRIDES)) {
   }
 }
 
-// 标题/分类定点重写（2026-11-02）：软件表对 anon key 只开了 SELECT，
-// PATCH 返回 204 但 0 行受影响，后台改不动，只能在生成层改写。
-// 待有后台/服务端权限时改数据库并删除这里的条目，避免两处维护不一致。
-const NAME_OVERRIDES = {
-  // 源名称是促销文案「电脑驱动更新工具 Driver Booster 13 Pro，限时 7 折特惠快入手！」，
-  // 会被直接当成 SERP 标题展示，属低质信号；版本字段里也有品牌名，去掉促销词后由标题模板自动省略版本号
-  "847f51b9ebfb78661faf5bde": "Driver Booster 13 Pro 驱动更新工具",
-};
-const CATEGORY_OVERRIDES = {
-  // 原分类「驱动管理」只有这 1 条记录，生成的是 1 条目的薄分类页（入链仅 2）
-  "847f51b9ebfb78661faf5bde": "实用工具",
-};
 for (const [id, name] of Object.entries(NAME_OVERRIDES)) {
   const row = softs.find((s) => s.id === id);
   if (row) {
