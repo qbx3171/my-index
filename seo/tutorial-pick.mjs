@@ -11,6 +11,10 @@ import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DESC_OVERRIDES, NAME_OVERRIDES, CATEGORY_OVERRIDES } from "./overrides.mjs";
+// 2026-11-27：覆盖判定改用别名集（与 generate.mjs 互链同一套 ./aliases.mjs）。
+// 原来只认「教程标题包含完整软件名」，而教程标题习惯写短品牌名，带中文长后缀的软件名永远判为未覆盖
+// → 候选池里反复出现已经写过教程的软件。改后与「页面实际互链」口径一致。
+import { norm, aliasesOf } from "./aliases.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const N = Number(process.argv[2]) || 10;
@@ -64,7 +68,20 @@ const softs = softsRaw.map((s) => ({
 }));
 
 const titles = tutorials.map((t) => t.title || "");
-const uncovered = softs.filter((s) => s.name && !titles.some((t) => t.includes(s.name)));
+const tutTitles = titles.map((t) => ({ t, n: norm(t) }));
+/** 该软件名是否已被某篇教程覆盖（别名集命中即算，完整名命中优先） */
+const coverOf = (name) => {
+  const al = aliasesOf(name);
+  if (!al.length) return [];
+  return tutTitles.filter(({ n }) => al.some((x) => n.includes(x.a))).map((x) => x.t);
+};
+const uncovered = softs.filter((s) => s.name && coverOf(s.name).length === 0);
+// 诊断用：REPORT=1 时把「新口径下已覆盖」的软件打到 stderr，便于抽检是否误配
+if (process.env.REPORT === "1") {
+  const newly = softs.filter((s) => s.name && !titles.some((t) => t.includes(s.name)) && coverOf(s.name).length);
+  console.error(`[report] 别名口径新增判为已覆盖 ${newly.length} 款：`);
+  for (const s of newly) console.error(`  ${s.name}  ←  ${coverOf(s.name).join(" / ")}`);
+}
 
 const catSize = new Map();
 for (const s of softs) catSize.set(s.category, (catSize.get(s.category) || 0) + 1);
@@ -112,7 +129,7 @@ if (existsSync(planPath)) {
             version: hit.version,
             platforms: hit.platforms,
             description: (hit.description || "").slice(0, 160),
-            has_tutorial: titles.some((t) => t.includes(hit.name)),
+            has_tutorial: coverOf(hit.name).length > 0,
           }
         : null,
       action: hit

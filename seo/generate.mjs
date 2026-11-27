@@ -22,6 +22,8 @@ import {
 import { ensureCovers } from "./cover.mjs";
 import { buildAiSection } from "./ai-section.mjs";
 import { DESC_OVERRIDES, NAME_OVERRIDES, CATEGORY_OVERRIDES } from "./overrides.mjs";
+// 互链别名集抽到 ./aliases.mjs（2026-11-27），与 tutorial-pick.mjs 共用同一套判定
+import { norm, aliasesOf } from "./aliases.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -162,6 +164,9 @@ const tutorials = applyFixups(await sb("tutorials?select=*&limit=500"));
 // （6058916d / c298b689 的存储层数据已于 2026-11-03 经服务端探测确认干净，
 //   残留 FFD 纯属传输噪声，母本用于中和传输层损坏，不是源数据损坏。）
 const DATA_MASTERS = [
+  // Eagle 智能文件夹教程（2026-11-27 新增）：长中文正文传输易损坏，母本兜底
+  { table: "tutorials", id: "2e65ff7f-cdde-46e8-b366-821fe9577416", field: "content", file: "content-master-2e65ff7f.txt" },
+  { table: "tutorials", id: "2e65ff7f-cdde-46e8-b366-821fe9577416", field: "summary", file: "summary-master-2e65ff7f.txt" },
   // Driver Booster 教程（2026-11-26 新增）：长中文正文传输易损坏，母本兜底
   { table: "tutorials", id: "af0c830b-366a-4b7c-8353-bb967afedb24", field: "content", file: "content-master-af0c830b.txt" },
   { table: "tutorials", id: "af0c830b-366a-4b7c-8353-bb967afedb24", field: "summary", file: "summary-master-af0c830b.txt" },
@@ -393,52 +398,7 @@ const pickRelated = (s) => {
   for (let i = 1; i <= REL_N; i += 1) out.push(list[(idx + i) % list.length]);
   return out;
 };
-// 教程 ↔ 软件 互链：教程标题里出现软件名（去空格、忽略大小写，长度≥3）即视为同一主题。
-// 2026-11-09 优化：原来只认「完整软件名」，但库里软件名多带中文后缀（如「Photon Studio 图片编辑软件」
-// 「CleanMyMac 苹果电脑清理工具软件」），教程标题写的是「Photon Studio使用教程：…」，永远匹配不上——
-// 13 篇教程只命中 4 篇。改为「别名集」匹配：完整名 + 开头连续拉丁/数字段（≥4 位）+ 开头连续中文段（≥3 位），
-// 命中任一即算，完整名命中优先。匹配不到时区块整段不渲染，不会出现空壳。
-const norm = (s) => String(s || "").toLowerCase().replace(/\s+/g, "");
-const aliasCache = new Map();
-function aliasesOf(name) {
-  const key = norm(name);
-  if (aliasCache.has(key)) return aliasCache.get(key);
-  const out = [];
-  if (key.length >= 3) out.push({ a: key, full: true });
-  const latin = key.match(/^[a-z0-9][a-z0-9.+#&_-]*/);
-  if (latin && latin[0].length >= 4) {
-    out.push({ a: latin[0], full: false });
-    // 软件名常带版本号（Total Uninstall 2026 / Adobe Creative Cloud 2025），教程标题一般不带，去掉尾数字再试一次
-    const noVer = latin[0].replace(/[0-9._-]+$/, "");
-    if (noVer.length >= 4 && noVer !== latin[0]) out.push({ a: noVer, full: false });
-  }
-  // 2026-11-16：3 位全大写缩写（WPS / PDF / CAD）被上面的「≥4 位」规则漏掉，
-  // 导致「WPS Office使用教程」与「WPS电信定制版…」双向不互链。只认「全大写 3 位 + 后面不是字母数字」，
-  // 避免把小写短词当别名；实测全站影响面 = 新增 1 对（WPS），无误配。
-  if (!(latin && latin[0].length >= 4)) {
-    const acro = String(name || "").match(/^([A-Z0-9]{3})(?![A-Za-z0-9])/);
-    if (acro) out.push({ a: acro[1].toLowerCase(), full: false });
-  }
-  const cn = key.match(/^[\u4e00-\u9fa5]{3,}/);
-  if (cn && cn[0] !== key) out.push({ a: cn[0], full: false });
-  // 2026-11-12：norm() 去空格会把相邻拉丁词粘成一整段。软件名里拉丁词重复出现时
-  // （「Geek Uninstaller Geek卸载工具」→ geekuninstallergeek），与教程标题里的
-  // 「Geek Uninstaller」永远匹配不上。改按原串（中文之前的拉丁前缀）取前两个词作别名，
-  // 只用两词前缀、不用单词，避免「adobe」这类泛词把不相关页面拉进来。
-  const head = String(name || "").split(/[\u4e00-\u9fa5]/)[0];
-  const words = head
-    .split(/\s+/)
-    .map((w) => w.replace(/^[^A-Za-z0-9]+/, "").replace(/[^A-Za-z0-9.+#&_-]+$/, ""))
-    .filter(Boolean);
-  if (words.length >= 2) {
-    const two = norm(words.slice(0, 2).join(" "));
-    if (two.length >= 5 && two !== key && !out.some((x) => x.a === two)) out.push({ a: two, full: false });
-  }
-  // 长别名优先，避免短别名先把不相关页面拉进来
-  out.sort((x, y) => (y.full ? 1 : 0) - (x.full ? 1 : 0) || y.a.length - x.a.length);
-  aliasCache.set(key, out);
-  return out;
-}
+// 教程 ↔ 软件 互链：别名集见 ./aliases.mjs（2026-11-27 抽出，逻辑逐字未改）
 const tutBySoft = new Map();
 for (const s of softs) {
   const al = aliasesOf(s.name);
